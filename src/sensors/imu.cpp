@@ -10,10 +10,9 @@ namespace IMU {
 
         IntervalControl imuInterval; 
 
-        MPU9250FIFO imuTest(SPI, 3);
+        MPU9250FIFO imuTest(SPI, imuNCS);
 
     }
-
 
     DeviceStatus imuStatus = DeviceStatus::DEVICE_NOT_STARTED; 
 

@@ -122,14 +122,6 @@ class Quaternion {
          */
         void getAxisAngle(Vector *axis, float *angle) {
 
-            angle /= 2.0f;
-            float sa = sinf(angle);
-            
-            w = cosf(angle);
-            x = axis.x*sa;
-            y = axis.y*sa;
-            z = axis.z*sa;
-
             axis->x = this->x;
             axis->y = this->y;
             axis->z = this->z;

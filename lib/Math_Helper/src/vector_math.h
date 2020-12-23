@@ -171,6 +171,28 @@ class Vector {
         }
 
         /**
+         * Vector equals.
+         * True is all components are equal
+         *
+         * @param values none.
+         * @return bool.
+         */
+        bool operator == (Vector b) {
+            return x==b.x && y==b.y && z==b.z;
+        }
+
+        /**
+         * Vector not equals.
+         * true if any component not equal
+         *
+         * @param values none.
+         * @return bool.
+         */
+        bool operator != (Vector b) {
+            return !(x==b.x && y==b.y && z==b.z);
+        }
+
+        /**
          * Computes cross multiplication of 2 vectors.
          * 
          *

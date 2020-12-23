@@ -87,7 +87,7 @@ public:
      */
     void waitTillNextRun() {
 
-        while(micros() - _lastRun_us < _interval_us);
+        while(micros() - _lastRun_us < _interval_us || _block);
         
         if (_limit) _lastRun_us = micros();
         else _lastRun_us += _interval_us;
@@ -103,7 +103,7 @@ public:
      */
     void waitTillNextRun(void (*callMethod)(void)) {
 
-        while(micros() - _lastRun_us < _interval_us) callMethod();
+        while(micros() - _lastRun_us < _interval_us || _block) callMethod();
         
         if (_limit) _lastRun_us = micros();
         else _lastRun_us += _interval_us;
@@ -127,6 +127,8 @@ public:
      * @return none.
      */
     bool isTimeToRun(bool updateClock = true) {
+
+        if (_block) return false;
         
         if (micros() - _lastRun_us >= _interval_us) {
             if (!_limit && updateClock) _lastRun_us +=_interval_us;
@@ -136,6 +138,20 @@ public:
 
     }
 
+    /**
+     * If block is enabled then .isTimeToRun() will
+     * always return false and .waitTillNextRun() will
+     * never exit. This can be undone by calling the 
+     * method and giving false as a parameter.
+     *
+     * @param values block
+     * @return none.
+     */
+    void block(bool block) {
+        _block = block;
+    }
+
+
 private:
 
     uint32_t _lastRun_us = 0;
@@ -143,6 +159,8 @@ private:
     uint32_t _interval_us = 0;
 
     bool _limit = true;
+
+    bool _block = false;
 
 };
 

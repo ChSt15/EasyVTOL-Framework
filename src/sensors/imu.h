@@ -15,6 +15,8 @@
 
 namespace IMU {
 
+    extern volatile uint32_t counter;
+
     void imuThread();
     
 } 

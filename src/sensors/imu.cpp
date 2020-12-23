@@ -16,6 +16,8 @@ namespace IMU {
 
     DeviceStatus imuStatus = DeviceStatus::DEVICE_NOT_STARTED; 
 
+    volatile uint32_t counter = 0;
+
 }
 
 
@@ -23,14 +25,17 @@ void IMU::imuThread() {
 
     if (!imuInterval.isTimeToRun()) return; 
 
+    counter++;
 
-    if (imuStatus == DeviceStatus::DEVICE_RUNNNIG) {
+
+    if (imuStatus == DeviceStatus::DEVICE_RUNNING) {
 
 
 
     } else if (imuStatus == DEVICE_NOT_STARTED) {
 
         imuInterval.setRate(32000);
+        imuStatus = DeviceStatus::DEVICE_RUNNING;
 
     } else if (imuStatus == DeviceStatus::DEVICE_FAILURE) {
 

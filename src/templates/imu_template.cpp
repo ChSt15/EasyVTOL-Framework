@@ -26,7 +26,7 @@ void IMUTemplate::imuThread() { //This is public because it was declare in the i
     if (!imuInterval.isTimeToRun()) return; //This limits the rate the thread will run at to save time. By default the rate is infinite until the code below resticts it (pls do this).
 
 
-    if (imuStatus == DeviceStatus::DEVICE_RUNNNIG) {
+    if (imuStatus == DeviceStatus::DEVICE_RUNNING) {
 
         /*
          * Here is where all the code goes for running the device, checking for error etc.

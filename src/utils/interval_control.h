@@ -12,6 +12,11 @@ public:
         _lastRun_us = micros();
     }
 
+    IntervalControl(uint32_t rate) {
+        _lastRun_us = micros();
+        if (rate != 0) setRate(rate);
+    }
+
     /**
      * Sets the rate in Hz
      *

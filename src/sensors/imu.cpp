@@ -8,7 +8,9 @@ namespace IMU {
         const int imuNCS = 3;
         const int imuInt = 2;
 
-        IntervalControl imuInterval; 
+        IntervalControl imuInterval(32000); 
+        IntervalControl rateCalcInterval(1); 
+
 
         MPU9250FIFO imuTest(SPI, imuNCS);
 
@@ -16,7 +18,9 @@ namespace IMU {
 
     DeviceStatus imuStatus = DeviceStatus::DEVICE_NOT_STARTED; 
 
-    volatile uint32_t counter = 0;
+    uint32_t rate = 0;
+    uint32_t loopCounter = 0;
+
 
 }
 
@@ -25,7 +29,7 @@ void IMU::imuThread() {
 
     if (!imuInterval.isTimeToRun()) return; 
 
-    counter++;
+    loopCounter++;
 
 
     if (imuStatus == DeviceStatus::DEVICE_RUNNING) {
@@ -34,7 +38,6 @@ void IMU::imuThread() {
 
     } else if (imuStatus == DEVICE_NOT_STARTED) {
 
-        imuInterval.setRate(32000);
         imuStatus = DeviceStatus::DEVICE_RUNNING;
 
     } else if (imuStatus == DeviceStatus::DEVICE_FAILURE) {
@@ -43,6 +46,18 @@ void IMU::imuThread() {
 
     }
 
+
+
+    if (rateCalcInterval.isTimeToRun()) {
+        rate = loopCounter;
+        loopCounter = 0;
+    }
+
+}
+
+
+uint32_t IMU::getRate() {
+    return rate;
 }
 
 

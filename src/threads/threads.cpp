@@ -87,11 +87,9 @@ void threadControl() {
         #ifdef PRINT_THREAD_USAGE
             Serial.println("Total CPU usage: " + String(cpuUsage) + "%");
             Serial.println("Idle Thread: " + String(idleThreadCount*100/totalCount) + "%");
-            Serial.println("IMU Rate: " + String(IMU::counter));
+            Serial.println("IMU Rate: " + String(IMU::getRate()));
             Serial.println();
         #endif
-
-        IMU::counter = 0;
 
     }
 

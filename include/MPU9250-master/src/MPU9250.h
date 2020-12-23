@@ -51,6 +51,12 @@ class MPU9250{
       DLPF_BANDWIDTH_10HZ,
       DLPF_BANDWIDTH_5HZ
     };
+    enum HighspeedRate
+    {
+      RATE_1KHZ,
+      RATE_8KHZ,
+      RATE_32KHZ
+    };
     enum LpAccelOdr
     {
       LP_ACCEL_ODR_0_24HZ = 0,
@@ -72,6 +78,7 @@ class MPU9250{
     int setAccelRange(AccelRange range);
     int setGyroRange(GyroRange range);
     int setDlpfBandwidth(DlpfBandwidth bandwidth);
+    //int setHighspeedRate(HighspeedRate rate);
     int setSrd(uint8_t srd);
     int enableDataReadyInterrupt();
     int disableDataReadyInterrupt();
@@ -256,6 +263,7 @@ class MPU9250{
     const uint8_t FIFO_MAG = 0x01;
     const uint8_t FIFO_COUNT = 0x72;
     const uint8_t FIFO_READ = 0x74;
+    const uint16_t FIFO_MAX = 512;
     // AK8963 registers
     const uint8_t AK8963_I2C_ADDR = 0x0C;
     const uint8_t AK8963_HXL = 0x03; 
@@ -282,6 +290,8 @@ class MPU9250FIFO: public MPU9250 {
     using MPU9250::MPU9250;
     int enableFifo(bool accel,bool gyro,bool mag,bool temp);
     int readFifo();
+    int getFifoSize();
+    int resetFifo();
     void getFifoAccelX_mss(size_t *size,float* data);
     void getFifoAccelY_mss(size_t *size,float* data);
     void getFifoAccelZ_mss(size_t *size,float* data);

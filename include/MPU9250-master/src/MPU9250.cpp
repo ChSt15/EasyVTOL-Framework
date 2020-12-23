@@ -154,10 +154,6 @@ int MPU9250::begin(){
   }       
   // instruct the MPU9250 to get 7 bytes of data from the AK8963 at the sample rate
   readAK8963Registers(AK8963_HXL,7,_buffer);
-  // estimate gyro bias
-  if (calibrateGyro() < 0) {
-    return -20;
-  }
   // successful init, return 1
   return 1;
 }
@@ -515,17 +511,37 @@ float MPU9250::getTemperature_C() {
   return _t;
 }
 
+/* returns amount of bytes in FIFO */
+int MPU9250FIFO::getFifoSize() {
+  // get the fifo size
+  if (readRegisters(FIFO_COUNT, 2, _buffer) < 0) {
+    return 0;
+  }
+  _fifoSize = (((uint16_t) (_buffer[0]&0x0F)) <<8) + (((uint16_t) _buffer[1]));
+  return _fifoSize;
+}
+
+/* remove all byte in FIFO */
+int MPU9250FIFO::resetFifo() {
+    getFifoSize();
+    return readRegisters(FIFO_READ,_fifoSize,_buffer);
+}
+
 /* reads data from the MPU9250 FIFO and stores in buffer */
 int MPU9250FIFO::readFifo() {
   _useSPIHS = true; // use the high speed SPI for data readout
-  // get the fifo size
-  readRegisters(FIFO_COUNT, 2, _buffer);
-  _fifoSize = (((uint16_t) (_buffer[0]&0x0F)) <<8) + (((uint16_t) _buffer[1]));
+  //Get fifo size
+  if (getFifoSize() < 0) return -1;
+  //Check for FIFO overflow
+  if (_fifoSize >= FIFO_MAX) {
+      resetFifo();
+      return -2;
+  }
   // read and parse the buffer
   for (size_t i=0; i < _fifoSize/_fifoFrameSize; i++) {
     // grab the data from the MPU9250
     if (readRegisters(FIFO_READ,_fifoFrameSize,_buffer) < 0) {
-      return -1;
+      return -3;
     }
     if (_enFifoAccel) {
       // combine into 16 bit values

@@ -5,7 +5,12 @@ namespace IMU {
 
     namespace {
 
+        const int imuNCS = 3;
+        const int imuInt = 2;
+
         IntervalControl imuInterval; 
+
+        MPU9250FIFO imuTest(SPI, 3);
 
     }
 
@@ -26,7 +31,7 @@ void IMU::imuThread() {
 
     } else if (imuStatus == DEVICE_NOT_STARTED) {
 
-        imuInterval.setRate(1000);
+        imuInterval.setRate(32000);
 
     } else if (imuStatus == DeviceStatus::DEVICE_FAILURE) {
 

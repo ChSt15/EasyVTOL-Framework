@@ -1,5 +1,5 @@
-#ifndef IMU_H
-#define IMU_H
+#ifndef IMU_TEMPLATE_H
+#define IMU_TEMPLATE_H
 /*
  *
  * This is a template to help with programming devices. This is based off of the imu Sensor.
@@ -31,7 +31,7 @@
 
 
 
-namespace IMU {
+namespace IMUTemplate {
 
     /*
      * All public methods must be first declared here

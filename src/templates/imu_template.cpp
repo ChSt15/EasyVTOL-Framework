@@ -1,7 +1,7 @@
-#include "imu.h"
+#include "imu_template.h"
 
 
-namespace IMU {
+namespace IMUTemplate {
 
     namespace {
 
@@ -21,7 +21,7 @@ namespace IMU {
 }
 
 
-void IMU::imuThread() { //This is public because it was declare in the imu.h file
+void IMUTemplate::imuThread() { //This is public because it was declare in the imu.h file
 
     if (!imuInterval.isTimeToRun()) return; //This limits the rate the thread will run at to save time. By default the rate is infinite until the code below resticts it (pls do this).
 

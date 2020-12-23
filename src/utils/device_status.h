@@ -8,7 +8,7 @@ enum DeviceStatus {
     DEVICE_CALIBRATING,
     DEVICE_RUNNNIG,
     DEVICE_FAILURE
-}
+};
 
 
 

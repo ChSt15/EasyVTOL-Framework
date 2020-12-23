@@ -106,7 +106,7 @@ void thread0() {
 
     while(1) {
 
-
+        IMU::imuThread();
 
         threadCounter[0]++;
         threads.yield();

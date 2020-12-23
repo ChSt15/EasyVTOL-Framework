@@ -6,6 +6,8 @@
 
 #include "definitions.h"
 
+#include "sensors/imu.h"
+
 #include "utils/interval_control.h"
 
 

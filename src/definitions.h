@@ -2,15 +2,22 @@
 #define DEFINITIONS_H
 
 //##### Thread Settings #####
-#define TIMESLICE_US 125
+#define THREADS_TICK_US 10
 #define THREAD0_ACTIVE true
-#define THREAD1_ACTIVE false
-#define THREAD2_ACTIVE false
-#define THREAD3_ACTIVE false
-#define THREAD4_ACTIVE false
-#define THREAD5_ACTIVE false
-#define THREAD6_ACTIVE false
-#define THREAD7_ACTIVE false
+#define THREAD1_ACTIVE true
+#define THREAD2_ACTIVE true
+#define THREAD3_ACTIVE true
+#define THREAD4_ACTIVE true
+#define THREAD5_ACTIVE true
+#define THREAD6_ACTIVE true
+
+#define THREAD0_TIMESLICE_TICKS 1
+#define THREAD1_TIMESLICE_TICKS 1
+#define THREAD2_TIMESLICE_TICKS 1
+#define THREAD3_TIMESLICE_TICKS 1
+#define THREAD4_TIMESLICE_TICKS 1
+#define THREAD5_TIMESLICE_TICKS 1
+#define THREAD6_TIMESLICE_TICKS 1
 
 //##### System Testing #####
 #define WAIT_FOR_SERIAL

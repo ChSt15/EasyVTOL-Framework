@@ -12,8 +12,8 @@
 #include "utils/interval_control.h"
 
 
-extern int threadID[8];
-extern uint8_t threadUsage[8];
+extern int threadID[7];
+extern uint8_t threadUsage[7];
 extern uint8_t cpuUsage;
 extern bool threadStartSuccess;
 

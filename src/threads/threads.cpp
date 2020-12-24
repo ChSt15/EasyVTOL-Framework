@@ -1,31 +1,30 @@
 #include "threads/threads.h"
 
 
-int threadID[8];
-volatile uint16_t threadCounter[8];
-uint8_t threadUsage[8];
+int threadID[7];
+volatile uint16_t threadCounter[7];
+uint8_t threadUsage[7];
 uint8_t cpuUsage = 0;
 volatile uint16_t idleThreadCount = 0;
 bool threadStartSuccess = false;
-void (*func[8])() = {
+void (*func[7])() = {
     thread0,
     thread1,
     thread2,
     thread3,
     thread4,
     thread5,
-    thread6,
-    threadControl,
+    thread6
 };
-bool threadActive[8] = {
+uint32_t threadTimeSlice_Ticks[7];
+bool threadActive[7] = {
     THREAD0_ACTIVE,
     THREAD1_ACTIVE,
     THREAD2_ACTIVE,
     THREAD3_ACTIVE,
     THREAD4_ACTIVE,
     THREAD5_ACTIVE,
-    THREAD6_ACTIVE,
-    THREAD7_ACTIVE
+    THREAD6_ACTIVE
 };
 
 IntervalControl threadMonitorPrintInterval;
@@ -36,22 +35,31 @@ void threadBegin() {
     //For detecting thread start failure
     threadStartSuccess = true;
     
-    threads.setMicroTimer();
+    threads.setMicroTimer(THREADS_TICK_US);
+
+    for (uint8_t i = 0; i < 7; i++) {
+        threadTimeSlice_Ticks[i] = (uint8_t)pow(2,(7-i));
+    }
+
+    
 
     //Attempt to start all needed threads and if one fails then set mark threadStartSuccess flag and exit
-    for (uint8_t i = 0; i < 8 && threadStartSuccess; i++) {
+    for (uint8_t i = 0; i < 7 && threadStartSuccess; i++) {
 
         if (threadActive[i]) {
 
             threadID[i] = threads.addThread(func[i]);
             if (threadID[i] == -1) threadStartSuccess = false;
+            else threads.setTimeSlice(threadID[i], threadTimeSlice_Ticks[i]);
 
         }
 
     }
 
+    threads.setTimeSlice(0, 10);
+
     //Set default counter values
-    for (uint8_t i = 0; i < 8; i++) threadCounter[i] = 0;
+    for (uint8_t i = 0; i < 7; i++) threadCounter[i] = 0;
     idleThreadCount = 0;
 
     threadMonitorPrintInterval.setRate(1);
@@ -64,19 +72,19 @@ void threadControl() {
     if (threadMonitorPrintInterval.isTimeToRun()) {
 
         uint32_t totalCount = idleThreadCount;
-        for (uint8_t i = 0; i < 8; i++) totalCount += threadCounter[i];
+        for (uint8_t i = 0; i < 7; i++) totalCount += threadCounter[i];
 
         #ifdef PRINT_THREAD_USAGE
             Serial.println("Thread CPU usage:");
         #endif
 
-        for (uint8_t i = 0; i < 8; i++) {
+        for (uint8_t i = 0; i < 7; i++) {
 
             threadUsage[i] = threadCounter[i]*100/totalCount;
             threadUsage[i] = constrain(threadUsage[i], 0, 100);
 
             #ifdef PRINT_THREAD_USAGE
-                Serial.println("Thread " + String(i) + ": " + String(threadUsage[i]) + "%");
+                Serial.println("Thread " + String(i) + ": " + String(threadUsage[i]) + "%, ID: " + String(threadID[i]));
             #endif
 
             cpuUsage = 100 - idleThreadCount*100/totalCount;
@@ -105,11 +113,13 @@ void threadControl() {
     /*volatile double cpuWaste = 0;
 
 
-    for (int i = 0; i < 100000 && !threadMonitorPrintInterval.isTimeToRun(); i++) {
+    for (int i = 0; i < 1000 && !threadMonitorPrintInterval.isTimeToRun(); i++) {
         cpuWaste = sin(cpuWaste*5.4);
     }*/
 
-    threads.yield();
+
+
+    //threads.yield();
 
 }
 
@@ -240,32 +250,5 @@ void thread6() {
     }
 
 }
-
-
-
-void thread7() {
-
-
-
-    
-
-    while(1) {
-
-        
-        threadCounter[7]++;
-        threads.yield();
-
-    }
-
-}
-
-
-
-
-
-
-
-
-
 
 

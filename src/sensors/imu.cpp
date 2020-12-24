@@ -25,6 +25,8 @@ namespace IMU {
     uint32_t rate = 0;
     uint32_t loopCounter = 0;
 
+    uint32_t lastMeasurement = 0;
+
 }
 
 
@@ -83,8 +85,10 @@ void IMU::imuThread() {
 
                 }
 
+                lastMeasurement = micros();
 
-            }
+
+            } else if (micros() - lastMeasurement >= SENSOR_MEASUREMENT_TIMEOUT_US) imuStatus = DeviceStatus::DEVICE_FAILURE;
 
         }
 
@@ -102,6 +106,8 @@ void IMU::imuThread() {
             //###################### Following will be changed in the future to allow higher rates #####################
             imu.setSrd(0);
             imu.setDlpfBandwidth(MPU9250::DlpfBandwidth::DLPF_BANDWIDTH_184HZ);
+
+            lastMeasurement = micros();
 
             imuStatus = DeviceStatus::DEVICE_CALIBRATING;
 

@@ -45,7 +45,7 @@ void AirData::imuThread() {
 
             lastMeasurement = micros();
 
-        } else if (micros() - lastMeasurement >= MEASUREMENT_TIMEOUT_US) bmeStatus = DeviceStatus::DEVICE_FAILURE;
+        } else if (micros() - lastMeasurement >= SENSOR_MEASUREMENT_TIMEOUT_US) bmeStatus = DeviceStatus::DEVICE_FAILURE;
 
     } else if (bmeStatus == DeviceStatus::DEVICE_NOT_STARTED || bmeStatus == DeviceStatus::DEVICE_RESTARTATTEMPT) {
 

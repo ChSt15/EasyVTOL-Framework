@@ -14,6 +14,10 @@
 
 
 
+#define IMU_RATE 8000
+
+
+
 namespace IMU {
 
     extern CircularBuffer <Vector, 100> gyroFifo;

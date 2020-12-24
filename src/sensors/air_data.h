@@ -17,7 +17,6 @@
 
 
 #define BME_RATE 50
-#define MEASUREMENT_TIMEOUT_US 200000L
 
 
 

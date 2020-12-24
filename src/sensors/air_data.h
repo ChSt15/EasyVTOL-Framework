@@ -1,5 +1,5 @@
-#ifndef IMU_H
-#define IMU_H
+#ifndef AIR_DATA_H
+#define AIR_DATA_H
 
 
 
@@ -29,7 +29,7 @@ namespace AirData {
 
     uint16_t getDataCount();
 
-    void imuThread();
+    void deviceThread();
 
     uint32_t getRate();
 

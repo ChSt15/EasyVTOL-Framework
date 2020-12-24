@@ -26,6 +26,7 @@
 #include "Wire.h"    // I2C library
 #include "SPI.h"     // SPI library
 
+
 class MPU9250{
   public:
     enum GyroRange

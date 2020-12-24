@@ -30,7 +30,7 @@ namespace IMU {
 }
 
 
-void IMU::imuThread() {
+void IMU::deviceThread() {
 
     if (!imuInterval.isTimeToRun()) return; 
 
@@ -39,7 +39,7 @@ void IMU::imuThread() {
 
     if (imuStatus == DeviceStatus::DEVICE_RUNNING) {
 
-        if (digitalReadFast(imuInt)) { //If high then data is ready in imu FIFO
+        if (digitalReadFast(imuInt)) { //If high then data is ready in the imu FIFO
 
             if (imu.readFifo()) { // read data and check if successful
 
@@ -94,7 +94,7 @@ void IMU::imuThread() {
 
     } else if (imuStatus == DeviceStatus::DEVICE_NOT_STARTED || imuStatus == DeviceStatus::DEVICE_RESTARTATTEMPT) {
 
-        if (imu.begin()) {
+        if (imu.begin() > 0) {
 
             imuInterval.setRate(8000);
 
@@ -125,6 +125,7 @@ void IMU::imuThread() {
 
     } else { //This section is for device failure or a wierd mode that should not be set, therefore assume failure
 
+        imuStatus = DeviceStatus::DEVICE_FAILURE;
         imuInterval.block(true);
         rate = 0;
 

@@ -43,7 +43,7 @@ namespace SensorTemplate {
 
     uint16_t getDataCount();
 
-    void sensorThread();
+    void deviceThread();
 
     uint32_t getRate();
 

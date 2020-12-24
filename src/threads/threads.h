@@ -7,6 +7,7 @@
 #include "definitions.h"
 
 #include "sensors/imu.h"
+#include "sensors/air_data.h"
 
 #include "utils/interval_control.h"
 

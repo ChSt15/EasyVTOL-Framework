@@ -28,7 +28,7 @@ namespace IMU {
 
     void getData(Vector *accel, Vector *gyro, Vector *mag, uint16_t size);
 
-    void imuThread();
+    void deviceThread();
 
     uint32_t getRate();
 

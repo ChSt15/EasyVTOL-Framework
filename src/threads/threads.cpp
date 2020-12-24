@@ -15,7 +15,7 @@ void (*func[8])() = {
     thread4,
     thread5,
     thread6,
-    thread7,
+    threadControl,
 };
 bool threadActive[8] = {
     THREAD0_ACTIVE,
@@ -36,7 +36,7 @@ void threadBegin() {
     //For detecting thread start failure
     threadStartSuccess = true;
     
-    threads.setSliceMicros(TIMESLICE_US);
+    threads.setMicroTimer();
 
     //Attempt to start all needed threads and if one fails then set mark threadStartSuccess flag and exit
     for (uint8_t i = 0; i < 8 && threadStartSuccess; i++) {
@@ -81,19 +81,33 @@ void threadControl() {
 
             cpuUsage = 100 - idleThreadCount*100/totalCount;
             cpuUsage = constrain(cpuUsage, 0, 100);
+            threadCounter[i] = 0;
 
         }
 
         #ifdef PRINT_THREAD_USAGE
             Serial.println("Total CPU usage: " + String(cpuUsage) + "%");
             Serial.println("Idle Thread: " + String(idleThreadCount*100/totalCount) + "%");
-            Serial.println("IMU Rate: " + String(IMU::getRate()));
+            Serial.println("Thread Start success: " + String(threadStartSuccess));
+            Serial.println();
+            Serial.println("IMU status: " + deviceStatusToString(IMU::getDeviceStatus()) + ", Rate: " + IMU::getRate());
+            Serial.println("BME status: " + deviceStatusToString(AirData::getDeviceStatus()));
             Serial.println();
         #endif
+
+        idleThreadCount = 0;
 
     }
 
     idleThreadCount++;
+
+
+    /*volatile double cpuWaste = 0;
+
+
+    for (int i = 0; i < 100000 && !threadMonitorPrintInterval.isTimeToRun(); i++) {
+        cpuWaste = sin(cpuWaste*5.4);
+    }*/
 
     threads.yield();
 
@@ -109,7 +123,8 @@ void thread0() {
 
     while(1) {
 
-        IMU::imuThread();
+        IMU::deviceThread();
+        AirData::deviceThread();
 
         threadCounter[0]++;
         threads.yield();

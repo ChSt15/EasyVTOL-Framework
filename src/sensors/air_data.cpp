@@ -26,7 +26,7 @@ namespace AirData {
 }
 
 
-void AirData::imuThread() {
+void AirData::deviceThread() {
 
     if (!bmeInterval.isTimeToRun()) return; 
 
@@ -76,6 +76,7 @@ void AirData::imuThread() {
 
     } else { //This section is for device failure or a wierd mode that should not be set, therefore assume failure
 
+        bmeStatus = DeviceStatus::DEVICE_FAILURE;
         bmeInterval.block(true);
         rate = 0;
 

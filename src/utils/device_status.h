@@ -12,6 +12,46 @@ enum DeviceStatus {
 };
 
 
+inline String deviceStatusToString(DeviceStatus status) {
+
+    String buff = "UNKNOWN STATE";
+
+    switch (status)
+    {
+    case DeviceStatus::DEVICE_NOT_STARTED :
+        buff = "Device not started";
+        break;
+
+    case DeviceStatus::DEVICE_STARTING :
+        buff = "Device starting";
+        break;
+
+    case DeviceStatus::DEVICE_CALIBRATING :
+        buff = "Device calibrating";
+        break;
+
+    case DeviceStatus::DEVICE_RUNNING :
+        buff = "Device running";
+        break;
+
+    case DeviceStatus::DEVICE_RESTARTATTEMPT:
+        buff = "Device attempting restart";
+        break;
+
+    case DeviceStatus::DEVICE_FAILURE :
+        buff = "Device failure";
+        break;
+    
+    default:
+        buff = "UNKNOWN STATE: " + String(status);
+        break;
+    }
+
+    return buff;
+
+}
+
+
 
 
 

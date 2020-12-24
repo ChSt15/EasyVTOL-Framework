@@ -1000,8 +1000,6 @@ int MPU9250::writeRegister(uint8_t subAddress, uint8_t data){
     _i2c->write(data); // write the data
     _i2c->endTransmission();
   }
-
-  delay(10);
   
   /* read back the register */
   readRegisters(subAddress,1,_buffer);

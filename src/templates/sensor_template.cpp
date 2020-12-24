@@ -31,7 +31,7 @@ namespace SensorTemplate {
 }
 
 
-void SensorTemplate::sensorThread() { //This methode public because it was declares in the imu.h files namespace
+void SensorTemplate::deviceThread() { //This methode public because it was declares in the imu.h files namespace
 
     if (!sensorInterval.isTimeToRun()) return; //This limits the rate the thread will run at to save time. By default the rate is infinite until the code below resticts it (pls do this).
 

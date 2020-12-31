@@ -69,10 +69,6 @@ void threadBegin() {
 
 void threadControl() {
 
-    /*static bool threading = true;
-
-    if (Serial.available()) //#################### CONTINUE HERE ##############################*/
-
     if (threadMonitorPrintInterval.isTimeToRun()) {
 
         uint32_t totalCount = idleThreadCount;

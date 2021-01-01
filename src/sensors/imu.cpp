@@ -14,7 +14,7 @@ namespace IMU {
     Vector lastAccel;
     Vector lastMag;
 
-    IntervalControl imuInterval(320000); //Keep rate low for starting
+    IntervalControl imuInterval(1); //Keep rate low for starting
     IntervalControl rateCalcInterval(1); 
 
     MPU9250FIFO imu(SPI, imuNCS);
@@ -35,13 +35,6 @@ void IMU::deviceThread() {
     if (!imuInterval.isTimeToRun()) return; 
 
     loopCounter++;
-
-    if (rateCalcInterval.isTimeToRun()) {
-        rate = loopCounter;
-        loopCounter = 0;
-    }
-
-    return;
 
 
     if (imuStatus == DeviceStatus::DEVICE_RUNNING) {
@@ -116,7 +109,7 @@ void IMU::deviceThread() {
 
             lastMeasurement = micros();
 
-            imuStatus = DeviceStatus::DEVICE_CALIBRATING;
+            imuStatus = DeviceStatus::DEVICE_RUNNING;
 
         } else imuStatus = DeviceStatus::DEVICE_RESTARTATTEMPT; 
 
@@ -128,7 +121,7 @@ void IMU::deviceThread() {
 
         //################## Following is Temporary #################
         if (imu.calibrateGyro()) imuStatus = DeviceStatus::DEVICE_RUNNING; 
-        else imuStatus = DeviceStatus::DEVICE_FAILURE; 
+        //else imuStatus = DeviceStatus::DEVICE_FAILURE; 
 
     } else { //This section is for device failure or a wierd mode that should not be set, therefore assume failure
 

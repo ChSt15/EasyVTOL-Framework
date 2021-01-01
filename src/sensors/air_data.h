@@ -27,8 +27,6 @@ namespace AirData {
     extern CircularBuffer <float, 50> temperatureFifo;
     extern CircularBuffer <uint32_t, 50> timestampFifo;
 
-    uint16_t getDataCount();
-
     void deviceThread();
 
     uint32_t getRate();

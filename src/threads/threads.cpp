@@ -100,6 +100,7 @@ void threadControl() {
             Serial.println();
             Serial.println("IMU status: " + deviceStatusToString(IMU::getDeviceStatus()) + ", Rate: " + IMU::getRate());
             Serial.println("BME status: " + deviceStatusToString(AirData::getDeviceStatus()));
+            Serial.println("LED status: " + deviceStatusToString(RGBLED::getDeviceStatus()));
             Serial.println();
         #endif
 
@@ -153,6 +154,7 @@ void thread1() {
 
     while(1) {
 
+        RGBLED::deviceThread();
         
         threadCounter[1]++;
         threads.yield();

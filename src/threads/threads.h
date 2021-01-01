@@ -9,6 +9,8 @@
 #include "sensors/imu.h"
 #include "sensors/air_data.h"
 
+#include "outputs/rgb_led.h"
+
 #include "utils/interval_control.h"
 
 

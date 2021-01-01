@@ -30,11 +30,13 @@ void RGBLED::deviceThread() {
 
     if (ledStatus == DeviceStatus::DEVICE_RUNNING) {
 
-        led.setHSV(hue++, 255, 255);
+        led = CHSV(hue++, 0, 255);
+        FastLED.show();
 
     } else if (ledStatus == DeviceStatus::DEVICE_NOT_STARTED || ledStatus == DeviceStatus::DEVICE_RESTARTATTEMPT) {
 
         FastLED.addLeds<WS2812B, ledPin, RGB>(&led, 1);
+        FastLED.setBrightness(255);
 
         ledInterval.setRate(LED_FPS);
 

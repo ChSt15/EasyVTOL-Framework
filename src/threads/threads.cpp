@@ -100,7 +100,7 @@ void threadControl() {
             Serial.println("Idle Thread: " + String(idleThreadCount*100/totalCount) + "%");
             Serial.println("Thread Start success: " + String(threadStartSuccess));
             Serial.println();
-            Serial.println("IMU status: " + deviceStatusToString(IMU::getDeviceStatus()) + ", Rate: " + IMU::getMeasurementRate() + ", Gyro X: " + String(IMU::gyroFifo.available() ? IMU::gyroFifo.shift().x : NAN));
+            Serial.println("IMU status: " + deviceStatusToString(IMU::getDeviceStatus()) + ", Rate: " + IMU::getMeasurementRate() + ", Gyro X: " + String(IMU::gyroFifo.shift().x));
             Serial.println("BME status: " + deviceStatusToString(AirData::getDeviceStatus()));
             Serial.println("LED status: " + deviceStatusToString(RGBLED::getDeviceStatus()));
             Serial.println("GPS status: " + deviceStatusToString(GPS::getDeviceStatus()) + ", Sats: " + String(GPS::getSatellites()));

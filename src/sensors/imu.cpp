@@ -53,7 +53,7 @@ void IMU::deviceThread() {
 
     if (imuStatus == DeviceStatus::DEVICE_RUNNING) {
 
-        if (newDataInterrupt || digitalRead(imuInt)) { //If high then data is ready in the imu FIFO
+        if (newDataInterrupt) { //If high then data is ready in the imu FIFO
             newDataInterrupt = false;
 
             sensorCounter++;

@@ -30,7 +30,7 @@ void RGBLED::deviceThread() {
 
     if (ledStatus == DeviceStatus::DEVICE_RUNNING) {
 
-        led = CHSV(hue++, 0, 255);
+        led = CHSV(hue++, 255, 255);
         FastLED.show();
 
     } else if (ledStatus == DeviceStatus::DEVICE_NOT_STARTED || ledStatus == DeviceStatus::DEVICE_RESTARTATTEMPT) {

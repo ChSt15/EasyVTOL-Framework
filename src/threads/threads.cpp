@@ -71,6 +71,8 @@ void threadControl() {
 
     if (threadMonitorPrintInterval.isTimeToRun()) {
 
+        threadMonitorPrintInterval.setRate(1);
+
         uint32_t totalCount = idleThreadCount;
         for (uint8_t i = 0; i < 7; i++) totalCount += threadCounter[i];
 
@@ -98,9 +100,10 @@ void threadControl() {
             Serial.println("Idle Thread: " + String(idleThreadCount*100/totalCount) + "%");
             Serial.println("Thread Start success: " + String(threadStartSuccess));
             Serial.println();
-            Serial.println("IMU status: " + deviceStatusToString(IMU::getDeviceStatus()) + ", Rate: " + IMU::getRate());
+            Serial.println("IMU status: " + deviceStatusToString(IMU::getDeviceStatus()) + ", Rate: " + IMU::getRate() + ", Gyro X: " + String(IMU::gyroFifo.available() ? IMU::gyroFifo.shift().x : NAN));
             Serial.println("BME status: " + deviceStatusToString(AirData::getDeviceStatus()));
             Serial.println("LED status: " + deviceStatusToString(RGBLED::getDeviceStatus()));
+            Serial.println("GPS status: " + deviceStatusToString(RGBLED::getDeviceStatus()) + ", Sats: " + String(GPS::getGPS()->getSec()));
             Serial.println();
         #endif
 
@@ -134,8 +137,9 @@ void thread0() {
 
     while(1) {
 
-        IMU::deviceThread();
+        //IMU::deviceThread();
         AirData::deviceThread();
+        //GPS::deviceThread();
 
         threadCounter[0]++;
         threads.yield();

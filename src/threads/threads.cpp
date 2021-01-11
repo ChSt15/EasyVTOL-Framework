@@ -103,7 +103,7 @@ void threadControl() {
             Serial.println("IMU status: " + deviceStatusToString(IMU::getDeviceStatus()) + ", Rate: " + IMU::getRate() + ", Gyro X: " + String(IMU::gyroFifo.available() ? IMU::gyroFifo.shift().x : NAN));
             Serial.println("BME status: " + deviceStatusToString(AirData::getDeviceStatus()));
             Serial.println("LED status: " + deviceStatusToString(RGBLED::getDeviceStatus()));
-            Serial.println("GPS status: " + deviceStatusToString(RGBLED::getDeviceStatus()) + ", Sats: " + String(GPS::getGPS()->getSec()));
+            Serial.println("GPS status: " + deviceStatusToString(GPS::getDeviceStatus()) + ", Sats: " + String(GPS::getGPS()->getSec()));
             Serial.println();
         #endif
 

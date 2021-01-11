@@ -5,9 +5,7 @@
 
 #include "Arduino.h"
 
-#include <SPI.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_BME280.h>
+#include "SparkFunBME280.h"
 #include "vector_math.h"
 #include "CircularBuffer.h"
 

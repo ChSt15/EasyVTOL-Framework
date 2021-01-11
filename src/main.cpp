@@ -15,7 +15,7 @@ void setup() {
 
     Serial.begin(USB_BAUD_RATE);
 
-    Serial2.begin(9600);
+    //Serial2.begin(9600);
 
 
     #ifdef WAIT_FOR_SERIAL
@@ -32,7 +32,7 @@ void setup() {
     Serial.println("CPU Speed: " + String(F_CPU_ACTUAL));
     delay(500);
 
-    //threadBegin();
+    threadBegin();
 
     //Serial.println("Thread start success: " + String(threadStartSuccess));
 
@@ -66,6 +66,6 @@ void loop() {
 
     
 
-    //threadControl();
+    threadControl();
 
 }

@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-#include "UBLOX.h"
+#include "SparkFun_Ublox_Arduino_Library.h"
 #include "vector_math.h"
 #include "CircularBuffer.h"
 
@@ -25,7 +25,7 @@ namespace GPS {
 
     uint8_t getSatellites();
 
-    UBLOX* getGPS();
+    SFE_UBLOX_GPS* getGPS();
 
     void deviceThread();
 

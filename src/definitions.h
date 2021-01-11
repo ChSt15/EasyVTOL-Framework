@@ -6,10 +6,10 @@
 #define THREAD0_ACTIVE true
 #define THREAD1_ACTIVE true
 #define THREAD2_ACTIVE true
-#define THREAD3_ACTIVE true
-#define THREAD4_ACTIVE true
-#define THREAD5_ACTIVE true
-#define THREAD6_ACTIVE true
+#define THREAD3_ACTIVE false
+#define THREAD4_ACTIVE false
+#define THREAD5_ACTIVE false
+#define THREAD6_ACTIVE false
 
 #define THREAD0_TIMESLICE_TICKS 1
 #define THREAD1_TIMESLICE_TICKS 1

@@ -27,6 +27,8 @@ namespace IMU {
 
     uint32_t rate = 0;
     uint32_t loopCounter = 0;
+    uint32_t sensorRate = 0;
+    uint32_t sensorCounter = 0;
 
     uint32_t lastMeasurement = 0;
 
@@ -44,9 +46,12 @@ void IMU::deviceThread() {
 
         if (digitalRead(imuInt)) { //If high then data is ready in the imu FIFO
 
+            sensorCounter++;
+
             imu.readSensor();
-            
-            Serial.println("Test: " + String(imu.getGyroX_rads()));
+
+            Vector bufVec(imu.getGyroX_rads(), imu.getGyroY_rads(), imu.getGyroZ_rads());
+            gyroFifo.unshift(bufVec);
 
             /*if (imu.readFifo()) { // read data and check if successful
 
@@ -150,9 +155,16 @@ void IMU::deviceThread() {
 
     if (rateCalcInterval.isTimeToRun()) {
         rate = loopCounter;
+        sensorRate = sensorCounter;
+        sensorCounter = 0;
         loopCounter = 0;
     }
 
+}
+
+
+uint16_t IMU::getMeasurementRate() {
+    return sensorRate;
 }
 
 

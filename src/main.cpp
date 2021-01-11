@@ -64,6 +64,8 @@ void loop() {
 
     //AirData::deviceThread();
 
+    //GPS::deviceThread();
+
     
 
     threadControl();

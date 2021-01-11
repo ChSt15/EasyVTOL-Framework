@@ -28,6 +28,8 @@ namespace IMU {
 
     uint32_t getRate();
 
+    uint16_t getMeasurementRate();
+
     DeviceStatus getDeviceStatus();
     
 } 

@@ -16,7 +16,7 @@
 
 
 
-#define BME_RATE 50
+#define BME_RATE 20
 
 
 

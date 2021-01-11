@@ -8,6 +8,7 @@
 
 #include "sensors/imu.h"
 #include "sensors/air_data.h"
+#include "sensors/gps.h"
 
 #include "outputs/rgb_led.h"
 

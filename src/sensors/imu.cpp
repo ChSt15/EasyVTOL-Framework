@@ -5,6 +5,9 @@ namespace IMU {
 
     const int imuNCS = 3;
     const int imuInt = 2;
+    //const int imuNCS = 33;
+    //const int imuInt = 32;
+
 
     CircularBuffer <Vector, 100> gyroFifo;
     CircularBuffer <Vector, 100> accelFifo;
@@ -17,16 +20,27 @@ namespace IMU {
     IntervalControl imuInterval(1); //Keep rate low for starting
     IntervalControl rateCalcInterval(1); 
 
-    MPU9250FIFO imu(SPI, imuNCS);
+    MPU9250 imu(SPI, imuNCS);
 
     DeviceStatus imuStatus = DeviceStatus::DEVICE_NOT_STARTED; 
     uint8_t startAttempts = 0;
 
     uint32_t rate = 0;
     uint32_t loopCounter = 0;
+    uint32_t sensorRate = 0;
+    uint32_t sensorCounter = 0;
 
     uint32_t lastMeasurement = 0;
 
+    bool newDataInterrupt = false;
+
+    void interruptRoutine();
+
+}
+
+
+void IMU::interruptRoutine() {
+    newDataInterrupt = true;
 }
 
 
@@ -39,9 +53,17 @@ void IMU::deviceThread() {
 
     if (imuStatus == DeviceStatus::DEVICE_RUNNING) {
 
-        if (digitalReadFast(imuInt)) { //If high then data is ready in the imu FIFO
+        if (newDataInterrupt) { //If high then data is ready in the imu FIFO
+            newDataInterrupt = false;
 
-            if (imu.readFifo()) { // read data and check if successful
+            sensorCounter++;
+
+            imu.readSensor();
+
+            Vector bufVec(imu.getGyroX_rads(), imu.getGyroY_rads(), imu.getGyroZ_rads());
+            gyroFifo.unshift(bufVec);
+
+            /*if (imu.readFifo()) { // read data and check if successful
 
                 float gyroX[100];
                 float gyroY[100];
@@ -74,6 +96,7 @@ void IMU::deviceThread() {
                     Vector bufVec(gyroX[i], gyroY[i], gyroZ[i]);
                     if (bufVec != lastGyro && !gyroFifo.isFull()) gyroFifo.unshift(bufVec);
                     lastGyro = bufVec;
+                    Serial.println("Gyro X: " + String(lastGyro.x));
 
                     bufVec = Vector(accelX[i], accelY[i], accelZ[i]);
                     if (bufVec != lastAccel && !accelFifo.isFull()) accelFifo.unshift(bufVec);
@@ -88,30 +111,39 @@ void IMU::deviceThread() {
                 lastMeasurement = micros();
 
 
-            } else if (micros() - lastMeasurement >= SENSOR_MEASUREMENT_TIMEOUT_US) imuStatus = DeviceStatus::DEVICE_FAILURE;
+            } else if (micros() - lastMeasurement >= SENSOR_MEASUREMENT_TIMEOUT_US) imuStatus = DeviceStatus::DEVICE_FAILURE;*/
 
         }
 
     } else if (imuStatus == DeviceStatus::DEVICE_NOT_STARTED || imuStatus == DeviceStatus::DEVICE_RESTARTATTEMPT) {
+        
 
-        if (imu.begin() > 0) {
+        int startCode = imu.begin();
+
+
+        if (startCode > 0) {
 
             imuInterval.setRate(8000);
 
             imu.setAccelRange(MPU9250::AccelRange::ACCEL_RANGE_16G); //Yes this and the gyro range being so high will make it less accurate but we also dont want to loose information. This could be changed later depending on the application
             imu.setGyroRange(MPU9250::GyroRange::GYRO_RANGE_2000DPS);
-            imu.enableFifo(true, true, true, false); //We do not need the temperature so it will be disabled
+            //imu.enableFifo(true, true, true, false); //We do not need the temperature so it will be disabled
             imu.enableDataReadyInterrupt();
 
             //###################### Following will be changed in the future to allow higher rates #####################
             imu.setSrd(0);
             imu.setDlpfBandwidth(MPU9250::DlpfBandwidth::DLPF_BANDWIDTH_184HZ);
 
+            attachInterrupt(imuInt, interruptRoutine, HIGH);
+
             lastMeasurement = micros();
 
             imuStatus = DeviceStatus::DEVICE_RUNNING;
 
-        } else imuStatus = DeviceStatus::DEVICE_RESTARTATTEMPT; 
+        } else {
+            imuStatus = DeviceStatus::DEVICE_RESTARTATTEMPT; 
+            Serial.println("IMU Start Fail. Code: " + String(startCode));
+        }
 
         startAttempts++;
 
@@ -135,9 +167,16 @@ void IMU::deviceThread() {
 
     if (rateCalcInterval.isTimeToRun()) {
         rate = loopCounter;
+        sensorRate = sensorCounter;
+        sensorCounter = 0;
         loopCounter = 0;
     }
 
+}
+
+
+uint16_t IMU::getMeasurementRate() {
+    return sensorRate;
 }
 
 

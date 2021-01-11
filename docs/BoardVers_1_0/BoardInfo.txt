@@ -1,0 +1,27 @@
+Absolute Maximums:
+
+- Input Voltage:                6-30V
+- 3.3V Max Current:             150mA
+- 5V Max Current:               300mA
+- IO Max Voltage:               0-3.3V
+
+
+Pin Infos:
+
+- RGBLED Pin:                   4
+
+- MPU6500/9250 Interrrupt Pin:  2
+- MPU6500/9250 NCS Pin:         3
+
+- BME280 NCS Pin:               6
+
+- QMC5883L Interrrupt Pin:      16
+
+- SX1280 NSS                    9
+- SX1280 RESET                  5
+- SX1280 BUSY                   15
+- SX1280 DIO1                   14
+- SX1280 RXEN                   10
+- SX1280 TXEN                   17
+
+- Input Voltage ADC Pin         26

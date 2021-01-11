@@ -43,8 +43,9 @@ void GPS::deviceThread() {
         }
 
     } else if (gpsStatus == DeviceStatus::DEVICE_NOT_STARTED || gpsStatus == DeviceStatus::DEVICE_RESTARTATTEMPT) {
-
-        Serial2.begin(9600*max(serialBaudMulti,1));
+        
+        if (gpsStatus == DeviceStatus::DEVICE_NOT_STARTED) Serial2.begin(115200);
+        else Serial2.begin(9600*max(serialBaudMulti,1));
 
         Serial.println("Attempting Start at: " + String(9600*max(serialBaudMulti,1)));
 
@@ -64,8 +65,10 @@ void GPS::deviceThread() {
 
         } else {
 
+            if (gpsStatus != DeviceStatus::DEVICE_NOT_STARTED) {
+                serialBaudMulti += 2;
+            }
             gpsStatus = DeviceStatus::DEVICE_RESTARTATTEMPT;
-            serialBaudMulti += 2;
 
             if (serialBaudMulti >= 14) gpsStatus = DeviceStatus::DEVICE_FAILURE;
 

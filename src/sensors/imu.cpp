@@ -32,6 +32,15 @@ namespace IMU {
 
     uint32_t lastMeasurement = 0;
 
+    bool newDataInterrupt = false;
+
+    void interruptRoutine();
+
+}
+
+
+void IMU::interruptRoutine() {
+    newDataInterrupt = true;
 }
 
 
@@ -44,7 +53,8 @@ void IMU::deviceThread() {
 
     if (imuStatus == DeviceStatus::DEVICE_RUNNING) {
 
-        if (digitalRead(imuInt)) { //If high then data is ready in the imu FIFO
+        if (newDataInterrupt || digitalRead(imuInt)) { //If high then data is ready in the imu FIFO
+            newDataInterrupt = false;
 
             sensorCounter++;
 
@@ -123,6 +133,8 @@ void IMU::deviceThread() {
             //###################### Following will be changed in the future to allow higher rates #####################
             imu.setSrd(0);
             imu.setDlpfBandwidth(MPU9250::DlpfBandwidth::DLPF_BANDWIDTH_184HZ);
+
+            attachInterrupt(imuInt, interruptRoutine, HIGH);
 
             lastMeasurement = micros();
 

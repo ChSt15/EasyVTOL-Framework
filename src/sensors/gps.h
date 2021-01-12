@@ -30,6 +30,7 @@ namespace GPS {
     void deviceThread();
 
     uint32_t getRate();
+    uint32_t getMeasurementRate();
 
     DeviceStatus getDeviceStatus();
     

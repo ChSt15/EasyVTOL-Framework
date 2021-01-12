@@ -28,7 +28,7 @@ namespace IMU {
 
     uint32_t getRate();
 
-    uint16_t getMeasurementRate();
+    uint32_t getMeasurementRate();
 
     DeviceStatus getDeviceStatus();
     

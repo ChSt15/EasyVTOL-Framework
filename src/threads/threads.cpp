@@ -103,7 +103,7 @@ void threadControl() {
             Serial.println("IMU status: " + deviceStatusToString(IMU::getDeviceStatus()) + ", Rate: " + IMU::getMeasurementRate() + ", Gyro X: " + String(IMU::gyroFifo.shift().x));
             Serial.println("BME status: " + deviceStatusToString(AirData::getDeviceStatus()));
             Serial.println("LED status: " + deviceStatusToString(RGBLED::getDeviceStatus()));
-            Serial.println("GPS status: " + deviceStatusToString(GPS::getDeviceStatus()) + ", Sats: " + String(GPS::getSatellites()));
+            Serial.println("GPS status: " + deviceStatusToString(GPS::getDeviceStatus()) + ", MeasRate: " + GPS::getMeasurementRate() + ", LoopRate: " + GPS::getRate() +", Sats: " + String(GPS::getSatellites()));
             Serial.println();
         #endif
 
@@ -123,7 +123,7 @@ void threadControl() {
 
 
 
-    threads.yield();
+    //threads.yield();
 
 }
 
@@ -176,7 +176,7 @@ void thread2() {
 
     while(1) {
 
-        RGBLED::deviceThread();
+        //RGBLED::deviceThread();
         
         threadCounter[2]++;
         threads.yield();

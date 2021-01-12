@@ -175,7 +175,7 @@ void IMU::deviceThread() {
 }
 
 
-uint16_t IMU::getMeasurementRate() {
+uint32_t IMU::getMeasurementRate() {
     return sensorRate;
 }
 

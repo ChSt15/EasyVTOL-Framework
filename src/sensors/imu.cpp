@@ -58,10 +58,12 @@ void IMU::deviceThread() {
 
             sensorCounter++;
 
+
             imu.readSensor();
 
             Vector bufVec(imu.getGyroX_rads(), imu.getGyroY_rads(), imu.getGyroZ_rads());
             gyroFifo.unshift(bufVec);
+
 
             /*if (imu.readFifo()) { // read data and check if successful
 
@@ -96,7 +98,6 @@ void IMU::deviceThread() {
                     Vector bufVec(gyroX[i], gyroY[i], gyroZ[i]);
                     if (bufVec != lastGyro && !gyroFifo.isFull()) gyroFifo.unshift(bufVec);
                     lastGyro = bufVec;
-                    Serial.println("Gyro X: " + String(lastGyro.x));
 
                     bufVec = Vector(accelX[i], accelY[i], accelZ[i]);
                     if (bufVec != lastAccel && !accelFifo.isFull()) accelFifo.unshift(bufVec);

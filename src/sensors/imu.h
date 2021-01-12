@@ -6,6 +6,7 @@
 #include "MPU9250.h"
 #include "vector_math.h"
 #include "CircularBuffer.h"
+#include "TeensyThreads.h"
 
 #include "utils/interval_control.h"
 #include "utils/device_status.h"

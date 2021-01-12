@@ -177,6 +177,7 @@ void thread2() {
     while(1) {
 
         //RGBLED::deviceThread();
+        LORA_2_4::deviceThread();
         
         threadCounter[2]++;
         threads.yield();

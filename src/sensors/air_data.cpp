@@ -20,6 +20,8 @@ namespace AirData {
 
     uint32_t rate = 0;
     uint32_t loopCounter = 0;
+    uint32_t sensorRate = 0;
+    uint32_t sensorCounter = 0;
 
     uint32_t lastMeasurement = 0;
 
@@ -42,6 +44,8 @@ void AirData::deviceThread() {
             temperatureFifo.unshift(bme.readTempC());
 
             timestampFifo.unshift(micros());
+
+            sensorCounter++;
 
             lastMeasurement = micros();
 
@@ -86,6 +90,8 @@ void AirData::deviceThread() {
 
     if (rateCalcInterval.isTimeToRun()) {
         rate = loopCounter;
+        sensorRate = sensorCounter;
+        sensorCounter = 0;
         loopCounter = 0;
     }
 
@@ -94,6 +100,11 @@ void AirData::deviceThread() {
 
 uint32_t AirData::getRate() {
     return rate;
+}
+
+
+uint32_t AirData::getMeasurementRate() {
+    return sensorRate;
 }
 
 

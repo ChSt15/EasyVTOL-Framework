@@ -100,10 +100,11 @@ void threadControl() {
             Serial.println("Idle Thread: " + String(idleThreadCount*100/totalCount) + "%");
             Serial.println("Thread Start success: " + String(threadStartSuccess));
             Serial.println();
-            Serial.println("IMU status: " + deviceStatusToString(IMU::getDeviceStatus()) + ", Rate: " + IMU::getMeasurementRate() + ", Gyro X: " + String(IMU::gyroFifo.shift().x));
-            Serial.println("BME status: " + deviceStatusToString(AirData::getDeviceStatus()));
-            Serial.println("LED status: " + deviceStatusToString(RGBLED::getDeviceStatus()));
-            Serial.println("GPS status: " + deviceStatusToString(GPS::getDeviceStatus()) + ", MeasRate: " + GPS::getMeasurementRate() + ", LoopRate: " + GPS::getRate() +", Sats: " + String(GPS::getSatellites()));
+            Serial.println("IMU  status: " + deviceStatusToString(IMU::getDeviceStatus()) + ", Rate: " + IMU::getMeasurementRate() + ", Gyro X: " + String(IMU::gyroFifo.shift().x));
+            Serial.println("BME  status: " + deviceStatusToString(AirData::getDeviceStatus()) + ", MeasRate: " + AirData::getMeasurementRate() + ", Temp: " + AirData::temperatureFifo.first());
+            Serial.println("LED  status: " + deviceStatusToString(RGBLED::getDeviceStatus()));
+            Serial.println("GPS  status: " + deviceStatusToString(GPS::getDeviceStatus()) + ", MeasRate: " + GPS::getMeasurementRate() + ", LoopRate: " + GPS::getRate() +", Sats: " + String(GPS::getSatellites()));
+            Serial.println("LORA status: " + deviceStatusToString(LORA_2_4::getDeviceStatus()) + ", LoopRate: " + LORA_2_4::getRate());
             Serial.println();
         #endif
 
@@ -138,6 +139,8 @@ void thread0() {
     while(1) {
 
         IMU::deviceThread();
+        AirData::deviceThread();
+        LORA_2_4::deviceThread();
 
         threadCounter[0]++;
         threads.yield();
@@ -156,7 +159,6 @@ void thread1() {
 
     while(1) {
 
-        AirData::deviceThread();
         GPS::deviceThread();
         
         threadCounter[1]++;
@@ -176,8 +178,7 @@ void thread2() {
 
     while(1) {
 
-        //RGBLED::deviceThread();
-        LORA_2_4::deviceThread();
+        RGBLED::deviceThread();
         
         threadCounter[2]++;
         threads.yield();

@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "dshot_api.h"
+#include "Arda/dshot_simple_api/include/dshot_api.h"
 
 bool flagErr = false;
 

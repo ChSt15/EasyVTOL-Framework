@@ -19,7 +19,7 @@
 #define ONESHOT125_HIGH 250
 
 #define ONESHOT42_LOW 42
-#define ONESHOT125_HIGH 82
+#define ONESHOT42_HIGH 82
 
 #define MULTISHOT_LOW 5
 #define MULTISHOT_HIGH 25
@@ -45,8 +45,8 @@ public:
     uint32_t getHighTimeMaxMicros();
     uint32_t getHighTimeMinMicros();
 
-    bool startSending();
-    void stopSending();
+    //bool startSending();      needs implementing
+    //void stopSending();       needs implementing
 
     bool setPin(int16_t pin);
 

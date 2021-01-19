@@ -10,11 +10,6 @@
 
 
 
-#define PROTOCOL_STANDARD 0
-#define PROTOCOL_ONESHOT125 1
-#define PROTOCOL_MULTISHOT 2
-
-
 #define STANDARD_LOW 1000
 #define STANDARD_HIGH 2000
 
@@ -22,6 +17,12 @@
 
 class PPMChannel {
 public:
+
+    enum PROTOCOL {
+        PROTOCOL_STANDARD,
+        PROTOCOL_ONESHOT125,
+        PROTOCOL_MULTISHOT
+    };
 
     static void deviceThread();
 

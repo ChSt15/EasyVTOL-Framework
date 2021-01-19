@@ -45,8 +45,8 @@ public:
     uint32_t getHighTimeMaxMicros();
     uint32_t getHighTimeMinMicros();
 
-    //bool startSending();      needs implementing
-    //void stopSending();       needs implementing
+    //bool startSending();      needs implementing. Should Start the pwm output. Other functions must be changes too.
+    //void stopSending();       needs implementing. Should stop the pwm output. Other functions must be changes too.
 
     bool setPin(int16_t pin);
 

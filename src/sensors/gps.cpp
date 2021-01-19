@@ -19,8 +19,11 @@ namespace GPS {
 
     uint32_t rate = 0;
     uint32_t loopCounter = 0;
+    uint32_t sensorRate = 0;
+    uint32_t sensorCounter = 0;
 
     uint32_t lastMeasurement = 0;
+    uint32_t lastGPSTime = 0;
 
 }
 
@@ -34,11 +37,14 @@ void GPS::deviceThread() {
 
     if (gpsStatus == DeviceStatus::DEVICE_RUNNING) {
 
-        uint32_t t0 = micros();
+        gps.getPVT();
 
-        if (gps.getPVT()) { //If high then data is ready in the gps FIFO
+        if (gps.timeOfWeek != lastGPSTime) { //If high then data is ready in the gps FIFO
+            lastGPSTime = gps.timeOfWeek;
 
-            numSatellites = gps.getSIV();
+            numSatellites = gps.SIV;
+
+            sensorCounter++;
 
         }
 
@@ -46,8 +52,6 @@ void GPS::deviceThread() {
         
         if (gpsStatus == DeviceStatus::DEVICE_NOT_STARTED) Serial2.begin(115200);
         else Serial2.begin(9600*max(serialBaudMulti,1));
-
-        Serial.println("Attempting Start at: " + String(9600*max(serialBaudMulti,1)));
 
         if (gps.begin(Serial2)) {
 
@@ -59,6 +63,8 @@ void GPS::deviceThread() {
 
             gps.setNavigationFrequency(10);
             gps.setAutoPVT(true);
+            gps.setDynamicModel(DYN_MODEL_AIRBORNE4g);
+
             gps.saveConfiguration();
 
             lastMeasurement = micros();
@@ -89,7 +95,9 @@ void GPS::deviceThread() {
 
     if (rateCalcInterval.isTimeToRun()) {
         rate = loopCounter;
+        sensorRate = sensorCounter;
         loopCounter = 0;
+        sensorCounter = 0;
     }
 
 }
@@ -103,6 +111,11 @@ SFE_UBLOX_GPS* GPS::getGPS() {return &gps;}
 
 uint32_t GPS::getRate() {
     return rate;
+}
+
+
+uint32_t GPS::getMeasurementRate() {
+    return sensorRate;
 }
 
 

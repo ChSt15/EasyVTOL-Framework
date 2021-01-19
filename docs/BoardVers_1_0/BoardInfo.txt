@@ -17,11 +17,11 @@ Pin Infos:
 
 - QMC5883L Interrrupt Pin:      16
 
-- SX1280 NSS                    9
-- SX1280 RESET                  5
-- SX1280 BUSY                   15
-- SX1280 DIO1                   14
-- SX1280 RXEN                   10
-- SX1280 TXEN                   17
+- SX1280 NSS Pin                9
+- SX1280 NRESET Pin             5
+- SX1280 RFBUSY Pin             15
+- SX1280 DIO1 Pin               14
+- SX1280 RXEN Pin               10
+- SX1280 TXEN Pin               17
 
 - Input Voltage ADC Pin         26

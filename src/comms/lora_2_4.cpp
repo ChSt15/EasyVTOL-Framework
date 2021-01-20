@@ -3,12 +3,12 @@
 
 namespace LORA_2_4 {
 
-    const int NSSPin = 9;
-    const int NRESETPin = 5;
-    const int RFBUSYPin = 15;
-    const int DIO1Pin = 14;
-    const int RXENPin = 10;
-    const int TXENPin = 17;
+    const int NSSPin = SX1280_NSS_PIN;
+    const int NRESETPin = SX1280_NRESET_PIN;
+    const int RFBUSYPin = SX1280_RFBUSY_PIN;
+    const int DIO1Pin = SX1280_DIO1_PIN;
+    const int RXENPin = SX1280_RXEN_PIN;
+    const int TXENPin = SX1280_TXEN_PIN;
 
 
     CircularBuffer <Quaternion, 100> attitudeSendFifo;

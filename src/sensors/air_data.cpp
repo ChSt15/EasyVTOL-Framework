@@ -3,7 +3,7 @@
 
 namespace AirData {
 
-    const int bmeNCS = 6;
+    const int bmeNCS = BME280_NCS_PIN;
 
     CircularBuffer <float, 50> pressureFifo;
     CircularBuffer <float, 50> humidityFifo;

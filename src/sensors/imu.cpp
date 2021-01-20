@@ -3,10 +3,8 @@
 
 namespace IMU {
 
-    const int imuNCS = 3;
-    const int imuInt = 2;
-    //const int imuNCS = 33;
-    //const int imuInt = 32;
+    const int imuNCS = MPU_NCS_PIN;
+    const int imuInt = MPU_INT_PIN;
 
 
     CircularBuffer <Vector, 100> gyroFifo;

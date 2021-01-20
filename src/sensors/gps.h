@@ -16,6 +16,8 @@
 
 #define GPS_RATE 100
 
+#define GPS_SERIAL_PORT Serial2
+
 
 
 namespace GPS {

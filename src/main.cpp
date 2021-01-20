@@ -15,8 +15,6 @@ void setup() {
 
     Serial.begin(USB_BAUD_RATE);
 
-    //Serial2.begin(9600);
-
 
     #ifdef WAIT_FOR_SERIAL
         Serial.println("Waiting for Serial comms");
@@ -37,20 +35,6 @@ void setup() {
 }
 
 void loop() {
-
-
-    //if (Serial.available()) Serial2.write(Serial.read());
-    //if (Serial2.available()) Serial.write(Serial2.read());
-
-    //IMU::deviceThread();
-
-    //RGBLED::deviceThread();
-
-    //AirData::deviceThread();
-
-    //GPS::deviceThread();
-
-    
 
     threadControl();
 

@@ -3,7 +3,7 @@
 
 namespace RGBLED {
 
-    const int ledPin = 4;
+    const int ledPin = RGBLED_PIN;
 
     IntervalControl ledInterval(1); //Keep rate low for starting
     IntervalControl rateCalcInterval(1); 

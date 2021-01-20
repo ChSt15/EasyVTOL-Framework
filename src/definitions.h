@@ -34,6 +34,8 @@
 //##### Other #####
 #define USB_BAUD_RATE 115200
 
+#define BOARD_VERSION_HEADER "boards/board_v_1_0.h"
+
 
 
 

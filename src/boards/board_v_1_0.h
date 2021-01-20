@@ -5,6 +5,8 @@
  * 
  * This defines all pins for a board and can be used to
  * easily change between boards and testing.
+ * Board can be changed in definitions.h file by changing
+ * the BOARD_VERSION_HEADER definition.
  * 
 */
 

@@ -11,7 +11,6 @@
 #include "utils/device_status.h"
 
 #include "definitions.h"
-#include BOARD_VERSION_HEADER
 
 
 

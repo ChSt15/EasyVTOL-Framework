@@ -1,5 +1,5 @@
-#ifndef VEHICLE_DYNAMICS_H
-#define VEHICLE_DYNAMICS_H
+#ifndef VEHICLE_KINEMATICS_H
+#define VEHICLE_KINEMATICS_H
 
 
 
@@ -13,10 +13,10 @@
 
 
 
-class VehicleDynamics {
+class VehicleKinematics {
 public:
 
-    virtual void sensorFusionThread();
+    virtual void calcKinematics();
 
 private:
 

@@ -20,9 +20,12 @@ public:
 
 private:
 
-    Quaternion _attitude;
-    Vector _acceleration;
+    Vector _position;
     Vector _velocity;
+    Vector _acceleration;
+
+    Quaternion _attitude;
+    Vector _angularVelocity;
 
 };
 

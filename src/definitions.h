@@ -22,6 +22,8 @@
 #define THREAD5_TIMESLICE_TICKS 1
 #define THREAD6_TIMESLICE_TICKS 1
 
+#define DISABLE_THREADING
+
 //##### System Testing #####
 #define WAIT_FOR_SERIAL
 #define PRINT_THREAD_USAGE

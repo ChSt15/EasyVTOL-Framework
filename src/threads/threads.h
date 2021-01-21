@@ -14,6 +14,8 @@
 
 #include "outputs/rgb_led.h"
 
+#include "vehicles/vehicle.h"
+
 #include "utils/interval_control.h"
 
 

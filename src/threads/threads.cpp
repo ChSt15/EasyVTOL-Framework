@@ -29,6 +29,8 @@ bool threadActive[7] = {
 
 IntervalControl threadMonitorPrintInterval;
 
+Vehicle vehicle;
+
 
 void threadBegin() {
 
@@ -105,6 +107,7 @@ void threadControl() {
             Serial.println("LED  status: " + deviceStatusToString(RGBLED::getDeviceStatus()));
             Serial.println("GPS  status: " + deviceStatusToString(GPS::getDeviceStatus()) + ", MeasRate: " + GPS::getMeasurementRate() + ", LoopRate: " + GPS::getRate() +", Sats: " + String(GPS::getSatellites()));
             Serial.println("LORA status: " + deviceStatusToString(LORA_2_4::getDeviceStatus()) + ", LoopRate: " + LORA_2_4::getRate());
+            Serial.println("Vehicle attitude: w: " + String(vehicle.getAttitude().w) + ", x: " + String(vehicle.getAttitude().x) + ", y: " + String(vehicle.getAttitude().y) + ", z: " + String(vehicle.getAttitude().z));
             Serial.println();
         #endif
 
@@ -115,32 +118,96 @@ void threadControl() {
     idleThreadCount++;
 
 
-    /*volatile double cpuWaste = 0;
 
 
-    for (int i = 0; i < 1000 && !threadMonitorPrintInterval.isTimeToRun(); i++) {
-        cpuWaste = sin(cpuWaste*5.4);
-    }*/
+    #ifdef DISABLE_THREADING
 
+        //If threading disabled then go through tasks without multithreading
 
+        tasks0();
+        tasks1();
+        tasks2();
+        tasks3();
+        tasks4();
+        tasks5();
+        tasks6();
 
-    //threads.yield();
+    #endif
+
 
 }
 
 
 
-void thread0() {
+//Tasks hold a group of things that need to be done. It is built this way to allow multithreading to be easily disabled
+
+void tasks0() {
+
+    IMU::deviceThread();
+    AirData::deviceThread();
+    LORA_2_4::deviceThread();
+
+}
 
 
+
+void tasks1() {
+
+    GPS::deviceThread();
+
+}
+
+
+
+void tasks2() {
+
+    RGBLED::deviceThread();
+
+}
+
+
+
+void tasks3() {
+
+    vehicle.vehicleThread();
+
+}
+
+
+
+void tasks4() {
 
     
 
+}
+
+
+
+void tasks5() {
+
+    
+
+}
+
+
+
+void tasks6() {
+
+    
+
+}
+
+
+
+
+
+//Each thread hold a task (Group of things) that is then continuesly done
+
+void thread0() {
+
     while(1) {
 
-        IMU::deviceThread();
-        AirData::deviceThread();
-        LORA_2_4::deviceThread();
+        tasks0();
 
         threadCounter[0]++;
         threads.yield();
@@ -153,13 +220,9 @@ void thread0() {
 
 void thread1() {
 
-
-
-    
-
     while(1) {
 
-        GPS::deviceThread();
+        tasks1();
         
         threadCounter[1]++;
         threads.yield();
@@ -172,13 +235,9 @@ void thread1() {
 
 void thread2() {
 
-
-
-    
-
     while(1) {
 
-        RGBLED::deviceThread();
+        tasks2();
         
         threadCounter[2]++;
         threads.yield();
@@ -190,13 +249,11 @@ void thread2() {
 
 
 void thread3() {
-
-
-
     
 
     while(1) {
-
+        
+        tasks3();
         
         threadCounter[3]++;
         threads.yield();
@@ -209,12 +266,9 @@ void thread3() {
 
 void thread4() {
 
-
-
-    
-
     while(1) {
 
+        tasks4();
         
         threadCounter[4]++;
         threads.yield();
@@ -227,12 +281,9 @@ void thread4() {
 
 void thread5() {
 
-
-
-    
-
     while(1) {
 
+        tasks5();
         
         threadCounter[5]++;
         threads.yield();
@@ -245,12 +296,9 @@ void thread5() {
 
 void thread6() {
 
-
-
-    
-
     while(1) {
 
+        tasks6();
         
         threadCounter[6]++;
         threads.yield();

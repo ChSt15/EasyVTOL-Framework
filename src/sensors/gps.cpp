@@ -50,16 +50,16 @@ void GPS::deviceThread() {
 
     } else if (gpsStatus == DeviceStatus::DEVICE_NOT_STARTED || gpsStatus == DeviceStatus::DEVICE_RESTARTATTEMPT) {
         
-        if (gpsStatus == DeviceStatus::DEVICE_NOT_STARTED) Serial2.begin(115200);
-        else Serial2.begin(9600*max(serialBaudMulti,1));
+        if (gpsStatus == DeviceStatus::DEVICE_NOT_STARTED) GPS_SERIAL_PORT.begin(115200);
+        else GPS_SERIAL_PORT.begin(9600*max(serialBaudMulti,1));
 
-        if (gps.begin(Serial2)) {
+        if (gps.begin(GPS_SERIAL_PORT)) {
 
             gpsInterval.setRate(GPS_RATE);
             gpsStatus = DeviceStatus::DEVICE_RUNNING;
 
             gps.setSerialRate(115200);
-            Serial2.begin(115200);
+            GPS_SERIAL_PORT.begin(115200);
 
             gps.setNavigationFrequency(10);
             gps.setAutoPVT(true);

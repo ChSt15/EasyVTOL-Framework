@@ -2,7 +2,6 @@
 #define _QUATERNION_MATH_H_
 
 
-#include <Arduino.h>
 
 #include "vector_math.h"
 

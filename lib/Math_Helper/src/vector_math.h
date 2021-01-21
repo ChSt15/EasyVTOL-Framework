@@ -2,7 +2,7 @@
 #define _VECTOR_MATH_H_
 
 
-#include <Arduino.h>
+//#include <Arduino.h>
 
 
 #ifndef PI

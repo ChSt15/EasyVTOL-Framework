@@ -22,7 +22,7 @@
 #define THREAD5_TIMESLICE_TICKS 1
 #define THREAD6_TIMESLICE_TICKS 1
 
-#define DISABLE_THREADING
+//#define DISABLE_MULTITHREADING
 
 //##### System Testing #####
 #define WAIT_FOR_SERIAL

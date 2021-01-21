@@ -58,7 +58,7 @@ void threadBegin() {
 
     }
 
-    threads.setTimeSlice(0, 10);
+    threads.setTimeSlice(0, 1);
 
     //Set default counter values
     for (uint8_t i = 0; i < 7; i++) threadCounter[i] = 0;
@@ -120,7 +120,7 @@ void threadControl() {
 
 
 
-    #ifdef DISABLE_THREADING
+    #ifdef DISABLE_MULTITHREADING
 
         //If threading disabled then go through tasks without multithreading
 

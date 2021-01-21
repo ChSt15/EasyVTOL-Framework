@@ -30,7 +30,7 @@ void setup() {
     Serial.println("CPU Speed: " + String(F_CPU_ACTUAL));
     delay(500);
 
-    #ifndef DISABLE_THREADING
+    #ifndef DISABLE_MULTITHREADING
         threadBegin();
     #endif
 

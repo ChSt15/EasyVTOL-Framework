@@ -57,6 +57,17 @@ class Quaternion {
 
         }
         
+
+        Quaternion(Vector vector) {
+            
+            w = 0;
+            x = vector.x;
+            y = vector.y;
+            z = vector.z;
+
+        }
+
+        
         Quaternion(float w, float x, float y, float z) {
             this->w = w;
             this->x = x;

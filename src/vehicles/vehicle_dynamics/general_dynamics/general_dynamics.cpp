@@ -7,18 +7,13 @@ void GeneralDynamics::sensorFusionThread() {
     if (IMU::getDeviceStatus() != DeviceStatus::DEVICE_RUNNING) return;
 
 
-    if (IMU::newData) {
-        IMU::newData = false;
-
-        float dt = 0.001f; //Timestep
-
-        float beta = 0.001f; //Z-Axis correction factor
-        float gamma = 0.1f; //X-Axis correction factor
-
+    if (IMU::gyroFifo.available()) {
 
         //Predict system state
 
-        Vector rotationVector = IMU::lastGyro;
+        float dt = 0.001f; //Timestep
+
+        Vector rotationVector = IMU::gyroFifo.pop();
 
         if (rotationVector.magnitude() > 0.0f) {
 
@@ -28,12 +23,17 @@ void GeneralDynamics::sensorFusionThread() {
 
         }
 
+    }
+
+    if (IMU::accelFifo.available()) {
 
         //Correct state prediction
 
+        float beta = 0.001f;
+
         //Z-Axis correction
         Vector zAxisIs = Vector(0,0,1);
-        Vector zAxisSet = (_attitude*IMU::lastAccel.copy().normalize()*_attitude.copy().conjugate()).toVector();
+        Vector zAxisSet = (_attitude*IMU::accelFifo.pop().normalize()*_attitude.copy().conjugate()).toVector();
 
         Vector zAxisRotationAxis = zAxisSet.cross(zAxisIs);
         float zAxisRotationAngle = zAxisSet.getAngleTo(zAxisIs);
@@ -42,10 +42,20 @@ void GeneralDynamics::sensorFusionThread() {
 
         if (zAxisRotationAngle > 0.01*DEGREES) zAxisCorrectionQuat = Quaternion(zAxisRotationAxis, zAxisRotationAngle*beta);
 
-        
+        _attitude = zAxisCorrectionQuat*_attitude;
+        _attitude.normalize(true);
+
+    }
+
+    if (IMU::magFifo.available()) {
+
+        //Correct state prediction
+
+        float gamma = 0.1f;
+
         //X-Axis correction
         Vector xAxisIs(1,0,0);
-        Vector xAxisSet = (_attitude*IMU::lastMag.copy()*_attitude.copy().conjugate()).toVector();
+        Vector xAxisSet = (_attitude*IMU::magFifo.pop().normalize()*_attitude.copy().conjugate()).toVector();
         xAxisSet.z = 0;
         xAxisSet.normalize();
 
@@ -58,7 +68,7 @@ void GeneralDynamics::sensorFusionThread() {
 
 
         //Apply state correction and normalise attitude quaternion 
-        _attitude = zAxisCorrectionQuat*xAxisCorrectionQuat*_attitude;
+        _attitude = xAxisCorrectionQuat*_attitude;
         _attitude.normalize(true);
 
     }

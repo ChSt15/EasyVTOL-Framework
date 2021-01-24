@@ -21,15 +21,9 @@
 
 namespace IMU {
 
-    extern volatile CircularBuffer <Vector, 100> gyroFifo;
-    extern volatile CircularBuffer <Vector, 100> accelFifo;
-    extern volatile CircularBuffer <Vector, 100> magFifo;
-
-    extern Vector lastGyro;
-    extern Vector lastAccel;
-    extern Vector lastMag;
-
-    extern bool newData;
+    extern CircularBuffer <Vector, 100> gyroFifo;
+    extern CircularBuffer <Vector, 100> accelFifo;
+    extern CircularBuffer <Vector, 100> magFifo;
 
     void deviceThread();
 

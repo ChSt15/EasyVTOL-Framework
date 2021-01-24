@@ -7,14 +7,13 @@ namespace IMU {
     const int imuInt = MPU_INT_PIN;
 
 
-    volatile CircularBuffer <Vector, 100> gyroFifo;
-    volatile CircularBuffer <Vector, 100> accelFifo;
-    volatile CircularBuffer <Vector, 100> magFifo;
+    CircularBuffer <Vector, 100> gyroFifo;
+    CircularBuffer <Vector, 100> accelFifo;
+    CircularBuffer <Vector, 100> magFifo;
 
     Vector lastGyro;
     Vector lastAccel;
     Vector lastMag;
-    bool newData = false;
 
     IntervalControl imuInterval(1); //Keep rate low for starting
     IntervalControl rateCalcInterval(1); 
@@ -61,20 +60,17 @@ void IMU::deviceThread() {
             imu.readSensor();
 
             Vector bufVec(-imu.getGyroX_rads(), -imu.getGyroY_rads(), imu.getGyroZ_rads());
-            gyroFifo.unshift(bufVec);
-
+            if (lastGyro != bufVec) gyroFifo.unshift(bufVec);
             lastGyro = bufVec;
 
             bufVec = Vector(imu.getAccelX_mss(), imu.getAccelY_mss(), -imu.getAccelZ_mss());
+            if (lastAccel != bufVec) accelFifo.unshift(bufVec);
             lastAccel = bufVec;
 
             bufVec = Vector(-imu.getMagX_uT(), -imu.getMagY_uT(), imu.getMagZ_uT());
+            if (lastMag != bufVec) magFifo.unshift(bufVec);
             lastMag = bufVec;
 
-            newData = true;
-
-
-            Vector MagCal(imu.getMagBiasX_uT(), imu.getMagBiasY_uT(), imu.getMagBiasZ_uT());
 
             //Serial.println("MagBias: x: " + String(MagCal.x) + ", y: " + String(MagCal.y) + ", z: " + String(MagCal.z));
             //Serial.println("Mag: x: " + String(lastMag.x) + ", y: " + String(lastMag.y) + ", z: " + String(lastMag.z));

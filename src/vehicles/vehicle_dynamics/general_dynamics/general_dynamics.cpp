@@ -30,7 +30,7 @@ void GeneralDynamics::sensorFusionThread() {
 
         //Correct state prediction
 
-        float beta = 0.001f;
+        float beta = 0.0001f;
 
         //Z-Axis correction
         Vector zAxisIs = Vector(0,0,1);
@@ -47,7 +47,7 @@ void GeneralDynamics::sensorFusionThread() {
         _attitude.normalize(true);
 
     }
-    
+
 
     if (IMU::magFifo.available()) {
 

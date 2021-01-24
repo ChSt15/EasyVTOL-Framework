@@ -73,7 +73,7 @@ void threadControl() {
 
     if (threadMonitorPrintInterval.isTimeToRun()) {
 
-        threadMonitorPrintInterval.setRate(1);
+        threadMonitorPrintInterval.setRate(10);
 
         uint32_t totalCount = idleThreadCount;
         for (uint8_t i = 0; i < 7; i++) totalCount += threadCounter[i];
@@ -102,15 +102,15 @@ void threadControl() {
             Serial.println("Idle Thread: " + String(idleThreadCount*100/totalCount) + "%");
             Serial.println("Thread Start success: " + String(threadStartSuccess));
             Serial.println();
-            Serial.println("IMU  status: " + deviceStatusToString(IMU::getDeviceStatus()) + ", Rate: " + IMU::getMeasurementRate() + ", Gyro X: " + String(IMU::gyroFifo.shift().x));
+            Serial.println("IMU  status: " + deviceStatusToString(IMU::getDeviceStatus()) + ", Rate: " + IMU::getMeasurementRate() + ", Gyro X: " + String(IMU::gyroFifo.first().x));
             Serial.println("BME  status: " + deviceStatusToString(AirData::getDeviceStatus()) + ", MeasRate: " + AirData::getMeasurementRate() + ", Temp: " + AirData::temperatureFifo.first());
             Serial.println("LED  status: " + deviceStatusToString(RGBLED::getDeviceStatus()));
             Serial.println("GPS  status: " + deviceStatusToString(GPS::getDeviceStatus()) + ", MeasRate: " + GPS::getMeasurementRate() + ", LoopRate: " + GPS::getRate() +", Sats: " + String(GPS::getSatellites()));
             Serial.println("LORA status: " + deviceStatusToString(LORA_2_4::getDeviceStatus()) + ", LoopRate: " + LORA_2_4::getRate());
-            Serial.println("Vehicle attitude: w: " + String(vehicle.getAttitude().w) + ", x: " + String(vehicle.getAttitude().x) + ", y: " + String(vehicle.getAttitude().y) + ", z: " + String(vehicle.getAttitude().z));
             Serial.println();
         #endif
 
+        
         idleThreadCount = 0;
 
     }
@@ -144,8 +144,10 @@ void threadControl() {
 void tasks0() {
 
     IMU::deviceThread();
-    AirData::deviceThread();
-    LORA_2_4::deviceThread();
+    //AirData::deviceThread();
+    //LORA_2_4::deviceThread();
+
+    vehicle.vehicleThread();
 
 }
 
@@ -153,7 +155,7 @@ void tasks0() {
 
 void tasks1() {
 
-    GPS::deviceThread();
+    //GPS::deviceThread();
 
 }
 
@@ -161,7 +163,7 @@ void tasks1() {
 
 void tasks2() {
 
-    RGBLED::deviceThread();
+    //RGBLED::deviceThread();
 
 }
 
@@ -169,7 +171,7 @@ void tasks2() {
 
 void tasks3() {
 
-    vehicle.vehicleThread();
+
 
 }
 

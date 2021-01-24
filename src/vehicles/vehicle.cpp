@@ -2,3 +2,8 @@
 
 
 
+void Vehicle::vehicleThread() {
+
+    sensorFusionThread();
+
+}

@@ -13,11 +13,9 @@
 
 
 class VehicleControl {
-public:
+protected:
 
     virtual void controlThread();
-
-private:
 
     Vector _setPosition;
     Vector _setVelocity;

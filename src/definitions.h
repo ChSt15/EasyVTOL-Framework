@@ -26,7 +26,7 @@
 
 //##### System Testing #####
 #define WAIT_FOR_SERIAL
-#define PRINT_THREAD_USAGE
+//#define PRINT_THREAD_USAGE
 
 //##### Loop Rates #####
 #define CONTROL_RATE_HZ 4000

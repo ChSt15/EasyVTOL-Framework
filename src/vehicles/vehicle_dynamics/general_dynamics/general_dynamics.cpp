@@ -25,6 +25,7 @@ void GeneralDynamics::sensorFusionThread() {
 
     }
 
+
     if (IMU::accelFifo.available()) {
 
         //Correct state prediction
@@ -46,6 +47,7 @@ void GeneralDynamics::sensorFusionThread() {
         _attitude.normalize(true);
 
     }
+    
 
     if (IMU::magFifo.available()) {
 

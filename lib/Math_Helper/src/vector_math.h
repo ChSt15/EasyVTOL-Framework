@@ -10,7 +10,7 @@
 #endif
 
 #ifndef DEGREES
-#define DEGREES 180.0f/PI
+#define DEGREES (PI/180.0f)
 #endif
 
 
@@ -29,9 +29,8 @@ class Vector {
             y = 0.0f;
             z = 0.0f;
         }
-        
 
-        Vector(float nx, float ny = 0, float nz = 0) {
+        Vector(float nx, float ny, float nz) {
             x = nx;
             y = ny;
             z = nz;
@@ -216,7 +215,7 @@ class Vector {
          */
         float getAngleTo(Vector b) {
             
-            float ca = *this*b/this->magnitude()/b.magnitude();
+            float ca = (*this)*b/(magnitude()*b.magnitude());
 
             return acos(ca);
 

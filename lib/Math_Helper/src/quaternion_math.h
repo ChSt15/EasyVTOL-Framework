@@ -68,11 +68,11 @@ class Quaternion {
         }
 
         
-        Quaternion(float w, float x, float y, float z) {
-            this->w = w;
-            this->x = x;
-            this->y = y;
-            this->z = z;
+        Quaternion(float nw, float nx, float ny, float nz) {
+            this->w = nw;
+            this->x = nx;
+            this->y = ny;
+            this->z = nz;
         }
 
         /**
@@ -83,11 +83,11 @@ class Quaternion {
          * @return none.
          */
 
-        Quaternion(float x, float y, float z) {
+        Quaternion(float nx, float ny, float nz) {
             this->w = 0.0f;
-            this->x = x;
-            this->y = y;
-            this->z = z;
+            this->x = nx;
+            this->y = ny;
+            this->z = nz;
         }
 
         /**
@@ -99,7 +99,7 @@ class Quaternion {
         Quaternion conjugate() {
             x = -x;
             y = -y;
-            y = -z;
+            z = -z;
             return *this;
         }
 
@@ -138,7 +138,7 @@ class Quaternion {
 
             axis->normalize();
 
-            *angle = acos(w*2);
+            *angle = acosf(w)*2;
 
         }
 
@@ -154,9 +154,9 @@ class Quaternion {
 
             float m = getMagnitude();
 
-            if (valid) {
+            if (true) {
 
-                if (sign && w < 0) m = -m;
+                if (sign && w < 0.0f) m = -m;
                 
                 w /= m;
                 x /= m;
@@ -167,7 +167,7 @@ class Quaternion {
 
             if (w==w && x==x && y==y && z==z) return *this; //Check for NAN event
 
-            valid = false;
+            //valid = false;
 
             return *this;
 
@@ -180,7 +180,17 @@ class Quaternion {
          * @return copy of Quaternion.
          */
         Quaternion copy() {
-            return *this;
+            return Quaternion(w,x,y,z);
+        }
+
+        /**
+         * Returns a Vector from x,y,z components of quaternion
+         *
+         * @param values none
+         * @return Vector.
+         */
+        Vector toVector() {
+            return Vector(x,y,z);
         }
 
         Quaternion operator + (Quaternion b) {
@@ -228,4 +238,4 @@ class Quaternion {
 };
 
 
-#endif /* _HELPER_3DMATH_H_ */
+#endif

@@ -75,11 +75,29 @@ class Vector {
 
             float mag = magnitude();
 
-            x /= mag;
-            y /= mag;
-            z /= mag;
+            if (mag != 0.0f) {
+                x /= mag;
+                y /= mag;
+                z /= mag;
+            } else {
+                x = 0.0f;
+                y = 0.0f;
+                z = 0.0f;
+            }
 
             return *this;
+
+        }
+
+        /**
+         * Checks if vector is zero vector.
+         *
+         * @param values none.
+         * @return true if vecter is zero vector.
+         */
+        bool isZeroVector() {
+
+            return magnitude() == 0.0f;
 
         }
 

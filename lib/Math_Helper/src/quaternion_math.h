@@ -46,15 +46,23 @@ class Quaternion {
 
         Quaternion(Vector axis, float angle) {
 
-            axis.normalize();
+            if (axis.isZeroVector()) {
 
-            angle /= 2.0f;
-            float sa = sinf(angle);
-            
-            w = cosf(angle);
-            x = axis.x*sa;
-            y = axis.y*sa;
-            z = axis.z*sa;
+                *this = Quaternion(1,0,0,0);
+
+            } else {
+
+                axis.normalize();
+
+                angle /= 2.0f;
+                float sa = sinf(angle);
+                
+                w = cosf(angle);
+                x = axis.x*sa;
+                y = axis.y*sa;
+                z = axis.z*sa;
+
+            }
 
         }
         
@@ -113,15 +121,7 @@ class Quaternion {
          */
         float getMagnitude() {
 
-            float m = w*w + x*x + y*y + z*z;
-
-            m = sqrtf(m);
-            
-            if (m == m) { // Check for NAN event
-                
-            } else valid = false;
-
-            return m;
+            return sqrtf(w*w + x*x + y*y + z*z);
 
         }
 

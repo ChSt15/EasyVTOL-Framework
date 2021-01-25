@@ -2,6 +2,7 @@
 #define _QUATERNION_MATH_H_
 
 
+#include "math.h"
 
 #include "vector_math.h"
 

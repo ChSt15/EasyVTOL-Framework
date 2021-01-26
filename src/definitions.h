@@ -8,7 +8,7 @@
 
 
 //##### Thread Settings #####
-#define THREADS_TICK_US 20
+#define THREADS_TICK_US 30 //So small so that IMU can be read at 32kHz (32.5us)
 
 #define THREAD0_ACTIVE true
 #define THREAD1_ACTIVE true

@@ -10,6 +10,9 @@ namespace IMU {
     CircularBuffer <Vector, 100> gyroFifo;
     CircularBuffer <Vector, 100> accelFifo;
     CircularBuffer <Vector, 100> magFifo;
+    CircularBuffer <uint32_t, 100> gyroTimestampFifo;
+    CircularBuffer <uint32_t, 100> accelTimestampFifo;
+    CircularBuffer <uint32_t, 100> magTimestampFifo;
 
     Vector lastGyro;
     Vector lastAccel;
@@ -23,10 +26,11 @@ namespace IMU {
     DeviceStatus imuStatus = DeviceStatus::DEVICE_NOT_STARTED; 
     uint8_t startAttempts = 0;
 
-    uint32_t rate = 0;
+    uint32_t loopRate = 0;
     uint32_t loopCounter = 0;
-    uint32_t sensorRate = 0;
-    uint32_t sensorCounter = 0;
+
+    uint32_t gyroRate = 0;
+    uint32_t gyroCounter = 0;
 
     uint32_t lastMeasurement = 0;
 
@@ -54,27 +58,37 @@ void IMU::deviceThread() {
         if (newDataInterrupt) { //If true then data is ready in the imu FIFO
             newDataInterrupt = false;
 
-            sensorCounter++;
-
 
             imu.readSensor();
+            uint32_t timestamp = micros();
 
             Vector bufVec(-imu.getGyroX_rads(), -imu.getGyroY_rads(), imu.getGyroZ_rads());
-            if (lastGyro != bufVec) gyroFifo.unshift(bufVec);
-            lastGyro = bufVec;
+            if (lastGyro != bufVec) {
+                gyroFifo.unshift(bufVec);
+                gyroTimestampFifo.unshift(timestamp);
+                lastGyro = bufVec;
+                gyroCounter++;
+            }
 
             bufVec = Vector(imu.getAccelX_mss(), imu.getAccelY_mss(), -imu.getAccelZ_mss());
-            if (lastAccel != bufVec) accelFifo.unshift(bufVec);
-            lastAccel = bufVec;
+            if (lastAccel != bufVec) {
+                accelFifo.unshift(bufVec);
+                accelTimestampFifo.unshift(timestamp);
+                lastAccel = bufVec;
+            }
 
             bufVec = Vector(-imu.getMagX_uT(), -imu.getMagY_uT(), imu.getMagZ_uT());
-            if (lastMag != bufVec) magFifo.unshift(bufVec);
-            lastMag = bufVec;
+            if (lastMag != bufVec) {
+                magFifo.unshift(bufVec);
+                magTimestampFifo.unshift(timestamp);
+                lastMag = bufVec;
+            }
 
+            Vector testVec = gyroFifo.first();
 
             //Serial.println("MagBias: x: " + String(MagCal.x) + ", y: " + String(MagCal.y) + ", z: " + String(MagCal.z));
             //Serial.println("Mag: x: " + String(lastMag.x) + ", y: " + String(lastMag.y) + ", z: " + String(lastMag.z));
-            //Serial.println("Gyro: x: " + String(lastGyro.x) + ", y: " + String(lastGyro.y) + ", z: " + String(lastGyro.z));
+            //Serial.println("Gyro: x: " + String(testVec.x) + ", y: " + String(testVec.y) + ", z: " + String(testVec.z));
             //Serial.println("Accel: x: " + String(lastAccel.x) + ", y: " + String(lastAccel.y) + ", z: " + String(lastAccel.z));
             //Serial.println();
 
@@ -138,7 +152,7 @@ void IMU::deviceThread() {
 
         if (startCode > 0) {
 
-            imuInterval.setRate(8000);
+            imuInterval.setRate(IMU_RATE_LIMIT);
 
             imu.setAccelRange(MPU9250::AccelRange::ACCEL_RANGE_16G); //Yes this and the gyro range being so high will make it less accurate but we also dont want to loose information. This could be changed later depending on the application
             imu.setGyroRange(MPU9250::GyroRange::GYRO_RANGE_2000DPS);
@@ -185,32 +199,57 @@ void IMU::deviceThread() {
 
         imuStatus = DeviceStatus::DEVICE_FAILURE;
         imuInterval.block(true);
-        rate = 0;
+        loopRate = 0;
 
     }
 
 
 
     if (rateCalcInterval.isTimeToRun()) {
-        rate = loopCounter;
-        sensorRate = sensorCounter;
-        sensorCounter = 0;
+        loopRate = loopCounter;
+        gyroRate = gyroCounter;
+        gyroCounter = 0;
         loopCounter = 0;
     }
 
 }
 
 
-uint32_t IMU::getMeasurementRate() {
-    return sensorRate;
+uint32_t IMU::getGyroRate() {
+    return gyroRate;
 }
 
 
 uint32_t IMU::getRate() {
-    return rate;
+    return loopRate;
 }
 
 
 DeviceStatus IMU::getDeviceStatus() {return imuStatus;}
+
+
+bool IMU::gyroAvailable() {return !gyroFifo.isEmpty();};
+bool IMU::getGyro(Vector* gyro, uint32_t* timestamp) {
+    if (gyroFifo.isEmpty()) return false;
+    *gyro = gyroFifo.pop();
+    *timestamp = gyroTimestampFifo.pop();
+    return true;
+}
+
+bool IMU::accelAvailable() {return !accelFifo.isEmpty();};
+bool IMU::getAccel(Vector* accel, uint32_t* timestamp) {
+    if (accelFifo.isEmpty()) return false;
+    *accel = accelFifo.pop();
+    *timestamp = accelTimestampFifo.pop();
+    return true;
+}
+
+bool IMU::magAvailable() {return !magFifo.isEmpty();};
+bool IMU::getMag(Vector* mag, uint32_t* timestamp) {
+    if (magFifo.isEmpty()) return false;
+    *mag = magFifo.pop();
+    *timestamp = magTimestampFifo.pop();
+    return true;
+}
 
 

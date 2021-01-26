@@ -84,7 +84,7 @@ void IMU::deviceThread() {
                 lastMag = bufVec;
             }
 
-            Vector testVec = gyroFifo.first();
+            //Vector testVec = gyroFifo.first();
 
             //Serial.println("MagBias: x: " + String(MagCal.x) + ", y: " + String(MagCal.y) + ", z: " + String(MagCal.z));
             //Serial.println("Mag: x: " + String(lastMag.x) + ", y: " + String(lastMag.y) + ", z: " + String(lastMag.z));

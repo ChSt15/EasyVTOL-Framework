@@ -1,11 +1,15 @@
 #ifndef DEFINITIONS_H 
 #define DEFINITIONS_H
 
+
+
 //General includes all files should have
 #include "boards/board_v_1_0.h" //Board version for pins etc.
 
+
 //##### Thread Settings #####
-#define THREADS_TICK_US 10
+#define THREADS_TICK_US 20
+
 #define THREAD0_ACTIVE true
 #define THREAD1_ACTIVE true
 #define THREAD2_ACTIVE true
@@ -23,16 +27,21 @@
 #define THREAD6_TIMESLICE_TICKS 1
 
 //#define DISABLE_MULTITHREADING
+//#define DISABLE_THREAD_YIELDING
+
 
 //##### System Testing #####
 #define WAIT_FOR_SERIAL
-//#define PRINT_THREAD_USAGE
+#define PRINT_THREAD_USAGE
+
 
 //##### Loop Rates #####
 #define CONTROL_RATE_HZ 4000
 
+
 //##### Safe Guards #####
 #define SENSOR_MEASUREMENT_TIMEOUT_US 200000L
+
 
 //##### Other #####
 #define USB_BAUD_RATE 115200

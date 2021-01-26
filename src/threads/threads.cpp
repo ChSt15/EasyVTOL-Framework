@@ -102,15 +102,25 @@ void threadControl() {
             Serial.println("Idle Thread: " + String(idleThreadCount*100/totalCount) + "%");
             Serial.println("Thread Start success: " + String(threadStartSuccess));
             Serial.println();
-            Serial.println("IMU  status: " + deviceStatusToString(IMU::getDeviceStatus()) + ", Rate: " + IMU::getMeasurementRate() + ", Gyro X: " + String(IMU::gyroFifo.first().x));
+            Serial.println("IMU  status: " + deviceStatusToString(IMU::getDeviceStatus()) + ", Gyro Rate: " + IMU::getGyroRate());
             Serial.println("BME  status: " + deviceStatusToString(AirData::getDeviceStatus()) + ", MeasRate: " + AirData::getMeasurementRate() + ", Temp: " + AirData::temperatureFifo.first());
             Serial.println("LED  status: " + deviceStatusToString(RGBLED::getDeviceStatus()));
             Serial.println("GPS  status: " + deviceStatusToString(GPS::getDeviceStatus()) + ", MeasRate: " + GPS::getMeasurementRate() + ", LoopRate: " + GPS::getRate() +", Sats: " + String(GPS::getSatellites()));
             Serial.println("LORA status: " + deviceStatusToString(LORA_2_4::getDeviceStatus()) + ", LoopRate: " + LORA_2_4::getRate());
+            Serial.println("Vehicle attitude: w: " + String(vehicle.getAttitude().w) + ", x: " + String(vehicle.getAttitude().x) + ", y: " + String(vehicle.getAttitude().y) + ", z: " + String(vehicle.getAttitude().z));
             Serial.println();
         #endif
 
-        
+        Vector axis;
+        float angle = -1;
+
+        vehicle.getAttitude().getAxisAngle(&axis, &angle);
+        angle = angle/DEGREES;
+
+        //Serial.println();
+        //Serial.println("Speed: " + String(IMU::getMeasurementRate()));
+        //Serial.println("Vehicle attitude: w: " + String(vehicle.getAttitude().w) + ", x: " + String(vehicle.getAttitude().x) + ", y: " + String(vehicle.getAttitude().y) + ", z: " + String(vehicle.getAttitude().z));
+
         idleThreadCount = 0;
 
     }
@@ -212,7 +222,10 @@ void thread0() {
         tasks0();
 
         threadCounter[0]++;
-        threads.yield();
+
+        #ifndef DISABLE_THREAD_YIELDING
+            threads.yield();
+        #endif
 
     }
 
@@ -227,7 +240,10 @@ void thread1() {
         tasks1();
         
         threadCounter[1]++;
-        threads.yield();
+        
+        #ifndef DISABLE_THREAD_YIELDING
+            threads.yield();
+        #endif
 
     }
 
@@ -242,7 +258,10 @@ void thread2() {
         tasks2();
         
         threadCounter[2]++;
-        threads.yield();
+        
+        #ifndef DISABLE_THREAD_YIELDING
+            threads.yield();
+        #endif
 
     }
 
@@ -258,7 +277,10 @@ void thread3() {
         tasks3();
         
         threadCounter[3]++;
-        threads.yield();
+        
+        #ifndef DISABLE_THREAD_YIELDING
+            threads.yield();
+        #endif
 
     }
 
@@ -273,7 +295,10 @@ void thread4() {
         tasks4();
         
         threadCounter[4]++;
-        threads.yield();
+        
+        #ifndef DISABLE_THREAD_YIELDING
+            threads.yield();
+        #endif
 
     }
 
@@ -288,7 +313,10 @@ void thread5() {
         tasks5();
         
         threadCounter[5]++;
-        threads.yield();
+        
+        #ifndef DISABLE_THREAD_YIELDING
+            threads.yield();
+        #endif
 
     }
 
@@ -303,7 +331,10 @@ void thread6() {
         tasks6();
         
         threadCounter[6]++;
-        threads.yield();
+        
+        #ifndef DISABLE_THREAD_YIELDING
+            threads.yield();
+        #endif
 
     }
 

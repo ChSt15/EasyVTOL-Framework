@@ -17,6 +17,7 @@ class VehicleDynamics {
 public:
 
     Quaternion getAttitude() {return _attitude;}
+    Vector getAngularRate() {return _angularRate;}
 
 
 protected:
@@ -28,8 +29,18 @@ protected:
     Vector _velocity;
     Vector _acceleration;
 
-    Quaternion _attitude = Quaternion(Vector(1,1,1), 90*DEGREES);
-    Vector _angularVelocity;
+    Quaternion _attitude = Quaternion(Vector(1,1,1), 0*DEGREES);
+    Vector _angularRate;
+
+    bool _angularRateValid = false;
+    bool _attitudeValid = false;
+    bool _headingValid = false;
+
+    bool _accelerationValid = false;
+    bool _velocityValid = false;
+    bool _positionValid = false;
+
+    bool _highPrecisionValid = false;
 
 };
 

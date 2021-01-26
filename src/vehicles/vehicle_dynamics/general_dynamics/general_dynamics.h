@@ -13,6 +13,7 @@
 #include "sensors/imu.h"
 
 #include "utils/device_status.h"
+#include "utils/interval_control.h"
 
 
 
@@ -23,6 +24,18 @@ protected:
     void sensorFusionThread();
 
 private:
+
+    uint32_t lastGyroTimestamp = 0;
+    uint32_t lastAccelTimestamp = 0;
+    uint32_t lastMagTimestamp = 0;
+
+    Vector gyroAverage;
+
+    bool gyroInitialized = false;
+    bool accelInitialized = false;
+    bool magInitialized = false;
+
+    IntervalControl interval = IntervalControl(2000);
 
 
 };

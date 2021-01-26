@@ -51,7 +51,7 @@ void IMU::deviceThread() {
 
     if (imuStatus == DeviceStatus::DEVICE_RUNNING) {
 
-        if (newDataInterrupt) { //If high then data is ready in the imu FIFO
+        if (newDataInterrupt) { //If true then data is ready in the imu FIFO
             newDataInterrupt = false;
 
             sensorCounter++;
@@ -59,8 +59,24 @@ void IMU::deviceThread() {
 
             imu.readSensor();
 
-            Vector bufVec(imu.getGyroX_rads(), imu.getGyroY_rads(), imu.getGyroZ_rads());
-            gyroFifo.unshift(bufVec);
+            Vector bufVec(-imu.getGyroX_rads(), -imu.getGyroY_rads(), imu.getGyroZ_rads());
+            if (lastGyro != bufVec) gyroFifo.unshift(bufVec);
+            lastGyro = bufVec;
+
+            bufVec = Vector(imu.getAccelX_mss(), imu.getAccelY_mss(), -imu.getAccelZ_mss());
+            if (lastAccel != bufVec) accelFifo.unshift(bufVec);
+            lastAccel = bufVec;
+
+            bufVec = Vector(-imu.getMagX_uT(), -imu.getMagY_uT(), imu.getMagZ_uT());
+            if (lastMag != bufVec) magFifo.unshift(bufVec);
+            lastMag = bufVec;
+
+
+            //Serial.println("MagBias: x: " + String(MagCal.x) + ", y: " + String(MagCal.y) + ", z: " + String(MagCal.z));
+            //Serial.println("Mag: x: " + String(lastMag.x) + ", y: " + String(lastMag.y) + ", z: " + String(lastMag.z));
+            //Serial.println("Gyro: x: " + String(lastGyro.x) + ", y: " + String(lastGyro.y) + ", z: " + String(lastGyro.z));
+            //Serial.println("Accel: x: " + String(lastAccel.x) + ", y: " + String(lastAccel.y) + ", z: " + String(lastAccel.z));
+            //Serial.println();
 
 
             /*if (imu.readFifo()) { // read data and check if successful
@@ -133,10 +149,15 @@ void IMU::deviceThread() {
             imu.setSrd(0);
             imu.setDlpfBandwidth(MPU9250::DlpfBandwidth::DLPF_BANDWIDTH_184HZ);
 
+            imu.setMagCalX(18.26, 1.0f);
+            imu.setMagCalY(39.14, 1.0f);
+            imu.setMagCalZ(-40.69, 1.0f);
+
             attachInterrupt(imuInt, interruptRoutine, HIGH);
 
             lastMeasurement = micros();
 
+            //imuStatus = DeviceStatus::DEVICE_CALIBRATING;
             imuStatus = DeviceStatus::DEVICE_RUNNING;
 
         } else {
@@ -151,7 +172,13 @@ void IMU::deviceThread() {
     } else if (imuStatus == DeviceStatus::DEVICE_CALIBRATING) {
 
         //################## Following is Temporary #################
-        if (imu.calibrateGyro()) imuStatus = DeviceStatus::DEVICE_RUNNING; 
+        Serial.println("CALIBRATING IMU");
+        //imu.calibrateGyro();
+
+        
+        imu.calibrateMag();
+
+        imuStatus = DeviceStatus::DEVICE_RUNNING; 
         //else imuStatus = DeviceStatus::DEVICE_FAILURE; 
 
     } else { //This section is for device failure or a wierd mode that should not be set, therefore assume failure

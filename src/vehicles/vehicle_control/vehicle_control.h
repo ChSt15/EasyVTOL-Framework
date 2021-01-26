@@ -13,15 +13,16 @@
 
 
 class VehicleControl {
-public:
+protected:
 
-    virtual void controlLoop();
+    virtual void controlThread();
 
-private:
+    Vector _setPosition;
+    Vector _setVelocity;
+    Vector _setAcceleration;
 
     Quaternion _setAttitude;
-    Vector _setAcceleration;
-    Vector _setVelocity;
+    Vector _setAngularVelocity;
 
 };
 

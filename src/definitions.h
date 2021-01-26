@@ -22,9 +22,11 @@
 #define THREAD5_TIMESLICE_TICKS 1
 #define THREAD6_TIMESLICE_TICKS 1
 
+//#define DISABLE_MULTITHREADING
+
 //##### System Testing #####
 #define WAIT_FOR_SERIAL
-#define PRINT_THREAD_USAGE
+//#define PRINT_THREAD_USAGE
 
 //##### Loop Rates #####
 #define CONTROL_RATE_HZ 4000

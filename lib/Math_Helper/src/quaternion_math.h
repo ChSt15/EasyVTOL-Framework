@@ -2,6 +2,7 @@
 #define _QUATERNION_MATH_H_
 
 
+#include "math.h"
 
 #include "vector_math.h"
 
@@ -45,23 +46,42 @@ class Quaternion {
 
         Quaternion(Vector axis, float angle) {
 
-            axis.normalize();
+            if (axis.isZeroVector()) {
 
-            angle /= 2.0f;
-            float sa = sinf(angle);
-            
-            w = cosf(angle);
-            x = axis.x*sa;
-            y = axis.y*sa;
-            z = axis.z*sa;
+                *this = Quaternion(1,0,0,0);
+
+            } else {
+
+                axis.normalize();
+
+                angle /= 2.0f;
+                float sa = sinf(angle);
+                
+                w = cosf(angle);
+                x = axis.x*sa;
+                y = axis.y*sa;
+                z = axis.z*sa;
+
+            }
 
         }
         
-        Quaternion(float w, float x, float y, float z) {
-            this->w = w;
-            this->x = x;
-            this->y = y;
-            this->z = z;
+
+        Quaternion(Vector vector) {
+            
+            w = 0;
+            x = vector.x;
+            y = vector.y;
+            z = vector.z;
+
+        }
+
+        
+        Quaternion(float nw, float nx, float ny, float nz) {
+            this->w = nw;
+            this->x = nx;
+            this->y = ny;
+            this->z = nz;
         }
 
         /**
@@ -72,11 +92,11 @@ class Quaternion {
          * @return none.
          */
 
-        Quaternion(float x, float y, float z) {
+        Quaternion(float nx, float ny, float nz) {
             this->w = 0.0f;
-            this->x = x;
-            this->y = y;
-            this->z = z;
+            this->x = nx;
+            this->y = ny;
+            this->z = nz;
         }
 
         /**
@@ -88,7 +108,7 @@ class Quaternion {
         Quaternion conjugate() {
             x = -x;
             y = -y;
-            y = -z;
+            z = -z;
             return *this;
         }
 
@@ -101,15 +121,7 @@ class Quaternion {
          */
         float getMagnitude() {
 
-            float m = w*w + x*x + y*y + z*z;
-
-            m = sqrtf(m);
-            
-            if (m == m) { // Check for NAN event
-                
-            } else valid = false;
-
-            return m;
+            return sqrtf(w*w + x*x + y*y + z*z);
 
         }
 
@@ -127,7 +139,7 @@ class Quaternion {
 
             axis->normalize();
 
-            *angle = acos(w*2);
+            *angle = acosf(w)*2;
 
         }
 
@@ -143,9 +155,9 @@ class Quaternion {
 
             float m = getMagnitude();
 
-            if (valid) {
+            if (true) {
 
-                if (sign && w < 0) m = -m;
+                if (sign && w < 0.0f) m = -m;
                 
                 w /= m;
                 x /= m;
@@ -156,7 +168,7 @@ class Quaternion {
 
             if (w==w && x==x && y==y && z==z) return *this; //Check for NAN event
 
-            valid = false;
+            //valid = false;
 
             return *this;
 
@@ -169,7 +181,17 @@ class Quaternion {
          * @return copy of Quaternion.
          */
         Quaternion copy() {
-            return *this;
+            return Quaternion(w,x,y,z);
+        }
+
+        /**
+         * Returns a Vector from x,y,z components of quaternion
+         *
+         * @param values none
+         * @return Vector.
+         */
+        Vector toVector() {
+            return Vector(x,y,z);
         }
 
         Quaternion operator + (Quaternion b) {
@@ -217,4 +239,4 @@ class Quaternion {
 };
 
 
-#endif /* _HELPER_3DMATH_H_ */
+#endif

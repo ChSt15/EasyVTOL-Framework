@@ -14,6 +14,8 @@
 
 #include "outputs/rgb_led.h"
 
+#include "vehicles/vehicle.h"
+
 #include "utils/interval_control.h"
 
 
@@ -25,6 +27,15 @@ extern bool threadStartSuccess;
 
 void threadBegin();
 void threadControl();
+
+void tasks0();
+void tasks1();
+void tasks2();
+void tasks3();
+void tasks4();
+void tasks5();
+void tasks6();
+void tasks7();
 
 void thread0();
 void thread1();

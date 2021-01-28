@@ -3,6 +3,16 @@
 
 
 
+/**
+ * This is where the vehicle sensor measurements (sensorfusion) is done. This takes
+ * the sensor measurements and calculates all inertial parameters of the vehicle.
+ * This allows the navigation to be written in a general way for the simulator.
+ * Because this class will be augmented by the simulator, this structure also allows for very
+ * easy testing of the vehicle code in the simulator in a very "drag and drop" type way.
+*/
+
+
+
 #include "Arduino.h"
 
 #include "sensors/imu.h"

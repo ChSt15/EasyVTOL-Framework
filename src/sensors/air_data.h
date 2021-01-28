@@ -16,8 +16,9 @@
 
 
 
-
 #define BME_RATE 20
+
+#define SENSOR_MEASUREMENT_TIMEOUT_US 20000
 
 
 

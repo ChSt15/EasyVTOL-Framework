@@ -36,6 +36,10 @@
 
 
 
+#define SENSOR_MEASUREMENT_TIMEOUT_US 20000
+
+
+
 namespace SensorTemplate {
 
     //All methods and variables declared here are public

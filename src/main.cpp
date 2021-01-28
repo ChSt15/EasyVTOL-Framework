@@ -13,7 +13,7 @@
 
 void setup() {
 
-    Serial.begin(USB_BAUD_RATE);
+    Serial.begin(115200);
 
 
     #ifdef WAIT_FOR_SERIAL

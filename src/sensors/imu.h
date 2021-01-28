@@ -44,8 +44,8 @@ namespace IMU {
     uint32_t getLoopRate();
 
     uint32_t getGyroRate();
-    uint32_t getAccelRate(); //TO BE IMPLEMENTED. Returns data rate in same way as getGyroRate()
-    uint32_t getMagRate(); //TO BE IMPLEMENTED.
+    uint32_t getAccelRate(); 
+    uint32_t getMagRate(); 
 
     DeviceStatus getDeviceStatus();
     

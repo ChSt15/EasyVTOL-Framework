@@ -16,12 +16,19 @@
 #include "utils/interval_control.h"
 
 
+#define LOOP_RATE_LIMIT 2000
 
 
 class GeneralDynamics: public VehicleDynamics {
+public:
+
+    void resetInertialTEST() {_position = Vector(0,0,0); _velocity = Vector(0,0,0);}; //To be removed or replaced. This is only for testing Inertial navigation
+
+
 protected:
 
     void sensorFusionThread();
+
 
 private:
 
@@ -35,7 +42,7 @@ private:
     bool accelInitialized = false;
     bool magInitialized = false;
 
-    IntervalControl interval = IntervalControl(2000);
+    IntervalControl interval = IntervalControl(LOOP_RATE_LIMIT);
 
 
 };

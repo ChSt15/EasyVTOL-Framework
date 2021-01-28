@@ -30,6 +30,9 @@ public:
     Vector getAngularRate() {return _angularRate;}
 
     Vector getPosition() {return _position;}
+    Vector getVelocity() {return _velocity;}
+    Vector getAcceleration() {return _acceleration;}
+    Vector getLinearAcceleration() {return _linearAcceleration;}
 
 
 protected:
@@ -40,6 +43,7 @@ protected:
     Vector _position;
     Vector _velocity;
     Vector _acceleration;
+    Vector _linearAcceleration;
 
     Quaternion _attitude = Quaternion(Vector(1,1,1), 0*DEGREES);
     Vector _angularRate;

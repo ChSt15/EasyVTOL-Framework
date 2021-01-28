@@ -32,6 +32,9 @@ void GeneralDynamics::sensorFusionThread() {
 
             }
 
+            //Update angularRate
+            _angularRate = (_attitude*rotationVector*_attitude.copy().conjugate()).toVector(); //Transform angular rate into world coordinate system
+
         } else {
 
             //Gyro filter initialisation
@@ -57,7 +60,7 @@ void GeneralDynamics::sensorFusionThread() {
             float dt = float(timestamp - lastAccelTimestamp)/1000000.0f;
             lastAccelTimestamp = timestamp;
 
-            float beta = 0.1f;
+            float beta = 1.0f;
 
             //Z-Axis correction
             Vector zAxisIs = Vector(0,0,1);
@@ -72,6 +75,11 @@ void GeneralDynamics::sensorFusionThread() {
             //Apply state correction and normalise attitude quaternion 
             _attitude = zAxisCorrectionQuat*_attitude;
             _attitude.normalize(true);
+
+
+            //Update acceleration
+            _acceleration = (_attitude*accelVector*_attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
+            _linearAcceleration = _acceleration - Vector(0,0,9.81);
 
         } else if (gyroInitialized) {
             
@@ -110,7 +118,7 @@ void GeneralDynamics::sensorFusionThread() {
             float dt = float(timestamp - lastMagTimestamp)/1000000.0f;
             lastMagTimestamp = timestamp;
 
-            float gamma = 0.1f;
+            float gamma = 100.0f;
 
             //X-Axis correction
             Vector xAxisIs(1,0,0);
@@ -152,5 +160,16 @@ void GeneralDynamics::sensorFusionThread() {
         }
 
     }
+
+
+
+
+    //################## Inertial navigation testing ###############
+
+    float dt = 1.0f/LOOP_RATE_LIMIT;
+
+    _velocity = _velocity + _acceleration*dt;
+
+    _position = _position + _velocity*dt;
 
 }

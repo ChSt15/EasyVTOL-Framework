@@ -4,11 +4,6 @@
 
 #include "threads/threads.h"
 
-#include "sensors/gps.h"
-#include "sensors/imu.h"
-#include "sensors/air_data.h"
-
-#include "outputs/rgb_led.h"
 
 
 void setup() {

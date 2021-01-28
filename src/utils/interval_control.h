@@ -4,6 +4,8 @@
 
 #include "Arduino.h"
 
+#include "definitions.h"
+
 
 class IntervalControl {
 public:

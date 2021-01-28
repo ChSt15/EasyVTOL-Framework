@@ -5,6 +5,8 @@
 
 #include "Arduino.h"
 
+#include "definitions.h"
+
 #include "SparkFunBME280.h"
 #include "vector_math.h"
 #include "CircularBuffer.h"
@@ -12,7 +14,6 @@
 #include "utils/interval_control.h"
 #include "utils/device_status.h"
 
-#include "definitions.h"
 
 
 

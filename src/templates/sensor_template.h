@@ -25,6 +25,8 @@
 //We NEED these includes. But other includes can be added
 #include "Arduino.h"
 
+#include "definitions.h"
+
 #include "CircularBuffer.h"
 
 #include "utils/interval_control.h"

@@ -118,8 +118,16 @@ void threadControl() {
         angle = angle/DEGREES;
 
         //Serial.println();
-        //Serial.println("Speed: " + String(IMU::getMeasurementRate()));
-        //Serial.println("Vehicle attitude: w: " + String(vehicle.getAttitude().w) + ", x: " + String(vehicle.getAttitude().x) + ", y: " + String(vehicle.getAttitude().y) + ", z: " + String(vehicle.getAttitude().z));
+        //Serial.println("LoopRate: " + String(IMU::getRate()) + ", GyroRate: " + String(IMU::getGyroRate()) + ", AccelRate: " + String(IMU::getAccelRate()) + ", MagRate: " + String(IMU::getMagRate()));
+        Serial.println("Vehicle attitude: w: " + String(vehicle.getAttitude().w) + ", x: " + String(vehicle.getAttitude().x) + ", y: " + String(vehicle.getAttitude().y) + ", z: " + String(vehicle.getAttitude().z));
+        //Serial.println("Vehicle accel: x: " + String(vehicle.getAcceleration().x) + ", y: " + String(vehicle.getAcceleration().y) + ", z: " + String(vehicle.getAcceleration().z));
+        //Serial.println("Vehicle speed: x: " + String(vehicle.getVelocity().x) + ", y: " + String(vehicle.getVelocity().y) + ", z: " + String(vehicle.getVelocity().z));
+        Serial.println("Vehicle pos: x: " + String(vehicle.getPosition().x) + ", y: " + String(vehicle.getPosition().y) + ", z: " + String(vehicle.getPosition().z));
+
+        if (Serial.available()) {
+            vehicle.resetInertialTEST();
+            while(Serial.available()) Serial.read();
+        }
 
         idleThreadCount = 0;
 

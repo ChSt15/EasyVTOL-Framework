@@ -1,5 +1,5 @@
-#ifndef CONTROL_H
-#define CONTROL_H
+#ifndef KINEMATICS_H
+#define KINEMATICS_H
 
 
 

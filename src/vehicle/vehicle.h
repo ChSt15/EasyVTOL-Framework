@@ -5,14 +5,11 @@
 
 #include "Arduino.h"
 
+#include "definitions.h"
+
 #include "guidance.h"
 #include "navigation.h"
 #include "control.h"
-
-#include "quaternion_math.h"
-#include "vector_math.h"
-
-#include "utils/device_status.h"
 
 
 

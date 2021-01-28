@@ -3,6 +3,8 @@
 
 #include "Arduino.h"
 
+#include "definitions.h"
+
 #include "MPU9250.h"
 #include "vector_math.h"
 #include "CircularBuffer.h"
@@ -10,8 +12,6 @@
 
 #include "utils/interval_control.h"
 #include "utils/device_status.h"
-
-#include "definitions.h"
 
 
 

@@ -78,6 +78,7 @@ void IMU::deviceThread() {
 
             bufVec = Vector(imu.getAccelX_mss(), imu.getAccelY_mss(), -imu.getAccelZ_mss());
             if (lastAccel != bufVec) {
+                //bufVec = bufVec*0.001f + lastAccel*0.999f;
                 accelFifo.unshift(bufVec);
                 accelTimestampFifo.unshift(timestamp);
                 lastAccel = bufVec;
@@ -93,12 +94,16 @@ void IMU::deviceThread() {
             }
 
             //Vector testVec = gyroFifo.first();
-            //Vector testVec = gyroFifo.first();
+            //Vector bias = Vector(imu.getAccelBiasX_mss(), imu.getAccelBiasY_mss(), imu.getAccelBiasZ_mss());
+            //Vector scale = Vector(imu.getAccelScaleFactorX(), imu.getAccelScaleFactorY(), imu.getAccelScaleFactorZ());
+
+            //Serial.println("AccelBias: x: " + String(bias.x) + ", y: " + String(bias.y) + ", z: " + String(bias.z));
+            //Serial.println("AccelScale: x: " + String(scale.x) + ", y: " + String(scale.y) + ", z: " + String(scale.z));
 
             //Serial.println("MagBias: x: " + String(MagCal.x) + ", y: " + String(MagCal.y) + ", z: " + String(MagCal.z));
             //Serial.println("Mag: x: " + String(lastMag.x) + ", y: " + String(lastMag.y) + ", z: " + String(lastMag.z));
             //Serial.println("Gyro: x: " + String(testVec.x) + ", y: " + String(testVec.y) + ", z: " + String(testVec.z));
-            //Serial.println("Accel: x: " + String(lastAccel.x) + ", y: " + String(lastAccel.y) + ", z: " + String(lastAccel.z));
+            //Serial.println("Accel: x: " + String(lastAccel.x,5) + ", y: " + String(lastAccel.y,5) + ", z: " + String(lastAccel.z,5));
             //Serial.println();
 
 
@@ -195,6 +200,10 @@ void IMU::deviceThread() {
             imu.setMagCalY(39.14, 1.0f);
             imu.setMagCalZ(-40.69, 1.0f);
 
+            imu.setAccelCalX(0.20268, 1.0f);
+            imu.setAccelCalY(-0.14238, 1.001f);
+            imu.setAccelCalZ(0.6755, 0.9869f);
+
             attachInterrupt(imuInt, interruptRoutine, HIGH);
 
             lastMeasurement = micros();
@@ -217,9 +226,11 @@ void IMU::deviceThread() {
         //################## Following is Temporary #################
         Serial.println("CALIBRATING IMU");
         //imu.calibrateGyro();
-
-        
-        imu.calibrateMag();
+        //imu.calibrateMag();
+        for (byte n = 0; n < 6; n++) {
+            if (n != 0) Serial.println("SWITCH");
+            imu.calibrateAccel();
+        }
 
         imuStatus = DeviceStatus::DEVICE_RUNNING; 
         //else imuStatus = DeviceStatus::DEVICE_FAILURE; 

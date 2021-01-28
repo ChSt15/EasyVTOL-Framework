@@ -3,14 +3,14 @@
 
 #include "Arduino.h"
 
+#include "definitions.h"
+
 #include "SparkFun_Ublox_Arduino_Library.h"
 #include "vector_math.h"
 #include "CircularBuffer.h"
 
 #include "utils/interval_control.h"
 #include "utils/device_status.h"
-
-#include "definitions.h"
 
 
 

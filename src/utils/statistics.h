@@ -2,7 +2,8 @@
 #define STATISTICS_HELPER_H
 
 
-#include "math.h"
+
+#include "definitions.h"
 
 #include "CircularBuffer.h"
 

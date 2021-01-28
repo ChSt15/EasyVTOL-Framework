@@ -5,12 +5,8 @@
 
 #include "Arduino.h"
 
-#include "quaternion_math.h"
-#include "vector_math.h"
-
 #include "sensors/imu.h"
 
-#include "utils/device_status.h"
 #include "utils/interval_control.h"
 
 
@@ -38,6 +34,7 @@ protected:
 
 private:
 
+    //System inertial information
     Vector _position;
     Vector _velocity;
     Vector _acceleration;
@@ -46,6 +43,14 @@ private:
     Quaternion _attitude = Quaternion(Vector(1,1,1), 0*DEGREES);
     Vector _angularRate;
 
+    //Filter data
+    Vector gyroAverage;
+
+    uint32_t lastGyroTimestamp = 0;
+    uint32_t lastAccelTimestamp = 0;
+    uint32_t lastMagTimestamp = 0;
+
+    //System information flagges
     bool _angularRateValid = false;
     bool _attitudeValid = false;
     bool _headingValid = false;
@@ -56,16 +61,11 @@ private:
 
     bool _highPrecisionValid = false;
 
-    uint32_t lastGyroTimestamp = 0;
-    uint32_t lastAccelTimestamp = 0;
-    uint32_t lastMagTimestamp = 0;
-
-    Vector gyroAverage;
-
     bool gyroInitialized = false;
     bool accelInitialized = false;
     bool magInitialized = false;
 
+    //Loop interval control
     IntervalControl interval = IntervalControl(LOOP_RATE_LIMIT);
 
 

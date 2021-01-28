@@ -86,7 +86,6 @@ private:
     T _lastOutputValue;
     T _lastInputValue;
     uint32_t _lastRun = 0;
-    //alpha * (filteredArray[i-1] + data.recordedSamples[i] - data.recordedSamples[i-1]);
 
 
 };

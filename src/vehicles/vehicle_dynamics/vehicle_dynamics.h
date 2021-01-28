@@ -12,12 +12,24 @@
 
 
 
+struct VehicleInertal {
+    Vector _position;
+    Vector _velocity;
+    Vector _acceleration;
+
+    Quaternion _attitude = Quaternion(Vector(1,1,1), 0*DEGREES);
+    Vector _angularRate;
+};
+
+
 
 class VehicleDynamics {
 public:
 
     Quaternion getAttitude() {return _attitude;}
     Vector getAngularRate() {return _angularRate;}
+
+    Vector getPosition() {return _position;}
 
 
 protected:

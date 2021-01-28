@@ -10,11 +10,11 @@
 #include "guidance.h"
 #include "navigation.h"
 #include "control.h"
+#include "kinematics.h"
 
 
 
-
-class Vehicle: public Guidance, public Control, public Navigation {
+class Vehicle: public Guidance, public Control, public Navigation, public Kinematics {
 public:
 
     void vehicleThread();

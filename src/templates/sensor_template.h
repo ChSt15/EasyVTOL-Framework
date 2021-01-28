@@ -25,12 +25,18 @@
 //We NEED these includes. But other includes can be added
 #include "Arduino.h"
 
+#include "definitions.h"
+
 #include "CircularBuffer.h"
 
 #include "utils/interval_control.h"
 #include "utils/device_status.h"
 
 #include "definitions.h"
+
+
+
+#define SENSOR_MEASUREMENT_TIMEOUT_US 20000
 
 
 

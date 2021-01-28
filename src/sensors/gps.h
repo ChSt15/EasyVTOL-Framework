@@ -3,6 +3,8 @@
 
 #include "Arduino.h"
 
+#include "definitions.h"
+
 #include "SparkFun_Ublox_Arduino_Library.h"
 #include "vector_math.h"
 #include "CircularBuffer.h"
@@ -10,11 +12,11 @@
 #include "utils/interval_control.h"
 #include "utils/device_status.h"
 
-#include "definitions.h"
-
 
 
 #define GPS_RATE 100
+
+#define SENSOR_MEASUREMENT_TIMEOUT_US 20000
 
 #define GPS_SERIAL_PORT Serial2
 

@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 
+#include "definitions.h"
 
 #include "SX128XLT.h"
 #include "vector_math.h"
@@ -11,8 +12,6 @@
 
 #include "utils/interval_control.h"
 #include "utils/device_status.h"
-
-#include "definitions.h"
 
 
 

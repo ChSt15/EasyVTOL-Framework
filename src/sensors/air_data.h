@@ -5,6 +5,8 @@
 
 #include "Arduino.h"
 
+#include "definitions.h"
+
 #include "SparkFunBME280.h"
 #include "vector_math.h"
 #include "CircularBuffer.h"
@@ -12,11 +14,11 @@
 #include "utils/interval_control.h"
 #include "utils/device_status.h"
 
-#include "definitions.h"
-
 
 
 #define BME_RATE 20
+
+#define SENSOR_MEASUREMENT_TIMEOUT_US 20000
 
 
 

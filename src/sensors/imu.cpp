@@ -32,6 +32,12 @@ namespace IMU {
     uint32_t gyroRate = 0;
     uint32_t gyroCounter = 0;
 
+    uint32_t accelRate = 0;
+    uint32_t accelCounter = 0;
+
+    uint32_t magRate = 0;
+    uint32_t magCounter = 0;
+
     uint32_t lastMeasurement = 0;
 
     bool newDataInterrupt = false;
@@ -75,6 +81,7 @@ void IMU::deviceThread() {
                 accelFifo.unshift(bufVec);
                 accelTimestampFifo.unshift(timestamp);
                 lastAccel = bufVec;
+                accelCounter++;
             }
 
             bufVec = Vector(-imu.getMagX_uT(), -imu.getMagY_uT(), imu.getMagZ_uT());
@@ -82,8 +89,10 @@ void IMU::deviceThread() {
                 magFifo.unshift(bufVec);
                 magTimestampFifo.unshift(timestamp);
                 lastMag = bufVec;
+                magCounter++;
             }
 
+            //Vector testVec = gyroFifo.first();
             //Vector testVec = gyroFifo.first();
 
             //Serial.println("MagBias: x: " + String(MagCal.x) + ", y: " + String(MagCal.y) + ", z: " + String(MagCal.z));
@@ -123,17 +132,35 @@ void IMU::deviceThread() {
 
                 for (byte i = 0; i < bufferSize; i++) {
 
-                    Vector bufVec(gyroX[i], gyroY[i], gyroZ[i]);
-                    if (bufVec != lastGyro && !gyroFifo.isFull()) gyroFifo.unshift(bufVec);
-                    lastGyro = bufVec;
+                    Vector bufVec(-gyroX[i], -gyroY[i], gyroZ[i]);
+                    if (lastGyro != bufVec) {
+                        static uint32_t timestamp = micros();
+                        gyroFifo.unshift(bufVec);
+                        gyroTimestampFifo.unshift(timestamp);
+                        timestamp += 1000000/gyroRate;
+                        lastGyro = bufVec;
+                        gyroCounter++;
+                    }
 
-                    bufVec = Vector(accelX[i], accelY[i], accelZ[i]);
-                    if (bufVec != lastAccel && !accelFifo.isFull()) accelFifo.unshift(bufVec);
-                    lastAccel = bufVec;
+                    bufVec = Vector(accelX[i], accelY[i], -accelZ[i]);
+                    if (lastAccel != bufVec) {
+                        static uint32_t timestamp = micros();
+                        accelFifo.unshift(bufVec);
+                        accelTimestampFifo.unshift(timestamp);
+                        timestamp += 1000000/accelRate;
+                        lastAccel = bufVec;
+                        accelCounter++;
+                    }
 
-                    bufVec = Vector(magX[i], magY[i], magZ[i]);
-                    if (bufVec != lastMag && !magFifo.isFull()) magFifo.unshift(bufVec);
-                    lastMag = bufVec;
+                    bufVec = Vector(-magX[i], -magY[i], magZ[i]);
+                    if (lastMag != bufVec) {
+                        static uint32_t timestamp = micros();
+                        magFifo.unshift(bufVec);
+                        magTimestampFifo.unshift(timestamp);
+                        timestamp += 1000000/magRate;
+                        lastMag = bufVec;
+                        magCounter++;
+                    }
 
                 }
 
@@ -146,8 +173,9 @@ void IMU::deviceThread() {
 
     } else if (imuStatus == DeviceStatus::DEVICE_NOT_STARTED || imuStatus == DeviceStatus::DEVICE_RESTARTATTEMPT) {
         
-
+        Serial.println("Test1");
         int startCode = imu.begin();
+        Serial.println("Test2");
 
 
         if (startCode > 0) {
@@ -170,6 +198,7 @@ void IMU::deviceThread() {
             attachInterrupt(imuInt, interruptRoutine, HIGH);
 
             lastMeasurement = micros();
+            
 
             //imuStatus = DeviceStatus::DEVICE_CALIBRATING;
             imuStatus = DeviceStatus::DEVICE_RUNNING;
@@ -208,7 +237,11 @@ void IMU::deviceThread() {
     if (rateCalcInterval.isTimeToRun()) {
         loopRate = loopCounter;
         gyroRate = gyroCounter;
+        accelRate = accelCounter;
+        magRate = magCounter;
         gyroCounter = 0;
+        accelCounter = 0;
+        magCounter = 0;
         loopCounter = 0;
     }
 
@@ -219,8 +252,15 @@ uint32_t IMU::getGyroRate() {
     return gyroRate;
 }
 
+uint32_t IMU::getAccelRate() {
+    return accelRate;
+}
 
-uint32_t IMU::getRate() {
+uint32_t IMU::getMagRate() {
+    return magRate;
+}
+
+uint32_t IMU::getLoopRate() {
     return loopRate;
 }
 

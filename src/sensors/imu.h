@@ -17,6 +17,9 @@
 
 #define IMU_RATE_LIMIT 35000
 
+#define GYRO_MEASUREMENT_INTERVAL_US 
+#define ACCEL_MEASUREMENT_INTERVAL_US 
+#define MAG_MEASUREMENT_INTERVAL_US 
 
 
 namespace IMU {
@@ -38,7 +41,7 @@ namespace IMU {
 
     void deviceThread();
 
-    uint32_t getRate();
+    uint32_t getLoopRate();
 
     uint32_t getGyroRate();
     uint32_t getAccelRate(); //TO BE IMPLEMENTED. Returns data rate in same way as getGyroRate()

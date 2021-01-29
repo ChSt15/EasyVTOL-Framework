@@ -56,7 +56,7 @@ private:
     Vector _angularRate;
 
     //Filter data
-    HighPassFilter<Vector> gyroHPF = HighPassFilter<Vector>(0.01);
+    //HighPassFilter<Vector> gyroHPF = HighPassFilter<Vector>(0.01);
 
     uint32_t lastGyroTimestamp = 0;
     uint32_t lastAccelTimestamp = 0;

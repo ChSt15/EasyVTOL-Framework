@@ -18,6 +18,8 @@
 #include "sensors/imu.h"
 
 #include "utils/interval_control.h"
+#include "utils/high_pass_filter.h"
+#include "utils/low_pass_filter.h"
 
 
 #define LOOP_RATE_LIMIT 2000
@@ -54,7 +56,7 @@ private:
     Vector _angularRate;
 
     //Filter data
-    Vector gyroAverage;
+    HighPassFilter<Vector> gyroHPF = HighPassFilter<Vector>(0.01);
 
     uint32_t lastGyroTimestamp = 0;
     uint32_t lastAccelTimestamp = 0;

@@ -23,11 +23,11 @@ public:
 
         _sampleRate = sampleRate;
         _cutOffFreq = cutOffFreq;
-        float RC = 1.0/(cutOffFreq*2*3.14);
+        _RC = 1.0/(cutOffFreq*2*3.14);
 
         if (_sampleRate != -1) {
             float dt = 1.0/_sampleRate;
-            _alpha = dt/(RC+dt);
+            _alpha = dt/(_RC+dt);
         }
 
     }
@@ -41,11 +41,12 @@ public:
     T update(T input) {
         
         if (_sampleRate == -1) {
-            float dt = 1.0/(micros() - _lastRun);
+            float dt = (micros() - _lastRun)/1000000.0;
+            _lastRun = micros();
             _alpha = dt/(_RC+dt);
         }
 
-        T output = _lastValue + _alpha*(input - _lastValue);
+        T output = _lastValue + (input - _lastValue)*_alpha;
         _lastValue = output;
 
         return output;
@@ -62,10 +63,11 @@ public:
      */
     T update(T input, uint32_t timestampUS) {
         
-        float dt = 1.0/(timestampUS - _lastRun);
+        float dt = (timestampUS - _lastRun)/1000000.0;
+        _lastRun = timestampUS;
         _alpha = dt/(_RC+dt);
 
-        T output = _lastValue + _alpha*(input - _lastValue);
+        T output = _lastValue + (input - _lastValue)*_alpha;
         _lastValue = output;
 
         return output;

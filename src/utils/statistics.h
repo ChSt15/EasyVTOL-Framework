@@ -2,6 +2,12 @@
 #define STATISTICS_HELPER_H
 
 
+/**
+ * This class stores samples and calculates the average
+ * of the stored samples and the deviation from average.
+ * Usefull for filtering and sensorfusion.
+*/
+
 
 #include "definitions.h"
 

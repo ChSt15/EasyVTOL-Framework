@@ -178,9 +178,9 @@ void IMU::deviceThread() {
 
     } else if (imuStatus == DeviceStatus::DEVICE_NOT_STARTED || imuStatus == DeviceStatus::DEVICE_RESTARTATTEMPT) {
         
-        Serial.println("Test1");
+        //Serial.println("Test1");
         int startCode = imu.begin();
-        Serial.println("Test2");
+        //Serial.println("Test2");
 
 
         if (startCode > 0) {

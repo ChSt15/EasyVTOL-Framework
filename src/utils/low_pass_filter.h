@@ -14,16 +14,37 @@ public:
 
 
     /**
+     * Constructor for no filtering.
+     * Cutoff = 1Hz
+     *
+     * @param values none
+     * @return none.
+     */
+    LowPassFilter() {
+
+        _sampleRate = -1;
+        _cutOffFreq = 1;
+        _RC = 1.0/(_cutOffFreq*2*3.14);
+
+        if (_sampleRate != -1) {
+            float dt = 1.0/_sampleRate;
+            _alpha = dt/(_RC+dt);
+        }
+
+    }
+
+
+    /**
      * Give sampleRate to improve performance
      *
      * @param values cutOffFreq and sampleRate
      * @return none.
      */
-    LowPassFilter(float cutOffFreq, uint32_t sampleRate = -1) {
+    LowPassFilter(float cutOffFreq, int32_t sampleRate = -1) {
 
         _sampleRate = sampleRate;
         _cutOffFreq = cutOffFreq;
-        _RC = 1.0/(cutOffFreq*2*3.14);
+        _RC = 1.0/(_cutOffFreq*2*3.14);
 
         if (_sampleRate != -1) {
             float dt = 1.0/_sampleRate;
@@ -73,6 +94,16 @@ public:
         return output;
 
     }
+
+
+    /**
+     * Returns that current filtered value.
+     *
+     * @param values none
+     * @return filtered value.
+     */
+    T getValue() {return _lastValue;}
+
 
 
 private:

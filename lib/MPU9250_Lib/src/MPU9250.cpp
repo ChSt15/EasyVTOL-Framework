@@ -158,6 +158,31 @@ int MPU9250::begin(){
   return 1;
 }
 
+/* "Light speed is too slow. We're gonna have to go ludicrous speed!" */
+int MPU9250::setStupidSpeeeds() {
+
+    if(setDlpfBandwidth(DLPF_NO_DLPF) < 0) {
+        return -1;
+    }
+
+    uint8_t byte;
+
+    readRegisters(0x1B, 1, &byte);
+
+    uint8_t choice = ~(B00000001) &0x3;
+
+    byte = byte & B11111100;
+    byte = byte | choice;
+
+    if(writeRegister(0x1B,byte) < 0){
+        return -2;
+    }
+
+    writeRegister(ACCEL_CONFIG2, B11111111);
+
+    return 1;
+}
+
 /* sets the accelerometer full scale range to values other than default */
 int MPU9250::setAccelRange(AccelRange range) {
   // use low speed SPI for register setting
@@ -247,6 +272,15 @@ int MPU9250::setDlpfBandwidth(DlpfBandwidth bandwidth) {
   // use low speed SPI for register setting
   _useSPIHS = false;
   switch(bandwidth) {
+    case DLPF_NO_DLPF: {
+      if(writeRegister(ACCEL_CONFIG2,ACCEL_DLPF_184) < 0){ // setting accel bandwidth to 184Hz
+        return -1;
+      } 
+      if(writeRegister(CONFIG,GYRO_DLPF_NONE) < 0){ // setting gyro bandwidth to 184Hz
+        return -2;
+      }
+      break;
+    }
     case DLPF_BANDWIDTH_184HZ: {
       if(writeRegister(ACCEL_CONFIG2,ACCEL_DLPF_184) < 0){ // setting accel bandwidth to 184Hz
         return -1;

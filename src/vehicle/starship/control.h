@@ -14,7 +14,7 @@ public:
 
     void kineticSetpoint(KineticData setpoint) {_kineticsSetpoint = setpoint;}
 
-    Dynamics getDynamicsSetpoint() {return _dynamicsSetpoint;}
+    DynamicData getDynamicsSetpoint() {return _dynamicsSetpoint;}
 
 
 protected:
@@ -26,7 +26,7 @@ private:
 
     KineticData _kineticsSetpoint;
 
-    Dynamics _dynamicsSetpoint;
+    DynamicData _dynamicsSetpoint;
 
     
 };

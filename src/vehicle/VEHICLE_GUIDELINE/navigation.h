@@ -21,6 +21,8 @@
 #include "utils/high_pass_filter.h"
 #include "utils/low_pass_filter.h"
 
+#include "vehicle/inertial_data.h"
+
 
 #define LOOP_RATE_LIMIT 2000
 
@@ -28,15 +30,17 @@
 class Navigation {
 public:
 
-    void resetInertialTEST() {_position = Vector(0,0,0); _velocity = Vector(0,0,0);}; //To be removed or replaced. This is only for testing Inertial navigation
+    void resetInertialTEST() {_inertialData.position = Vector(0,0,0); _inertialData.velocity = Vector(0,0,0);}; //To be removed or replaced. This is only for testing Inertial navigation
 
-    Quaternion getAttitude() {return _attitude;}
-    Vector getAngularRate() {return _angularRate;}
+    Quaternion getAttitude() {return _inertialData.attitude;}
+    Vector getAngularRate() {return _inertialData.angularRate;}
 
-    Vector getPosition() {return _position;}
-    Vector getVelocity() {return _velocity;}
-    Vector getAcceleration() {return _acceleration;}
-    Vector getLinearAcceleration() {return _linearAcceleration;}
+    Vector getPosition() {return _inertialData.position;}
+    Vector getVelocity() {return _inertialData.velocity;}
+    Vector getAcceleration() {return _inertialData.acceleration;}
+    Vector getLinearAcceleration() {return _inertialData.linearAcceleration;}
+
+    InertialData getInertialData () {return _inertialData;}
 
 
 protected:
@@ -47,13 +51,7 @@ protected:
 private:
 
     //System inertial information
-    Vector _position;
-    Vector _velocity;
-    Vector _acceleration;
-    Vector _linearAcceleration;
-
-    Quaternion _attitude = Quaternion(Vector(1,1,1), 0*DEGREES);
-    Vector _angularRate;
+    InertialData _inertialData;
 
     //Filter data
     //HighPassFilter<Vector> gyroHPF = HighPassFilter<Vector>(0.01);

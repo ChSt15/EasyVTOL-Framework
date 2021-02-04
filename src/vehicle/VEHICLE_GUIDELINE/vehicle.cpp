@@ -4,6 +4,9 @@
 
 void Vehicle::vehicleThread() {
 
-    sensorFusionThread();
+    navigationThread();
+    //guidanceThread();
+    //controlThread(getKineticData());
+    //dynamicsThread(getKineticData());
 
 }

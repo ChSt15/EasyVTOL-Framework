@@ -1,5 +1,5 @@
-#ifndef INERTIAL_DATA_H
-#define INERTIAL_DATA_H
+#ifndef KINETIC_DATA_H
+#define KINETIC_DATA_H
 
 
 #include "definitions.h"
@@ -8,7 +8,7 @@
 #include "quaternion_math.h"
 
 
-struct InertialData {
+struct KineticData {
 
     Vector position;
     Vector velocity;

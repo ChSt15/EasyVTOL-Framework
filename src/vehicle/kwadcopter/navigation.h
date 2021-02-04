@@ -21,7 +21,7 @@
 #include "utils/high_pass_filter.h"
 #include "utils/low_pass_filter.h"
 
-#include "vehicle/inertial_data.h"
+#include "vehicle/kinetic_data.h"
 
 
 #define LOOP_RATE_LIMIT 2000
@@ -30,35 +30,35 @@
 class Navigation {
 public:
 
-    void resetInertialTEST() {_inertialData.position = Vector(0,0,0); _inertialData.velocity = Vector(0,0,0);}; //To be removed or replaced. This is only for testing Inertial navigation
+    void resetInertialTEST() {_kineticData.position = Vector(0,0,0); _kineticData.velocity = Vector(0,0,0);}; //To be removed or replaced. This is only for testing Inertial navigation
 
-    Quaternion getAttitude() {return _inertialData.attitude;}
-    Vector getAngularRate() {return _inertialData.angularRate;}
+    Quaternion getAttitude() {return _kineticData.attitude;}
+    Vector getAngularRate() {return _kineticData.angularRate;}
 
-    Vector getPosition() {return _inertialData.position;}
-    Vector getVelocity() {return _inertialData.velocity;}
-    Vector getAcceleration() {return _inertialData.acceleration;}
-    Vector getLinearAcceleration() {return _inertialData.linearAcceleration;}
+    Vector getPosition() {return _kineticData.position;}
+    Vector getVelocity() {return _kineticData.velocity;}
+    Vector getAcceleration() {return _kineticData.acceleration;}
+    Vector getLinearAcceleration() {return _kineticData.linearAcceleration;}
 
-    InertialData getInertialData () {return _inertialData;}
+    KineticData getKineticData() {return _kineticData;}
 
 
 protected:
 
-    void sensorFusionThread();
+    void navigationThread();
 
 
 private:
 
     //System inertial information
-    InertialData _inertialData;
+    KineticData _kineticData;
 
     //Filter data
     //HighPassFilter<Vector> gyroHPF = HighPassFilter<Vector>(0.01);
 
-    uint32_t lastGyroTimestamp = 0;
-    uint32_t lastAccelTimestamp = 0;
-    uint32_t lastMagTimestamp = 0;
+    uint32_t _lastGyroTimestamp = 0;
+    uint32_t _lastAccelTimestamp = 0;
+    uint32_t _lastMagTimestamp = 0;
 
     //System information flagges
     bool _angularRateValid = false;
@@ -76,7 +76,7 @@ private:
     bool magInitialized = false;
 
     //Loop interval control
-    IntervalControl interval = IntervalControl(LOOP_RATE_LIMIT);
+    IntervalControl _interval = IntervalControl(LOOP_RATE_LIMIT);
 
 
 };

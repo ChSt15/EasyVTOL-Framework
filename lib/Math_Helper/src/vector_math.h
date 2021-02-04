@@ -4,6 +4,8 @@
 
 #include "math.h"
 
+#include "WString.h"
+
 
 #ifndef PI
 #define PI 3.1415926541f
@@ -253,7 +255,22 @@ class Vector {
 
             return b*(*this*b);
 
+        }
 
+
+        /**
+         * Returns a String containing components.
+         * Form:
+         * x: ..., y: ..., z:...
+         * Where ... is the value.
+         * Default digits is 2.
+         * 
+         *
+         * @param values digits.
+         * @return String.
+         */
+        String toString(uint8_t digits = 2) {
+            return "x: " + String(x, digits) + ", y: " + String(y, digits) + ", z: " + String(z, digits);  
         }
 
 

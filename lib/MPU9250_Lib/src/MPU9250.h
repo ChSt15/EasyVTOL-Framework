@@ -45,6 +45,7 @@ class MPU9250{
     };
     enum DlpfBandwidth
     {
+      DLPF_NO_DLPF,
       DLPF_BANDWIDTH_184HZ,
       DLPF_BANDWIDTH_92HZ,
       DLPF_BANDWIDTH_41HZ,
@@ -79,7 +80,7 @@ class MPU9250{
     int setAccelRange(AccelRange range);
     int setGyroRange(GyroRange range);
     int setDlpfBandwidth(DlpfBandwidth bandwidth);
-    //int setHighspeedRate(HighspeedRate rate);
+    int setStupidSpeeeds();
     int setSrd(uint8_t srd);
     int enableDataReadyInterrupt();
     int disableDataReadyInterrupt();
@@ -136,7 +137,7 @@ class MPU9250{
     bool _useSPIHS;
     const uint8_t SPI_READ = 0x80;
     const uint32_t SPI_LS_CLOCK = 1000000;  // 1 MHz
-    const uint32_t SPI_HS_CLOCK = 15000000; // 15 MHz
+    const uint32_t SPI_HS_CLOCK = 40000000; // 15 MHz
     // track success of interacting with sensor
     int _status;
     // buffer for reading from sensor
@@ -221,6 +222,10 @@ class MPU9250{
     const uint8_t ACCEL_DLPF_10 = 0x05;
     const uint8_t ACCEL_DLPF_5 = 0x06;
     const uint8_t CONFIG = 0x1A;
+    const uint8_t GYRO_FCHOICE_1K = 0x00;
+    const uint8_t GYRO_FCHOICE_8K = 0x00;
+    const uint8_t GYRO_FCHOICE_32K = 0x01;
+    const uint8_t GYRO_DLPF_NONE = 0x00;
     const uint8_t GYRO_DLPF_184 = 0x01;
     const uint8_t GYRO_DLPF_92 = 0x02;
     const uint8_t GYRO_DLPF_41 = 0x03;

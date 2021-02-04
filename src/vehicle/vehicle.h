@@ -3,8 +3,6 @@
 
 
 
-#include "Arduino.h"
-
 #include "definitions.h"
 
 #include "guidance.h"

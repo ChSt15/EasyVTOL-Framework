@@ -260,4 +260,9 @@ class Vector {
 };
 
 
+/*Vector sqrt(Vector a) {
+    return Vector(sqrt(a.x), sqrt(a.y), sqrt(a.z));
+}*/
+
+
 #endif /* _HELPER_3DMATH_H_ */

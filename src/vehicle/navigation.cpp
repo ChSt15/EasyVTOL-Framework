@@ -17,6 +17,9 @@ void Navigation::sensorFusionThread() {
         uint32_t timestamp;
         IMU::getGyro(&rotationVector, &timestamp);
 
+        //rotationVector += Vector(0,0,0.1);
+        //rotationVector = gyroHPF.update(rotationVector, timestamp);
+
         //Check if gyro initialised
         if (gyroInitialized) {
 
@@ -54,7 +57,7 @@ void Navigation::sensorFusionThread() {
         IMU::getAccel(&accelVector, &timestamp);
 
         //Check if accelerometer initialised
-        if (!accelInitialized) {
+        if (accelInitialized) {
             
             //Correct state prediction
             float dt = float(timestamp - lastAccelTimestamp)/1000000.0f;
@@ -118,7 +121,7 @@ void Navigation::sensorFusionThread() {
             float dt = float(timestamp - lastMagTimestamp)/1000000.0f;
             lastMagTimestamp = timestamp;
 
-            float gamma = 100.0f;
+            float gamma = 0.1f;
 
             //X-Axis correction
             Vector xAxisIs(1,0,0);

@@ -43,7 +43,6 @@ class Quaternion {
          * @param values axis[Vector] and angle[Rad]
          * @return none.
          */
-
         Quaternion(Vector axis, float angle) {
 
             if (axis.isZeroVector()) {
@@ -237,6 +236,11 @@ class Quaternion {
         }
 
 };
+
+
+/*Quaternion sqrt(Quaternion a) {
+    return Quaternion(sqrtf(a.w), sqrtf(a.x), sqrtf(a.y), sqrtf(a.z));
+}*/
 
 
 #endif

@@ -15,10 +15,15 @@
 #define COMMS_RATE 100
 
 
+struct RCChannelData {
+    float channelData[16];
+    bool failsafe = true;
+};
+
 
 namespace IBUSReceiver {
 
-    extern CircularBuffer <float[16], 100> channelData;
+    extern CircularBuffer <RCChannelData, 100> channelDataFifo;
 
     void deviceThread();
 

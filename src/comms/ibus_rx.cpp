@@ -4,7 +4,7 @@
 namespace IBUSReceiver {
 
 
-    CircularBuffer <float[16], 100> channelData;
+    CircularBuffer <RCChannelData, 100> channelDataFifo;
 
 
     IntervalControl rxInterval(1); //Keep rate low for starting

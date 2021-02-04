@@ -21,6 +21,8 @@
 #include "utils/high_pass_filter.h"
 #include "utils/low_pass_filter.h"
 
+#include "vehicle/kinetic_data.h"
+
 
 #define LOOP_RATE_LIMIT 2000
 
@@ -28,39 +30,35 @@
 class Navigation {
 public:
 
-    void resetInertialTEST() {_position = Vector(0,0,0); _velocity = Vector(0,0,0);}; //To be removed or replaced. This is only for testing Inertial navigation
+    void resetInertialTEST() {_kineticData.position = Vector(0,0,0); _kineticData.velocity = Vector(0,0,0);}; //To be removed or replaced. This is only for testing Inertial navigation
 
-    Quaternion getAttitude() {return _attitude;}
-    Vector getAngularRate() {return _angularRate;}
+    Quaternion getAttitude() {return _kineticData.attitude;}
+    Vector getAngularRate() {return _kineticData.angularRate;}
 
-    Vector getPosition() {return _position;}
-    Vector getVelocity() {return _velocity;}
-    Vector getAcceleration() {return _acceleration;}
-    Vector getLinearAcceleration() {return _linearAcceleration;}
+    Vector getPosition() {return _kineticData.position;}
+    Vector getVelocity() {return _kineticData.velocity;}
+    Vector getAcceleration() {return _kineticData.acceleration;}
+    Vector getLinearAcceleration() {return _kineticData.linearAcceleration;}
+
+    KineticData getKineticData() {return _kineticData;}
 
 
 protected:
 
-    void sensorFusionThread();
+    void navigationThread();
 
 
 private:
 
     //System inertial information
-    Vector _position;
-    Vector _velocity;
-    Vector _acceleration;
-    Vector _linearAcceleration;
-
-    Quaternion _attitude = Quaternion(Vector(1,1,1), 0*DEGREES);
-    Vector _angularRate;
+    KineticData _kineticData;
 
     //Filter data
     //HighPassFilter<Vector> gyroHPF = HighPassFilter<Vector>(0.01);
 
-    uint32_t lastGyroTimestamp = 0;
-    uint32_t lastAccelTimestamp = 0;
-    uint32_t lastMagTimestamp = 0;
+    uint32_t _lastGyroTimestamp = 0;
+    uint32_t _lastAccelTimestamp = 0;
+    uint32_t _lastMagTimestamp = 0;
 
     //System information flagges
     bool _angularRateValid = false;
@@ -78,7 +76,7 @@ private:
     bool magInitialized = false;
 
     //Loop interval control
-    IntervalControl interval = IntervalControl(LOOP_RATE_LIMIT);
+    IntervalControl _interval = IntervalControl(LOOP_RATE_LIMIT);
 
 
 };

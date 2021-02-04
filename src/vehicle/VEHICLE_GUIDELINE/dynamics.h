@@ -1,5 +1,5 @@
-#ifndef KINEMATICS_H
-#define KINEMATICS_H
+#ifndef DYNAMICS_H
+#define DYNAMICS_H
 
 
 /**
@@ -14,18 +14,23 @@
 
 #include "Arduino.h"
 
+#include "vehicle/dynamic_data.h"
 
 
-
-class Kinematics {
+class Dynamics {
 public:
 
-    
+    void setDynamics(DynamicData dynamics) {_dynamicData = dynamics;}
+
+
+protected:
+
+    void dynamicsThread(KineticData vehicleKinetics);
     
 
 private:
 
-
+    DynamicData _dynamicData;
 
     
 };

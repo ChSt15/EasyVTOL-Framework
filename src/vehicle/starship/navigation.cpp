@@ -31,12 +31,12 @@ void Navigation::sensorFusionThread() {
 
                 Quaternion rotationQuat = Quaternion(rotationVector, rotationVector.magnitude()*dt);
 
-                _attitude = _attitude*rotationQuat;
+                _inertialData.attitude = _inertialData.attitude*rotationQuat;
 
             }
 
             //Update angularRate
-            _angularRate = (_attitude*rotationVector*_attitude.copy().conjugate()).toVector(); //Transform angular rate into world coordinate system
+            _inertialData.angularRate = (_inertialData.attitude*rotationVector*_inertialData.attitude.copy().conjugate()).toVector(); //Transform angular rate into world coordinate system
 
         } else {
 
@@ -67,7 +67,7 @@ void Navigation::sensorFusionThread() {
 
             //Z-Axis correction
             Vector zAxisIs = Vector(0,0,1);
-            Vector zAxisSet = (_attitude*accelVector*_attitude.copy().conjugate()).toVector();
+            Vector zAxisSet = (_inertialData.attitude*accelVector*_inertialData.attitude.copy().conjugate()).toVector();
 
             Vector zAxisRotationAxis = zAxisSet.cross(zAxisIs);
             float zAxisRotationAngle = zAxisSet.getAngleTo(zAxisIs);
@@ -76,13 +76,13 @@ void Navigation::sensorFusionThread() {
 
 
             //Apply state correction and normalise attitude quaternion 
-            _attitude = zAxisCorrectionQuat*_attitude;
-            _attitude.normalize(true);
+            _inertialData.attitude = zAxisCorrectionQuat*_inertialData.attitude;
+            _inertialData.attitude.normalize(true);
 
 
             //Update acceleration
-            _acceleration = (_attitude*accelVector*_attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
-            _linearAcceleration = _acceleration - Vector(0,0,9.81);
+            _inertialData.acceleration = (_inertialData.attitude*accelVector*_inertialData.attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
+            _inertialData.linearAcceleration = _inertialData.acceleration - Vector(0,0,9.81);
 
         } else if (gyroInitialized) {
             
@@ -92,7 +92,7 @@ void Navigation::sensorFusionThread() {
 
             //Set Attitude
             Vector zAxisIs = Vector(0,0,1);
-            Vector zAxisSet = (_attitude*accelVector*_attitude.copy().conjugate()).toVector();
+            Vector zAxisSet = (_inertialData.attitude*accelVector*_inertialData.attitude.copy().conjugate()).toVector();
 
             Vector zAxisRotationAxis = zAxisSet.cross(zAxisIs);
             float zAxisRotationAngle = zAxisSet.getAngleTo(zAxisIs);
@@ -100,8 +100,8 @@ void Navigation::sensorFusionThread() {
             Quaternion zAxisCorrectionQuat = Quaternion(zAxisRotationAxis, zAxisRotationAngle);
 
             //Apply state correction and normalise attitude quaternion 
-            _attitude = zAxisCorrectionQuat*_attitude;
-            _attitude.normalize(true);
+            _inertialData.attitude = zAxisCorrectionQuat*_inertialData.attitude;
+            _inertialData.attitude.normalize(true);
 
         }
 
@@ -125,7 +125,7 @@ void Navigation::sensorFusionThread() {
 
             //X-Axis correction
             Vector xAxisIs(1,0,0);
-            Vector xAxisSet = (_attitude*magVector*_attitude.copy().conjugate()).toVector();
+            Vector xAxisSet = (_inertialData.attitude*magVector*_inertialData.attitude.copy().conjugate()).toVector();
             xAxisSet.z = 0;
             xAxisSet.normalize();
 
@@ -136,8 +136,8 @@ void Navigation::sensorFusionThread() {
 
 
             //Apply state correction and normalise attitude quaternion 
-            _attitude = xAxisCorrectionQuat*_attitude;
-            _attitude.normalize(true);
+            _inertialData.attitude = xAxisCorrectionQuat*_inertialData.attitude;
+            _inertialData.attitude.normalize(true);
 
         } else if (accelInitialized) {
 
@@ -147,7 +147,7 @@ void Navigation::sensorFusionThread() {
 
             //Set heading
             Vector xAxisIs(1,0,0);
-            Vector xAxisSet = (_attitude*magVector*_attitude.copy().conjugate()).toVector();
+            Vector xAxisSet = (_inertialData.attitude*magVector*_inertialData.attitude.copy().conjugate()).toVector();
             xAxisSet.z = 0;
             xAxisSet.normalize();
 
@@ -157,8 +157,8 @@ void Navigation::sensorFusionThread() {
             Quaternion xAxisCorrectionQuat = Quaternion(xAxisRotationAxis, xAxisRotationAngle);
 
             //Apply state correction and normalise attitude quaternion 
-            _attitude = xAxisCorrectionQuat*_attitude;
-            _attitude.normalize(true);
+            _inertialData.attitude = xAxisCorrectionQuat*_inertialData.attitude;
+            _inertialData.attitude.normalize(true);
 
         }
 
@@ -171,8 +171,8 @@ void Navigation::sensorFusionThread() {
 
     float dt = 1.0f/LOOP_RATE_LIMIT;
 
-    _velocity = _velocity + _acceleration*dt;
+    _inertialData.velocity = _inertialData.velocity + _inertialData.acceleration*dt;
 
-    _position = _position + _velocity*dt;
+    _inertialData.position = _inertialData.position + _inertialData.velocity*dt;
 
 }

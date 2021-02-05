@@ -18,7 +18,7 @@ public:
 
 private:
 
-    IntervalControl interval = IntervalControl(VEHICLE_LOOP_RATE);
+    IntervalControl interval = IntervalControl(AUTONOMY_LOOP_RATE);
 
     
 };

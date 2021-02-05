@@ -30,21 +30,79 @@
 class Navigation {
 public:
 
-    void resetInertialTEST() {_kineticData.position = Vector(0,0,0); _kineticData.velocity = Vector(0,0,0);}; //To be removed or replaced. This is only for testing Inertial navigation
+    /**
+     * Resets all kinetic Parameters to 0.
+     * 
+     * @param values none.
+     * @return none.
+     */
+    void resetInertial() {_kineticData.position = Vector(0,0,0); _kineticData.velocity = Vector(0,0,0);}; //To be removed or replaced. This is only for testing Inertial navigation
 
+    /**
+     * Returns the vehicles attitude.
+     *
+     * @param values none.
+     * @return vehicle attitude.
+     */
     Quaternion getAttitude() {return _kineticData.attitude;}
+
+    /**
+     * Returns the vehicles angular rate.
+     *
+     * @param values none.
+     * @return vehicle angular rate.
+     */
     Vector getAngularRate() {return _kineticData.angularRate;}
 
+    /**
+     * Returns the vehicles position.
+     *
+     * @param values none.
+     * @return vehicle position.
+     */
     Vector getPosition() {return _kineticData.position;}
+
+    /**
+     * Returns the vehicles velocity.
+     *
+     * @param values none.
+     * @return vehicle velocity.
+     */
     Vector getVelocity() {return _kineticData.velocity;}
+
+    /**
+     * Returns the vehicles acceleration.
+     *
+     * @param values none.
+     * @return vehicle acceleration.
+     */
     Vector getAcceleration() {return _kineticData.acceleration;}
+
+    /**
+     * Returns the vehicles acceleration without gravity.
+     *
+     * @param values none.
+     * @return vehicle acceleration without gravity.
+     */
     Vector getLinearAcceleration() {return _kineticData.linearAcceleration;}
 
+    /**
+     * Returns a struct containing all kinetic parameters.
+     *
+     * @param values none.
+     * @return Kinetic paramenters.
+     */
     KineticData getKineticData() {return _kineticData;}
 
 
 protected:
 
+    /**
+     * This is where all calculations are done.
+     *
+     * @param values none.
+     * @return none.
+     */
     void navigationThread();
 
 

@@ -2,3 +2,8 @@
 
 
 
+void Control::controlThread(KineticData vehicleKinetics) {
+
+
+    
+}

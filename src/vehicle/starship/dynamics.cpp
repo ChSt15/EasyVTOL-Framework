@@ -2,3 +2,8 @@
 
 
 
+void Dynamics::dynamicsThread(KineticData vehicleKinetics) {
+
+
+
+}

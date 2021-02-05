@@ -18,20 +18,24 @@
 #include "vehicle/dynamic_data.h"
 
 
+
 class Dynamics {
 public:
 
-    void setDynamics(DynamicData dynamics) {_dynamicData = dynamics;}
 
 
 protected:
 
     void dynamicsThread(KineticData vehicleKinetics);
+
+    void setDynamics(DynamicData dynamics) {_dynamicData = dynamics;}
     
 
 private:
 
     DynamicData _dynamicData;
+
+    
 
     
 };

@@ -12,14 +12,14 @@
 class Control {
 public:
 
-    void kineticSetpoint(KineticData setpoint) {_kineticsSetpoint = setpoint;}
-
     DynamicData getDynamicsSetpoint() {return _dynamicsSetpoint;}
 
 
 protected:
 
     void controlThread(KineticData vehicleKinetics);
+
+    void kineticSetpoint(KineticData setpoint) {_kineticsSetpoint = setpoint;}
     
 
 private:   

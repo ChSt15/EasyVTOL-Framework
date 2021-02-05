@@ -17,9 +17,6 @@ void Navigation::navigationThread() {
         uint32_t timestamp;
         IMU::getGyro(&rotationVector, &timestamp);
 
-        //rotationVector += Vector(0,0,0.1);
-        //rotationVector = gyroHPF.update(rotationVector, timestamp);
-
         //Check if gyro initialised
         if (gyroInitialized) {
 

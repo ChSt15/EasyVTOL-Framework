@@ -4,6 +4,8 @@
 
 void Vehicle::vehicleThread() {
 
+    if (!interval.isTimeToRun()) return; //Leave if its not time to run yet
+
     navigationThread();
 
     guidanceThread();

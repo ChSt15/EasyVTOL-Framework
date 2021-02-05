@@ -9,6 +9,11 @@
  * development if the control systems. 
  * Because this class will be augmented by the simulator, this structure also allows for very
  * easy testing of the vehicle code in the simulator in a very "drag and drop" type way.
+ * 
+ * Dynamics does not require to be a closed loop solution. Meaning it could simply map the control
+ * outputs to the vehicle controls (flaps, motors etc.) and the control algorithms can to the rest
+ * but implementing closed loop control allows for more accuracy and further linearity of control 
+ * outputs and simplifies the control algorithms. 
 */
 
 
@@ -27,7 +32,13 @@ public:
 protected:
 
     void dynamicsThread(KineticData vehicleKinetics);
-
+    
+    /**
+     * Sets the dynamic data. This should all be in local coordinate system
+     *
+     * @param values dynamics.
+     * @return none.
+     */
     void setDynamics(DynamicData dynamics) {_dynamicData = dynamics;}
     
 
@@ -36,7 +47,7 @@ private:
     DynamicData _dynamicData;
 
     
-
+    
     
 };
 

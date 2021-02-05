@@ -117,6 +117,7 @@ void threadControl() {
         vehicle.getAttitude().getAxisAngle(&axis, &angle);
         angle = angle/DEGREES;
 
+
         //Serial.println();
         //Serial.println("LoopRate: " + String(IMU::getRate()) + ", GyroRate: " + String(IMU::getGyroRate()) + ", AccelRate: " + String(IMU::getAccelRate()) + ", MagRate: " + String(IMU::getMagRate()));
         Serial.println("vehicle attitude: w: " + String(vehicle.getAttitude().w) + ", x: " + String(vehicle.getAttitude().x) + ", y: " + String(vehicle.getAttitude().y) + ", z: " + String(vehicle.getAttitude().z));
@@ -126,7 +127,7 @@ void threadControl() {
         //Serial.println("vehicle pos: x: " + String(vehicle.getPosition().x) + ", y: " + String(vehicle.getPosition().y) + ", z: " + String(vehicle.getPosition().z));
 
         if (Serial.available()) {
-            vehicle.resetInertialTEST();
+            vehicle.resetInertial();
             while(Serial.available()) Serial.read();
         }
 

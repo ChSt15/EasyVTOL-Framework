@@ -174,8 +174,9 @@ void Navigation::navigationThread() {
 
 
 
-void Navigation::navigationInit(FLIGHT_MODE* flightModePointer) {
+void Navigation::navigationInit(FLIGHT_MODE* flightModePointer, FLIGHT_PROFILE* flightProfilePointer) {
 
     _flightMode = flightModePointer;
+    _flightProfile = flightProfilePointer;
     
 }

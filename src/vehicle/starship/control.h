@@ -8,7 +8,7 @@
 #include "vehicle/dynamic_data.h"
 #include "vehicle/kinetic_data.h"
 
-#include "flight_modes.h"
+#include "flight_settings.h"
 
 
 class Control {
@@ -27,7 +27,7 @@ public:
 protected:
 
     void controlThread(KineticData vehicleKinetics);
-    void controlInit(FLIGHT_MODE* flightModePointer);
+    void controlInit(FLIGHT_MODE* flightModePointer, FLIGHT_PROFILE* flightProfilePointer);
     
     /**
      * Sets the kinetics of which the vehicle should have.
@@ -45,6 +45,7 @@ private:
     DynamicData _dynamicsSetpoint;
 
     FLIGHT_MODE* _flightMode;
+    FLIGHT_PROFILE* _flightProfile;
 
     
 };

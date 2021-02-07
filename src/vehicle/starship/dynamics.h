@@ -22,7 +22,7 @@
 #include "vehicle/kinetic_data.h"
 #include "vehicle/dynamic_data.h"
 
-#include "flight_modes.h"
+#include "flight_settings.h"
 
 
 
@@ -34,7 +34,7 @@ public:
 protected:
 
     void dynamicsThread(KineticData vehicleKinetics);
-    void dynamicsInit(FLIGHT_MODE* flightModePointer);
+    void dynamicsInit(FLIGHT_MODE* flightModePointer, FLIGHT_PROFILE* flightProfilePointer);
     
     /**
      * Sets the dynamic data. This should all be in local coordinate system
@@ -50,6 +50,7 @@ private:
     DynamicData _dynamicData;
 
     FLIGHT_MODE* _flightMode;
+    FLIGHT_PROFILE* _flightProfile;
     
     
 };

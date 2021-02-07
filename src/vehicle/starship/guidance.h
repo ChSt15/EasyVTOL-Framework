@@ -11,7 +11,7 @@
 #include "circular_buffer.h"
 
 #include "vehicle/kinetic_data.h"
-#include "flight_modes.h"
+#include "flight_settings.h"
 
 
 class Guidance {
@@ -103,7 +103,7 @@ public:
 protected:
 
     void guidanceThread();
-    void guidanceInit(FLIGHT_MODE* flightModePointer);
+    void guidanceInit(FLIGHT_MODE* flightModePointer, FLIGHT_PROFILE* flightProfilePointer);
 
 private:
 
@@ -112,6 +112,7 @@ private:
     KineticData _kineticSetpoint;
 
     FLIGHT_MODE* _flightMode;
+    FLIGHT_PROFILE* _flightProfile;
 
 };
 

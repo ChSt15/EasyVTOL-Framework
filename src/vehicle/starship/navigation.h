@@ -22,7 +22,7 @@
 #include "utils/low_pass_filter.h"
 
 #include "vehicle/kinetic_data.h"
-#include "flight_modes.h"
+#include "flight_settings.h"
 
 
 #define LOOP_RATE_LIMIT 2000
@@ -105,7 +105,7 @@ protected:
      * @return none.
      */
     void navigationThread();
-    void navigationInit(FLIGHT_MODE* flightModePointer);
+    void navigationInit(FLIGHT_MODE* flightModePointer, FLIGHT_PROFILE* flightProfilePointer);
 
 
 private:
@@ -139,6 +139,7 @@ private:
     IntervalControl _interval = IntervalControl(LOOP_RATE_LIMIT);
 
     FLIGHT_MODE* _flightMode;
+    FLIGHT_PROFILE* _flightProfile;
 
 
 };

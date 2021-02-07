@@ -22,8 +22,8 @@ void Vehicle::vehicleThread() {
 
 
 void Vehicle::vehicleInit() {
-    controlInit(&_flightMode);
-    dynamicsInit(&_flightMode);
-    navigationInit(&_flightMode);
-    guidanceInit(&_flightMode);
+    controlInit(&_flightMode, &_flightProfile);
+    dynamicsInit(&_flightMode, &_flightProfile);
+    navigationInit(&_flightMode, &_flightProfile);
+    guidanceInit(&_flightMode, &_flightProfile);
 }

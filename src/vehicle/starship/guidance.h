@@ -78,12 +78,7 @@ public:
     KineticData getGuidanceKineticSetpoint() {return _kineticSetpoint;}
 
     /**
-     * Sets the mode of flight. Modes are:
-     * DISARM       disables motors and moves actuators to store position
-     * ARMED        enables motors but at lowest thottle and moves actuators to flight ready position
-     * HOVER        flys given commands
-     * BELLY_FLOP   goes into bellyflop and flys to given endstate
-     * FAILSAFE     stops all processes and diactivates all motors and actuators
+     * Sets the mode of flight.
      *
      * @param values flight mode.
      * @return none.
@@ -91,13 +86,28 @@ public:
     void setFlightMode(const FLIGHT_MODE &flightMode) {*_flightMode = flightMode;}
 
     /**
-     * Returns the current flight mode. See setFlightMode() 
-     * for further infos on modes.
+     * Returns the current flight mode.
      *
      * @param values none.
      * @return flight mode.
      */
     FLIGHT_MODE getFlightMode() {return *_flightMode;};
+
+    /**
+     * Sets the flights profile.
+     *
+     * @param values flight mode.
+     * @return none.
+     */
+    void setFlightProfile(const FLIGHT_PROFILE &flightProfile) {*_flightProfile = flightProfile;}
+
+    /**
+     * Returns the current flight profile.
+     *
+     * @param values none.
+     * @return flight mode.
+     */
+    FLIGHT_PROFILE getFlightProfile() {return *_flightProfile;};
     
 
 protected:

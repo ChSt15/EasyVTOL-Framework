@@ -20,12 +20,16 @@ class Vehicle: public Guidance, public Navigation, public Control, public Dynami
 public:
 
     void vehicleThread();
+    void vehicleInit();
 
 private:
 
     IntervalControl interval = IntervalControl(VEHICLE_LOOP_RATE);
 
-    
+    bool _vehicleInitialized = false;
+
+    FLIGHT_MODE _flightMode = FLIGHT_MODE::FAILSAFE;
+
 };
 
 

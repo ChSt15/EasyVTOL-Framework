@@ -162,8 +162,6 @@ void Navigation::navigationThread() {
     }
 
 
-
-
     //################## Inertial navigation testing ###############
 
     float dt = 1.0f/LOOP_RATE_LIMIT;
@@ -172,4 +170,12 @@ void Navigation::navigationThread() {
 
     _kineticData.position = _kineticData.position + _kineticData.velocity*dt;
 
+}
+
+
+
+void Navigation::navigationInit(FLIGHT_MODE* flightModePointer) {
+
+    _flightMode = flightModePointer;
+    
 }

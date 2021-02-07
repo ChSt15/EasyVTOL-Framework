@@ -11,6 +11,7 @@
 #include "circular_buffer.h"
 
 #include "vehicle/kinetic_data.h"
+#include "flight_modes.h"
 
 
 class Guidance {
@@ -74,13 +75,35 @@ public:
      * @param values none.
      * @return kinetic setpoint.
      */
-    KineticData getKineticSetpoint() {return _kineticSetpoint;}
+    KineticData getGuidanceKineticSetpoint() {return _kineticSetpoint;}
 
+    /**
+     * Sets the mode of flight. Modes are:
+     * DISARM       disables motors and moves actuators to store position
+     * ARMED        enables motors but at lowest thottle and moves actuators to flight ready position
+     * HOVER        flys given commands
+     * BELLY_FLOP   goes into bellyflop and flys to given endstate
+     * FAILSAFE     stops all processes and diactivates all motors and actuators
+     *
+     * @param values flight mode.
+     * @return none.
+     */
+    void setFlightMode(const FLIGHT_MODE &flightMode) {*_flightMode = flightMode;}
+
+    /**
+     * Returns the current flight mode. See setFlightMode() 
+     * for further infos on modes.
+     *
+     * @param values none.
+     * @return flight mode.
+     */
+    FLIGHT_MODE getFlightMode() {return *_flightMode;};
+    
 
 protected:
 
     void guidanceThread();
-    
+    void guidanceInit(FLIGHT_MODE* flightModePointer);
 
 private:
 
@@ -88,7 +111,8 @@ private:
 
     KineticData _kineticSetpoint;
 
-    
+    FLIGHT_MODE* _flightMode;
+
 };
 
 

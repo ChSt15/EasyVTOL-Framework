@@ -8,6 +8,9 @@
 #include "quaternion_math.h"
 
 
+/**
+ * Kinetic data is usually in world coordinate system!.
+ */
 struct KineticData {
 
     Vector position;

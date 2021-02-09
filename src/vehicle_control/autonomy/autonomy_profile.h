@@ -15,6 +15,7 @@ class Autonomy {
 public:
 
     void autonomyThread();
+    void autonomyInit();
 
 private:
 

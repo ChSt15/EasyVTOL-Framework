@@ -6,7 +6,9 @@
 
 #include "vector_math.h"
 
-
+/**
+ * Dynamic data is usually in local coordinate system!.
+ */
 struct DynamicData {
 
     Vector force;

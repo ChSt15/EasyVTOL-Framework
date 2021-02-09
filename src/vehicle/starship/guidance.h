@@ -11,6 +11,7 @@
 #include "circular_buffer.h"
 
 #include "vehicle/kinetic_data.h"
+#include "flight_settings.h"
 
 
 class Guidance {
@@ -74,13 +75,45 @@ public:
      * @param values none.
      * @return kinetic setpoint.
      */
-    KineticData getKineticSetpoint() {return _kineticSetpoint;}
+    KineticData getGuidanceKineticSetpoint() {return _kineticSetpoint;}
 
+    /**
+     * Sets the mode of flight.
+     *
+     * @param values flight mode.
+     * @return none.
+     */
+    void setFlightMode(const FLIGHT_MODE &flightMode) {*_flightMode = flightMode;}
+
+    /**
+     * Returns the current flight mode.
+     *
+     * @param values none.
+     * @return flight mode.
+     */
+    FLIGHT_MODE getFlightMode() {return *_flightMode;};
+
+    /**
+     * Sets the flights profile.
+     *
+     * @param values flight mode.
+     * @return none.
+     */
+    void setFlightProfile(const FLIGHT_PROFILE &flightProfile) {*_flightProfile = flightProfile;}
+
+    /**
+     * Returns the current flight profile.
+     *
+     * @param values none.
+     * @return flight mode.
+     */
+    FLIGHT_PROFILE getFlightProfile() {return *_flightProfile;};
+    
 
 protected:
 
     void guidanceThread();
-    
+    void guidanceInit(FLIGHT_MODE* flightModePointer, FLIGHT_PROFILE* flightProfilePointer);
 
 private:
 
@@ -88,7 +121,9 @@ private:
 
     KineticData _kineticSetpoint;
 
-    
+    FLIGHT_MODE* _flightMode;
+    FLIGHT_PROFILE* _flightProfile;
+
 };
 
 

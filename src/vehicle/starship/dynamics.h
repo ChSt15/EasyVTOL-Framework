@@ -19,6 +19,8 @@
 
 #include "Arduino.h"
 
+#include "vehicle/dynamics_template.h"
+
 #include "vehicle/kinetic_data.h"
 #include "vehicle/dynamic_data.h"
 
@@ -26,7 +28,7 @@
 
 
 
-class Dynamics {
+class Dynamics: DynamicsTemplate {
 public:
 
 

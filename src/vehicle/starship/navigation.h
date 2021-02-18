@@ -15,6 +15,8 @@
 
 #include "Arduino.h"
 
+#include "vehicle/navigation_template.h"
+
 #include "sensors/imu.h"
 
 #include "utils/interval_control.h"
@@ -28,7 +30,7 @@
 #define LOOP_RATE_LIMIT 2000
 
 
-class Navigation {
+class Navigation: NavigationTemplate {
 public:
 
     /**

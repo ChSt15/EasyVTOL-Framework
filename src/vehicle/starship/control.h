@@ -5,13 +5,15 @@
 
 #include "Arduino.h"
 
+#include "vehicle/control_template.h"
+
 #include "vehicle/dynamic_data.h"
 #include "vehicle/kinetic_data.h"
 
 #include "flight_settings.h"
 
 
-class Control {
+class Control: ControlTemplate {
 public:
 
     /**

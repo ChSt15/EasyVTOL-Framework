@@ -23,7 +23,7 @@ public:
 
 protected:
 
-    virtual void outputControlThread(KineticData vehicleKinetics);
+    virtual void outputControlThread(const KineticData &vehicleKinetics);
     virtual void outputControlInit(FLIGHT_MODE* flightModePointer, FLIGHT_PROFILE* flightProfilePointer);
     
 

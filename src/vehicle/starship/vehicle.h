@@ -11,13 +11,15 @@
 #include "navigation.h"
 #include "control.h"
 #include "dynamics.h"
+#include "output_control.h"
+
 #include "flight_settings.h"
 
 
 #define VEHICLE_LOOP_RATE 4000
 
 
-class Vehicle: public Guidance, public Navigation, public Control, public Dynamics {
+class Vehicle: public Guidance, public Navigation, public Control, public Dynamics, public OutputControl {
 public:
 
     void vehicleThread();

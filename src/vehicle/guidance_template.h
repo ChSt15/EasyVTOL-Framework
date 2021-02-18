@@ -46,11 +46,28 @@ public:
      * @return none.
      */
     void toPoint(KineticData state, uint32_t timeAtArrivalus);
+
+
+
     
 
 protected:
 
+    /**
+     * Main thread were all calculations and logic
+     * are done.
+     *
+     * @param values none.
+     * @return none.
+     */
     virtual void guidanceThread();
+
+    /**
+     * Init function that sets the module up.
+     *
+     * @param values none.
+     * @return none.
+     */
     virtual void guidanceInit(FLIGHT_MODE* flightModePointer, FLIGHT_PROFILE* flightProfilePointer);
 
 

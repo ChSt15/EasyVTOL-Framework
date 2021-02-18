@@ -26,7 +26,20 @@ public:
 
 protected:
 
+    /**
+     * This is where all calculations are done.
+     *
+     * @param values none.
+     * @return none.
+     */
     virtual void controlThread(KineticData vehicleKinetics);
+
+    /**
+     * Init function that sets the module up.
+     *
+     * @param values none.
+     * @return none.
+     */
     virtual void controlInit(FLIGHT_MODE* flightModePointer, FLIGHT_PROFILE* flightProfilePointer);
     
     /**

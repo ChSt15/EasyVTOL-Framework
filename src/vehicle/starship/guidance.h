@@ -5,7 +5,7 @@
 
 #include "Arduino.h"
 
-#include "vehicle/guidance_template.h"
+#include "vehicle/template_modules/guidance_template.h"
 
 #include "quaternion_math.h"
 #include "vector_math.h"

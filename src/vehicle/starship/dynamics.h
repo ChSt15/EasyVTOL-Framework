@@ -19,7 +19,7 @@
 
 #include "Arduino.h"
 
-#include "vehicle/dynamics_template.h"
+#include "vehicle/template_modules/dynamics_template.h"
 
 #include "output_control.h"
 

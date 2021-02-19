@@ -5,7 +5,7 @@
 
 #include "definitions.h"
 
-#include "vehicle/vehicle_template.h"
+#include "vehicle/template_modules/vehicle_template.h"
 
 #include "utils/interval_control.h"
 
@@ -19,6 +19,7 @@
 
 
 #define VEHICLE_LOOP_RATE 4000
+
 
 
 class Vehicle: public VehicleTemplate, public Guidance, public NavigationComplementary, public Control, public Dynamics, public OutputControl {
@@ -42,7 +43,7 @@ public:
      * @param values none.
      * @return none.
      */
-    void vehicleInit(bool test);
+    void vehicleInit();
 
     /**
      * Returns true if the vehicle is ready for flight.

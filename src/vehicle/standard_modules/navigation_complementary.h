@@ -15,7 +15,7 @@
 
 #include "Arduino.h"
 
-#include "vehicle/navigation_template.h"
+#include "vehicle/template_modules/navigation_template.h"
 
 #include "sensors/imu.h"
 

@@ -5,7 +5,7 @@
 
 #include "Arduino.h"
 
-#include "vehicle/control_template.h"
+#include "vehicle/template_modules/control_template.h"
 
 #include "vehicle/dynamic_data.h"
 #include "vehicle/kinetic_data.h"

@@ -13,7 +13,7 @@
 
 #include "outputs/servo_ppm.h"
 
-#include "vehicle/output_control_template.h"
+#include "vehicle/template_modules/output_control_template.h"
 
 #include "vehicle/kinetic_data.h"
 #include "vehicle/flight_modes.h"

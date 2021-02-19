@@ -35,7 +35,20 @@ public:
 
 protected:
 
+    /**
+     * This is where all calculations are done.
+     *
+     * @param values none.
+     * @return none.
+     */
     void outputControlThread(const KineticData &vehicleKinetics);
+
+    /**
+     * Init function that sets the module up.
+     *
+     * @param values none.
+     * @return none.
+     */
     void outputControlInit(FLIGHT_MODE* flightModePointer, FLIGHT_PROFILE* flightProfilePointer);
     
     /**

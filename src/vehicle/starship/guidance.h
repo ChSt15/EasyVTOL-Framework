@@ -130,7 +130,20 @@ public:
 
 protected:
 
+    /**
+     * This is where all calculations are done.
+     *
+     * @param values none.
+     * @return none.
+     */
     void guidanceThread();
+
+    /**
+     * Init function that sets the module up.
+     *
+     * @param values none.
+     * @return none.
+     */
     void guidanceInit(FLIGHT_MODE* flightModePointer, FLIGHT_PROFILE* flightProfilePointer);
 
 private:

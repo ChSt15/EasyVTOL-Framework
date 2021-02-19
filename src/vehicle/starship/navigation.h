@@ -107,6 +107,13 @@ protected:
      * @return none.
      */
     void navigationThread();
+
+    /**
+     * Init function that sets the module up.
+     *
+     * @param values none.
+     * @return none.
+     */
     void navigationInit(FLIGHT_MODE* flightModePointer, FLIGHT_PROFILE* flightProfilePointer);
 
 

@@ -11,13 +11,14 @@
 #include "circular_buffer.h"
 
 #include "vehicle/kinetic_data.h"
-#include "flight_settings.h"
+#include "vehicle/flight_modes.h"
+#include "vehicle/flight_profiles.h"
 
 
 struct PathPoint {
 
     KineticData pointData;
-    uint32_t timeAtArrival = 0;
+    uint32_t time = 0;
     bool useTime = false;
     bool isLinear = false;
 
@@ -28,27 +29,12 @@ class GuidanceTemplate {
 public:
 
     /**
-     * Tells to vehicle to go to one point.
-     * The path that the vehicle should take might not be 
-     * a line. For that use toPointLinear().
-     * This program also takes the velocities, and attitudes
-     * of the start and end point.
-     * Some vehicles might not support (ignore) certain
-     * Kinetic parameters. E.g a multicopter due to it being 
-     * underactuated will ignore attitude parameters. 
-     * 
-     * The time at arrival is the time at which the vehicle 
-     * should reach the point relative to the last point or 
-     * in the case that this has already happend then relative
-     * to the time the function is called and is in microseconds.
+     * Tells the vehicle to go to a certain point in space.
      *
      * @param values point and time at arrival.
      * @return none.
      */
-    void toPoint(KineticData state, uint32_t timeAtArrivalus);
-
-
-
+    //virtual void toPoint(PathPoint state);
     
 
 protected:

@@ -13,7 +13,8 @@
 #include "circular_buffer.h"
 
 #include "vehicle/kinetic_data.h"
-#include "flight_settings.h"
+#include "vehicle/flight_modes.h"
+#include "vehicle/flight_profiles.h"
 
 
 
@@ -91,7 +92,7 @@ public:
      * @param values flight mode.
      * @return none.
      */
-    void setFlightMode(const FLIGHT_MODE &flightMode) {*_flightMode = flightMode;}
+    //void setFlightMode(const FLIGHT_MODE &flightMode) {*_flightMode = flightMode;}
 
     /**
      * Returns the current flight mode.
@@ -99,7 +100,7 @@ public:
      * @param values none.
      * @return flight mode.
      */
-    FLIGHT_MODE getFlightMode() {return *_flightMode;};
+    //FLIGHT_MODE getFlightMode() {return *_flightMode;};
 
     /**
      * Sets the flights profile.
@@ -107,7 +108,7 @@ public:
      * @param values flight mode.
      * @return none.
      */
-    void setFlightProfile(const FLIGHT_PROFILE &flightProfile) {*_flightProfile = flightProfile;}
+    //void setFlightProfile(const FLIGHT_PROFILE &flightProfile) {*_flightProfile = flightProfile;}
 
     /**
      * Returns the current flight profile.
@@ -115,7 +116,7 @@ public:
      * @param values none.
      * @return flight mode.
      */
-    FLIGHT_PROFILE getFlightProfile() {return *_flightProfile;};
+    //FLIGHT_PROFILE getFlightProfile() {return *_flightProfile;};
 
     /**
      * Returns number of path states are left to be reached. 
@@ -125,7 +126,9 @@ public:
      * @param values none.
      * @return number of points left.
      */
-    uint8_t numberPathStatesToGo() {return _path.capacity() - _path.size();};
+    //uint8_t numberPathStatesToGo() {return _path.capacity() - _path.size();};
+
+    void setFlightMode(const FLIGHT_MODE &flightMode) {*_flightMode = flightMode;};
     
 
 protected:

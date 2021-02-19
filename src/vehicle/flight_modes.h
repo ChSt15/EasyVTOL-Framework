@@ -2,7 +2,10 @@
 #define FLIGHT_MODES_H
 
 /**
- * Enum containing all flight modes
+ * Enum containing all flight modes.
+ * These tell the vehicle which kinematic 
+ * parameters to control and if it should
+ * be disarmed, armed or emergency shutdown.
  */
 enum FLIGHT_MODE {
     //Disarms vehicle disabling motors and moving acuators into a home postion

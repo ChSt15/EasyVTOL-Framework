@@ -5,6 +5,8 @@
 
 #include "definitions.h"
 
+#include "vehicle/vehicle_template.h"
+
 #include "utils/interval_control.h"
 
 #include "guidance.h"
@@ -13,13 +15,13 @@
 #include "dynamics.h"
 #include "output_control.h"
 
-#include "flight_settings.h"
+#include "vehicle/flight_modes.h"
 
 
 #define VEHICLE_LOOP_RATE 4000
 
 
-class Vehicle: public Guidance, public Navigation, public Control, public Dynamics, public OutputControl {
+class Vehicle: public VehicleTemplate, public Guidance, public Navigation, public Control, public Dynamics, public OutputControl {
 public:
 
     void vehicleThread();

@@ -16,7 +16,8 @@
 #include "Arduino.h"
 
 #include "vehicle/kinetic_data.h"
-#include "flight_settings.h"
+#include "vehicle/flight_modes.h"
+#include "vehicle/flight_profiles.h"
 
 
 

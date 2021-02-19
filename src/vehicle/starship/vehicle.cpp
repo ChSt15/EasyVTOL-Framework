@@ -6,10 +6,10 @@ void Vehicle::vehicleThread() {
 
     if (!interval.isTimeToRun()) return; //Leave if its not time to run yet
 
-    if (!_vehicleInitialized) vehicleInit();
+    if (!_vehicleInitialized) vehicleInit(true);
 
     navigationThread();
-    KineticData kineticData = getNavigationKineticData();
+    KineticData kineticData = getNavigationKineticData(); //retrieve vehicle kinematics
 
     guidanceThread();
 
@@ -25,7 +25,7 @@ void Vehicle::vehicleThread() {
 }
 
 
-void Vehicle::vehicleInit() {
+void Vehicle::vehicleInit(bool test) {
     guidanceInit(&_flightMode, &_flightProfile);
     navigationInit(&_flightMode, &_flightProfile);
     controlInit(&_flightMode, &_flightProfile);

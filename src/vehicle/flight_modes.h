@@ -22,16 +22,5 @@ enum FLIGHT_MODE {
 };
 
 
-/**
- * Enum containing all flight profiles
- */
-enum FLIGHT_PROFILE {
-    //Goes into "normal" rocket flight but can also hover at given point
-    HOVER,
-    //Goes into belly flop. Meaning side of vehicle windwards.
-    BELLY_FLOP,
-};
-
-
 
 #endif

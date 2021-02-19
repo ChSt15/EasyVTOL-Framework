@@ -1,5 +1,5 @@
-#ifndef NAVIGATION_H
-#define NAVIGATION_H
+#ifndef NAVIGATION_COMPLEMENTARY_H
+#define NAVIGATION_COMPLEMENTARY_H
 
 
 
@@ -15,6 +15,8 @@
 
 #include "Arduino.h"
 
+#include "vehicle/template_modules/navigation_template.h"
+
 #include "sensors/imu.h"
 
 #include "utils/interval_control.h"
@@ -22,13 +24,14 @@
 #include "utils/low_pass_filter.h"
 
 #include "vehicle/kinetic_data.h"
-#include "flight_settings.h"
+#include "vehicle/flight_modes.h"
+#include "vehicle/flight_profiles.h"
 
 
 #define LOOP_RATE_LIMIT 2000
 
 
-class Navigation {
+class NavigationComplementary: NavigationTemplate {
 public:
 
     /**
@@ -105,6 +108,13 @@ protected:
      * @return none.
      */
     void navigationThread();
+
+    /**
+     * Init function that sets the module up.
+     *
+     * @param values none.
+     * @return none.
+     */
     void navigationInit(FLIGHT_MODE* flightModePointer, FLIGHT_PROFILE* flightProfilePointer);
 
 

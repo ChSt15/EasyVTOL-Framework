@@ -2,26 +2,17 @@
 
 
 
-byte PPMChannel::devices = 0;
-
-
 PPMChannel::PPMChannel(int16_t pin) {
     _pin = pin;
     pinMode(_pin, OUTPUT);
     digitalWrite(_pin, LOW);
-
-    if (devices == 0) {
-        for (byte n = 0; n < MAX_NUM_CHANNELS; n++) usedPins[n] = -1;
-    }
-
-    devices++;
 
     _servoStatus = DeviceStatus::DEVICE_RUNNING;
 }
 
 
 PPMChannel::~PPMChannel() {
-    devices--;
+
 }
 
 

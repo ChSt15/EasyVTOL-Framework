@@ -1,11 +1,9 @@
-#ifndef CONTROL_H
-#define CONTROL_H
+#ifndef CONTROL_TEMPLATE_H
+#define CONTROL_TEMPLATE_H
 
 
 
 #include "Arduino.h"
-
-#include "vehicle/template_modules/control_template.h"
 
 #include "vehicle/dynamic_data.h"
 #include "vehicle/kinetic_data.h"
@@ -13,7 +11,7 @@
 #include "vehicle/flight_profiles.h"
 
 
-class Control: ControlTemplate {
+class ControlTemplate {
 public:
 
     /**
@@ -23,7 +21,7 @@ public:
      * @param values none.
      * @return dynamic setpoint in local coordinate system.
      */
-    DynamicData getControlDynamicsSetpoint() {return _dynamicsSetpoint;}
+    virtual DynamicData getControlDynamicsSetpoint();
 
 
 protected:
@@ -34,7 +32,7 @@ protected:
      * @param values none.
      * @return none.
      */
-    void controlThread(KineticData vehicleKinetics);
+    virtual void controlThread(KineticData vehicleKinetics);
 
     /**
      * Init function that sets the module up.
@@ -42,7 +40,7 @@ protected:
      * @param values none.
      * @return none.
      */
-    void controlInit(FLIGHT_MODE* flightModePointer, FLIGHT_PROFILE* flightProfilePointer);
+    virtual void controlInit(FLIGHT_MODE* flightModePointer, FLIGHT_PROFILE* flightProfilePointer);
     
     /**
      * Sets the kinetics of which the vehicle should have.
@@ -50,17 +48,7 @@ protected:
      * @param values setpoint in world coordinate system.
      * @return none.
      */
-    void setControlKineticSetpoint(KineticData setpoint) {_kineticsSetpoint = setpoint;}
-    
-
-private:   
-
-    KineticData _kineticsSetpoint;
-
-    DynamicData _dynamicsSetpoint;
-
-    FLIGHT_MODE* _flightMode;
-    FLIGHT_PROFILE* _flightProfile;
+    virtual void setControlKineticSetpoint(KineticData setpoint);
 
     
 };

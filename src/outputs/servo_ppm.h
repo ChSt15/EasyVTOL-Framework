@@ -54,9 +54,6 @@ public:
 
 private:
 
-    static int16_t usedPins[MAX_NUM_CHANNELS];
-    static byte devices;
-
     int16_t _pin = -1;  
 
     DeviceStatus _servoStatus = DeviceStatus::DEVICE_NOT_STARTED;
@@ -69,8 +66,8 @@ private:
     float _deltaHighUS = _highMaxUS - _highMinUS;
     float _periodUS = _highMaxUS*1.25f;
 
-    const byte resolution = 12;
-    const uint32_t bits = (uint32_t)1<<resolution;
+    static const byte resolution = 12;                      //static const because these should not change
+    static const uint32_t bits = (uint32_t)1<<resolution;
     
 };
 

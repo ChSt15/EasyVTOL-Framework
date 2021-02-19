@@ -40,6 +40,8 @@ namespace IMU {
 
     uint32_t lastMeasurement = 0;
 
+    uint32_t newDataTimestamp = 0;
+
     bool newDataInterrupt = false;
 
     void interruptRoutine();
@@ -49,6 +51,7 @@ namespace IMU {
 
 void IMU::interruptRoutine() {
     newDataInterrupt = true;
+    newDataTimestamp = micros();
 }
 
 
@@ -66,12 +69,11 @@ void IMU::deviceThread() {
 
 
             imu.readSensor();
-            uint32_t timestamp = micros();
 
             Vector bufVec(-imu.getGyroX_rads(), -imu.getGyroY_rads(), imu.getGyroZ_rads());
             if (lastGyro != bufVec) {
                 gyroFifo.unshift(bufVec);
-                gyroTimestampFifo.unshift(timestamp);
+                gyroTimestampFifo.unshift(newDataTimestamp);
                 lastGyro = bufVec;
                 gyroCounter++;
             }
@@ -80,7 +82,7 @@ void IMU::deviceThread() {
             if (lastAccel != bufVec) {
                 //bufVec = bufVec*0.001f + lastAccel*0.999f;
                 accelFifo.unshift(bufVec);
-                accelTimestampFifo.unshift(timestamp);
+                accelTimestampFifo.unshift(newDataTimestamp);
                 lastAccel = bufVec;
                 accelCounter++;
             }
@@ -88,7 +90,7 @@ void IMU::deviceThread() {
             bufVec = Vector(-imu.getMagX_uT(), -imu.getMagY_uT(), imu.getMagZ_uT());
             if (lastMag != bufVec) {
                 magFifo.unshift(bufVec);
-                magTimestampFifo.unshift(timestamp);
+                magTimestampFifo.unshift(newDataTimestamp);
                 lastMag = bufVec;
                 magCounter++;
             }

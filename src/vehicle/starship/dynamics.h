@@ -3,8 +3,8 @@
 
 
 /**
- * This is where the vehicle "output mapping" is done. This takes the outputs of the control
- * and transforms (post processes) it to the different servo outputs, motor ESCs etc.
+ * This is where the vehicle "output mapping" is done. This should for example 
+ * compensate for actuator errors from servos.
  * This allows the control to be written in a very general way and streamlines the 
  * development if the control systems. 
  * Because this class will be augmented by the simulator, this structure also allows for very
@@ -19,21 +19,38 @@
 
 #include "Arduino.h"
 
+#include "vehicle/template_modules/dynamics_template.h"
+
+#include "output_control.h"
+
 #include "vehicle/kinetic_data.h"
 #include "vehicle/dynamic_data.h"
+#include "vehicle/flight_modes.h"
+#include "vehicle/flight_profiles.h"
 
-#include "flight_settings.h"
 
 
-
-class Dynamics {
+class Dynamics: DynamicsTemplate {
 public:
 
 
 
 protected:
 
+    /**
+     * This is where all calculations are done.
+     *
+     * @param values none.
+     * @return none.
+     */
     void dynamicsThread(KineticData vehicleKinetics);
+
+    /**
+     * Init function that sets the module up.
+     *
+     * @param values none.
+     * @return none.
+     */
     void dynamicsInit(FLIGHT_MODE* flightModePointer, FLIGHT_PROFILE* flightProfilePointer);
     
     /**
@@ -43,9 +60,35 @@ protected:
      * @return none.
      */
     void setDynamicsSetpoint(DynamicData dynamics) {_dynamicData = dynamics;}
+
+    /**
+     * Returns the actuator positions.
+     * Definitions:
+     * 
+     * TVCServoXP: TVC servo that controls the flap in X axis positive. Range is -1 to 1.
+     * TVCServoXN: TVC servo that controls the flap in X axis negative. Range is -1 to 1.
+     * TVCServoYP: TVC servo that controls the flap in Y axis positive. Range is -1 to 1.
+     * TVCServoYN: TVC servo that controls the flap in Y axis negative. Range is -1 to 1.
+     * 
+     * motorCW: Motor control for clockwise motor. Range is 0 to 1.
+     * motorCCW: Motor control for counter clockwise motor. Range is 0 to 1.
+     * 
+     * flapTL: Servo that controls the drag flap on top left. Range is 0 to 1.
+     * flapTR: Servo that controls the drag flap on top right. Range is 0 to 1.
+     * flapBL: Servo that controls the drag flap on bottom left. Range is 0 to 1.
+     * flapBR: Servo that controls the drag flap on bottom right. Range is 0 to 1.
+     * 
+     *
+     * @param values lots but all will be changed by function as these are adresses.
+     * @return none.
+     */
+    Outputs getActuatorSetpoints() {return _outputs;};
+    //void getActuatorSetpoints(float &TVCServoXP, float &TVCServoXN, float &TVCServoYP, float &TVCServoYN, float &motorCW, float &motorCCW, float &flapTL, float &flapTR, float &flapBL, float &flapBR);
     
 
 private:
+
+    Outputs _outputs;
 
     DynamicData _dynamicData;
 

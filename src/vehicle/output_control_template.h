@@ -27,12 +27,6 @@ protected:
     virtual void outputControlThread(const KineticData &vehicleKinetics);
     virtual void outputControlInit(FLIGHT_MODE* flightModePointer, FLIGHT_PROFILE* flightProfilePointer);
     
-
-private:
-
-    FLIGHT_MODE* _flightMode;
-    FLIGHT_PROFILE* _flightProfile;
-    
     
 };
 

@@ -52,9 +52,6 @@ protected:
     virtual void navigationInit(FLIGHT_MODE* flightModePointer, FLIGHT_PROFILE* flightProfilePointer);
 
 
-private:
-
-
 };
 
 

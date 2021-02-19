@@ -57,9 +57,6 @@ protected:
      */
     virtual void setDynamicsSetpoint(DynamicData dynamics);
     
-
-private:
-    
     
 };
 

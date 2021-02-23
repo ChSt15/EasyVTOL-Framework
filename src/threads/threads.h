@@ -14,7 +14,7 @@
 
 #include "outputs/rgb_led.h"
 
-#include "vehicle/starship/vehicle.h"
+#include "vehicle/starship/starship.h"
 
 #include "utils/interval_control.h"
 

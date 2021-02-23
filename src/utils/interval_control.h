@@ -45,6 +45,7 @@ public:
 
     /**
      * Returns the amount of time till the next run.
+     * Negative number means the how long ago it should have ran
      *
      * @param values none
      * @return remaining time till next run.

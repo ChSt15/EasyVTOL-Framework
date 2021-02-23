@@ -29,7 +29,7 @@ bool threadActive[7] = {
 
 IntervalControl threadMonitorPrintInterval;
 
-Vehicle vehicle;
+Starship vehicle;
 
 
 void threadBegin() {
@@ -111,24 +111,21 @@ void threadControl() {
             Serial.println();
         #endif
 
-        Vector axis;
-        float angle = -1;
 
-        vehicle.getAttitude().getAxisAngle(&axis, &angle);
-        angle = angle/DEGREES;
-
+        KinematicData vehicleKinetics = vehicle.getKinematicData();
 
         //Serial.println();
         //Serial.println("LoopRate: " + String(IMU::getRate()) + ", GyroRate: " + String(IMU::getGyroRate()) + ", AccelRate: " + String(IMU::getAccelRate()) + ", MagRate: " + String(IMU::getMagRate()));
-        Serial.println("vehicle attitude: w: " + String(vehicle.getAttitude().w) + ", x: " + String(vehicle.getAttitude().x) + ", y: " + String(vehicle.getAttitude().y) + ", z: " + String(vehicle.getAttitude().z));
-        Serial.println("vehicle angularRate: x: " + String(vehicle.getAngularRate().x) + ", y: " + String(vehicle.getAngularRate().y) + ", z: " + String(vehicle.getAngularRate().z));
-        Serial.println("IMU Rate: " + String(IMU::getGyroRate()));
+        Serial.println("vehicle attitude: w: " + String(vehicleKinetics.attitude.w) + ", x: " + String(vehicleKinetics.attitude.x) + ", y: " + String(vehicleKinetics.attitude.y) + ", z: " + String(vehicleKinetics.attitude.z));
+        Serial.println("Number of threads: " + String(Module::getNumThreads()));
+        //Serial.println("vehicle angularRate: x: " + String(vehicleKinetics.angularRate.x) + ", y: " + String(vehicleKinetics.angularRate.y) + ", z: " + String(vehicleKinetics.angularRate.z));
+        //Serial.println("IMU Rate: " + String(IMU::getGyroRate()));
         //Serial.println("vehicle accel: x: " + String(vehicle.getAcceleration().x) + ", y: " + String(vehicle.getAcceleration().y) + ", z: " + String(vehicle.getAcceleration().z));
         //Serial.println("vehicle speed: x: " + String(vehicle.getVelocity().x) + ", y: " + String(vehicle.getVelocity().y) + ", z: " + String(vehicle.getVelocity().z));
         //Serial.println("vehicle pos: x: " + String(vehicle.getPosition().x) + ", y: " + String(vehicle.getPosition().y) + ", z: " + String(vehicle.getPosition().z));
 
         if (Serial.available()) {
-            vehicle.resetInertial();
+            //vehicle.resetInertial();
             while(Serial.available()) Serial.read();
         }
 
@@ -168,7 +165,8 @@ void tasks0() {
     //AirData::deviceThread();
     //LORA_2_4::deviceThread();
 
-    vehicle.vehicleThread();
+    //vehicle.thread();
+    Module::moduleThreadControlLoop();
 
 }
 

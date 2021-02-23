@@ -2,13 +2,13 @@
 
 
 
-void NavigationComplementary::navigationThread() {
+void NavigationComplementary::thread() {
 
     if (!_interval.isTimeToRun()) return;
 
-
     if (IMU::getDeviceStatus() != DeviceStatus::DEVICE_RUNNING) return;
-
+    	
+    //KinematicData *_vehicleKinematics.= _vehicle;
 
     if (IMU::gyroAvailable()) {
         
@@ -18,7 +18,7 @@ void NavigationComplementary::navigationThread() {
         IMU::getGyro(&rotationVector, &timestamp);
 
         //Check if gyro initialised
-        if (gyroInitialized) {
+        if (_gyroInitialized) {
 
             //Predict system state
             float dt = float(timestamp - _lastGyroTimestamp)/1000000.0f;
@@ -28,17 +28,17 @@ void NavigationComplementary::navigationThread() {
 
                 Quaternion rotationQuat = Quaternion(rotationVector, rotationVector.magnitude()*dt);
 
-                _kineticData.attitude = _kineticData.attitude*rotationQuat;
+                _vehicleKinematics.attitude = _vehicleKinematics.attitude*rotationQuat;
 
             }
 
             //Update angularRate
-            _kineticData.angularRate = (_kineticData.attitude*rotationVector*_kineticData.attitude.copy().conjugate()).toVector(); //Transform angular rate into world coordinate system
+            _vehicleKinematics.angularRate = (_vehicleKinematics.attitude*rotationVector*_vehicleKinematics.attitude.copy().conjugate()).toVector(); //Transform angular rate into world coordinate system
 
         } else {
 
             //Gyro filter initialisation
-            gyroInitialized = true;
+            _gyroInitialized = true;
             _lastGyroTimestamp = timestamp;
 
         }
@@ -54,7 +54,7 @@ void NavigationComplementary::navigationThread() {
         IMU::getAccel(&accelVector, &timestamp);
 
         //Check if accelerometer initialised
-        if (accelInitialized) {
+        if (_accelInitialized) {
             
             //Correct state prediction
             float dt = float(timestamp - _lastAccelTimestamp)/1000000.0f;
@@ -64,7 +64,7 @@ void NavigationComplementary::navigationThread() {
 
             //Z-Axis correction
             Vector zAxisIs = Vector(0,0,1);
-            Vector zAxisSet = (_kineticData.attitude*accelVector*_kineticData.attitude.copy().conjugate()).toVector();
+            Vector zAxisSet = (_vehicleKinematics.attitude*accelVector*_vehicleKinematics.attitude.copy().conjugate()).toVector();
 
             Vector zAxisRotationAxis = zAxisSet.cross(zAxisIs);
             float zAxisRotationAngle = zAxisSet.getAngleTo(zAxisIs);
@@ -73,23 +73,23 @@ void NavigationComplementary::navigationThread() {
 
 
             //Apply state correction and normalise attitude quaternion 
-            _kineticData.attitude = zAxisCorrectionQuat*_kineticData.attitude;
-            _kineticData.attitude.normalize(true);
+            _vehicleKinematics.attitude = zAxisCorrectionQuat*_vehicleKinematics.attitude;
+            _vehicleKinematics.attitude.normalize(true);
 
 
             //Update acceleration
-            _kineticData.acceleration = (_kineticData.attitude*accelVector*_kineticData.attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
-            _kineticData.linearAcceleration = _kineticData.acceleration - Vector(0,0,9.81);
+            _vehicleKinematics.acceleration = (_vehicleKinematics.attitude*accelVector*_vehicleKinematics.attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
+            _vehicleKinematics.linearAcceleration = _vehicleKinematics.acceleration - Vector(0,0,9.81);
 
-        } else if (gyroInitialized) {
+        } else if (_gyroInitialized) {
             
             //Accel filter initialisation
-            accelInitialized = true;
+            _accelInitialized = true;
             _lastAccelTimestamp = timestamp;
 
             //Set Attitude
             Vector zAxisIs = Vector(0,0,1);
-            Vector zAxisSet = (_kineticData.attitude*accelVector*_kineticData.attitude.copy().conjugate()).toVector();
+            Vector zAxisSet = (_vehicleKinematics.attitude*accelVector*_vehicleKinematics.attitude.copy().conjugate()).toVector();
 
             Vector zAxisRotationAxis = zAxisSet.cross(zAxisIs);
             float zAxisRotationAngle = zAxisSet.getAngleTo(zAxisIs);
@@ -97,8 +97,8 @@ void NavigationComplementary::navigationThread() {
             Quaternion zAxisCorrectionQuat = Quaternion(zAxisRotationAxis, zAxisRotationAngle);
 
             //Apply state correction and normalise attitude quaternion 
-            _kineticData.attitude = zAxisCorrectionQuat*_kineticData.attitude;
-            _kineticData.attitude.normalize(true);
+            _vehicleKinematics.attitude = zAxisCorrectionQuat*_vehicleKinematics.attitude;
+            _vehicleKinematics.attitude.normalize(true);
 
         }
 
@@ -112,7 +112,7 @@ void NavigationComplementary::navigationThread() {
         uint32_t timestamp;
         IMU::getMag(&magVector, &timestamp);
 
-        if (magInitialized) {
+        if (_magInitialized) {
 
             //Correct state prediction
             float dt = float(timestamp - _lastMagTimestamp)/1000000.0f;
@@ -122,7 +122,7 @@ void NavigationComplementary::navigationThread() {
 
             //X-Axis correction
             Vector xAxisIs(1,0,0);
-            Vector xAxisSet = (_kineticData.attitude*magVector*_kineticData.attitude.copy().conjugate()).toVector();
+            Vector xAxisSet = (_vehicleKinematics.attitude*magVector*_vehicleKinematics.attitude.copy().conjugate()).toVector();
             xAxisSet.z = 0;
             xAxisSet.normalize();
 
@@ -133,18 +133,18 @@ void NavigationComplementary::navigationThread() {
 
 
             //Apply state correction and normalise attitude quaternion 
-            _kineticData.attitude = xAxisCorrectionQuat*_kineticData.attitude;
-            _kineticData.attitude.normalize(true);
+            _vehicleKinematics.attitude = xAxisCorrectionQuat*_vehicleKinematics.attitude;
+            _vehicleKinematics.attitude.normalize(true);
 
-        } else if (accelInitialized) {
+        } else if (_accelInitialized) {
 
             //Magnetometer filter initialisation
-            magInitialized = true;
+            _magInitialized = true;
             _lastMagTimestamp = timestamp;
 
             //Set heading
             Vector xAxisIs(1,0,0);
-            Vector xAxisSet = (_kineticData.attitude*magVector*_kineticData.attitude.copy().conjugate()).toVector();
+            Vector xAxisSet = (_vehicleKinematics.attitude*magVector*_vehicleKinematics.attitude.copy().conjugate()).toVector();
             xAxisSet.z = 0;
             xAxisSet.normalize();
 
@@ -154,8 +154,8 @@ void NavigationComplementary::navigationThread() {
             Quaternion xAxisCorrectionQuat = Quaternion(xAxisRotationAxis, xAxisRotationAngle);
 
             //Apply state correction and normalise attitude quaternion 
-            _kineticData.attitude = xAxisCorrectionQuat*_kineticData.attitude;
-            _kineticData.attitude.normalize(true);
+            _vehicleKinematics.attitude = xAxisCorrectionQuat*_vehicleKinematics.attitude;
+            _vehicleKinematics.attitude.normalize(true);
 
         }
 
@@ -166,17 +166,15 @@ void NavigationComplementary::navigationThread() {
 
     float dt = 1.0f/LOOP_RATE_LIMIT;
 
-    _kineticData.velocity = _kineticData.velocity + _kineticData.acceleration*dt;
+    _vehicleKinematics.velocity = _vehicleKinematics.velocity + _vehicleKinematics.acceleration*dt;
 
-    _kineticData.position = _kineticData.position + _kineticData.velocity*dt;
+    _vehicleKinematics.position = _vehicleKinematics.position + _vehicleKinematics.velocity*dt;
 
 }
 
 
 
-void NavigationComplementary::navigationInit(FLIGHT_MODE* flightModePointer, FLIGHT_PROFILE* flightProfilePointer) {
-
-    _flightMode = flightModePointer;
-    _flightProfile = flightProfilePointer;
-    
+void NavigationComplementary::init() {
+    //_vehicleKinematics.= &Vehicle::_vehicleKinematics.
+    //_connectThread();
 }

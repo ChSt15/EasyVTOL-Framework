@@ -11,7 +11,7 @@
 /**
  * Kinetic data is usually in world coordinate system!.
  */
-struct KineticData {
+struct KinematicData {
 
     Vector position;
     Vector velocity;

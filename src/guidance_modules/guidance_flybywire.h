@@ -32,7 +32,7 @@ public:
     /**
      * Tells the guidance to rotate vehicle to a attitude.
      *
-     * @param values attitde.
+     * @param values attitude.
      * @return none.
      */
     void setAngularRate(const Quaternion &attitude) {
@@ -42,7 +42,7 @@ public:
     /**
      * Tells the guidance to move vehicle at a set velocity.
      *
-     * @param values attitde.
+     * @param values velocity.
      * @return none.
      */
     void setVelocity(const Vector &velocity) {
@@ -52,13 +52,19 @@ public:
     /**
      * Tells the guidance to move vehicle to a set position.
      *
-     * @param values attitde.
+     * @param values position.
      * @return none.
      */
     void setVelocity(const Vector &position) {
         _inputs.position = position;
     }
 
+    /**
+     * Tells the guidance to stop rotating and moving.
+     *
+     * @param values none.
+     * @return none.
+     */
     void stopVehicle() {
         _inputs.angularRate = Vector(0,0,0);
         _inputs.velocity = Vector(0,0,0);

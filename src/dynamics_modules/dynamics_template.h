@@ -30,6 +30,9 @@ public:
      * 
      * This allows for data linking meaning that the data does 
      * not need to be passed between modules.
+     * 
+     * Returns false if linking failed. Can only happen if pointer was
+     * null pointer.
      *
      * @param values kinematicSetpoint.
      * @return none.

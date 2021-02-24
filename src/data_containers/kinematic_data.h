@@ -1,5 +1,5 @@
-#ifndef KINETIC_DATA_H
-#define KINETIC_DATA_H
+#ifndef KINEMATIC_DATA_H
+#define KINEMATIC_DATA_H
 
 
 #include "definitions.h"

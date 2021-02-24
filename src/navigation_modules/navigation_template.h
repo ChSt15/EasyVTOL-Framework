@@ -88,6 +88,15 @@ public:
     virtual float getPositionAccuracy() {return -1.0f;}
 
     /**
+     * Returns the current attitude accuracy.
+     * Returns -1.0 if unsupported.
+     * 
+     * @param values none.
+     * @return float.
+     */
+    virtual float getAttitudeAccuracy() {return -1.0f;}
+
+    /**
      * Returns a pointer to a struct containing all 
      * the vehicles current kinematic parameters.
      * 

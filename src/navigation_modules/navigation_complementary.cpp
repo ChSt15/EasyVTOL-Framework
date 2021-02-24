@@ -8,7 +8,7 @@ void NavigationComplementary::thread() {
 
     if (IMU::getDeviceStatus() != DeviceStatus::DEVICE_RUNNING) return;
     	
-    //KinematicData *_vehicleKinematics.= _vehicle;
+    //KinematicData *_navigationData.= _vehicle;
 
     if (IMU::gyroAvailable()) {
         
@@ -28,12 +28,12 @@ void NavigationComplementary::thread() {
 
                 Quaternion rotationQuat = Quaternion(rotationVector, rotationVector.magnitude()*dt);
 
-                _vehicleKinematics.attitude = _vehicleKinematics.attitude*rotationQuat;
+                _navigationData.attitude = _navigationData.attitude*rotationQuat;
 
             }
 
             //Update angularRate
-            _vehicleKinematics.angularRate = (_vehicleKinematics.attitude*rotationVector*_vehicleKinematics.attitude.copy().conjugate()).toVector(); //Transform angular rate into world coordinate system
+            _navigationData.angularRate = (_navigationData.attitude*rotationVector*_navigationData.attitude.copy().conjugate()).toVector(); //Transform angular rate into world coordinate system
 
         } else {
 
@@ -64,7 +64,7 @@ void NavigationComplementary::thread() {
 
             //Z-Axis correction
             Vector zAxisIs = Vector(0,0,1);
-            Vector zAxisSet = (_vehicleKinematics.attitude*accelVector*_vehicleKinematics.attitude.copy().conjugate()).toVector();
+            Vector zAxisSet = (_navigationData.attitude*accelVector*_navigationData.attitude.copy().conjugate()).toVector();
 
             Vector zAxisRotationAxis = zAxisSet.cross(zAxisIs);
             float zAxisRotationAngle = zAxisSet.getAngleTo(zAxisIs);
@@ -73,13 +73,13 @@ void NavigationComplementary::thread() {
 
 
             //Apply state correction and normalise attitude quaternion 
-            _vehicleKinematics.attitude = zAxisCorrectionQuat*_vehicleKinematics.attitude;
-            _vehicleKinematics.attitude.normalize(true);
+            _navigationData.attitude = zAxisCorrectionQuat*_navigationData.attitude;
+            _navigationData.attitude.normalize(true);
 
 
             //Update acceleration
-            _vehicleKinematics.acceleration = (_vehicleKinematics.attitude*accelVector*_vehicleKinematics.attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
-            _vehicleKinematics.linearAcceleration = _vehicleKinematics.acceleration - Vector(0,0,9.81);
+            _navigationData.acceleration = (_navigationData.attitude*accelVector*_navigationData.attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
+            _navigationData.linearAcceleration = _navigationData.acceleration - Vector(0,0,9.81);
 
         } else if (_gyroInitialized) {
             
@@ -89,7 +89,7 @@ void NavigationComplementary::thread() {
 
             //Set Attitude
             Vector zAxisIs = Vector(0,0,1);
-            Vector zAxisSet = (_vehicleKinematics.attitude*accelVector*_vehicleKinematics.attitude.copy().conjugate()).toVector();
+            Vector zAxisSet = (_navigationData.attitude*accelVector*_navigationData.attitude.copy().conjugate()).toVector();
 
             Vector zAxisRotationAxis = zAxisSet.cross(zAxisIs);
             float zAxisRotationAngle = zAxisSet.getAngleTo(zAxisIs);
@@ -97,8 +97,8 @@ void NavigationComplementary::thread() {
             Quaternion zAxisCorrectionQuat = Quaternion(zAxisRotationAxis, zAxisRotationAngle);
 
             //Apply state correction and normalise attitude quaternion 
-            _vehicleKinematics.attitude = zAxisCorrectionQuat*_vehicleKinematics.attitude;
-            _vehicleKinematics.attitude.normalize(true);
+            _navigationData.attitude = zAxisCorrectionQuat*_navigationData.attitude;
+            _navigationData.attitude.normalize(true);
 
         }
 
@@ -122,7 +122,7 @@ void NavigationComplementary::thread() {
 
             //X-Axis correction
             Vector xAxisIs(1,0,0);
-            Vector xAxisSet = (_vehicleKinematics.attitude*magVector*_vehicleKinematics.attitude.copy().conjugate()).toVector();
+            Vector xAxisSet = (_navigationData.attitude*magVector*_navigationData.attitude.copy().conjugate()).toVector();
             xAxisSet.z = 0;
             xAxisSet.normalize();
 
@@ -133,8 +133,8 @@ void NavigationComplementary::thread() {
 
 
             //Apply state correction and normalise attitude quaternion 
-            _vehicleKinematics.attitude = xAxisCorrectionQuat*_vehicleKinematics.attitude;
-            _vehicleKinematics.attitude.normalize(true);
+            _navigationData.attitude = xAxisCorrectionQuat*_navigationData.attitude;
+            _navigationData.attitude.normalize(true);
 
         } else if (_accelInitialized) {
 
@@ -144,7 +144,7 @@ void NavigationComplementary::thread() {
 
             //Set heading
             Vector xAxisIs(1,0,0);
-            Vector xAxisSet = (_vehicleKinematics.attitude*magVector*_vehicleKinematics.attitude.copy().conjugate()).toVector();
+            Vector xAxisSet = (_navigationData.attitude*magVector*_navigationData.attitude.copy().conjugate()).toVector();
             xAxisSet.z = 0;
             xAxisSet.normalize();
 
@@ -154,8 +154,8 @@ void NavigationComplementary::thread() {
             Quaternion xAxisCorrectionQuat = Quaternion(xAxisRotationAxis, xAxisRotationAngle);
 
             //Apply state correction and normalise attitude quaternion 
-            _vehicleKinematics.attitude = xAxisCorrectionQuat*_vehicleKinematics.attitude;
-            _vehicleKinematics.attitude.normalize(true);
+            _navigationData.attitude = xAxisCorrectionQuat*_navigationData.attitude;
+            _navigationData.attitude.normalize(true);
 
         }
 
@@ -166,9 +166,9 @@ void NavigationComplementary::thread() {
 
     float dt = 1.0f/LOOP_RATE_LIMIT;
 
-    _vehicleKinematics.velocity = _vehicleKinematics.velocity + _vehicleKinematics.acceleration*dt;
+    _navigationData.velocity = _navigationData.velocity + _navigationData.acceleration*dt;
 
-    _vehicleKinematics.position = _vehicleKinematics.position + _vehicleKinematics.velocity*dt;
+    _navigationData.position = _navigationData.position + _navigationData.velocity*dt;
 
 }
 

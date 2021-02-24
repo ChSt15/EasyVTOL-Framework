@@ -55,7 +55,7 @@ public:
      * @param values position.
      * @return none.
      */
-    void setVelocity(const Vector &position) {
+    void setPosition(const Vector &position) {
         _inputs.position = position;
     }
 

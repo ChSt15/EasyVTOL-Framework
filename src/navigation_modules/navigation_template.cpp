@@ -2,4 +2,4 @@
 
 
 
-KinematicData Navigation::_vehicleKinematics;
+NavigationData Navigation::_vehicleKinematics;

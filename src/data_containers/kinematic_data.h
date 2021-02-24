@@ -1,5 +1,5 @@
-#ifndef KINETIC_DATA_H
-#define KINETIC_DATA_H
+#ifndef KINEMATIC_DATA_H
+#define KINEMATIC_DATA_H
 
 
 #include "definitions.h"
@@ -13,12 +13,18 @@
  */
 struct KinematicData {
 
+    //Position in meters.
     Vector position;
+    //Velocity in m/s.
     Vector velocity;
+    //Acceleration in m/s/s.
     Vector acceleration;
+    //Acceleration without gravity.
     Vector linearAcceleration;
 
+    //Attitude is without units as it is a quaternion. No idea what unit it should have ¯\_(ツ)_/¯
     Quaternion attitude = Quaternion(1,0,0,0);
+    //Angular rate in radians/s.
     Vector angularRate;
     
 };

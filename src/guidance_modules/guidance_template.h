@@ -5,23 +5,41 @@
 
 #include "templates/module_template.h"
 
-#include "data_containers/kinematic_data.h"
+#include "data_containers/control_data.h"
 
 
 
 class Guidance: public Module {
-private:
+public:
 
     /**
-     * Returns a struct containing all kinetic parameters 
-     * the vehicle should have to perform its commanded 
-     * movements.
+     * Returns a struct containing all the vehicles
+     * setpoint data that feeds to the controller.
      *
      * @param values none.
-     * @return Kinetic paramenters.
+     * @return control parameters.
      */
-    virtual KinematicData getKineticSetpoint() = 0;
+    virtual ControlData getControlSetpoint() {return _vehicleControlSettings;};
 
+    /**
+     * Returns a pointer to a struct containing all the 
+     * vehicles setpoint data that feeds to the controller.
+     * 
+     * Using pointers allows for data linking instead of
+     * always passing data.
+     *
+     * @param values none.
+     * @return control parameter pointer.
+     */
+    virtual ControlData* getControlSetpointPointer() {return &_vehicleControlSettings;};
+
+
+protected:
+
+    /**
+     * This pointer points to the global navigation data kinematic data container
+     */
+    static ControlData _vehicleControlSettings;
 
 };
 

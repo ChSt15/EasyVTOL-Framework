@@ -11,7 +11,9 @@
  */
 struct DynamicData {
 
+    //Force in Newtons.
     Vector force;
+    //Torqe in Nm.
     Vector torqe;
     
 };

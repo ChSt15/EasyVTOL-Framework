@@ -20,7 +20,7 @@ class Starship: public Vehicle {
 public:
 
     Starship() {
-        _connectThread(); //Add thread to threadChain.
+        //_connectThread(); //Add thread to threadChain.
         _navigation = &_navigationDefault; //Set default navigation module.
     }
 

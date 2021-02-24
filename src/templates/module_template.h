@@ -34,11 +34,15 @@ public:
 
     /**
      * Will run all module threads that need to run.
+     * 
+     * CURRENTLY NOT WORKING. Will simply return.
      *
      * @param values none.
      * @return none.
      */
     static void moduleThreadControlLoop() {
+
+        return;
 
         //std::cout << "test1" << std::endl;
 

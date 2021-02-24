@@ -165,8 +165,7 @@ void tasks0() {
     //AirData::deviceThread();
     //LORA_2_4::deviceThread();
 
-    //vehicle.thread();
-    Module::moduleThreadControlLoop();
+    vehicle.thread();
 
 }
 

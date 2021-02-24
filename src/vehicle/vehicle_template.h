@@ -32,22 +32,6 @@ class Vehicle: public Module {
 public:
 
     /**
-     * This is where all calculations are done.
-     *
-     * @param values none.
-     * @return none.
-     */
-    virtual void thread() = 0;
-
-    /**
-     * Init function that setups the vehicle.
-     *
-     * @param values none.
-     * @return none.
-     */
-    virtual void init() = 0;
-
-    /**
      * Returns true if vehicle is ready for flight.
      *
      * @param values none.

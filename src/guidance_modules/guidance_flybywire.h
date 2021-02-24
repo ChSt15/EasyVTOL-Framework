@@ -70,6 +70,21 @@ public:
         _inputs.velocity = Vector(0,0,0);
     }
 
+    /**
+     * This is where all calculations are done.
+     *
+     * @param values none.
+     * @return none.
+     */
+    void thread();
+
+    /**
+     * Init function that sets the module up.
+     *
+     * @param values none.
+     * @return none.
+     */
+    void init();
 
 
 

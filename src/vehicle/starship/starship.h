@@ -5,11 +5,13 @@
 
 #include "definitions.h"
 
+#include "utils/interval_control.h"
+
 #include "vehicle/vehicle_template.h"
 
 #include "navigation_modules/navigation_complementary.h"
+#include "guidance_modules/guidance_flybywire.h"
 
-#include "utils/interval_control.h"
 
 
 #define VEHICLE_LOOP_RATE 8000
@@ -22,6 +24,7 @@ public:
     Starship() {
         //_connectThread(); //Add thread to threadChain.
         _navigation = &_navigationDefault; //Set default navigation module.
+        _guidance = &_guidanceDefault;
     }
 
     /**
@@ -61,8 +64,11 @@ private:
     //Set to true when vehicle is ready for flight.
     bool _vehicleInitialized = false;
 
-    //Module that takes care of navigation (sensorfusion etc.).
+    //Default module to use at start
     NavigationComplementary _navigationDefault;
+
+    //Default module to use at start
+    GuidanceFlyByWire _guidanceDefault;
 
     //static Navigation* _navigation;
 

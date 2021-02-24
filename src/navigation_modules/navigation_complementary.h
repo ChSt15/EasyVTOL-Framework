@@ -47,6 +47,14 @@ public:
     void thread();
 
     /**
+     * Init function that sets the module up.
+     *
+     * @param values none.
+     * @return none.
+     */
+    void init();
+
+    /**
      * Returns true if module is ready.
      *
      * @param values none.
@@ -61,14 +69,6 @@ public:
      * @return float.
      */
     //float getPositionAccuracy() {return 50.0f;}
-
-    /**
-     * Init function that sets the module up.
-     *
-     * @param values none.
-     * @return none.
-     */
-    void init();
 
 
 private:

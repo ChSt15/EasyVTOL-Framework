@@ -79,7 +79,7 @@ public:
     virtual KinematicData getKinematicData() {return _vehicleKinematics;};
 
     /**
-     * Returns the current position accuracy.
+     * Returns the current position accuracy in meters.
      * Returns -1.0 if unsupported.
      * 
      * @param values none.
@@ -88,7 +88,7 @@ public:
     virtual float getPositionAccuracy() {return -1.0f;}
 
     /**
-     * Returns the current attitude accuracy.
+     * Returns the current attitude accuracy in radians.
      * Returns -1.0 if unsupported.
      * 
      * @param values none.

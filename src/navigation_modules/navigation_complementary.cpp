@@ -175,6 +175,5 @@ void NavigationComplementary::thread() {
 
 
 void NavigationComplementary::init() {
-    //_vehicleKinematics.= &Vehicle::_vehicleKinematics.
-    //_connectThread();
+    
 }

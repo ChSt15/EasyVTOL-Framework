@@ -27,7 +27,7 @@
 
 
 
-#define LOOP_RATE_LIMIT 2000
+#define LOOP_RATE_LIMIT 8000
 
 
 
@@ -35,7 +35,7 @@ class NavigationComplementary: public Navigation {
 public:
 
     NavigationComplementary() {
-        _connectThread();
+        //_connectThread();
     }
 
     /**

@@ -17,7 +17,7 @@
 
 #include "templates/module_template.h"
 
-#include "data_containers/kinematic_data.h"
+#include "data_containers/navigation_data.h"
 
 /**
  * This enum is for the navigation attitude solution
@@ -60,10 +60,21 @@ public:
 
     /**
      * Returns a struct containing all the vehicles
+     * current navigation parameters.
+     * If only the kinematic parameters are needed
+     * then use getKinematicData().
+     *
+     * @param values none.
+     * @return navigation paramenters.
+     */
+    virtual NavigationData getNavigationData() {return _vehicleKinematics;};
+
+    /**
+     * Returns a struct containing all the vehicles
      * current kinematic parameters.
      *
      * @param values none.
-     * @return Kinetic paramenters.
+     * @return kinematic paramenters.
      */
     virtual KinematicData getKinematicData() {return _vehicleKinematics;};
 
@@ -77,33 +88,24 @@ public:
     virtual float getPositionAccuracy() {return -1.0f;}
 
     /**
-     * Inits the nav module and give it the pointer
-     * it updates with the new kinematic data.
+     * Returns a pointer to a struct containing all 
+     * the vehicles current kinematic parameters.
      * 
-     * 
-     * @param values dataPointer.
-     * @return none.
+     * This is usefull for data linking instead of 
+     * always having to pass data manually.
+     *
+     * @param values none.
+     * @return kinematic parameter pointer.
      */
-    //void init(KinematicData* dataPointer) {_vehicleKinematics = dataPointer; init();}
+    virtual NavigationData* getNavigationDataPointer() {return &_vehicleKinematics;};
 
 
 protected:
 
     /**
-     * This pointer points to the global vehicle data kinematic data container
+     * This pointer points to the global navigation data kinematic data container
      */
-    static KinematicData _vehicleKinematics;
-
-    /**
-     * Current attitude solution state. 
-     */
-    NAV_ATTITUDE_MODE _attitudeMode;
-
-    /**
-     * Current position solution state. 
-     */
-    NAV_POSITION_MODE _positionMode;
-
+    static NavigationData _vehicleKinematics;
 
 };
 

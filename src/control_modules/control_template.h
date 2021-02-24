@@ -35,11 +35,17 @@ public:
      * data from the pointer.
      * 
      * This must only be called once.
+     * 
+     * returns false if failed from null pointer input.
      *
      * @param values control parameters.
-     * @return none.
+     * @return bool.
      */
-    void linkControlSetpointPointer(ControlData *controlDataPointer) {_controlSetpoint = controlDataPointer;};
+    bool linkControlSetpointPointer(ControlData *controlDataPointer) {
+        if (controlDataPointer == nullptr) return false;
+        _controlSetpoint = controlDataPointer;
+        return true;
+    };
 
     /**
      * Sets the navigation input data from a navigation module.
@@ -64,11 +70,17 @@ public:
      * data from the pointer.
      * 
      * This must only be called once.
+     * 
+     * returns false if null pointer was given.
      *
      * @param values navigation data pointer.
-     * @return none.
+     * @return bool.
      */
-    void linkNavigationDataPointer(NavigationData *navigationDataPointer) {_navigationData = navigationDataPointer;};
+    bool linkNavigationDataPointer(NavigationData *navigationDataPointer) {
+        if (navigationDataPointer == nullptr) return false;
+        _navigationData = navigationDataPointer;
+        return true;
+    };
 
     /**
      * Returns the kinematics the system needs to achieve the desired
@@ -78,6 +90,15 @@ public:
      * @return kinematicSetpoint.
      */
     virtual KinematicData getKinematicOutput() {return _controlOutput;};
+
+    /**
+     * Returns the a pointer to a struct with the kinematics the system 
+     * needs to achieve the desired guidance inputs.
+     *
+     * @param values none.
+     * @return kinematicSetpoint pointer.
+     */
+    virtual KinematicData* getKinematicOutputPointer() {return &_controlOutput;};
 
 
 protected:

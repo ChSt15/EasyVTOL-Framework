@@ -35,7 +35,7 @@ public:
      * null pointer.
      *
      * @param values kinematicSetpoint.
-     * @return none.
+     * @return bool.
      */
     bool linkKinematicSetpointPointer(KinematicData* kinematicSetpointPointer) {
         if (kinematicSetpointPointer == nullptr) return false;

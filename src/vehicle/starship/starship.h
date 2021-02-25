@@ -25,8 +25,8 @@ public:
 
     Starship() {
         //_connectThread(); //Add thread to threadChain.
-        _navigation = &_navigationDefault; //Set default navigation module.
-        _guidance = &_guidanceDefault;
+        _navigation = &_navigationComp; //Set default navigation module.
+        _guidance = &_guidanceFBW;
     }
 
     /**
@@ -57,22 +57,6 @@ public:
      */
     bool vehicleReady() {return _vehicleInitialized;}
 
-    /**
-     * Returns the navigation data.
-     *
-     * @param values none.
-     * @return navigation data.
-     */
-    NavigationData getNavigationData() {return _navigation->getNavigationData();}
-
-    /**
-     * Returns the guidance output.
-     *
-     * @param values none.
-     * @return controlData.
-     */
-    ControlData getGuidanceData() {return _guidance->getControlSetpoint();}
-
 
 private:
 
@@ -83,10 +67,10 @@ private:
     bool _vehicleInitialized = false;
 
     //Default module to use at start
-    NavigationComplementary _navigationDefault;
+    NavigationComplementary _navigationComp;
 
     //Default module to use at start
-    GuidanceFlyByWire _guidanceDefault;
+    GuidanceFlyByWire _guidanceFBW;
 
     //static Navigation* _navigation;
 

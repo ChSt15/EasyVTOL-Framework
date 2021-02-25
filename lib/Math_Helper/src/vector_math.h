@@ -25,11 +25,19 @@ class Vector {
 
         bool valid = true;
 
-
         Vector() {
             x = 0.0f;
             y = 0.0f;
             z = 0.0f;
+        }
+
+        /**
+         * This constructor sets all components to n.
+         */
+        Vector(float n) {
+            x = n;
+            y = n;
+            z = n;
         }
 
         Vector(float nx, float ny, float nz) {
@@ -277,9 +285,12 @@ class Vector {
 };
 
 
+#define GRAVITY_VECTOR Vector(0,0,-9.81)
+
+
 /*Vector sqrt(Vector a) {
     return Vector(sqrt(a.x), sqrt(a.y), sqrt(a.z));
 }*/
 
 
-#endif /* _HELPER_3DMATH_H_ */
+#endif

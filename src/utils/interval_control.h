@@ -118,7 +118,7 @@ public:
      * true if its time to run. 
      * If updateClock is true then the internal interval
      * is set for next run. If you only want to check if its
-     * run to run then set updateClock to false;
+     * time to run then set updateClock to false;
      * Usefull for if statements. 
      * e.g:
      * 
@@ -134,6 +134,38 @@ public:
         if (_block) return false;
         
         if (micros() - _lastRun_us >= _interval_us) {
+            if (!_limit && updateClock) _lastRun_us +=_interval_us;
+            else if (updateClock) _lastRun_us = micros();
+            return true;
+        } else return false;
+
+    }
+
+    /**
+     * Checks if it is time to run and returns
+     * true if its time to run. 
+     * If updateClock is true then the internal interval
+     * is set for next run. If you only want to check if its
+     * run to run then set updateClock to false;
+     * Usefull for if statements. 
+     * This overload will write the time delta from the 
+     * last run into the timeDelta variable. This way
+     * the time from the last run is passed on.
+     * e.g:
+     * 
+     * if (x.isTimeToRun()) {
+     *      Stuff to do periodically...
+     * }
+     *
+     * @param values updateClock
+     * @return none.
+     */
+    bool isTimeToRun(uint32_t &timeDelta, bool updateClock = true) {
+
+        if (_block) return false;
+        
+        timeDelta = micros() - _lastRun_us;
+        if (timeDelta >= _interval_us) {
             if (!_limit && updateClock) _lastRun_us +=_interval_us;
             else if (updateClock) _lastRun_us = micros();
             return true;

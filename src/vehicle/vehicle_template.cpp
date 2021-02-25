@@ -2,9 +2,6 @@
 
 
 
-//Contains current vehicle movement.
-KinematicData Vehicle::_vehicleKinematics;
-
 //Contains current forces exerted on the vehicle.
 VEHICLE_MODE Vehicle::_vehicleMode;
 

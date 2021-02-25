@@ -32,7 +32,8 @@ enum CONTROL_MODE {
  */
 struct ControlData: public KinematicData {
 
-    CONTROL_MODE controlMode = CONTROL_MODE::CONTROL_DISABLED;
+    CONTROL_MODE positionControlMode = CONTROL_MODE::CONTROL_DISABLED;
+    CONTROL_MODE attitudeControlMode = CONTROL_MODE::CONTROL_DISABLED;
     
 };
 

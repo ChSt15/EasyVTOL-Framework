@@ -10,6 +10,10 @@ void Starship::thread() {
 
     _navigation->thread(); //Run navigation thread
 
+    if (_guidance == &_guidanceFBW) { //Check if we are using FBW guidance module
+        //_guidanceFBW.setAngularRate(Vector(cos((float)millis()/1000.0f),0,0));
+    }
+
     _guidance->thread(); //Run guidance thread
 
 }

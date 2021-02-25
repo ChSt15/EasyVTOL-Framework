@@ -68,7 +68,7 @@ class Quaternion {
         }
         
 
-        Quaternion(Vector vector) {
+        Quaternion(const Vector &vector) {
             
             w = 0;
             x = vector.x;
@@ -78,7 +78,7 @@ class Quaternion {
         }
 
         
-        Quaternion(float nw, float nx, float ny, float nz) {
+        Quaternion(const float &nw, const float &nx, const float &ny, const float &nz) {
             this->w = nw;
             this->x = nx;
             this->y = ny;
@@ -93,7 +93,7 @@ class Quaternion {
          * @return none.
          */
 
-        Quaternion(float nx, float ny, float nz) {
+        Quaternion(const float &nx, const float &ny, const float &nz) {
             this->w = 0.0f;
             this->x = nx;
             this->y = ny;
@@ -101,12 +101,14 @@ class Quaternion {
         }
 
         /**
-         * Conjugates the Quaternion 
-         *
+         * Conjugates the Quaternion.
+         * Will change values of quaternion.
+         * USe .copy() to keep values.
+         * 
          * @param values none
          * @return copy of conjugated Quaternion.
          */
-        Quaternion conjugate() {
+        Quaternion& conjugate() {
             x = -x;
             y = -y;
             z = -z;
@@ -132,15 +134,15 @@ class Quaternion {
          * @param values pointer to axis Vector and angle float
          * @return none.
          */
-        void getAxisAngle(Vector *axis, float *angle) {
+        void getAxisAngle(Vector &axis, float &angle) {
 
-            axis->x = this->x;
-            axis->y = this->y;
-            axis->z = this->z;
+            axis.x = this->x;
+            axis.y = this->y;
+            axis.z = this->z;
 
-            axis->normalize();
+            axis.normalize();
 
-            *angle = acosf(w)*2;
+            angle = acosf(w)*2;
 
         }
 
@@ -152,7 +154,7 @@ class Quaternion {
          * @param values sign
          * @return normalized Quaternion.
          */
-        Quaternion normalize(bool sign = false) {
+        Quaternion& normalize(const bool &sign = false) {
 
             float m = getMagnitude();
 

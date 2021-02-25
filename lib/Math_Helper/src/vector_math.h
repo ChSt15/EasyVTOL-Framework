@@ -34,13 +34,13 @@ class Vector {
         /**
          * This constructor sets all components to n.
          */
-        Vector(float n) {
+        Vector(const float &n) {
             x = n;
             y = n;
             z = n;
         }
 
-        Vector(float nx, float ny, float nz) {
+        Vector(const float &nx, const float &ny, const float &nz) {
             x = nx;
             y = ny;
             z = nz;
@@ -81,7 +81,7 @@ class Vector {
          * @param values none.
          * @return copy of the normalized vector.
          */
-        Vector normalize() {
+        Vector& normalize() {
 
             float mag = magnitude();
 
@@ -285,6 +285,7 @@ class Vector {
 };
 
 
+//Is a vector with a z component of -9.81.
 #define GRAVITY_VECTOR Vector(0,0,-9.81)
 
 

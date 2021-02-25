@@ -3,12 +3,12 @@
 
 
 
-#include "templates/module_template.h"
+#include "modules/templates/module_template.h"
 
 #include "data_containers/kinematic_data.h"
 
-#include "guidance_modules/guidance_template.h"
-#include "navigation_modules/navigation_template.h"
+#include "modules/guidance_modules/guidance_template.h"
+#include "modules/navigation_modules/navigation_template.h"
 
 
 

@@ -2,9 +2,9 @@
 #define INTERVAL_CONTROL_H
 
 
-#include "Arduino.h"
 
 #include "definitions.h"
+
 
 
 class IntervalControl {

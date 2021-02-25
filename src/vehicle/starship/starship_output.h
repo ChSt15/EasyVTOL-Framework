@@ -13,7 +13,7 @@
 
 #include "outputs/servo_ppm.h"
 
-#include "templates/output_template.h"
+#include "modules/templates/output_template.h"
 
 #include "data_containers/kinematic_data.h"
 

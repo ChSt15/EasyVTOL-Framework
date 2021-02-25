@@ -6,7 +6,7 @@
 #include "definitions.h"
 
 #include "MPU9250.h"
-#include "vector_math.h"
+#include "3d_math.h"
 #include "CircularBuffer.h"
 #include "TeensyThreads.h"
 

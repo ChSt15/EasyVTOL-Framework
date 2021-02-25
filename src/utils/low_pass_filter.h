@@ -5,7 +5,6 @@
 
 #include "definitions.h"
 
-#include "CircularBuffer.h"
 
 
 template<typename T>

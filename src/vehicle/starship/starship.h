@@ -11,8 +11,8 @@
 
 #include "vehicle/vehicle_template.h"
 
-#include "navigation_modules/navigation_complementary.h"
-#include "guidance_modules/guidance_flybywire.h"
+#include "modules/navigation_modules/navigation_complementary.h"
+#include "modules/guidance_modules/guidance_flybywire.h"
 
 
 

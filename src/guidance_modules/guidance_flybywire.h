@@ -68,6 +68,7 @@ public:
     void stopVehicle() {
         _inputs.angularRate = Vector(0,0,0);
         _inputs.velocity = Vector(0,0,0);
+        _inputs.acceleration = Vector(0,0,0);
     }
 
     /**

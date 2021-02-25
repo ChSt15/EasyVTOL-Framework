@@ -28,6 +28,7 @@ enum CONTROL_MODE {
 
 /**
  * Inherits from Kinematic but add ability to show what needs to be controlled.
+ * Used to input to control modules and output from guidance.
  */
 struct ControlData: public KinematicData {
 

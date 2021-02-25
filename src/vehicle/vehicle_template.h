@@ -40,18 +40,39 @@ public:
     virtual bool vehicleReady() = 0;
 
     /**
-     * Returns vehicle kinematics
+     * Returns the navigation data.
      *
      * @param values none.
-     * @return KinematicData.
+     * @return navigation data.
      */
-    virtual KinematicData getKinematicData() {return _vehicleKinematics;};
+    virtual NavigationData getNavigationData() {return _navigation->getNavigationData();}
+
+    /**
+     * Returns the guidance output.
+     *
+     * @param values none.
+     * @return controlData.
+     */
+    virtual ControlData getGuidanceData() {return _guidance->getControlSetpoint();}
+
+    /**
+     * Returns a pointer to the navigation module.
+     *
+     * @param values none.
+     * @return Navigation pointer.
+     */
+    virtual Navigation* getNavigationPointer() {return _navigation;}
+
+    /**
+     * Returns a pointer to the guidance module.
+     *
+     * @param values none.
+     * @return Guidance pointer.
+     */
+    virtual Guidance* getGuidancePointer() {return _guidance;}
 
 
 protected:
-
-    //Contains current vehicle movement.
-    static KinematicData _vehicleKinematics;
 
     //Contains current forces exerted on the vehicle.
     static VEHICLE_MODE _vehicleMode;

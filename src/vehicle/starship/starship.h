@@ -7,6 +7,8 @@
 
 #include "utils/interval_control.h"
 
+#include "data_containers/navigation_data.h"
+
 #include "vehicle/vehicle_template.h"
 
 #include "navigation_modules/navigation_complementary.h"
@@ -23,8 +25,8 @@ public:
 
     Starship() {
         //_connectThread(); //Add thread to threadChain.
-        _navigation = &_navigationDefault; //Set default navigation module.
-        _guidance = &_guidanceDefault;
+        _navigation = &_navigationComp; //Set default navigation module.
+        _guidance = &_guidanceFBW;
     }
 
     /**
@@ -65,10 +67,10 @@ private:
     bool _vehicleInitialized = false;
 
     //Default module to use at start
-    NavigationComplementary _navigationDefault;
+    NavigationComplementary _navigationComp;
 
     //Default module to use at start
-    GuidanceFlyByWire _guidanceDefault;
+    GuidanceFlyByWire _guidanceFBW;
 
     //static Navigation* _navigation;
 

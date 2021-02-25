@@ -9,6 +9,8 @@
 
 #include "CircularBuffer.h"
 
+#include "utils/interval_control.h"
+
 
 
 /**
@@ -20,25 +22,52 @@ class GuidancePath: public Guidance {
 public:
 
     /**
-     * Tell guidance to go to a certain point, speed, attitude etc.
+     * Tells guidance to go to a certain point, speed, attitude etc.
      * Will travel from last point to new point in a line.
      * 
      * Control could ignore attitude commands.
      * 
+     * Returns false if point buffer is full. Then the system has to first 
+     * reach the next point before the next can be placed.
+     * 
      *
      * @param values kinematicData.
-     * @return none.
+     * @return bool.
      */
-    void toPoint(const KinematicData &endPoint) {
+    bool toPoint(const KinematicData &endPoint) {
 
     }
 
+    /**
+     * Returns distance from endpoint. Used for switching between guidance modules.
+     *
+     * @param values none.
+     * @return float.
+     */
+    float distanceFromEndpoint() {return 0.0;};
 
+    /**
+     * This is where all calculations are done.
+     *
+     * @param values none.
+     * @return none.
+     */
+    void thread();
+
+    /**
+     * Init function that sets the module up.
+     *
+     * @param values none.
+     * @return none.
+     */
+    void init();
 
 
 private:
 
     CircularBuffer<KinematicData, 100> _path;
+
+    IntervalControl _interval = IntervalControl(1000);
 
 
 };

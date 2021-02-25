@@ -6,6 +6,7 @@
 #include "guidance_template.h"
 
 #include "vector_math.h"
+#include "utils/interval_control.h"
 
 #include "data_containers/kinematic_data.h"
 
@@ -26,7 +27,7 @@ public:
      * @return none.
      */
     void setAngularRate(const Vector &rate) {
-        _inputs.angularRate = rate;
+        _vehicleControlSettings.angularRate = rate;
     }
 
     /**
@@ -35,8 +36,8 @@ public:
      * @param values attitude.
      * @return none.
      */
-    void setAngularRate(const Quaternion &attitude) {
-        _inputs.attitude = attitude;
+    void setAttitude(const Quaternion &attitude) {
+        _vehicleControlSettings.attitude = attitude;
     }
 
     /**
@@ -46,7 +47,7 @@ public:
      * @return none.
      */
     void setVelocity(const Vector &velocity) {
-        _inputs.velocity = velocity;
+        _vehicleControlSettings.velocity = velocity;
     }
 
     /**
@@ -56,7 +57,7 @@ public:
      * @return none.
      */
     void setPosition(const Vector &position) {
-        _inputs.position = position;
+        _vehicleControlSettings.position = position;
     }
 
     /**
@@ -66,9 +67,18 @@ public:
      * @return none.
      */
     void stopVehicle() {
-        _inputs.angularRate = Vector(0,0,0);
-        _inputs.velocity = Vector(0,0,0);
+        _vehicleControlSettings.angularRate = 0;
+        _vehicleControlSettings.velocity = 0;
+        _vehicleControlSettings.acceleration = 0;
     }
+
+    /**
+     * Returns distance from endpoint. Used for switching between guidance modules.
+     *
+     * @param values none.
+     * @return float.
+     */
+    float distanceFromEndpoint() {return 0.0;};
 
     /**
      * This is where all calculations are done.
@@ -90,8 +100,7 @@ public:
 
 private:
 
-    KinematicData _inputs;
-
+    IntervalControl _interval = IntervalControl(1000); //Loop rate is at 1kHz
 
 };
 

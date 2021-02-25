@@ -28,10 +28,12 @@ enum CONTROL_MODE {
 
 /**
  * Inherits from Kinematic but add ability to show what needs to be controlled.
+ * Used to input to control modules and output from guidance.
  */
 struct ControlData: public KinematicData {
 
-    CONTROL_MODE controlMode = CONTROL_MODE::CONTROL_DISABLED;
+    CONTROL_MODE positionControlMode = CONTROL_MODE::CONTROL_DISABLED;
+    CONTROL_MODE attitudeControlMode = CONTROL_MODE::CONTROL_DISABLED;
     
 };
 

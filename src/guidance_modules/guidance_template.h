@@ -33,6 +33,14 @@ public:
      */
     virtual ControlData* getControlSetpointPointer() {return &_vehicleControlSettings;};
 
+    /**
+     * Returns distance from endpoint. Used for switching between guidance modules.
+     *
+     * @param values none.
+     * @return float.
+     */
+    virtual float distanceFromEndpoint() = 0;
+
 
 protected:
 

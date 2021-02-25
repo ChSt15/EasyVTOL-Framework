@@ -7,6 +7,8 @@
 
 #include "utils/interval_control.h"
 
+#include "data_containers/navigation_data.h"
+
 #include "vehicle/vehicle_template.h"
 
 #include "navigation_modules/navigation_complementary.h"
@@ -54,6 +56,22 @@ public:
      * @return bool.
      */
     bool vehicleReady() {return _vehicleInitialized;}
+
+    /**
+     * Returns the navigation data.
+     *
+     * @param values none.
+     * @return navigation data.
+     */
+    NavigationData getNavigationData() {return _navigation->getNavigationData();}
+
+    /**
+     * Returns the guidance output.
+     *
+     * @param values none.
+     * @return controlData.
+     */
+    ControlData getGuidanceData() {return _guidance->getControlSetpoint();}
 
 
 private:

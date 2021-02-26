@@ -5,7 +5,7 @@
 
 #include "modules/templates/module_template.h"
 
-#include "data_containers/kinematic_data.h"
+#include "data_containers/navigation_data.h"
 #include "data_containers/dynamic_data.h"
 
 
@@ -44,6 +44,41 @@ public:
     };
 
     /**
+     * Sets the navigation input data from a navigation module.
+     * 
+     * Use linkNavigationDataPointer() for data linking.
+     * 
+     * Calling this will remove the link. Data must be linked again!
+     *
+     * @param values navigation data parameters.
+     * @return none.
+     */
+    void setNavigationInput(const NavigationData &navigationData) {
+        _navigationData = &_navigationDataDefault; //Make sure pointer is set to internal data so to not change linked data.
+        *_navigationData = navigationData;
+    };
+
+    /**
+     * Sets the navigation data pointer to the inputed pointer 
+     * from a navigation module.
+     * 
+     * Allows the output module to automatically retrieve its needed
+     * data from the pointer.
+     * 
+     * This must only be called once.
+     * 
+     * returns false if null pointer was given.
+     *
+     * @param values navigation data pointer.
+     * @return bool.
+     */
+    bool linkNavigationDataPointer(NavigationData *navigationDataPointer) {
+        if (navigationDataPointer == nullptr) return false;
+        _navigationData = navigationDataPointer;
+        return true;
+    };
+
+    /**
      * Returns the forces the acuators need to produce in total
      * on the vehicle in order to achieve the kinematic setpoints. 
      *
@@ -71,10 +106,14 @@ protected:
 
     static DynamicData _dynamicOutput;
 
+    static NavigationData* _navigationData;
+
 
 private:
 
     static KinematicData _kinematicSetpointDefault;
+
+    static NavigationData _navigationDataDefault;
     
     
 };

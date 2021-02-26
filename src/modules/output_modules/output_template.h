@@ -50,9 +50,9 @@ public:
      * @param values dynamics data pointer.
      * @return bool.
      */
-    bool linkDynamicSetpointPointer(DynamicData *dynamicSetpointpPointer) {
-        if (dynamicSetpointpPointer == nullptr) return false;
-        _dynamicSetpoint = dynamicSetpointpPointer;
+    bool linkDynamicSetpointPointer(DynamicData *dynamicSetpointPointer) {
+        if (dynamicSetpointPointer == nullptr) return false;
+        _dynamicSetpoint = dynamicSetpointPointer;
         return true;
     };
     	

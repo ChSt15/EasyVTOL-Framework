@@ -9,25 +9,21 @@
 */
 
 
-#include "Arduino.h"
+#include "definitions.h"
+
+#include "utils/interval_control.h"
 
 #include "outputs/servo_ppm.h"
 
-#include "modules/templates/output_template.h"
+#include "modules/output_modules/output_template.h"
 
-#include "data_containers/kinematic_data.h"
+#include "data_containers/navigation_data.h"
+#include "data_containers/dynamic_data.h"
 
 
 
 class StarshipOutput: public Output {
 public:
-
-    class Outputs {
-    public:
-        PPMChannel TVCServos[4];
-        PPMChannel motorCW;
-        PPMChannel motorCCW;
-    };
 
     /**
      * This is where all calculations are done.
@@ -45,18 +41,23 @@ public:
      */
     void init();
     
-    /**
-     * Inputs the set dynamic data
-     *
-     * @param values Outputs.
-     * @return none.
-     */
-    void setOutput(const DynamicData &dynamicSetpoint) {_dynamicSetpoint = dynamicSetpoint;}
-    
 
 private:
 
-    DynamicData _dynamicSetpoint;
+    //TVC servos. 0 is x+, 1 is y+, 2 is x-, 3 is y-.
+    PPMChannel TVCServos[4];
+    //CW motor control.
+    PPMChannel motorCW;
+    //CCW motor control.
+    PPMChannel motorCCW;
+    //Up Left flap servo.
+    PPMChannel flapUL;
+    //Up Right flap servo.
+    PPMChannel flapUR;
+    //Down Left flap servo.
+    PPMChannel flapDL;
+    //Down Right flap servo.
+    PPMChannel flapDR;
     
     
 };

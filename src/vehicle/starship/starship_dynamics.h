@@ -1,5 +1,5 @@
-#ifndef STARSHIP_OUTPUT_H
-#define STARSHIP_OUTPUT_H
+#ifndef STARSHIP_DYNAMICS_H
+#define STARSHIP_DYNAMICS_H
 
 
 /**
@@ -15,14 +15,14 @@
 
 #include "outputs/servo_ppm.h"
 
-#include "modules/output_modules/output_template.h"
+#include "modules/dynamics_modules/dynamics_template.h"
 
 #include "data_containers/navigation_data.h"
 #include "data_containers/dynamic_data.h"
 
 
 
-class StarshipOutput: public Output {
+class StarshipDynamics: public Dynamics {
 public:
 
     /**
@@ -58,6 +58,8 @@ private:
     PPMChannel flapDL;
     //Down Right flap servo.
     PPMChannel flapDR;
+
+    IntervalControl _interval = IntervalControl(1000);
     
     
 };

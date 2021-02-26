@@ -4,7 +4,10 @@
 
 void StarshipOutput::thread() {
 
+    if (!_interval.isTimeToRun()) return;
+
     
+
 
 }
 

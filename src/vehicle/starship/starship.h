@@ -14,7 +14,7 @@
 #include "modules/navigation_modules/navigation_complementary.h"
 #include "modules/guidance_modules/guidance_flybywire.h"
 
-#include "starship_output.h"
+#include "starship_dynamics.h"
 
 
 
@@ -29,7 +29,8 @@ public:
         //_connectThread(); //Add thread to threadChain.
         _navigation = &_navigationComp; //Set default navigation module.
         _guidance = &_guidanceFBW;
-        _output = &_outputStarship;
+        _dynamics = &_starshipDynamics;
+        //_output = &_outputStarship;
     }
 
     /**
@@ -54,11 +55,12 @@ public:
 
     /**
      * Returns true if the vehicle is ready for flight.
+     * Currently only once navigation has reached AHRS mode.
      *
      * @param values none.
      * @return bool.
      */
-    bool vehicleReady() {return _vehicleInitialized;}
+    bool vehicleReady() {return _vehicleInitialized && (_navigation->getNavigationData().attitudeMode == NAV_ATTITUDE_MODE::AHRS);}
 
 
 private:
@@ -76,9 +78,7 @@ private:
     GuidanceFlyByWire _guidanceFBW;
 
     //Default module to use at start
-    StarshipOutput _outputStarship;
-
-    //static Navigation* _navigation;
+    StarshipDynamics _starshipDynamics;
 
 
 };

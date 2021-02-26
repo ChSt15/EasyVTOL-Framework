@@ -3,7 +3,7 @@
 
 
 
-#include "templates/module_template.h"
+#include "modules/templates/module_template.h"
 
 #include "data_containers/control_data.h"
 

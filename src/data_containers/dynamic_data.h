@@ -2,9 +2,12 @@
 #define DYNAMIC_DATA_H
 
 
+
 #include "definitions.h"
 
-#include "vector_math.h"
+#include "3d_math.h"
+
+
 
 /**
  * Dynamic data is usually in local coordinate system!.

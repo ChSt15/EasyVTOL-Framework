@@ -6,8 +6,7 @@
 #include "definitions.h"
 
 #include "SX128XLT.h"
-#include "vector_math.h"
-#include "quaternion_math.h"
+#include "3d_math.h"
 #include "CircularBuffer.h"
 
 #include "utils/interval_control.h"

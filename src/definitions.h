@@ -3,12 +3,16 @@
 
 
 
-//General includes all files should have
+/**
+ * General includes all files should have.
+ */
+
+
 #include "boards/board_v_1_0.h" //Board version for pins etc.
 
-#include "quaternion_math.h"
-#include "vector_math.h"
+#include "3d_math.h"
 
+#include "Arduino.h"
 
 
 

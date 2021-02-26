@@ -8,7 +8,7 @@
 #include "definitions.h"
 
 #include "SparkFunBME280.h"
-#include "vector_math.h"
+#include "3d_math.h"
 #include "CircularBuffer.h"
 
 #include "utils/interval_control.h"

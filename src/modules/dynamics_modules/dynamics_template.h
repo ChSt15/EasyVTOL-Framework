@@ -3,7 +3,7 @@
 
 
 
-#include "templates/module_template.h"
+#include "modules/templates/module_template.h"
 
 #include "data_containers/kinematic_data.h"
 #include "data_containers/dynamic_data.h"

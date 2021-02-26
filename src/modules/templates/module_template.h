@@ -3,7 +3,7 @@
 
 
 
-#include "Arduino.h"
+#include "definitions.h"
 
 /**
  * This is a template that contains all the functions that all 

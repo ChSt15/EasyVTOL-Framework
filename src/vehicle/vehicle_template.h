@@ -3,12 +3,15 @@
 
 
 
-#include "templates/module_template.h"
+#include "modules/templates/module_template.h"
 
 #include "data_containers/kinematic_data.h"
 
-#include "guidance_modules/guidance_template.h"
-#include "navigation_modules/navigation_template.h"
+#include "modules/guidance_modules/guidance_template.h"
+#include "modules/navigation_modules/navigation_template.h"
+#include "modules/control_modules/control_template.h"
+#include "modules/dynamics_modules/dynamics_template.h"
+#include "modules/output_modules/output_template.h"
 
 
 
@@ -82,6 +85,15 @@ protected:
 
     //Points to the guidance module to use.
     static Guidance *_guidance;
+
+    //Points to the control module to use.
+    static Control *_control;
+
+    //Points to the dynamics module to use.
+    static Dynamics *_dynamics;
+
+    //Points to the output module to use.
+    static Output *_output;
 
 
 };

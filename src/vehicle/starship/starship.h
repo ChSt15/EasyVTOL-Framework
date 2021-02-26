@@ -11,8 +11,10 @@
 
 #include "vehicle/vehicle_template.h"
 
-#include "navigation_modules/navigation_complementary.h"
-#include "guidance_modules/guidance_flybywire.h"
+#include "modules/navigation_modules/navigation_complementary.h"
+#include "modules/guidance_modules/guidance_flybywire.h"
+
+#include "starship_output.h"
 
 
 
@@ -27,6 +29,7 @@ public:
         //_connectThread(); //Add thread to threadChain.
         _navigation = &_navigationComp; //Set default navigation module.
         _guidance = &_guidanceFBW;
+        _output = &_outputStarship;
     }
 
     /**
@@ -71,6 +74,9 @@ private:
 
     //Default module to use at start
     GuidanceFlyByWire _guidanceFBW;
+
+    //Default module to use at start
+    StarshipOutput _outputStarship;
 
     //static Navigation* _navigation;
 

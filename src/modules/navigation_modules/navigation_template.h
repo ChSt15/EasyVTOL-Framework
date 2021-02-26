@@ -15,7 +15,7 @@
 
 #include "Arduino.h"
 
-#include "templates/module_template.h"
+#include "modules/templates/module_template.h"
 
 #include "data_containers/navigation_data.h"
 

@@ -4,8 +4,7 @@
 
 #include "definitions.h"
 
-#include "vector_math.h"
-#include "quaternion_math.h"
+#include "3d_math.h"
 
 #include "kinematic_data.h"
 

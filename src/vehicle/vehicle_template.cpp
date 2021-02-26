@@ -18,4 +18,4 @@ Control* Vehicle::_control = nullptr;
 Dynamics* Vehicle::_dynamics = nullptr;
 
 //Points to the output module to use.
-Output* Vehicle::_output = nullptr;
+//Output* Vehicle::_output = nullptr;

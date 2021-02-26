@@ -93,7 +93,7 @@ protected:
     static Dynamics *_dynamics;
 
     //Points to the output module to use.
-    static Output *_output;
+    //static Output *_output;
 
 
 };

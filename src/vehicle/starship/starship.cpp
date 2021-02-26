@@ -20,6 +20,19 @@ void Starship::thread() {
 
 
 void Starship::init() {
+
+    //link module data together
+    _control->linkControlSetpointPointer(_guidance->getControlSetpointPointer()); //Links the data together
+    _control->linkNavigationDataPointer(_navigation->getNavigationDataPointer()); //Links the data together
+    _dynamics->linkKinematicSetpointPointer(_control->getKinematicOutputPointer()); //Links the data together
+    _output->linkNavigationDataPointer(_navigation->getNavigationDataPointer()); //Links the data together
+    _output->linkDynamicSetpointPointer(_dynamics->getDynamicSetpointPointer()); //Links the data together
+
+    //Initialise all modules
     _navigation->init(); //init the navigation module and pass pointer to vehicle data.
     _guidance->init();
+    _control->init();
+    _dynamics->init();
+    _output->init();
+
 }

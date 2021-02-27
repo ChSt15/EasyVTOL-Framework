@@ -13,6 +13,7 @@
 
 #include "modules/navigation_modules/navigation_complementary.h"
 #include "modules/guidance_modules/guidance_flybywire.h"
+#include "modules/control_modules/linear_pid_controller.h"
 
 #include "kwad_dynamics.h"
 
@@ -26,11 +27,11 @@ class Kwadcopter: public Vehicle {
 public:
 
     Kwadcopter() {
-        //_connectThread(); //Add thread to threadChain.
-        _navigation = &_navigationComp; //Set default navigation module.
+        //Set module pointers to defaults.
         _guidance = &_guidanceFBW;
+        _navigation = &_navigationComp; 
+        _control = &_linearController;
         _dynamics = &_kwadDynamics;
-        //_output = &_outputStarship;
     }
 
     /**
@@ -72,10 +73,13 @@ private:
     bool _vehicleInitialized = false;
 
     //Default module to use at start
+    GuidanceFlyByWire _guidanceFBW;
+
+    //Default module to use at start
     NavigationComplementary _navigationComp;
 
     //Default module to use at start
-    GuidanceFlyByWire _guidanceFBW;
+    LinearPIDController _linearController;
 
     //Default module to use at start
     KwadDynamics _kwadDynamics;

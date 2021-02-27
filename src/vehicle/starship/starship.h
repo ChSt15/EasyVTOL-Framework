@@ -18,7 +18,7 @@
 
 
 
-#define VEHICLE_LOOP_RATE 8000
+#define VEHICLE_LOOP_RATE 1000
 
 
 

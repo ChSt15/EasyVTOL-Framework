@@ -30,7 +30,6 @@ enum VEHICLE_MODE {
 };
 
 
-
 class Vehicle: public Module {
 public:
 
@@ -98,6 +97,38 @@ public:
      */
     virtual Dynamics* getDynamicsPointer() {return _dynamics;}
 
+    /**
+     * Returns a pointer to the navigation module.
+     *
+     * @param values none.
+     * @return Navigation pointer.
+     */
+    virtual void setNavigationPointer(Navigation* navigationModule) {_navigation = navigationModule;}
+
+    /**
+     * Returns a pointer to the guidance module.
+     *
+     * @param values none.
+     * @return Guidance pointer.
+     */
+    virtual void setGuidancePointer(Guidance* guidanceModule) {_guidance = guidanceModule;}
+
+    /**
+     * Returns a pointer to the control module.
+     *
+     * @param values none.
+     * @return Guidance pointer.
+     */
+    virtual void setControlPointer(Control* controlModule) {_control = controlModule;}
+
+    /**
+     * Returns a pointer to the dynamics module.
+     *
+     * @param values none.
+     * @return Guidance pointer.
+     */
+    virtual void setDynamicsPointer(Dynamics* dynamicsModule) {_dynamics = dynamicsModule;}
+
 
 protected:
 
@@ -115,9 +146,6 @@ protected:
 
     //Points to the dynamics module to use.
     static Dynamics *_dynamics;
-
-    //Points to the output module to use.
-    //static Output *_output;
 
 
 };

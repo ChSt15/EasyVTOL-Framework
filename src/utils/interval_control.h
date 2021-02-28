@@ -14,7 +14,7 @@ public:
         _lastRun_us = micros();
     }
 
-    IntervalControl(uint32_t rate) {
+    IntervalControl(float rate) {
         _lastRun_us = micros();
         if (rate != 0) setRate(rate);
     }
@@ -25,7 +25,15 @@ public:
      * @param values rate in Hz
      * @return none.
      */
-    void setRate(uint32_t rate_Hz) {_interval_us = 1000000L/rate_Hz;}
+    void setRate(float rate_Hz) {_interval_us = (float)1000000L/rate_Hz;}
+
+    /**
+     * Gets the rate in Hz
+     *
+     * @param values none.
+     * @return uint32_t.
+     */
+    uint32_t getRate() {return (float)1000000/_interval_us;}
 
     /**
      * Sets the interval in milliseconds
@@ -42,6 +50,22 @@ public:
      * @return none.
      */
     void setIntervalMicros(uint32_t interval_us) {_interval_us = interval_us; _lastRun_us = micros() - _interval_us;}
+
+    /**
+     * Gets the interval in milliseconds
+     *
+     * @param values none.
+     * @return interval in milliseconds.
+     */
+    uint32_t getIntervalMillis() {return _interval_us/1000;}
+
+    /**
+     * Gets the interval in microseconds
+     *
+     * @param values none.
+     * @return interval in microseconds.
+     */
+    uint32_t getIntervalMicros() {return _interval_us;}
 
     /**
      * Returns the amount of time till the next run.
@@ -106,7 +130,7 @@ public:
      */
     void waitTillNextRun(void (*callMethod)(void)) {
 
-        while(micros() - _lastRun_us < _interval_us || _block) callMethod();
+        while (micros() - _lastRun_us < _interval_us || _block) callMethod();
         
         if (_limit) _lastRun_us = micros();
         else _lastRun_us += _interval_us;

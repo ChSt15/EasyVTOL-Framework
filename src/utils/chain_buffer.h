@@ -40,12 +40,7 @@ public:
 
     //Need to remove all objects in chain or else memory leak.
     ~ChainBuffer() {
-        ChainObject<T>* pointer = _chainStart; //get chain start.
-        while (pointer != nullptr) { //Go down chain deleting all objects till nullptr(end).
-            ChainObject<T>* buf = pointer->nextObject;
-            //delete pointer;
-            pointer = buf;
-        }
+        clear();
     }
 
     /**
@@ -85,21 +80,8 @@ public:
      * @return bool.
      */
     bool removeItem(const T &item) {
-        ChainObject<T>* object = _searchForItem(item);
-        if (object == nullptr) return false; //Item wasnt found.
-        if (object == _chainStart) { //Item is at start of chain.
-            _chainStart = object->nextObject;
-            if (_chainStart != nullptr) _chainStart->lastObject = nullptr; //Make sure it isnt a nullptr when updating start of chain
-        } else if (object == _chainEnd) {
-            _chainEnd = object->lastObject;
-            if (_chainEnd != nullptr) _chainEnd->nextObject = nullptr; //Make sure it isnt a nullptr when updating end of chain
-        } else {
-            object->nextObject->lastObject = object->lastObject;
-            object->lastObject->nextObject = object->nextObject;
-        }
-        delete object;
-        _numObjects--;
-        return true;
+        uint32_t index;
+        return _removeObject(_searchForItem(item, index));
     }
 
     /**
@@ -111,21 +93,7 @@ public:
      * @return bool.
      */
     bool removeItem(T *item) {
-        ChainObject<T>* object = _searchForItem(item);
-        if (object == nullptr) return false; //Item wasnt found.
-        if (object == _chainStart) { //Item is at start of chain.
-            _chainStart = object->nextObject;
-            if (_chainStart != nullptr) _chainStart->lastObject = nullptr; //Make sure it isnt a nullptr when updating start of chain
-        } else if (object == _chainEnd) {
-            _chainEnd = object->lastObject;
-            if (_chainEnd != nullptr) _chainEnd->nextObject = nullptr; //Make sure it isnt a nullptr when updating end of chain
-        } else {
-            object->nextObject->lastObject = object->lastObject;
-            object->lastObject->nextObject = object->nextObject;
-        }
-        delete object;
-        _numObjects--;
-        return true;
+        return removeItem(*item);
     }
 
     /**
@@ -157,6 +125,22 @@ public:
         delete object;
         _numObjects--;
     }
+
+    /**
+     * Removes all items
+     *
+     * @param values none.
+     * @return none.
+     */
+    void clear() {
+        ChainObject<T>* pointer = _chainStart; //get chain start.
+        while (pointer != nullptr) { //Go down chain deleting all objects till nullptr(end).
+            ChainObject<T>* buf = pointer->nextObject;
+            delete pointer;
+            pointer = buf;
+        }
+        _numObjects = 0;
+    }
         
 
     /**
@@ -180,6 +164,24 @@ public:
     }
 
     /**
+     * Copies one buffer into another.
+     *
+     * @param values buffer.
+     * @return buffer.
+     */
+    ChainBuffer<T>& operator = (ChainBuffer<T> &original) {
+
+        clear();
+
+        for (uint32_t i = 0; i < original.length(); i++) {
+            addItem(*original[i]);
+        }
+
+        return *this;
+
+    }
+
+    /**
      * Returns the length of the buffer.
      *
      * @param values none.
@@ -189,32 +191,103 @@ public:
         return _numObjects;
     }
 
+    /**
+     * Searches for the given item. Returns its current index.
+     * 
+     * Will set param success to false and return 0 if not found;
+     *
+     * @param values none.
+     * @return uint32_t.
+     */
+    int32_t searchForItem(const T &item, bool &success) {
+        uint32_t index;
+        ChainObject<T>* pointer = _searchForItem(item, index);
+        if (pointer == nullptr) {
+            success = false;
+            return 0;
+        } else {
+            success = true;
+            return index;
+        }
+    }
+
+    /**
+     * Returns a pointer to the first object in the chain. Can be used to directly  
+     * access the chain without overhead IF YOU KNOW WHAT YOURE DOING.
+     * 
+     * Making changes to these objects WILL break things!
+     *
+     * @param values none.
+     * @return ChainObject.
+     */
+    ChainObject<T>* getChainStart() {
+        return _chainStart;
+    }
+
+    /**
+     * Returns a pointer to the last object in the chain. Can be used to directly  
+     * access the chain without overhead IF YOU KNOW WHAT YOURE DOING.
+     * 
+     * Making changes to these objects WILL break things!
+     *
+     * @param values none.
+     * @return ChainObject.
+     */
+    ChainObject<T>* getChainEnd() {
+        return _chainEnd;
+    }
+
+
+
 
 private:
 
-    ChainObject<T>* _searchForItem(const T &item) {
+    bool _removeObject(ChainObject<T>* object) {
+
+        if (object == nullptr) return false; //Item wasnt found.
+        if (object == _chainStart) { //Item is at start of chain.
+            _chainStart = object->nextObject;
+            if (_chainStart != nullptr) _chainStart->lastObject = nullptr; //Make sure it isnt a nullptr when updating start of chain
+        } else if (object == _chainEnd) {
+            _chainEnd = object->lastObject;
+            if (_chainEnd != nullptr) _chainEnd->nextObject = nullptr; //Make sure it isnt a nullptr when updating end of chain
+        } else {
+            object->nextObject->lastObject = object->lastObject;
+            object->lastObject->nextObject = object->nextObject;
+        }
+        delete object;
+        _numObjects--;
+        return true;
+
+    }
+
+    ChainObject<T>* _searchForItem(const T &item, uint32_t &index) {
         
         ChainObject<T>* pointer = _chainStart;
+        index = 0;
 
-        while (pointer != nullptr && pointer->object != item) {
+        while (pointer != nullptr && !(pointer->item == item)) {
             pointer = pointer->nextObject;
+            index++;
         }
 
         return pointer;
 
     }
 
-    /*ChainObject<T>* _searchForItem(T *item) {
+    ChainObject<T>* _searchForItem(T *item, uint32_t &index) {
         
         ChainObject<T>* pointer = _chainStart;
+        index = 0;
 
-        while (pointer != nullptr && &pointer->object != item) {
+        while (pointer != nullptr && !(&pointer->item == item)) {
             pointer = pointer->nextObject;
+            index++;
         }
 
         return pointer;
 
-    }*/
+    }
 
     ChainObject<T>* _chainStart = nullptr;
     ChainObject<T>* _chainEnd = nullptr;

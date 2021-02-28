@@ -1,5 +1,5 @@
-#ifndef STARSHIP_H
-#define STARSHIP_H
+#ifndef KWADCOPTER_H
+#define KWADCOPTER_H
 
 
 
@@ -13,24 +13,25 @@
 
 #include "modules/navigation_modules/navigation_complementary.h"
 #include "modules/guidance_modules/guidance_flybywire.h"
+#include "modules/control_modules/linear_pid_controller.h"
 
-#include "starship_dynamics.h"
-
-
-
-#define VEHICLE_LOOP_RATE 1000
+#include "kwad_dynamics.h"
 
 
 
-class Starship: public Vehicle {
+#define VEHICLE_LOOP_RATE 8000
+
+
+
+class Kwadcopter: public Vehicle {
 public:
 
-    Starship() {
-        //_connectThread(); //Add thread to threadChain.
-        _navigation = &_navigationComp; //Set default navigation module.
+    Kwadcopter() {
+        //Set module pointers to defaults.
         _guidance = &_guidanceFBW;
-        _dynamics = &_starshipDynamics;
-        //_output = &_outputStarship;
+        _navigation = &_navigationComp; 
+        _control = &_linearController;
+        _dynamics = &_kwadDynamics;
     }
 
     /**
@@ -72,13 +73,16 @@ private:
     bool _vehicleInitialized = false;
 
     //Default module to use at start
-    NavigationComplementary _navigationComp;
-
-    //Default module to use at start
     GuidanceFlyByWire _guidanceFBW;
 
     //Default module to use at start
-    StarshipDynamics _starshipDynamics;
+    NavigationComplementary _navigationComp;
+
+    //Default module to use at start
+    LinearPIDController _linearController;
+
+    //Default module to use at start
+    KwadDynamics _kwadDynamics;
 
 
 };

@@ -1,5 +1,5 @@
-#ifndef STARSHIP_OUTPUT_H
-#define STARSHIP_OUTPUT_H
+#ifndef KWAD_DYNAMICS_H
+#define KWAD_DYNAMICS_H
 
 
 /**
@@ -15,14 +15,14 @@
 
 #include "outputs/servo_ppm.h"
 
-#include "modules/output_modules/output_template.h"
+#include "modules/dynamics_modules/dynamics_template.h"
 
 #include "data_containers/navigation_data.h"
 #include "data_containers/dynamic_data.h"
 
 
 
-class StarshipOutput: public Output {
+class KwadDynamics: public Dynamics {
 public:
 
     /**
@@ -44,20 +44,16 @@ public:
 
 private:
 
-    //TVC servos. 0 is x+, 1 is y+, 2 is x-, 3 is y-.
-    PPMChannel TVCServos[4];
-    //CW motor control.
-    PPMChannel motorCW;
-    //CCW motor control.
-    PPMChannel motorCCW;
-    //Up Left flap servo.
-    PPMChannel flapUL;
-    //Up Right flap servo.
-    PPMChannel flapUR;
-    //Down Left flap servo.
-    PPMChannel flapDL;
-    //Down Right flap servo.
-    PPMChannel flapDR;
+    //Motor Front left
+    PPMChannel motorFL;
+    //Motor Front right
+    PPMChannel motorFR;
+    //Motor Back left
+    PPMChannel motorBL;
+    //Motor Back Right
+    PPMChannel motorBR;
+
+    IntervalControl _interval = IntervalControl(1000);
     
     
 };

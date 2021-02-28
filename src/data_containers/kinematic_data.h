@@ -26,6 +26,8 @@ struct KinematicData {
     Quaternion attitude = Quaternion(1,0,0,0);
     //Angular rate in radians/s.
     Vector angularRate;
+    //Angular acceleration in radians/s/s.
+    Vector angularAcceleration;
     
 };
 

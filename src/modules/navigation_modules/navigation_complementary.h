@@ -27,10 +27,6 @@
 
 
 
-#define LOOP_RATE_LIMIT 8000
-
-
-
 class NavigationComplementary: public Navigation {
 public:
 
@@ -96,7 +92,7 @@ private:
     bool _magInitialized = false;
 
     //Loop interval control
-    IntervalControl _interval = IntervalControl(LOOP_RATE_LIMIT);
+    IntervalControl _interval = IntervalControl(1000);
 
 
 };

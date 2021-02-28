@@ -59,6 +59,14 @@ public:
     virtual ControlData getGuidanceData() {return _guidance->getControlSetpoint();}
 
     /**
+     * Returns the control output.
+     *
+     * @param values none.
+     * @return controlData.
+     */
+    virtual KinematicData getControlData() {return _control->getKinematicOutput();}
+
+    /**
      * Returns a pointer to the navigation module.
      *
      * @param values none.
@@ -73,6 +81,22 @@ public:
      * @return Guidance pointer.
      */
     virtual Guidance* getGuidancePointer() {return _guidance;}
+
+    /**
+     * Returns a pointer to the control module.
+     *
+     * @param values none.
+     * @return Guidance pointer.
+     */
+    virtual Control* getControlPointer() {return _control;}
+
+    /**
+     * Returns a pointer to the dynamics module.
+     *
+     * @param values none.
+     * @return Guidance pointer.
+     */
+    virtual Dynamics* getDynamicsPointer() {return _dynamics;}
 
 
 protected:

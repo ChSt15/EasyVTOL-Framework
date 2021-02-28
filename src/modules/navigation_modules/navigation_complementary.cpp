@@ -164,7 +164,7 @@ void NavigationComplementary::thread() {
 
     //################## Inertial navigation testing ###############
 
-    float dt = 1.0f/LOOP_RATE_LIMIT;
+    float dt = (float)_interval.getIntervalMillis()/1000;
 
     _navigationData.velocity = _navigationData.velocity + _navigationData.acceleration*dt;
 

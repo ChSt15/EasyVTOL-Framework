@@ -9,7 +9,8 @@
 
 
 
-#include "definitions.h"
+#include "stdint.h"
+#include "math.h"
 
 
 

@@ -3,7 +3,7 @@
 
 
 
-#include "definitions.h"
+#include "Arduino.h"
 
 
 
@@ -25,7 +25,7 @@ public:
      * @param values rate in Hz
      * @return none.
      */
-    void setRate(float rate_Hz) {_interval_us = (float)1000000L/rate_Hz;}
+    inline void setRate(float rate_Hz) {_interval_us = (float)1000000L/rate_Hz;}
 
     /**
      * Gets the rate in Hz
@@ -33,7 +33,7 @@ public:
      * @param values none.
      * @return uint32_t.
      */
-    uint32_t getRate() {return (float)1000000/_interval_us;}
+    inline uint32_t getRate() {return (float)1000000/_interval_us;}
 
     /**
      * Sets the interval in milliseconds
@@ -41,7 +41,7 @@ public:
      * @param values interval in milliseconds
      * @return none.
      */
-    void setIntervalMillis(uint32_t interval_ms) {_interval_us = interval_ms*1000L; _lastRun_us = micros() - _interval_us;}
+    inline void setIntervalMillis(uint32_t interval_ms) {_interval_us = interval_ms*1000L; _lastRun_us = micros() - _interval_us;}
 
     /**
      * Sets the interval in microseconds
@@ -49,7 +49,7 @@ public:
      * @param values interval in microseconds
      * @return none.
      */
-    void setIntervalMicros(uint32_t interval_us) {_interval_us = interval_us; _lastRun_us = micros() - _interval_us;}
+    inline void setIntervalMicros(uint32_t interval_us) {_interval_us = interval_us; _lastRun_us = micros() - _interval_us;}
 
     /**
      * Gets the interval in milliseconds
@@ -57,7 +57,7 @@ public:
      * @param values none.
      * @return interval in milliseconds.
      */
-    uint32_t getIntervalMillis() {return _interval_us/1000;}
+    inline uint32_t getIntervalMillis() {return _interval_us/1000;}
 
     /**
      * Gets the interval in microseconds
@@ -65,7 +65,7 @@ public:
      * @param values none.
      * @return interval in microseconds.
      */
-    uint32_t getIntervalMicros() {return _interval_us;}
+    inline uint32_t getIntervalMicros() {return _interval_us;}
 
     /**
      * Returns the amount of time till the next run.
@@ -74,7 +74,7 @@ public:
      * @param values none
      * @return remaining time till next run.
      */
-    int32_t getTimeRemainMicros() {return (int32_t) -_interval_us + micros() + _lastRun_us;}
+    inline int32_t getTimeRemainMicros() {return (int32_t) -_interval_us + micros() + _lastRun_us;}
 
     /**
      * Sets the way the system limits the runs.
@@ -89,7 +89,7 @@ public:
      * @param values limit
      * @return none.
      */
-    void setLimit(bool limit) {_limit = limit;}
+    inline void setLimit(bool limit) {_limit = limit;}
 
     /**
      * This syncs the internal variables. This is usefull
@@ -103,7 +103,7 @@ public:
      * @param values none
      * @return none.
      */
-    void syncInternal() {_lastRun_us = micros();}
+    inline void syncInternal() {_lastRun_us = micros();}
 
     /**
      * Waits till next Run.
@@ -112,7 +112,7 @@ public:
      * @param values none
      * @return none.
      */
-    void waitTillNextRun() {
+    inline void waitTillNextRun() {
 
         while(micros() - _lastRun_us < _interval_us || _block);
         
@@ -128,7 +128,7 @@ public:
      * @param values method to run while waiting
      * @return none.
      */
-    void waitTillNextRun(void (*callMethod)(void)) {
+    inline void waitTillNextRun(void (*callMethod)(void)) {
 
         while (micros() - _lastRun_us < _interval_us || _block) callMethod();
         
@@ -153,7 +153,7 @@ public:
      * @param values updateClock
      * @return none.
      */
-    bool isTimeToRun(bool updateClock = true) {
+    inline bool isTimeToRun(bool updateClock = true) {
 
         if (_block) return false;
         
@@ -184,7 +184,7 @@ public:
      * @param values updateClock
      * @return none.
      */
-    bool isTimeToRun(uint32_t &timeDelta, bool updateClock = true) {
+    inline bool isTimeToRun(uint32_t &timeDelta, bool updateClock = true) {
 
         if (_block) return false;
         
@@ -206,7 +206,7 @@ public:
      * @param values block
      * @return none.
      */
-    void block(bool block) {
+    inline void block(bool block) {
         _block = block;
     }
 

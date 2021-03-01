@@ -7,6 +7,7 @@
 
 #include "data_containers/navigation_data.h"
 #include "data_containers/dynamic_data.h"
+#include "data_containers/vehicle_mode.h"
 
 
 
@@ -40,6 +41,35 @@ public:
     bool linkKinematicSetpointPointer(KinematicData* kinematicSetpointPointer) {
         if (kinematicSetpointPointer == nullptr) return false;
         _kinematicSetpoint = kinematicSetpointPointer;
+        return true;
+    };
+
+    /**
+     * Gives the dynamics module the current vehicle mode.
+     *
+     * @param values vehicleMode.
+     * @return none.
+     */
+    void setVehicleMode(const VEHICLE_MODE &vehicleMode) {
+        _vehicleMode = &_vehicleModeDefault;
+        *_vehicleMode = vehicleMode;
+    };
+
+    /**
+     * Sets the current vehicle pointer to the inputed one.
+     * 
+     * This allows for data linking meaning that the data does 
+     * not need to be passed between modules.
+     * 
+     * Returns false if linking failed. Can only happen if pointer was
+     * null pointer.
+     *
+     * @param values vehicleMode.
+     * @return bool.
+     */
+    bool linkVehicleModePointer(VEHICLE_MODE *vehicleMode) {
+        if (vehicleMode == nullptr) return false;
+        _vehicleMode = vehicleMode;
         return true;
     };
 
@@ -102,6 +132,8 @@ public:
 
 protected:
 
+    static VEHICLE_MODE *_vehicleMode;
+
     static KinematicData* _kinematicSetpoint;
 
     static DynamicData _dynamicOutput;
@@ -114,6 +146,8 @@ private:
     static KinematicData _kinematicSetpointDefault;
 
     static NavigationData _navigationDataDefault;
+
+    static VEHICLE_MODE _vehicleModeDefault;
     
     
 };

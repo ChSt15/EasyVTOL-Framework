@@ -142,12 +142,12 @@ void threadControl() {
         if (firstRun) { //Initialise scheduler
             firstRun = false;
             scheduler.attachFunction(tasks0, 64000, TASK_PRIORITY::PRIORITY_REALTIME);
-            scheduler.attachFunction(tasks1, 64000, TASK_PRIORITY::PRIORITY_VERYHIGH);
-            scheduler.attachFunction(tasks2, 64000, TASK_PRIORITY::PRIORITY_VERYHIGH);
-            scheduler.attachFunction(tasks3, 64000, TASK_PRIORITY::PRIORITY_HIGH);
-            scheduler.attachFunction(tasks4, 64000, TASK_PRIORITY::PRIORITY_HIGH);
-            scheduler.attachFunction(tasks5, 64000, TASK_PRIORITY::PRIORITY_LOW);
-            scheduler.attachFunction(tasks6, 64000, TASK_PRIORITY::PRIORITY_LOW);
+            scheduler.attachFunction(tasks1, 16000, TASK_PRIORITY::PRIORITY_VERYHIGH);
+            scheduler.attachFunction(tasks2, 16000, TASK_PRIORITY::PRIORITY_VERYHIGH);
+            scheduler.attachFunction(tasks3, 8000, TASK_PRIORITY::PRIORITY_HIGH);
+            scheduler.attachFunction(tasks4, 8000, TASK_PRIORITY::PRIORITY_HIGH);
+            scheduler.attachFunction(tasks5, 1000, TASK_PRIORITY::PRIORITY_LOW);
+            scheduler.attachFunction(tasks6, 1000, TASK_PRIORITY::PRIORITY_LOW);
             scheduler.attachFunction(threadSystemMonitor, 10, TASK_PRIORITY::PRIORITY_NONE);
             scheduler.initialise();
         }
@@ -166,8 +166,8 @@ void threadControl() {
 void tasks0() {
 
     IMU::deviceThread();
-    //AirData::deviceThread();
-    //LORA_2_4::deviceThread();
+    AirData::deviceThread();
+    LORA_2_4::deviceThread();
 
 }
 
@@ -175,7 +175,7 @@ void tasks0() {
 
 void tasks1() {
 
-    //GPS::deviceThread();
+    GPS::deviceThread();
     vehicle.thread();
 
 }
@@ -185,7 +185,7 @@ void tasks1() {
 void tasks2() {
 
     //vehicle.getNavigationPointer()->thread();
-    //RGBLED::deviceThread();
+    RGBLED::deviceThread();
 
 }
 

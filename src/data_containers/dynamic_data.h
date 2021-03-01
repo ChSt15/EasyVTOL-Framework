@@ -3,8 +3,6 @@
 
 
 
-#include "definitions.h"
-
 #include "3d_math.h"
 
 

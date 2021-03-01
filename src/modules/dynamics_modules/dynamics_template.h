@@ -85,7 +85,7 @@ public:
      * @param values none.
      * @return DynamicData.
      */
-    virtual DynamicData getDynamicSetpoint() {_dynamicOutput;};
+    virtual DynamicData getDynamicSetpoint() {return _dynamicOutput;};
 
     /**
      * Returns a pointer towards a struct containing the forces 
@@ -97,7 +97,7 @@ public:
      * @param values none.
      * @return DynamicData pointer.
      */
-    virtual DynamicData* getDynamicSetpointPointer() {&_dynamicOutput;};
+    virtual DynamicData* getDynamicSetpointPointer() {return &_dynamicOutput;};
 
 
 protected:

@@ -6,6 +6,7 @@
 #include "modules/templates/module_template.h"
 
 #include "data_containers/kinematic_data.h"
+#include "data_containers/vehicle_mode.h"
 
 #include "modules/guidance_modules/guidance_template.h"
 #include "modules/navigation_modules/navigation_template.h"
@@ -13,21 +14,6 @@
 #include "modules/dynamics_modules/dynamics_template.h"
 #include "modules/output_modules/output_template.h"
 
-
-
-/**
- * Enum containing all vehicle modes.
- */
-enum VEHICLE_MODE {
-    //When this is set, the vehicle turns everything off due to a critical error in a subsystem. Should only be resetable from power reset.
-    MODE_ERROR,
-    //When this is set, the vehicle turns everything off. Should be resetable from vehicle.
-    MODE_FAILSAFE,
-    //When this is set, the vehicle prepares itsself to arm. Dangerous actuators like motors must be shutoff.
-    MODE_DISARM,
-    //When this is set, the vehicle turns everything on and follows flight commands.
-    MODE_ARM
-};
 
 
 class Vehicle: public Module {
@@ -149,10 +135,6 @@ protected:
 
 
 };
-
-
-//Navigation Vehicle::_navigation = nullptr;
-
 
 
 

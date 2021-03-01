@@ -18,6 +18,8 @@
 
 #include "utils/interval_control.h"
 
+#include "scheduler/scheduler.h"
+
 
 
 //##### Thread Settings #####
@@ -53,6 +55,8 @@ extern int threadID[7];
 extern uint8_t threadUsage[7];
 extern uint8_t cpuUsage;
 extern bool threadStartSuccess;
+
+extern Scheduler scheduler;
 
 
 void threadBegin();

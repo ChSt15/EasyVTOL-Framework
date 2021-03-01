@@ -1,6 +1,9 @@
 #include "threads/threads.h"
 
 
+
+Scheduler scheduler;
+
 int threadID[7];
 volatile uint16_t threadCounter[7];
 uint8_t threadUsage[7];
@@ -26,8 +29,6 @@ bool threadActive[7] = {
     THREAD5_ACTIVE,
     THREAD6_ACTIVE
 };
-
-IntervalControl threadMonitorPrintInterval;
 
 Starship vehicle;
 
@@ -64,93 +65,94 @@ void threadBegin() {
     for (uint8_t i = 0; i < 7; i++) threadCounter[i] = 0;
     idleThreadCount = 0;
 
-    threadMonitorPrintInterval.setRate(1);
+}
+
+
+void threadSystemMonitor() {
+
+    /*uint32_t totalCount = idleThreadCount;
+    for (uint8_t i = 0; i < 7; i++) totalCount += threadCounter[i];
+
+    #ifdef PRINT_THREAD_USAGE
+        Serial.println("Thread CPU usage:");
+    #endif
+
+    for (uint8_t i = 0; i < 7; i++) {
+
+        threadUsage[i] = threadCounter[i]*100/totalCount;
+        threadUsage[i] = constrain(threadUsage[i], 0, 100);
+
+        #ifdef PRINT_THREAD_USAGE
+            Serial.println("Thread " + String(i) + ": " + String(threadUsage[i]) + "%, ID: " + String(threadID[i]));
+        #endif
+
+        cpuUsage = 100 - idleThreadCount*100/totalCount;
+        cpuUsage = constrain(cpuUsage, 0, 100);
+        threadCounter[i] = 0;
+
+    }
+
+    #ifdef PRINT_THREAD_USAGE
+        Serial.println("Total CPU usage: " + String(cpuUsage) + "%");
+        Serial.println("Idle Thread: " + String(idleThreadCount*100/totalCount) + "%");
+        Serial.println("Thread Start success: " + String(threadStartSuccess));
+        Serial.println();
+        Serial.println("IMU  status: " + deviceStatusToString(IMU::getDeviceStatus()) + ", Gyro Rate: " + IMU::getGyroRate());
+        Serial.println("BME  status: " + deviceStatusToString(AirData::getDeviceStatus()) + ", MeasRate: " + AirData::getMeasurementRate() + ", Temp: " + AirData::temperatureFifo.first());
+        Serial.println("LED  status: " + deviceStatusToString(RGBLED::getDeviceStatus()));
+        Serial.println("GPS  status: " + deviceStatusToString(GPS::getDeviceStatus()) + ", MeasRate: " + GPS::getMeasurementRate() + ", LoopRate: " + GPS::getRate() +", Sats: " + String(GPS::getSatellites()));
+        Serial.println("LORA status: " + deviceStatusToString(LORA_2_4::getDeviceStatus()) + ", LoopRate: " + LORA_2_4::getRate());
+        Serial.println("vehicle attitude: w: " + String(vehicle.getAttitude().w) + ", x: " + String(vehicle.getAttitude().x) + ", y: " + String(vehicle.getAttitude().y) + ", z: " + String(vehicle.getAttitude().z));
+        Serial.println();
+    #endif*/
+
+
+    KinematicData vehicleKinetics = vehicle.getNavigationData();
+    KinematicData vehicleSetpoints = vehicle.getGuidanceData();
+
+    //Serial.println();
+    Serial.println("LoopRate: " + String(IMU::getLoopRate()) + ", GyroRate: " + String(IMU::getGyroRate()) + ", AccelRate: " + String(IMU::getAccelRate()) + ", MagRate: " + String(IMU::getMagRate()));
+    Serial.println("vehicle attitude: w: " + String(vehicleKinetics.attitude.w) + ", x: " + String(vehicleKinetics.attitude.x) + ", y: " + String(vehicleKinetics.attitude.y) + ", z: " + String(vehicleKinetics.attitude.z));
+    //Serial.println("vehicle angularRate: x: " + String(vehicleKinetics.angularRate.x) + ", y: " + String(vehicleKinetics.angularRate.y) + ", z: " + String(vehicleKinetics.angularRate.z));
+    //Serial.println("vehicle angularRate setpoint: x: " + String(vehicleSetpoints.angularRate.x) + ", y: " + String(vehicleSetpoints.angularRate.y) + ", z: " + String(vehicleSetpoints.angularRate.z));
+    //Serial.println("vehicle attitude setpoint: w: " + String(vehicleSetpoints.attitude.w) + ", x: " + String(vehicleSetpoints.attitude.x) + ", y: " + String(vehicleSetpoints.attitude.y) + ", z: " + String(vehicleSetpoints.attitude.z));
+    //Serial.println("IMU Rate: " + String(IMU::getGyroRate()));
+    //Serial.println("vehicle accel: x: " + String(vehicle.getAcceleration().x) + ", y: " + String(vehicle.getAcceleration().y) + ", z: " + String(vehicle.getAcceleration().z));
+    //Serial.println("vehicle speed: x: " + String(vehicle.getVelocity().x) + ", y: " + String(vehicle.getVelocity().y) + ", z: " + String(vehicle.getVelocity().z));
+    //Serial.println("vehicle pos: x: " + String(vehicle.getPosition().x) + ", y: " + String(vehicle.getPosition().y) + ", z: " + String(vehicle.getPosition().z));
+
+    if (Serial.available()) {
+        //vehicle.resetInertial();
+        while(Serial.available()) Serial.read();
+    }
+
+    idleThreadCount = 0;
 
 }
 
 
 void threadControl() {
 
-    if (threadMonitorPrintInterval.isTimeToRun()) {
-
-        threadMonitorPrintInterval.setRate(10);
-
-        uint32_t totalCount = idleThreadCount;
-        for (uint8_t i = 0; i < 7; i++) totalCount += threadCounter[i];
-
-        #ifdef PRINT_THREAD_USAGE
-            Serial.println("Thread CPU usage:");
-        #endif
-
-        for (uint8_t i = 0; i < 7; i++) {
-
-            threadUsage[i] = threadCounter[i]*100/totalCount;
-            threadUsage[i] = constrain(threadUsage[i], 0, 100);
-
-            #ifdef PRINT_THREAD_USAGE
-                Serial.println("Thread " + String(i) + ": " + String(threadUsage[i]) + "%, ID: " + String(threadID[i]));
-            #endif
-
-            cpuUsage = 100 - idleThreadCount*100/totalCount;
-            cpuUsage = constrain(cpuUsage, 0, 100);
-            threadCounter[i] = 0;
-
-        }
-
-        #ifdef PRINT_THREAD_USAGE
-            Serial.println("Total CPU usage: " + String(cpuUsage) + "%");
-            Serial.println("Idle Thread: " + String(idleThreadCount*100/totalCount) + "%");
-            Serial.println("Thread Start success: " + String(threadStartSuccess));
-            Serial.println();
-            Serial.println("IMU  status: " + deviceStatusToString(IMU::getDeviceStatus()) + ", Gyro Rate: " + IMU::getGyroRate());
-            Serial.println("BME  status: " + deviceStatusToString(AirData::getDeviceStatus()) + ", MeasRate: " + AirData::getMeasurementRate() + ", Temp: " + AirData::temperatureFifo.first());
-            Serial.println("LED  status: " + deviceStatusToString(RGBLED::getDeviceStatus()));
-            Serial.println("GPS  status: " + deviceStatusToString(GPS::getDeviceStatus()) + ", MeasRate: " + GPS::getMeasurementRate() + ", LoopRate: " + GPS::getRate() +", Sats: " + String(GPS::getSatellites()));
-            Serial.println("LORA status: " + deviceStatusToString(LORA_2_4::getDeviceStatus()) + ", LoopRate: " + LORA_2_4::getRate());
-            Serial.println("vehicle attitude: w: " + String(vehicle.getAttitude().w) + ", x: " + String(vehicle.getAttitude().x) + ", y: " + String(vehicle.getAttitude().y) + ", z: " + String(vehicle.getAttitude().z));
-            Serial.println();
-        #endif
-
-
-        KinematicData vehicleKinetics = vehicle.getNavigationData();
-        KinematicData vehicleSetpoints = vehicle.getGuidanceData();
-
-        //Serial.println();
-        //Serial.println("LoopRate: " + String(IMU::getRate()) + ", GyroRate: " + String(IMU::getGyroRate()) + ", AccelRate: " + String(IMU::getAccelRate()) + ", MagRate: " + String(IMU::getMagRate()));
-        Serial.println("vehicle attitude: w: " + String(vehicleKinetics.attitude.w) + ", x: " + String(vehicleKinetics.attitude.x) + ", y: " + String(vehicleKinetics.attitude.y) + ", z: " + String(vehicleKinetics.attitude.z));
-        //Serial.println("vehicle angularRate: x: " + String(vehicleKinetics.angularRate.x) + ", y: " + String(vehicleKinetics.angularRate.y) + ", z: " + String(vehicleKinetics.angularRate.z));
-        //Serial.println("vehicle angularRate setpoint: x: " + String(vehicleSetpoints.angularRate.x) + ", y: " + String(vehicleSetpoints.angularRate.y) + ", z: " + String(vehicleSetpoints.angularRate.z));
-        //Serial.println("vehicle attitude setpoint: w: " + String(vehicleSetpoints.attitude.w) + ", x: " + String(vehicleSetpoints.attitude.x) + ", y: " + String(vehicleSetpoints.attitude.y) + ", z: " + String(vehicleSetpoints.attitude.z));
-        //Serial.println("IMU Rate: " + String(IMU::getGyroRate()));
-        //Serial.println("vehicle accel: x: " + String(vehicle.getAcceleration().x) + ", y: " + String(vehicle.getAcceleration().y) + ", z: " + String(vehicle.getAcceleration().z));
-        //Serial.println("vehicle speed: x: " + String(vehicle.getVelocity().x) + ", y: " + String(vehicle.getVelocity().y) + ", z: " + String(vehicle.getVelocity().z));
-        //Serial.println("vehicle pos: x: " + String(vehicle.getPosition().x) + ", y: " + String(vehicle.getPosition().y) + ", z: " + String(vehicle.getPosition().z));
-
-        if (Serial.available()) {
-            //vehicle.resetInertial();
-            while(Serial.available()) Serial.read();
-        }
-
-        idleThreadCount = 0;
-
-    }
-
-    idleThreadCount++;
-
-
-
-
     #ifdef DISABLE_MULTITHREADING
 
         //If threading disabled then go through tasks without multithreading
 
-        tasks0();
-        tasks1();
-        tasks2();
-        tasks3();
-        tasks4();
-        tasks5();
-        tasks6();
+        static bool firstRun = true;
+
+        if (firstRun) { //Initialise scheduler
+            firstRun = false;
+            scheduler.attachFunction(tasks0, 64000, TASK_PRIORITY::PRIORITY_REALTIME);
+            scheduler.attachFunction(tasks1, 64000, TASK_PRIORITY::PRIORITY_VERYHIGH);
+            scheduler.attachFunction(tasks2, 64000, TASK_PRIORITY::PRIORITY_VERYHIGH);
+            scheduler.attachFunction(tasks3, 64000, TASK_PRIORITY::PRIORITY_HIGH);
+            scheduler.attachFunction(tasks4, 64000, TASK_PRIORITY::PRIORITY_HIGH);
+            scheduler.attachFunction(tasks5, 64000, TASK_PRIORITY::PRIORITY_LOW);
+            scheduler.attachFunction(tasks6, 64000, TASK_PRIORITY::PRIORITY_LOW);
+            scheduler.attachFunction(threadSystemMonitor, 10, TASK_PRIORITY::PRIORITY_NONE);
+            scheduler.initialise();
+        }
+
+        scheduler.tick();
 
     #endif
 

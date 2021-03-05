@@ -3,43 +3,45 @@
 
 
 
-#include "modules/templates/module_template.h"
-
 #include "data_containers/kinematic_data.h"
+#include "data_containers/vehicle_mode.h"
 
 #include "modules/guidance_modules/guidance_template.h"
 #include "modules/navigation_modules/navigation_template.h"
 #include "modules/control_modules/control_template.h"
 #include "modules/dynamics_modules/dynamics_template.h"
-#include "modules/output_modules/output_template.h"
 
 
 
-/**
- * Enum containing all vehicle modes.
- */
-enum VEHICLE_MODE {
-    //When this is set, the vehicle turns everything off due to a critical error in a subsystem. Should only be resetable from power reset.
-    MODE_ERROR,
-    //When this is set, the vehicle turns everything off. Should be resetable from vehicle.
-    MODE_FAILSAFE,
-    //When this is set, the vehicle prepares itsself to arm. Dangerous actuators like motors must be shutoff.
-    MODE_DISARM,
-    //When this is set, the vehicle turns everything on and follows flight commands.
-    MODE_ARM
-};
-
-
-class Vehicle: public Module {
+class Vehicle {
 public:
 
     /**
-     * Returns true if vehicle is ready for flight.
+     * Thread function of the vehicle. 
+     * All calculations the vehicle ever has to do for its 
+     * control will be done here.
      *
      * @param values none.
-     * @return bool.
+     * @return none.
      */
-    virtual bool vehicleReady() = 0;
+    virtual void thread() = 0;
+
+    /**
+     * Init function that setups the vehicle. If not called
+     * then on the first Thread run this will automatically 
+     * be called.
+     *
+     * @param values none.
+     * @return none.
+     */
+    virtual void init(Guidance* guidanceModule, Navigation* navigationModule, Control* controlModule, Dynamics* dynamicsModule) {
+
+        _guidance = guidanceModule;
+        _navigation = navigationModule;
+        _control = controlModule;
+        _dynamics = dynamicsModule; 
+
+    };
 
     /**
      * Returns the navigation data.
@@ -149,10 +151,6 @@ protected:
 
 
 };
-
-
-//Navigation Vehicle::_navigation = nullptr;
-
 
 
 

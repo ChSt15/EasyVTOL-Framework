@@ -4,8 +4,6 @@
 
 void Kwadcopter::thread() {
 
-    if (!_interval.isTimeToRun()) return; //Leave if its not time to run yet
-
     if (!_vehicleInitialized) init(); //Initialise vehiclein not yet done.
 
     _navigation->thread(); //Run navigation thread
@@ -34,10 +32,10 @@ void Kwadcopter::init() {
     //_output->linkDynamicSetpointPointer(_dynamics->getDynamicSetpointPointer());
 
     //Initialise all modules
-    _navigation->init();
-    _guidance->init();
-    _control->init();
-    _dynamics->init();
+    _navigation->init(&_vehicleMode);
+    _guidance->init(&_vehicleMode);
+    _control->init(&_vehicleMode);
+    _dynamics->init(&_vehicleMode);
     //_output->init();
 
     _vehicleInitialized = true;

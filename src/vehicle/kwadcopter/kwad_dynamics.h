@@ -52,8 +52,6 @@ private:
     PPMChannel motorBL;
     //Motor Back Right
     PPMChannel motorBR;
-
-    IntervalControl _interval = IntervalControl(1000);
     
     
 };

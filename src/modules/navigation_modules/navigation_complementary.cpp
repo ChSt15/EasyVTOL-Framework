@@ -4,9 +4,10 @@
 
 void NavigationComplementary::thread() {
 
-    if (!_interval.isTimeToRun()) return;
-
     if (IMU::getDeviceStatus() != DeviceStatus::DEVICE_RUNNING) return;
+
+    float dTime = (float)(micros() - _lastLoopTimestamp)/1000000.0f;
+    _lastLoopTimestamp = micros();
     	
     //KinematicData *_navigationData.= _vehicle;
 
@@ -164,11 +165,9 @@ void NavigationComplementary::thread() {
 
     //################## Inertial navigation testing ###############
 
-    float dt = (float)_interval.getIntervalMillis()/1000;
+    _navigationData.velocity = _navigationData.velocity + _navigationData.acceleration*dTime;
 
-    _navigationData.velocity = _navigationData.velocity + _navigationData.acceleration*dt;
-
-    _navigationData.position = _navigationData.position + _navigationData.velocity*dt;
+    _navigationData.position = _navigationData.position + _navigationData.velocity*dTime;
 
 }
 

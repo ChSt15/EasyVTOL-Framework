@@ -13,12 +13,9 @@
 
 #include "modules/navigation_modules/navigation_complementary.h"
 #include "modules/guidance_modules/guidance_flybywire.h"
+#include "modules/control_modules/linear_pid_controller.h"
 
 #include "starship_dynamics.h"
-
-
-
-#define VEHICLE_LOOP_RATE 1000
 
 
 
@@ -26,11 +23,10 @@ class Starship: public Vehicle {
 public:
 
     Starship() {
-        //_connectThread(); //Add thread to threadChain.
-        _navigation = &_navigationComp; //Set default navigation module.
+        _navigation = &_navigationComp;
         _guidance = &_guidanceFBW;
         _dynamics = &_starshipDynamics;
-        //_output = &_outputStarship;
+        _control = &_linearPIDControl;
     }
 
     /**
@@ -65,9 +61,6 @@ public:
 
 private:
 
-    //limits the vehicle loop rate
-    IntervalControl _interval = IntervalControl(VEHICLE_LOOP_RATE);
-
     //Set to true when vehicle is ready for flight.
     bool _vehicleInitialized = false;
 
@@ -79,6 +72,9 @@ private:
 
     //Default module to use at start
     StarshipDynamics _starshipDynamics;
+
+    //Default module to use at start
+    LinearPIDController _linearPIDControl;
 
 
 };

@@ -24,8 +24,6 @@ void KraftKontrol::vehicleThread() {
 
 void KraftKontrol::initialise() {
 
-    Serial.begin(115200);
-
 
     #ifdef WAIT_FOR_SERIAL
         Serial.println("Waiting for Serial comms");

@@ -15,11 +15,16 @@
 
 #include "kraft_kontrol.h"
 
-
+#include "interval_control.h"
 
 
 
 void threadSystemMonitor() {
+
+    static IntervalControl intervalControl(10);
+
+    if (!intervalControl.isTimeToRun()) return; //Only run every 100ms (10Hz)
+    
 
     Vehicle* vehicle = KraftKontrol::kraft;
 

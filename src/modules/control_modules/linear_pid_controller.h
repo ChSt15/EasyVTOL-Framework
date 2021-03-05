@@ -10,8 +10,6 @@
 
 #include "control_template.h"
 
-#include "utils/interval_control.h"
-
 
 class LinearPIDController: public Control {
 public:

@@ -19,7 +19,6 @@
 
 #include "sensors/imu.h"
 
-#include "utils/interval_control.h"
 #include "utils/high_pass_filter.h"
 #include "utils/low_pass_filter.h"
 

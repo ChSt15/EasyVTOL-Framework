@@ -6,7 +6,7 @@
 #include "guidance_template.h"
 
 #include "3d_math.h"
-#include "utils/interval_control.h"
+#include "interval_control.h"
 
 #include "data_containers/kinematic_data.h"
 

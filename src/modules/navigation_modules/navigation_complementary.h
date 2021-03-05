@@ -76,6 +76,8 @@ private:
     uint32_t _lastAccelTimestamp = 0;
     uint32_t _lastMagTimestamp = 0;
 
+    uint32_t _lastLoopTimestamp = 0;
+
     //System information flagges
     bool _angularRateValid = false;
     bool _attitudeValid = false;
@@ -90,9 +92,6 @@ private:
     bool _gyroInitialized = false;
     bool _accelInitialized = false;
     bool _magInitialized = false;
-
-    //Loop interval control
-    IntervalControl _interval = IntervalControl(1000);
 
 
 };

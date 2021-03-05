@@ -19,10 +19,6 @@
 
 
 
-#define VEHICLE_LOOP_RATE 8000
-
-
-
 class Kwadcopter: public Vehicle {
 public:
 
@@ -65,9 +61,6 @@ public:
 
 
 private:
-
-    //limits the vehicle loop rate
-    IntervalControl _interval = IntervalControl(VEHICLE_LOOP_RATE);
 
     //Set to true when vehicle is ready for flight.
     bool _vehicleInitialized = false;

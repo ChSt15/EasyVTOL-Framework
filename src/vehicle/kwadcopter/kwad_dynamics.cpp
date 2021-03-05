@@ -4,9 +4,6 @@
 
 void KwadDynamics::thread() {
 
-    if (!_interval.isTimeToRun()) return;
-
-    
     
 
 }

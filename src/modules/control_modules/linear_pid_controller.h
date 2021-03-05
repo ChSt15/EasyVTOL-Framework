@@ -95,8 +95,6 @@ public:
 
 private:
 
-    IntervalControl _interval = IntervalControl(1000);
-
     //P factor for angular acceleration 
     Vector _angAccelPF = 0;
     //I factor for angular acceleration 

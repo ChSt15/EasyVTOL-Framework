@@ -3,23 +3,39 @@
 
 
 
-#include "definitions.h"
+#include "vehicle_control/control_profile_template.h"
 
-#include "utils/interval_control.h"
+#include "modules/guidance_modules/guidance_flybywire.h"
+
+#include "comms/ibus_rx.h"
 
 
-#define CONTROL_LOOP_RATE 100
 
-
-class ManualControl {
+class ManualControlProfile: public ControlProfile {
 public:
 
-    void manualControlThread();
-    void manualControlInit();
+    /**
+     * This is where all calculations are done.
+     *
+     * @param values none.
+     * @return none.
+     */
+    void thread();
+
+
 
 private:
 
-    IntervalControl interval = IntervalControl(CONTROL_LOOP_RATE);
+    /**
+     * Init function that sets the module up.
+     *
+     * @param values none.
+     * @return none.
+     */
+    void init();
+
+    //Guidance module given to vehicle to be used.
+    GuidanceFlyByWire _guidanceFBW;
 
     
 };

@@ -5,6 +5,7 @@
 namespace KraftKontrol {
 
     Vehicle* kraft = nullptr;
+    ControlProfile* controlProfile = nullptr;
 
     Scheduler systemScheduler;
 
@@ -20,6 +21,7 @@ void KraftKontrol::vehicleThread() {
     if (kraft != nullptr) kraft->thread(); //Make sure not to run a nullptr
 
 }
+
 
 
 void KraftKontrol::vehicleControlThread() {

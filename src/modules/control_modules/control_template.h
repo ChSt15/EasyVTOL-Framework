@@ -7,6 +7,7 @@
 
 #include "data_containers/control_data.h"
 #include "data_containers/navigation_data.h"
+#include "data_containers/dynamic_data.h"
 
 
 class Control: public Module {
@@ -89,7 +90,7 @@ public:
      * @param values none.
      * @return kinematicSetpoint.
      */
-    virtual KinematicData getKinematicOutput() {return _controlOutput;};
+    virtual DynamicData getDynamicsOutput() {return _controlOutput;};
 
     /**
      * Returns the a pointer to a struct with the kinematics the system 
@@ -98,7 +99,7 @@ public:
      * @param values none.
      * @return kinematicSetpoint pointer.
      */
-    virtual KinematicData* getKinematicOutputPointer() {return &_controlOutput;};
+    virtual DynamicData* getDynamicsOutputPointer() {return &_controlOutput;};
 
 
 protected:
@@ -106,7 +107,7 @@ protected:
     static ControlData* _controlSetpoint;
     static NavigationData* _navigationData;
 
-    static KinematicData _controlOutput;
+    static DynamicData _controlOutput;
 
 
 private:

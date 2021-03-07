@@ -81,6 +81,38 @@ public:
     float distanceFromEndpoint() {return 0.0;};
 
     /**
+     * Sets the attitude control mode
+     *
+     * @param values attitudeControlMode.
+     * @return none.
+     */
+    void setAttitudeControlMode(const CONTROL_MODE &attitudeControlMode) {_vehicleControlSettings.attitudeControlMode = attitudeControlMode;};
+
+    /**
+     * Gets the attitude control mode
+     *
+     * @param values none.
+     * @return CONTROL_MODE.
+     */
+    CONTROL_MODE getAttitudeControlMode() {return _vehicleControlSettings.attitudeControlMode;};
+
+    /**
+     * Sets the position control mode
+     *
+     * @param values positionControlMode.
+     * @return none.
+     */
+    void setPositionControlMode(const CONTROL_MODE &positionControlMode) {_vehicleControlSettings.positionControlMode = positionControlMode;};
+
+    /**
+     * Gets the postion control mode
+     *
+     * @param values none.
+     * @return CONTROL_MODE.
+     */
+    CONTROL_MODE getPositionControlMode() {return _vehicleControlSettings.positionControlMode;};
+
+    /**
      * This is where all calculations are done.
      *
      * @param values none.

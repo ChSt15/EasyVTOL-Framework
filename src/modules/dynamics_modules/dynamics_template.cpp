@@ -2,9 +2,9 @@
 
 
 
-KinematicData* Dynamics::_kinematicSetpoint = &Dynamics::_kinematicSetpointDefault;
-KinematicData Dynamics::_kinematicSetpointDefault;
-DynamicData Dynamics::_dynamicOutput;
+DynamicData Dynamics::_dynamicsSetpointDefault;
+DynamicData* Dynamics::_dynamicSetpoint = &_dynamicsSetpointDefault;
 
-NavigationData* Dynamics::_navigationData = &Dynamics::_navigationDataDefault;
 NavigationData Dynamics::_navigationDataDefault;
+NavigationData* Dynamics::_navigationData = &Dynamics::_navigationDataDefault;
+

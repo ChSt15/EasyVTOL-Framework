@@ -73,7 +73,7 @@ public:
      * @param values none.
      * @return controlData.
      */
-    virtual KinematicData getControlData() {return _control->getKinematicOutput();}
+    virtual DynamicData getControlData() {return _control->getDynamicsOutput();}
 
     /**
      * Returns a pointer to the navigation module.

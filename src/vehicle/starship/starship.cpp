@@ -22,7 +22,7 @@ void Starship::init() {
     //link module data together
     _control->linkControlSetpointPointer(_guidance->getControlSetpointPointer()); //Guidance -> Control
     _control->linkNavigationDataPointer(_navigation->getNavigationDataPointer()); //Navigation -> Control
-    _dynamics->linkKinematicSetpointPointer(_control->getKinematicOutputPointer()); //Navigation -> Dynamics
+    _dynamics->linkDynamicSetpointPointer(_control->getDynamicsOutputPointer()); //Navigation -> Dynamics
     _dynamics->linkNavigationDataPointer(_navigation->getNavigationDataPointer()); //Control -> Dynamics
 
     //Initialise all modules

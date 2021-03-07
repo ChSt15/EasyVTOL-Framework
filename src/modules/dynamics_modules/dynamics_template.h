@@ -15,65 +15,6 @@ class Dynamics: public Module {
 public:
 
     /**
-     * Sets the kinetic setpoints from which the needed forces
-     * are calculated.
-     *
-     * @param values kinematicSetpoint.
-     * @return none.
-     */
-    void setKinematicSetpoint(const KinematicData &kinematicSetpoint) {
-        _kinematicSetpoint = &_kinematicSetpointDefault;
-        *_kinematicSetpoint = kinematicSetpoint;
-    };
-
-    /**
-     * Sets the kinetic setpoints pointer to the inputed one.
-     * 
-     * This allows for data linking meaning that the data does 
-     * not need to be passed between modules.
-     * 
-     * Returns false if linking failed. Can only happen if pointer was
-     * null pointer.
-     *
-     * @param values kinematicSetpoint.
-     * @return bool.
-     */
-    bool linkKinematicSetpointPointer(KinematicData* kinematicSetpointPointer) {
-        if (kinematicSetpointPointer == nullptr) return false;
-        _kinematicSetpoint = kinematicSetpointPointer;
-        return true;
-    };
-
-    /**
-     * Gives the dynamics module the current vehicle mode.
-     *
-     * @param values vehicleMode.
-     * @return none.
-     */
-    void setVehicleMode(const VEHICLE_MODE &vehicleMode) {
-        _vehicleMode = &_vehicleModeDefault;
-        *_vehicleMode = vehicleMode;
-    };
-
-    /**
-     * Sets the current vehicle pointer to the inputed one.
-     * 
-     * This allows for data linking meaning that the data does 
-     * not need to be passed between modules.
-     * 
-     * Returns false if linking failed. Can only happen if pointer was
-     * null pointer.
-     *
-     * @param values vehicleMode.
-     * @return bool.
-     */
-    bool linkVehicleModePointer(VEHICLE_MODE *vehicleMode) {
-        if (vehicleMode == nullptr) return false;
-        _vehicleMode = vehicleMode;
-        return true;
-    };
-
-    /**
      * Sets the navigation input data from a navigation module.
      * 
      * Use linkNavigationDataPointer() for data linking.
@@ -115,7 +56,7 @@ public:
      * @param values none.
      * @return DynamicData.
      */
-    virtual DynamicData getDynamicSetpoint() {return _dynamicOutput;};
+    virtual DynamicData getDynamicSetpoint() {return *_dynamicSetpoint;};
 
     /**
      * Returns a pointer towards a struct containing the forces 
@@ -127,27 +68,45 @@ public:
      * @param values none.
      * @return DynamicData pointer.
      */
-    virtual DynamicData* getDynamicSetpointPointer() {return &_dynamicOutput;};
+    virtual DynamicData* getDynamicSetpointPointer() {return _dynamicSetpoint;};
+
+    /**
+     * Sets the dynamics the vehicle needs to achieve
+     *
+     * @param values none.
+     * @return DynamicData.
+     */
+    virtual void setDynamicSetpoint(const DynamicData &dynamicsSetpoint) {
+        *_dynamicSetpoint = dynamicsSetpoint;
+    };
+
+    /**
+     * Returns a pointer towards a struct containing the forces 
+     * the acuators need to produce in total on the vehicle in 
+     * order to achieve the kinematic setpoints. 
+     * 
+     * Using pointers allows for data linking.
+     *
+     * @param values none.
+     * @return DynamicData pointer.
+     */
+    virtual void linkDynamicSetpointPointer(DynamicData* dynamicsSetpoint) {_dynamicSetpoint = dynamicsSetpoint;};
 
 
 protected:
 
     static VEHICLE_MODE *_vehicleMode;
 
-    static KinematicData* _kinematicSetpoint;
-
-    static DynamicData _dynamicOutput;
+    static DynamicData* _dynamicSetpoint;
 
     static NavigationData* _navigationData;
 
 
 private:
 
-    static KinematicData _kinematicSetpointDefault;
+    static DynamicData _dynamicsSetpointDefault;
 
     static NavigationData _navigationDataDefault;
-
-    static VEHICLE_MODE _vehicleModeDefault;
     
     
 };

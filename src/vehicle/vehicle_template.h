@@ -44,6 +44,14 @@ public:
     };
 
     /**
+     * Returns true if vehicle is ready to be armed
+     *
+     * @param values none.
+     * @return bool.
+     */
+    virtual bool vehicleReady() = 0;
+
+    /**
      * Returns the navigation data.
      *
      * @param values none.

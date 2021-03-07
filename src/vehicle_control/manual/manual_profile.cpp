@@ -45,8 +45,13 @@ void ManualControlProfile::thread() {
 
                 velocity.z = _channelData.channelData[IBUS_CHANNEL_THROTTLE]*maxVelZ;
 
+                velocity = _vehicle->getNavigationData().attitude.rotateVector(velocity);
+
                 _guidanceFBW.setAngularRate(angularRate);
                 _guidanceFBW.setVelocity(velocity);
+
+                _guidanceFBW.setAttitudeControlMode(CONTROL_MODE::CONTROL_VELOCITY);
+                _guidanceFBW.setPositionControlMode(CONTROL_MODE::CONTROL_DISABLED);
 
             }
 

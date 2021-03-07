@@ -9,6 +9,7 @@ namespace KraftKontrol {
     Scheduler systemScheduler;
 
     void vehicleThread();
+    void vehicleControlThread();
 
 }
 
@@ -17,6 +18,13 @@ namespace KraftKontrol {
 void KraftKontrol::vehicleThread() {
 
     if (kraft != nullptr) kraft->thread(); //Make sure not to run a nullptr
+
+}
+
+
+void KraftKontrol::vehicleControlThread() {
+
+    if (controlProfile != nullptr) controlProfile->thread(); //Make sure not to run a nullptr
 
 }
 
@@ -40,6 +48,9 @@ void KraftKontrol::initialise() {
     delay(500);
 
 
+    controlProfile->setVehiclePointer(kraft);
+
+
     systemScheduler.attachFunction(IMU::deviceThread, 32000, TASK_PRIORITY::PRIORITY_REALTIME);
     systemScheduler.attachFunction(AirData::deviceThread, 200, TASK_PRIORITY::PRIORITY_REALTIME);
     systemScheduler.attachFunction(LORA_2_4::deviceThread, 500, TASK_PRIORITY::PRIORITY_MIDDLE);
@@ -47,6 +58,8 @@ void KraftKontrol::initialise() {
     systemScheduler.attachFunction(RGBLED::deviceThread, 100, TASK_PRIORITY::PRIORITY_NONE);
 
     systemScheduler.attachFunction(vehicleThread, 8000, TASK_PRIORITY::PRIORITY_REALTIME);
+
+    systemScheduler.attachFunction(vehicleControlThread, 8000, TASK_PRIORITY::PRIORITY_REALTIME);
 
 }
 

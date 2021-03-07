@@ -14,6 +14,7 @@
 #include "outputs/rgb_led.h"
 
 #include "vehicle/vehicle_template.h"
+#include "vehicle_control/control_profile_template.h"
 
 #include "utils/interval_control.h"
 
@@ -29,6 +30,9 @@ namespace KraftKontrol {
 
     //This is the vehicle that will be use by KraftKontrol. Set it to a reference of the wanted vehicle.
     extern Vehicle* kraft;
+
+    //This is the vehicle that will be use by KraftKontrol. Set it to a reference of the wanted vehicle.
+    extern ControlProfile* controlProfile;
 
     void initialise();
 

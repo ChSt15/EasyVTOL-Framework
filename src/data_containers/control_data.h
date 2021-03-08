@@ -16,12 +16,18 @@
 enum CONTROL_MODE {
     //Disable control.
     CONTROL_DISABLED,
+    //Control acceleration/rate acceleration
+    CONTROL_ACCELERATION,
     //Control velocity/rate
     CONTROL_VELOCITY,
+    //Control both velocity/rate and acceleration/rate acceleration
+    CONTROL_ACCELERATION_VELOCITY,
     //Control position
     CONTROL_POSITION,
     //Control velocity/rate and position
-    CONTROL_VELOCITY_POSITION
+    CONTROL_VELOCITY_POSITION,
+    //Control acceleration/rate acceleration and velocity/rate and position
+    CONTROL_ACCELERATION_VELOCITY_POSITION
 };
 
 

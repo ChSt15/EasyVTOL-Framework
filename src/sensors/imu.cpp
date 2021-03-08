@@ -57,7 +57,7 @@ void IMU::interruptRoutine() {
 
 void IMU::deviceThread() {
 
-    if (!imuInterval.isTimeToRun()) return; 
+    //if (!imuInterval.isTimeToRun()) return; 
 
     loopCounter++;
 
@@ -188,6 +188,8 @@ void IMU::deviceThread() {
         if (startCode > 0) {
 
             imuInterval.setRate(IMU_RATE_LIMIT);
+            //imuInterval.setLimit(false);
+            //imuInterval.syncInternal();
 
             imu.setAccelRange(MPU9250::AccelRange::ACCEL_RANGE_16G); //Yes this and the gyro range being so high will make it less accurate but we also dont want to loose information. This could be changed later depending on the application
             imu.setGyroRange(MPU9250::GyroRange::GYRO_RANGE_2000DPS);

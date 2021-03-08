@@ -199,6 +199,7 @@ void IMU::deviceThread() {
             //###################### Following will be changed in the future to allow higher rates #####################
             imu.setSrd(0);
             imu.setDlpfBandwidth(MPU9250::DlpfBandwidth::DLPF_BANDWIDTH_184HZ);
+            imu.setStupidSpeeeds();
 
             imu.setMagCalX(18.26, 1.0f);
             imu.setMagCalY(39.14, 1.0f);

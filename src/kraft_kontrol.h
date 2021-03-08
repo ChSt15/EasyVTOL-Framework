@@ -10,6 +10,7 @@
 #include "sensors/gps.h"
 
 #include "comms/lora_2_4.h"
+#include "comms/ibus_rx.h"
 
 #include "outputs/rgb_led.h"
 
@@ -28,10 +29,10 @@
 
 namespace KraftKontrol {
 
-    //This is the vehicle that will be use by KraftKontrol. Set it to a reference of the wanted vehicle.
+    //This is the vehicle that will be use by KraftKontrol. Set it to the reference of the to be controlled vehicle.
     extern Vehicle* kraft;
 
-    //This is the vehicle that will be use by KraftKontrol. Set it to a reference of the wanted vehicle.
+    //This is the control profile that will be use by KraftKontrol. Set it to the reference of the to be used control profile.
     extern ControlProfile* controlProfile;
 
     void initialise();

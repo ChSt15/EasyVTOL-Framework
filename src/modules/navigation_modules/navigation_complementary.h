@@ -77,6 +77,8 @@ private:
 
     uint32_t _lastLoopTimestamp = 0;
 
+    Vector _lastGyroValue = 0;
+
     //System information flagges
     bool _angularRateValid = false;
     bool _attitudeValid = false;

@@ -6,17 +6,13 @@ void Kwadcopter::thread() {
 
     if (!_vehicleInitialized) init(); //Initialise vehiclein not yet done.
 
-    _navigation->thread(); //Run navigation thread
+    if (_navigation != nullptr) _navigation->thread(); //Run navigation thread. Check to make sure it isnt invalid
 
-    if (_guidance == &_guidanceFBW) { //Check if we are using FBW guidance module. If so then do stuff
-        //_guidanceFBW.setAngularRate(Vector(cos((float)millis()/1000.0f),0,0));
-    }
+    if (_guidance != nullptr) _guidance->thread(); //Run guidance thread. Check to make sure it isnt invalid
 
-    _guidance->thread(); //Run guidance thread
+    if (_control != nullptr) _control->thread(); //Run control thread. Check to make sure it isnt invalid
 
-    _control->thread(); //Run control thread
-
-    _dynamics->thread(); //Run dynamics thread
+    if (_dynamics != nullptr) _dynamics->thread(); //Run dynamics thread. Check to make sure it isnt invalid
 
 }
 
@@ -26,10 +22,8 @@ void Kwadcopter::init() {
     //link module data together
     _control->linkControlSetpointPointer(_guidance->getControlSetpointPointer()); //Guidance -> Control
     _control->linkNavigationDataPointer(_navigation->getNavigationDataPointer()); //Navigation -> Control
-    _dynamics->linkKinematicSetpointPointer(_control->getKinematicOutputPointer()); //Navigation -> Dynamics
+    _dynamics->linkDynamicSetpointPointer(_control->getDynamicsOutputPointer()); //Navigation -> Dynamics
     _dynamics->linkNavigationDataPointer(_navigation->getNavigationDataPointer()); //Control -> Dynamics
-    //_output->linkNavigationDataPointer(_navigation->getNavigationDataPointer());
-    //_output->linkDynamicSetpointPointer(_dynamics->getDynamicSetpointPointer());
 
     //Initialise all modules
     _navigation->init(&_vehicleMode);

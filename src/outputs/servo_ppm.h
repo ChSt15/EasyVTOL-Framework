@@ -11,23 +11,27 @@
 
 
 
-#define MAX_NUM_CHANNELS 20
+/**
+ * Used to transfer protocol information.
+ * 
+ * To add a new protocol add the name to to this and add the protocol 
+ * timings to the switch statement in _setProtocolTiming() function.
+ */
+enum PPM_PROTOCOL {
+    STANDARD_1000,
+    ONESHOT_125,
+    ONESHOT_42,
+    MULTISHOT
+};
 
 
-#define STANDARD_LOW 1000
-#define STANDARD_HIGH 2000
-
-#define ONESHOT125_LOW 125
-#define ONESHOT125_HIGH 250
-
-#define ONESHOT42_LOW 42
-#define ONESHOT42_HIGH 82
-
-#define MULTISHOT_LOW 5
-#define MULTISHOT_HIGH 25
-
-
-
+/**
+ * Class used to create PPM channels on pins to control 
+ * Servos and ESCs.
+ * Due to this using PWM modules, if the CPU were to lock-up 
+ * then the PWM signal may continue to run the ESC/Servo at 
+ * the last given command. Meaning Motors may not turn off!
+ */
 class PPMChannel {
 public:
 
@@ -38,14 +42,10 @@ public:
 
     DeviceStatus getDeviceStatus();
 
-    bool setChannel(float percent);
+    bool setChannel(const float &percent);
     float getChannel();
 
-    bool setHighTimeMaxMicros(uint32_t maxTimeUS);
-    void setHighTimeMinMicros(uint32_t minTimeUS);
-
-    uint32_t getHighTimeMaxMicros();
-    uint32_t getHighTimeMinMicros();
+    void setProtocol(const PPM_PROTOCOL &protocol);
 
     //bool startSending();      needs implementing. Should Start the pwm output. Other functions must be changes too.
     //void stopSending();       needs implementing. Should stop the pwm output. Other functions must be changes too.
@@ -53,6 +53,8 @@ public:
     bool setPin(int16_t pin);
 
 private:
+
+    void _getProtocolTiming(uint32_t &min, uint32_t max, const PPM_PROTOCOL &protoco);
 
     int16_t _pin = -1;  
 

@@ -10,6 +10,14 @@
 #include "data_containers/vehicle_mode.h"
 
 
+/**
+ * struct used to sent raw actuator commands to a dynamics module
+ */
+struct ActuatorSetting {
+    float actuatorSetting[20];
+};
+
+
 
 class Dynamics: public Module {
 public:
@@ -94,36 +102,78 @@ public:
 
     /**
      * Tells dynamics module to test all actuators. 
-     * Dangerous ones like motors should not be tested.
+     * Giving false will stop testing.
      *
-     * @param values none.
+     * @param values bool.
      * @return none.
      */
-    virtual void startActuatorTesting() {
-        actuatorTesting = true;
+    virtual void setActuatorTesting(bool testing = true) {
+        _actuatorTesting = testing;
     }
 
     /**
-     * Tells dynamics module to test all actuators. 
-     * Dangerous ones like motors should not be tested.
+     * Returns if actuators are being tested.
      *
      * @param values none.
      * @return none.
      */
-    virtual void stopActuatorTesting() {
-        actuatorTesting = false;
+    virtual bool getActuatorTesting() {
+        return _actuatorTesting;
+    }
+
+    /**
+     * Tells dynamics module to enter manual mode
+     * Giving false will stop testing.
+     *
+     * @param values bool.
+     * @return none.
+     */
+    virtual void setActuatorManualMode(bool testing = true) {
+        _actuatorManualMode = testing;
+    }
+
+    /**
+     * Returns if currently in actuator tesing mode.
+     *
+     * @param values bool.
+     * @return none.
+     */
+    virtual bool getActuatorManualMode() {
+        return _actuatorManualMode = false;
+    }
+
+    /**
+     * Used to send raw actuator commands to actuators.
+     * Only valid if in actuator manual mode. Call _enterActuatorManualMode()
+     * to enter this mode.
+     *
+     * @param values ActuatorSetting.
+     * @return none.
+     */
+    virtual void setActuatorsRawData(const ActuatorSetting &actuatorSetpoint) {
+        _actuatorManualSetpoint = actuatorSetpoint;
     }
 
 
 protected:
 
+    //Points to vehicle mode.
     static VEHICLE_MODE *_vehicleMode;
 
+    //Points to dynamics setpoint data container.
     static DynamicData* _dynamicSetpoint;
 
+    //Points to navigation data container.
     static NavigationData* _navigationData;
 
-    bool actuatorTesting = false;
+    //When true then start tesing all actuators. Can be set to true by module when testing is finished.
+    bool _actuatorTesting = false;
+
+    //When true then ignore dynamic setpoints and only use manual setpoints
+    bool _actuatorManualMode = false;
+
+    //Contains actuator manual raw setpoints. Should only be used when in manual mode.
+    ActuatorSetting _actuatorManualSetpoint;
 
 
 private:

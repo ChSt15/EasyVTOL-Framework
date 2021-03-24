@@ -26,7 +26,7 @@ void Kwadcopter::init() {
     //link module data together
     _control->linkControlSetpointPointer(_guidance->getControlSetpointPointer()); //Guidance -> Control
     _control->linkNavigationDataPointer(_navigation->getNavigationDataPointer()); //Navigation -> Control
-    _dynamics->linkKinematicSetpointPointer(_control->getKinematicOutputPointer()); //Navigation -> Dynamics
+    //_dynamics->linkKinematicSetpointPointer(_control->getKinematicOutputPointer()); //Navigation -> Dynamics
     _dynamics->linkNavigationDataPointer(_navigation->getNavigationDataPointer()); //Control -> Dynamics
     //_output->linkNavigationDataPointer(_navigation->getNavigationDataPointer());
     //_output->linkDynamicSetpointPointer(_dynamics->getDynamicSetpointPointer());

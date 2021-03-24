@@ -92,6 +92,28 @@ public:
      */
     virtual void linkDynamicSetpointPointer(DynamicData* dynamicsSetpoint) {_dynamicSetpoint = dynamicsSetpoint;};
 
+    /**
+     * Tells dynamics module to test all actuators. 
+     * Dangerous ones like motors should not be tested.
+     *
+     * @param values none.
+     * @return none.
+     */
+    virtual void startActuatorTesting() {
+        actuatorTesting = true;
+    }
+
+    /**
+     * Tells dynamics module to test all actuators. 
+     * Dangerous ones like motors should not be tested.
+     *
+     * @param values none.
+     * @return none.
+     */
+    virtual void stopActuatorTesting() {
+        actuatorTesting = false;
+    }
+
 
 protected:
 
@@ -100,6 +122,8 @@ protected:
     static DynamicData* _dynamicSetpoint;
 
     static NavigationData* _navigationData;
+
+    bool actuatorTesting = false;
 
 
 private:

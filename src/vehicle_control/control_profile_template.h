@@ -33,7 +33,6 @@ protected:
     //Vehicle to be controlled
     static Vehicle* _vehicle;
 
-    
 };
 
 

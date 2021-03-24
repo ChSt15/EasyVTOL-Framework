@@ -59,9 +59,9 @@ void KraftKontrol::initialise() {
     systemScheduler.attachFunction(GPS::deviceThread, 100, TASK_PRIORITY::PRIORITY_HIGH);
     systemScheduler.attachFunction(RGBLED::deviceThread, 100, TASK_PRIORITY::PRIORITY_NONE);
 
-    systemScheduler.attachFunction(vehicleThread, 8000, TASK_PRIORITY::PRIORITY_REALTIME);
+    systemScheduler.attachFunction(vehicleThread, kraft->getLoopRate_Hz(), TASK_PRIORITY::PRIORITY_REALTIME);
 
-    systemScheduler.attachFunction(vehicleControlThread, 8000, TASK_PRIORITY::PRIORITY_REALTIME);
+    systemScheduler.attachFunction(vehicleControlThread, controlProfile->getLoopRate_Hz(), TASK_PRIORITY::PRIORITY_REALTIME);
 
 }
 

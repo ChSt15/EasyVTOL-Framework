@@ -22,13 +22,13 @@
 class Kwadcopter: public Vehicle {
 public:
 
-    Kwadcopter() {
+    /*Kwadcopter() {
         //Set module pointers to defaults.
         _guidance = &_guidanceFBW;
         _navigation = &_navigationComp; 
         _control = &_linearController;
         _dynamics = &_kwadDynamics;
-    }
+    }*/
 
     /**
      * Thread function of the vehicle. 

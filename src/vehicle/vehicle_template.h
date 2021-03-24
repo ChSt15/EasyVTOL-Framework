@@ -52,6 +52,16 @@ public:
     virtual bool vehicleReady() = 0;
 
     /**
+     * Returns how fast the module should be ran at.
+     *
+     * @param values none.
+     * @return uint32_t.
+     */
+    virtual uint32_t getLoopRate_Hz() {
+        return loopRate_Hz;
+    }
+
+    /**
      * Returns the navigation data.
      *
      * @param values none.
@@ -156,6 +166,9 @@ protected:
 
     //Points to the dynamics module to use.
     static Dynamics *_dynamics;
+
+    //How fast the vehicle loop should be ran at
+    uint32_t loopRate_Hz = 1000;
 
 
 };

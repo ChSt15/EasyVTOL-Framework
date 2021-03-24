@@ -31,7 +31,7 @@
 class PPMChannel {
 public:
 
-    PPMChannel(int16_t pin = -1);
+    PPMChannel(int16_t pin , uint32_t maxTimeUS = 2000, uint32_t minTimeUS = 1000);
     ~PPMChannel();
 
     void deviceThread();
@@ -41,8 +41,7 @@ public:
     bool setChannel(float percent);
     float getChannel();
 
-    bool setHighTimeMaxMicros(uint32_t maxTimeUS);
-    void setHighTimeMinMicros(uint32_t minTimeUS);
+    bool setTiming_Micros(uint32_t maxTimeUS, uint32_t minTimeUS);
 
     uint32_t getHighTimeMaxMicros();
     uint32_t getHighTimeMinMicros();

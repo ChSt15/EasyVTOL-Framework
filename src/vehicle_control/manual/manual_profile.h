@@ -14,6 +14,10 @@
 class ManualControlProfile: public ControlProfile {
 public:
 
+    ManualControlProfile() {
+        loopRate_Hz = 100;
+    }
+
     /**
      * This is where all calculations are done.
      *

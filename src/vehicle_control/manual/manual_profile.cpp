@@ -66,6 +66,4 @@ void ManualControlProfile::thread() {
 
 void ManualControlProfile::init() {
 
-    
-
 }

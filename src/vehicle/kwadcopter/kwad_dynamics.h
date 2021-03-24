@@ -45,13 +45,13 @@ public:
 private:
 
     //Motor Front left
-    PPMChannel motorFL;
+    //PPMChannel motorFL;
     //Motor Front right
-    PPMChannel motorFR;
+    //PPMChannel motorFR;
     //Motor Back left
-    PPMChannel motorBL;
+    //PPMChannel motorBL;
     //Motor Back Right
-    PPMChannel motorBR;
+    //PPMChannel motorBR;
     
     
 };

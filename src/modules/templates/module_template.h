@@ -41,12 +41,24 @@ public:
         init();
     };
 
+    /**
+     * Returns how fast the module should be ran at.
+     *
+     * @param values none.
+     * @return uint32_t.
+     */
+    virtual uint32_t getLoopRate_Hz() {
+        return loopRate_Hz;
+    }
+
 
 protected:
 
     virtual void init() = 0;
 
     static VEHICLE_MODE* _vehicleMode;
+
+    uint32_t loopRate_Hz = 1000;
 
 
 private:

@@ -2,8 +2,9 @@
 
 
 
-PPMChannel::PPMChannel(int16_t pin) {
+PPMChannel::PPMChannel(int16_t pin , uint32_t maxTimeUS, uint32_t minTimeUS) {
     _pin = pin;
+    setTiming_Micros(maxTimeUS, minTimeUS);
     pinMode(_pin, OUTPUT);
     digitalWrite(_pin, LOW);
 
@@ -73,11 +74,17 @@ float PPMChannel::getChannel() {return _percent;}
     * @param values uint32_t maxTimeUS in microseconds
     * @return bool.
 */
-bool PPMChannel::setHighTimeMaxMicros(uint32_t maxTimeUS) {
+bool PPMChannel::setTiming_Micros(uint32_t maxTimeUS, uint32_t minTimeUS) {
 
     if (_pin == -1) return false; //Make sure pin has been selected
 
-    _highMaxUS = max(maxTimeUS, _highMinUS); //Limit max to min
+    if (maxTimeUS <= minTimeUS) return false; //Return false as error if invalid timing is given
+
+    _highMinUS = minTimeUS;
+    _highMaxUS = maxTimeUS;
+
+    _deltaHighUS = _highMaxUS - _highMinUS; 
+
     uint32_t frequencyHZ = 1000000/(_highMaxUS*1.25f);
     _periodUS = 1000000/frequencyHZ;
     _deltaHighUS = _highMaxUS - _highMinUS;
@@ -85,20 +92,6 @@ bool PPMChannel::setHighTimeMaxMicros(uint32_t maxTimeUS) {
     analogWriteFrequency(_pin, frequencyHZ); //Update frequency
 
     return true;
-}
-
-
-/**
-    * Sets the PPMProtocol Min on time of signal.
-    *
-    * @param values uint32_t minTimeUS in microseconds
-    * @return none.
-*/
-void PPMChannel::setHighTimeMinMicros(uint32_t minTimeUS) {
-
-    _highMinUS = min(minTimeUS, _highMaxUS); //Limit min to max
-    _deltaHighUS = _highMaxUS - _highMinUS; 
-
 }
 
 

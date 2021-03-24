@@ -55,26 +55,26 @@ public:
 private:
 
     //TVC servos. 0 is x+, 1 is y+, 2 is x-, 3 is y-.
-    PPMChannel TVCServo1 = PPMChannel(TVC_SERVO_PIN_1, PPM_PROTOCOL::STANDARD_1000);
-    PPMChannel TVCServo2 = PPMChannel(TVC_SERVO_PIN_2, PPM_PROTOCOL::STANDARD_1000);
-    PPMChannel TVCServo3 = PPMChannel(TVC_SERVO_PIN_3, PPM_PROTOCOL::STANDARD_1000);
-    PPMChannel TVCServo4 = PPMChannel(TVC_SERVO_PIN_4, PPM_PROTOCOL::STANDARD_1000);
+    PPMChannel _TVCServo1 = PPMChannel(TVC_SERVO_PIN_1, PPM_PROTOCOL::STANDARD_1000);
+    PPMChannel _TVCServo2 = PPMChannel(TVC_SERVO_PIN_2, PPM_PROTOCOL::STANDARD_1000);
+    PPMChannel _TVCServo3 = PPMChannel(TVC_SERVO_PIN_3, PPM_PROTOCOL::STANDARD_1000);
+    PPMChannel _TVCServo4 = PPMChannel(TVC_SERVO_PIN_4, PPM_PROTOCOL::STANDARD_1000);
     //CW motor control.
-    PPMChannel motorCW = PPMChannel(MOTOR_PIN_CW, PPM_PROTOCOL::ONESHOT_125);
+    PPMChannel _motorCW = PPMChannel(MOTOR_PIN_CW, PPM_PROTOCOL::ONESHOT_125);
     //CCW motor control.
-    PPMChannel motorCCW = PPMChannel(MOTOR_PIN_CCW, PPM_PROTOCOL::ONESHOT_125);
+    PPMChannel _motorCCW = PPMChannel(MOTOR_PIN_CCW, PPM_PROTOCOL::ONESHOT_125);
     //Up Left flap servo.
-    PPMChannel flapUL = PPMChannel(FLAP_SERVO_PIN_UL, PPM_PROTOCOL::STANDARD_1000);
-    ServoDynamics flapULControl = ServoDynamics(&flapUL, 1/(90*DEGREES), 0, FLAP_MAX_VELOCITY, TOPFLAP_MAX_ACCEL);
+    PPMChannel _flapUL = PPMChannel(FLAP_SERVO_PIN_UL, PPM_PROTOCOL::STANDARD_1000);
+    ServoDynamics _flapULControl = ServoDynamics(&_flapUL, 1/(90*DEGREES), 0, FLAP_MAX_VELOCITY, TOPFLAP_MAX_ACCEL);
     //Up Right flap servo.
-    PPMChannel flapUR = PPMChannel(FLAP_SERVO_PIN_UR, PPM_PROTOCOL::STANDARD_1000);
-    ServoDynamics flapURControl = ServoDynamics(&flapUR, 1/(90*DEGREES), 0, FLAP_MAX_VELOCITY, TOPFLAP_MAX_ACCEL);
+    PPMChannel _flapUR = PPMChannel(FLAP_SERVO_PIN_UR, PPM_PROTOCOL::STANDARD_1000);
+    ServoDynamics _flapURControl = ServoDynamics(&_flapUR, 1/(90*DEGREES), 0, FLAP_MAX_VELOCITY, TOPFLAP_MAX_ACCEL);
     //Down Left flap servo.
-    PPMChannel flapDL = PPMChannel(FLAP_SERVO_PIN_DL, PPM_PROTOCOL::STANDARD_1000);
-    ServoDynamics flapDLControl = ServoDynamics(&flapDL, 1/(90*DEGREES), 0, FLAP_MAX_VELOCITY, BOTTOMFLAP_MAX_ACCEL);
+    PPMChannel _flapDL = PPMChannel(FLAP_SERVO_PIN_DL, PPM_PROTOCOL::STANDARD_1000);
+    ServoDynamics _flapDLControl = ServoDynamics(&_flapDL, 1/(90*DEGREES), 0, FLAP_MAX_VELOCITY, BOTTOMFLAP_MAX_ACCEL);
     //Down Right flap servo.
-    PPMChannel flapDR = PPMChannel(FLAP_SERVO_PIN_DR, PPM_PROTOCOL::STANDARD_1000);
-    ServoDynamics flapDRControl = ServoDynamics(&flapDR, 1/(90*DEGREES), 0, FLAP_MAX_VELOCITY, BOTTOMFLAP_MAX_ACCEL);
+    PPMChannel _flapDR = PPMChannel(FLAP_SERVO_PIN_DR, PPM_PROTOCOL::STANDARD_1000);
+    ServoDynamics _flapDRControl = ServoDynamics(&_flapDR, 1/(90*DEGREES), 0, FLAP_MAX_VELOCITY, BOTTOMFLAP_MAX_ACCEL);
 
     IntervalControl _interval = IntervalControl(1000);
     

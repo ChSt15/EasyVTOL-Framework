@@ -92,7 +92,6 @@ public:
         float outputValue = (_currentPosition + _positionOffset)*_positionScaler;
 
         _channel->setChannel(outputValue);
-        _channel->deviceThread();
 
     }
 

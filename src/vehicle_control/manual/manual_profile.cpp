@@ -18,16 +18,16 @@ void ManualControlProfile::thread() {
 
             if (*_vehicleMode == VEHICLE_MODE::MODE_FAILSAFE) {
                 if (_channelData.channelData[IBUS_CHANNEL_SWD] > 0.95f) {
-                    *_vehicleMode == VEHICLE_MODE::MODE_DISARM; 
+                    *_vehicleMode = VEHICLE_MODE::MODE_DISARM; 
                 }
             } else if (*_vehicleMode == VEHICLE_MODE::MODE_DISARM) {
                 if (_channelData.channelData[IBUS_CHANNEL_THROTTLE] < -0.95f && _channelData.channelData[IBUS_CHANNEL_SWD] < -0.95f && _vehicle->vehicleReady()) {
-                    *_vehicleMode == VEHICLE_MODE::MODE_ARM; 
+                    *_vehicleMode = VEHICLE_MODE::MODE_ARM; 
                 }
             } else if (*_vehicleMode == VEHICLE_MODE::MODE_ARM) {
 
                 if (_channelData.channelData[IBUS_CHANNEL_SWD] > 0.95f) {
-                    *_vehicleMode == VEHICLE_MODE::MODE_DISARM; 
+                    *_vehicleMode = VEHICLE_MODE::MODE_DISARM; 
                 }
                 
                 Vector angularRate;

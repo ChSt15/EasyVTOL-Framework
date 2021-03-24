@@ -18,13 +18,17 @@ void NavigationComplementary::thread() {
         uint32_t timestamp;
         IMU::getGyro(&rotationVector, &timestamp);
 
+        //Calulate time delta
+        float dt = float(timestamp - _lastGyroTimestamp)/1000000.0f;
+        _lastGyroTimestamp = timestamp;
+
+        //Calulate derivitive of gyro for angular acceleration
+        _navigationData.angularAcceleration = (rotationVector - _lastGyroValue)/dt;
+
         //Check if gyro initialised
         if (_gyroInitialized) {
 
             //Predict system state
-            float dt = float(timestamp - _lastGyroTimestamp)/1000000.0f;
-            _lastGyroTimestamp = timestamp;
-
             if (!rotationVector.isZeroVector()) {
 
                 Quaternion rotationQuat = Quaternion(rotationVector, rotationVector.magnitude()*dt);
@@ -40,7 +44,6 @@ void NavigationComplementary::thread() {
 
             //Gyro filter initialisation
             _gyroInitialized = true;
-            _lastGyroTimestamp = timestamp;
 
         }
 

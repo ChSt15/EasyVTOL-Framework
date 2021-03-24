@@ -19,6 +19,7 @@ void setup() {
 
     Serial.begin(115200);
 
+    KraftKontrol::controlProfile = &manualControl;
     KraftKontrol::kraft = &starship;
     KraftKontrol::controlProfile = &manualControl;
     //starship.getDynamicsPointer()->startActuatorTesting();

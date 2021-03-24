@@ -2,13 +2,11 @@
 
 
 
-PPMChannel::PPMChannel(int16_t pin , uint32_t maxTimeUS, uint32_t minTimeUS) {
+PPMChannel::PPMChannel(int16_t pin, const PPM_PROTOCOL &protocol) {
     _pin = pin;
-    setTiming_Micros(maxTimeUS, minTimeUS);
+    setProtocol(protocol);
     pinMode(_pin, OUTPUT);
     digitalWrite(_pin, LOW);
-
-    _servoStatus = DeviceStatus::DEVICE_RUNNING;
 }
 
 
@@ -18,31 +16,13 @@ PPMChannel::~PPMChannel() {
 
 
 /**
-    * deviceThread is currently not used
-    *
-    * @param values none
-    * @return none.
-*/
-void PPMChannel::deviceThread() {}
-
-
-/**
-    * Gives the current status of the PPMChannel
-    *
-    * @param values none
-    * @return DeviceStatus.
-*/
-DeviceStatus PPMChannel::getDeviceStatus() {return _servoStatus;}
-
-
-/**
     * Sets the channels value between 0% and 100%
     * Returns if the set was a success (Fail if pin was not set)
     *
     * @param values float percent
     * @return bool.
 */
-bool PPMChannel::setChannel(float percent) {
+bool PPMChannel::setChannel(const float &percent) {
 
     if (_pin == -1) return false;
     
@@ -67,50 +47,64 @@ float PPMChannel::getChannel() {return _percent;}
 
 
 /**
-    * Sets the PPMProtocol Max on time of signal
-    * and then changes the frequency accordingly.
-    * Returns if this was a success (Fail if pin not set)
+    * Sets the given parameters to the min max of the timing.
     *
-    * @param values uint32_t maxTimeUS in microseconds
-    * @return bool.
+    * @param values min, max, protocol
+    * @return none.
 */
-bool PPMChannel::setTiming_Micros(uint32_t maxTimeUS, uint32_t minTimeUS) {
+void PPMChannel::_getProtocolTiming(uint32_t &min, uint32_t max, const PPM_PROTOCOL &protocol) {
+    
+    switch (protocol) {
+    case PPM_PROTOCOL::STANDARD_1000 :
+        min = 1000;
+        max = 2000;
+        break;
 
-    if (_pin == -1) return false; //Make sure pin has been selected
+    case PPM_PROTOCOL::ONESHOT_125 :
+        min = 125;
+        max = 250;
+        break;
 
-    if (maxTimeUS <= minTimeUS) return false; //Return false as error if invalid timing is given
+    case PPM_PROTOCOL::ONESHOT_42 :
+        min = 42;
+        max = 82;
+        break;
 
-    _highMinUS = minTimeUS;
-    _highMaxUS = maxTimeUS;
+    case PPM_PROTOCOL::MULTISHOT :
+        min = 5;
+        max = 25;
+        break;
+    
+    default: //Default will set timing to standard 1500us
+        min = 1000;
+        max = 2000;
+        break;
+    }
 
-    _deltaHighUS = _highMaxUS - _highMinUS; 
+}
 
+
+/**
+    * Sets the PPMProtocol timing according to the 
+    * given protocol.
+    *
+    * @param values protocol
+    * @return none.
+*/
+void PPMChannel::setProtocol(const PPM_PROTOCOL &protocol) {
+
+    if (_pin == -1) return; //Make sure a pin has been selected
+
+    _getProtocolTiming(_highMinUS, _highMaxUS, protocol); //Get the timing from protocol type
+
+    _highMaxUS = max(_highMaxUS, _highMinUS); //Limit max to min
     uint32_t frequencyHZ = 1000000/(_highMaxUS*1.25f);
     _periodUS = 1000000/frequencyHZ;
     _deltaHighUS = _highMaxUS - _highMinUS;
 
     analogWriteFrequency(_pin, frequencyHZ); //Update frequency
 
-    return true;
 }
-
-
-/**
-    * Returns protocol Max High Time
-    *
-    * @param values none.
-    * @return uint32_t time in microseconds.
-*/
-uint32_t PPMChannel::getHighTimeMaxMicros() {return _highMaxUS;}
-
-
-/**
-    * Returns protocol Min High Time
-    *
-    * @param values none.
-    * @return uint32_t time in microseconds.
-*/
-uint32_t PPMChannel::getHighTimeMinMicros() {return _highMinUS;}
 
 
 /**

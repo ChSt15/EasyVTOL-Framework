@@ -11,51 +11,48 @@
 
 
 
-#define MAX_NUM_CHANNELS 20
+/**
+ * Used to transfer protocol information.
+ * 
+ * To add a new protocol add the name to to this and add the protocol 
+ * timings to the switch statement in _setProtocolTiming() function.
+ */
+enum PPM_PROTOCOL {
+    STANDARD_1000,
+    ONESHOT_125,
+    ONESHOT_42,
+    MULTISHOT
+};
 
 
-#define STANDARD_LOW 1000
-#define STANDARD_HIGH 2000
-
-#define ONESHOT125_LOW 125
-#define ONESHOT125_HIGH 250
-
-#define ONESHOT42_LOW 42
-#define ONESHOT42_HIGH 82
-
-#define MULTISHOT_LOW 5
-#define MULTISHOT_HIGH 25
-
-
-
+/**
+ * Class used to create PPM channels on pins to control 
+ * Servos and ESCs.
+ * Due to this using PWM modules, if the CPU were to lock-up 
+ * then the PWM signal may continue to run the ESC/Servo at 
+ * the last given command. Meaning Motors may not turn off!
+ */
 class PPMChannel {
 public:
 
-    PPMChannel(int16_t pin , uint32_t maxTimeUS = 2000, uint32_t minTimeUS = 1000);
+    PPMChannel(int16_t pin, const PPM_PROTOCOL &protocol);
     ~PPMChannel();
 
-    void deviceThread();
-
-    DeviceStatus getDeviceStatus();
-
-    bool setChannel(float percent);
+    bool setChannel(const float &percent);
     float getChannel();
 
-    bool setTiming_Micros(uint32_t maxTimeUS, uint32_t minTimeUS);
+    void setProtocol(const PPM_PROTOCOL &protocol);
 
-    uint32_t getHighTimeMaxMicros();
-    uint32_t getHighTimeMinMicros();
-
-    //bool startSending();      needs implementing. Should Start the pwm output. Other functions must be changes too.
-    //void stopSending();       needs implementing. Should stop the pwm output. Other functions must be changes too.
+    //bool startSending();      needs implementing. Should Start the pwm output. Other functions must be changed too.
+    //void stopSending();       needs implementing. Should stop the pwm output. Other functions must be changed too.
 
     bool setPin(int16_t pin);
 
 private:
 
-    int16_t _pin = -1;  
+    void _getProtocolTiming(uint32_t &min, uint32_t max, const PPM_PROTOCOL &protocol);
 
-    DeviceStatus _servoStatus = DeviceStatus::DEVICE_NOT_STARTED;
+    int16_t _pin = -1;  
 
     float _percent = 0.5f;
 

@@ -13,7 +13,7 @@
 
 #include "modules/navigation_modules/navigation_complementary.h"
 #include "modules/guidance_modules/guidance_flybywire.h"
-#include "modules/control_modules/linear_pid_controller.h"
+#include "modules/control_modules/simple_pid_controller.h"
 
 #include "starship_dynamics.h"
 
@@ -74,7 +74,7 @@ private:
     StarshipDynamics _starshipDynamics;
 
     //Default module to use at start
-    LinearPIDController _linearPIDControl;
+    SimplePIDController _linearPIDControl;
 
 
 };

@@ -38,6 +38,7 @@ MPU9250::MPU9250(SPIClass &bus,uint8_t csPin){
 
 /* starts communication with the MPU-9250 */
 int MPU9250::begin(){
+  bool skipMag = false;
   if( _useSPI ) { // using SPI for communication
     // use low speed SPI for register setting
     _useSPIHS = false;
@@ -120,41 +121,43 @@ int MPU9250::begin(){
 	}
 	// check AK8963 WHO AM I register, expected value is 0x48 (decimal 72)
 	if( whoAmIAK8963() != 72 ){
-    return -14;
+      return -14;//skipMag = true;
 	}
   /* get the magnetometer calibration */
   // set AK8963 to Power Down
-  if(writeAK8963Register(AK8963_CNTL1,AK8963_PWR_DOWN) < 0){
-    return -15;
+  if (true) {
+    if(writeAK8963Register(AK8963_CNTL1,AK8963_PWR_DOWN) < 0){
+        return -15;
+    }
+    delay(100); // long wait between AK8963 mode changes
+    // set AK8963 to FUSE ROM access
+    if(writeAK8963Register(AK8963_CNTL1,AK8963_FUSE_ROM) < 0){
+        return -16;
+    }
+    delay(100); // long wait between AK8963 mode changes
+    // read the AK8963 ASA registers and compute magnetometer scale factors
+    readAK8963Registers(AK8963_ASA,3,_buffer);
+    _magScaleX = ((((float)_buffer[0]) - 128.0f)/(256.0f) + 1.0f) * 4912.0f / 32760.0f; // micro Tesla
+    _magScaleY = ((((float)_buffer[1]) - 128.0f)/(256.0f) + 1.0f) * 4912.0f / 32760.0f; // micro Tesla
+    _magScaleZ = ((((float)_buffer[2]) - 128.0f)/(256.0f) + 1.0f) * 4912.0f / 32760.0f; // micro Tesla 
+    // set AK8963 to Power Down
+    if(writeAK8963Register(AK8963_CNTL1,AK8963_PWR_DOWN) < 0){
+        return -17;
+    }
+    delay(100); // long wait between AK8963 mode changes  
+    // set AK8963 to 16 bit resolution, 100 Hz update rate
+    if(writeAK8963Register(AK8963_CNTL1,AK8963_CNT_MEAS2) < 0){
+        return -18;
+    }
+    delay(100); // long wait between AK8963 mode changes
+    // select clock source to gyro
+    if(writeRegister(PWR_MGMNT_1,CLOCK_SEL_PLL) < 0){
+        return -19;
+    }       
+    // instruct the MPU9250 to get 7 bytes of data from the AK8963 at the sample rate
+    readAK8963Registers(AK8963_HXL,7,_buffer);
+    // successful init, return 1
   }
-  delay(100); // long wait between AK8963 mode changes
-  // set AK8963 to FUSE ROM access
-  if(writeAK8963Register(AK8963_CNTL1,AK8963_FUSE_ROM) < 0){
-    return -16;
-  }
-  delay(100); // long wait between AK8963 mode changes
-  // read the AK8963 ASA registers and compute magnetometer scale factors
-  readAK8963Registers(AK8963_ASA,3,_buffer);
-  _magScaleX = ((((float)_buffer[0]) - 128.0f)/(256.0f) + 1.0f) * 4912.0f / 32760.0f; // micro Tesla
-  _magScaleY = ((((float)_buffer[1]) - 128.0f)/(256.0f) + 1.0f) * 4912.0f / 32760.0f; // micro Tesla
-  _magScaleZ = ((((float)_buffer[2]) - 128.0f)/(256.0f) + 1.0f) * 4912.0f / 32760.0f; // micro Tesla 
-  // set AK8963 to Power Down
-  if(writeAK8963Register(AK8963_CNTL1,AK8963_PWR_DOWN) < 0){
-    return -17;
-  }
-  delay(100); // long wait between AK8963 mode changes  
-  // set AK8963 to 16 bit resolution, 100 Hz update rate
-  if(writeAK8963Register(AK8963_CNTL1,AK8963_CNT_MEAS2) < 0){
-    return -18;
-  }
-  delay(100); // long wait between AK8963 mode changes
-  // select clock source to gyro
-  if(writeRegister(PWR_MGMNT_1,CLOCK_SEL_PLL) < 0){
-    return -19;
-  }       
-  // instruct the MPU9250 to get 7 bytes of data from the AK8963 at the sample rate
-  readAK8963Registers(AK8963_HXL,7,_buffer);
-  // successful init, return 1
   return 1;
 }
 

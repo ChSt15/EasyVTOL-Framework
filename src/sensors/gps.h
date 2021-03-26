@@ -18,7 +18,7 @@
 
 #define SENSOR_MEASUREMENT_TIMEOUT_US 20000
 
-#define GPS_SERIAL_PORT Serial2
+#define GPS_SERIAL_PORT Serial5
 
 
 

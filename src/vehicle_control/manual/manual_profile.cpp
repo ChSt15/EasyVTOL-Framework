@@ -4,6 +4,8 @@
 
 void ManualControlProfile::thread() {
 
+    return; //just for vehicle testing
+
     if (_vehicle == nullptr) return; //Leave if no vehicle given.
 
     _vehicle->setGuidancePointer(&_guidanceFBW); //Set the vehicles guidance to manual one.

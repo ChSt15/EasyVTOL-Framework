@@ -23,7 +23,7 @@
 
 
 
-#define WAIT_FOR_SERIAL //Tells system to wait for a signal from the usb serial port before continueing
+//#define WAIT_FOR_SERIAL //Tells system to wait for a signal from the usb serial port before continueing
 
 
 

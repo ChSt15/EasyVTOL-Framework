@@ -26,12 +26,11 @@ public:
      * @param values servoChannel, maxSpeed_radPerSec and maxAccel_radPerSecPerSec
      * @return none.
      */
-    ServoDynamics(PPMChannel* servoChannel, const float &positionScaler, const float &positionOffset, const float &maxSpeed_radPerSec, const float &maxAccel_radPerSecPerSec) {
+    ServoDynamics(PPMChannel* servoChannel, const float &positionOffset, const float &maxSpeed_radPerSec, const float &maxAccel_radPerSecPerSec) {
         _channel = servoChannel;
         _maxSpeed = maxSpeed_radPerSec;
         _maxAccel = maxAccel_radPerSecPerSec;
         _positionOffset = positionOffset;
-        _positionScaler = positionScaler;
     }
 
     /**
@@ -48,12 +47,11 @@ public:
      * @param values servoChannel, maxSpeed_radPerSec and maxAccel_radPerSecPerSec
      * @return none.
      */
-    ServoDynamics(PPMChannel* servoChannel, const float &positionScaler, const float &positionOffset, const float &maxSpeed_radPerSec, const float &maxAccel_radPerSecPerSec, float maxPosition, float minPosition) {
+    ServoDynamics(PPMChannel* servoChannel, const float &positionOffset, const float &maxSpeed_radPerSec, const float &maxAccel_radPerSecPerSec, float maxPosition, float minPosition) {
         _channel = servoChannel;
         _maxSpeed = maxSpeed_radPerSec;
         _maxAccel = maxAccel_radPerSecPerSec;
         _positionOffset = positionOffset;
-        _positionScaler = positionScaler;
         _maxPosition = maxPosition;
         _minPosition = minPosition;
     }
@@ -88,10 +86,7 @@ public:
         _currentPosition += _currentSpeed*dTime;
         _currentPosition = constrain(_currentPosition, _minPosition, _maxPosition);
 
-        
-        float outputValue = (_currentPosition + _positionOffset)*_positionScaler;
-
-        _channel->setChannel(outputValue);
+        _channel->setAngle(_currentPosition + _positionOffset, false);
 
     }
 
@@ -137,8 +132,7 @@ private:
     float _maxPosition = 3.1416;
     float _minPosition = -3.1416;
 
-    float _positionScaler = 1.0f;
-    float _positionOffset = 1.0f;
+    float _positionOffset = 0.0f;
 
     float _currentPosition = 0;
     float _currentSpeed = 0;

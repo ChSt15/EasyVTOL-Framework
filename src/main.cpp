@@ -22,7 +22,7 @@ void setup() {
     KraftKontrol::controlProfile = &manualControl;
     KraftKontrol::kraft = &starship;
     KraftKontrol::controlProfile = &manualControl;
-    //starship.getDynamicsPointer()->startActuatorTesting();
+    KraftKontrol::kraft->getDynamicsPointer()->setActuatorTesting();
 
     KraftKontrol::initialise();
 
@@ -32,6 +32,6 @@ void loop() {
 
     KraftKontrol::loop();
 
-    threadSystemMonitor(); //Monitors data and sends it to usb serial port
+    systemMonitor(); //Monitors data and sends it to usb serial port
 
 }

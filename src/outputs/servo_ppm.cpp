@@ -2,37 +2,95 @@
 
 
 
-PPMChannel::PPMChannel(int16_t pin, const PPM_PROTOCOL &protocol) {
+PPMChannel::PPMChannel(int16_t pin, const PPM_PROTOCOL &protocol, float offset, float scaler) {
     _pin = pin;
+    _offset = offset;
+    _scaler = scaler;
     setProtocol(protocol);
     pinMode(_pin, OUTPUT);
-    digitalWrite(_pin, LOW);
+    analogWriteResolution(_resolution);
+    setChannel(-1);
 }
 
 
 PPMChannel::~PPMChannel() {
 
+    if (_pin == -1) return;
+    analogWrite(_pin, 0);
+    digitalWrite(_pin, LOW);
+
 }
 
 
 /**
-    * Sets the channels value between 0% and 100%
+    * Sets the channels value between -100% and 100%
     * Returns if the set was a success (Fail if pin was not set)
     *
     * @param values float percent
     * @return bool.
 */
-bool PPMChannel::setChannel(const float &percent) {
+bool PPMChannel::setChannel(const float &percent, const bool &limit) {
 
     if (_pin == -1) return false;
     
-    _percent = constrain(percent, 0.0f, 1.0f); 
+    _percent = percent*_scaler + _offset; //apply offsets and scalers
+    _percent = (_percent+1)/2; //Remap to 0-1 
+    if (limit) _percent = constrain(_percent, 0.0f, 1.0f); //constrain
 
     float dutyCycle = ((float)_highMinUS + _percent*_deltaHighUS)/_periodUS;
 
-    analogWrite(_pin, dutyCycle*bits);
+    dutyCycle = constrain(dutyCycle, 0.0f, 1.0f);
+
+    if (_active) analogWrite(_pin, dutyCycle*_maxValue);
+    else {
+        analogWrite(_pin, 0);
+        digitalWrite(_pin, LOW);
+    }
 
     return true;
+
+}
+
+
+/**
+    * Sets the servo to a certain angle
+    *
+    * @param values angle, offset and scaler
+    * @return bool.
+*/
+bool PPMChannel::setAngle(const float &angle, const bool &limit) {
+
+    float output = angle/(45.0f*DEGREES);
+
+    return setChannel(output, limit);
+
+}
+
+
+/**
+    * Turns channel off or on.
+    *
+    * @param values angle, offset and scaler
+    * @return bool.
+*/
+void PPMChannel::activateChannel(const bool &activate) {
+
+    _active = activate;
+    setChannel(_percent);
+
+}
+
+
+/**
+    * Returns if channel is active
+    *
+    * @param values angle, offset and scaler
+    * @return bool.
+*/
+bool PPMChannel::getActive() {
+
+    return _active;
+
 }
 
 
@@ -124,8 +182,8 @@ bool PPMChannel::setPin(int16_t pin) {
     _pin = pin; //change pins
 
     pinMode(_pin, OUTPUT); //add new pin to channel
-    digitalWrite(_pin, LOW);
 
+    analogWriteResolution(_resolution);
     analogWriteFrequency(_pin, 1000000/_periodUS);
     
     setChannel(_percent); //Update channel

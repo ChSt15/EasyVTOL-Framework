@@ -35,16 +35,18 @@ enum PPM_PROTOCOL {
 class PPMChannel {
 public:
 
-    PPMChannel(int16_t pin, const PPM_PROTOCOL &protocol);
+    PPMChannel(int16_t pin, const PPM_PROTOCOL &protocol, float offset = 0, float scaler = 1);
     ~PPMChannel();
 
-    bool setChannel(const float &percent);
+    bool setAngle(const float &angle, const bool &limit = true);
+
+    bool setChannel(const float &percent, const bool &limit = true);
     float getChannel();
 
-    void setProtocol(const PPM_PROTOCOL &protocol);
+    void activateChannel(const bool &activate = true);
+    bool getActive();
 
-    //bool startSending();      needs implementing. Should Start the pwm output. Other functions must be changed too.
-    //void stopSending();       needs implementing. Should stop the pwm output. Other functions must be changed too.
+    void setProtocol(const PPM_PROTOCOL &protocol);
 
     bool setPin(int16_t pin);
 
@@ -54,6 +56,11 @@ private:
 
     int16_t _pin = -1;  
 
+    bool _active = false;
+
+    float _offset = 0;
+    float _scaler = 1;
+
     float _percent = 0.5f;
 
     uint32_t _highMaxUS = 2000;
@@ -62,8 +69,8 @@ private:
     float _deltaHighUS = _highMaxUS - _highMinUS;
     float _periodUS = _highMaxUS*1.25f;
 
-    static const byte resolution = 12;                      //static const because these should not change
-    static const uint32_t bits = (uint32_t)1<<resolution;
+    static const byte _resolution = 12;                      //static const because these should not change
+    static const uint32_t _maxValue = (uint32_t)1<<_resolution;
     
 };
 

@@ -22,6 +22,8 @@ namespace RGBLED {
 
     void deviceThread();
 
+    void setHSV(CHSV hsv);
+
     uint32_t getRate();
 
     DeviceStatus getDeviceStatus();

@@ -18,6 +18,8 @@ namespace RGBLED {
 
     byte hue = 0;
 
+    CHSV setting = CHSV(70, 255, 255);
+
 }
 
 
@@ -30,7 +32,7 @@ void RGBLED::deviceThread() {
 
     if (ledStatus == DeviceStatus::DEVICE_RUNNING) {
 
-        led = CHSV(hue++, 255, 255);
+        led = setting;
         FastLED.show();
 
     } else if (ledStatus == DeviceStatus::DEVICE_NOT_STARTED || ledStatus == DeviceStatus::DEVICE_RESTARTATTEMPT) {
@@ -57,6 +59,11 @@ void RGBLED::deviceThread() {
         loopCounter = 0;
     }
 
+}
+
+
+void RGBLED::setHSV(CHSV hsv) {
+    setting = hsv;
 }
 
 

@@ -1,5 +1,5 @@
-#ifndef STARSHIP_OUTPUT_PINS_H
-#define STARSHIP_OUTPUT_PINS_H
+#ifndef STARSHIP_PROPERTIES_H
+#define STARSHIP_PROPERTIES_H
 
 
 /**
@@ -19,8 +19,8 @@
 #define FLAP_SERVO_PIN_DL 29
 #define FLAP_SERVO_PIN_DR 28
 
-#define MOTOR_PIN_CW 7
-#define MOTOR_PIN_CCW 8
+#define MOTOR_PIN_CW 8
+#define MOTOR_PIN_CCW 7
 
 
 

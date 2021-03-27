@@ -75,6 +75,8 @@ bool PPMChannel::setAngle(const float &angle, const bool &limit) {
 */
 void PPMChannel::activateChannel(const bool &activate) {
 
+    if (activate == _active) return;
+
     _active = activate;
     setChannel(_percent);
 

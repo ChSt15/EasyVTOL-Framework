@@ -10,15 +10,19 @@ void StarshipDynamics::thread() {
     static uint32_t lastswitch = 0;
     static float angle = 0;
 
-
+    
 
     if (!_actuatorManualMode && !_actuatorTesting) {   
 
-        Vector direction = Quaternion(Vector(0,0,1), (float)millis()/1000).rotateVector(Vector(1,0,1));
+        float force = 0;
+        Vector direction = Vector(0,0,1);
+
+        _TVCCalculator.dynamicsSetpoint(*_dynamicSetpoint);
+        _TVCCalculator.getTVCSettings(force, direction);
 
         //calculate TVC angles
         float TVC1, TVC2, TVC3, TVC4;
-        float twist = 0;
+        float twist = constrain(_dynamicSetpoint->torqe.z, -45*DEGREES, 45*DEGREES);
         _getTVCAngles(direction, twist, TVC1, TVC2, TVC3, TVC4);
 
         _TVCServo1.setAngle(TVC1);
@@ -26,13 +30,13 @@ void StarshipDynamics::thread() {
         _TVCServo3.setAngle(TVC3);
         _TVCServo4.setAngle(TVC4);
 
-        _flapULControl.setPosition(90*DEGREES);
-        _flapURControl.setPosition(90*DEGREES);
-        _flapDRControl.setPosition(90*DEGREES);
-        _flapDLControl.setPosition(90*DEGREES);
+        _flapULControl.setPosition(0*DEGREES);
+        _flapURControl.setPosition(0*DEGREES);
+        _flapDRControl.setPosition(0*DEGREES);
+        _flapDLControl.setPosition(0*DEGREES);
 
-        _motorCW.setChannel(0);
-        _motorCCW.setChannel(0);
+        _motorCW.setChannel(force/MAX_TVC_FORCE);
+        _motorCCW.setChannel(force/MAX_TVC_FORCE);
 
     } else if (_actuatorManualMode && !_actuatorTesting) {
 
@@ -49,35 +53,82 @@ void StarshipDynamics::thread() {
 
     } else if (_actuatorTesting && !_actuatorManualMode) { //Actuator testing mode
 
-        if (millis() - lastswitch >= 5000) {
+        if (millis() - lastswitch >= 1000) {
             lastswitch = millis();
 
             if (angle == 90.0f*DEGREES) {
                 angle = 0.0f*DEGREES;
             } else {
                 angle = 90.0f*DEGREES;
+                _flapTestCounter++;
             }
 
         }
 
-        //angle = 0;//(sin((float)millis()/3000)/2 + 0.5)*90*DEGREES;
+        switch (_flapTestStage) {
 
-        _flapULControl.setPosition(angle);
-        _flapURControl.setPosition(angle);
-        _flapDRControl.setPosition(angle);
-        _flapDLControl.setPosition(angle);
+        case FLAP_TEST_STAGE::TOP_LEFT:
+            _flapULControl.setPosition(angle);
+            _flapURControl.setPosition(0);
+            _flapDRControl.setPosition(0);
+            _flapDLControl.setPosition(0);
+            if (_flapTestCounter > 1) {
+                _flapTestCounter = 0;
+                _flapTestStage = FLAP_TEST_STAGE::TOP_RIGHT;
+            }
+            break;
+
+        case FLAP_TEST_STAGE::TOP_RIGHT:
+            _flapULControl.setPosition(0);
+            _flapURControl.setPosition(angle);
+            _flapDRControl.setPosition(0);
+            _flapDLControl.setPosition(0);
+            if (_flapTestCounter > 2) {
+                _flapTestCounter = 0;
+                _flapTestStage = FLAP_TEST_STAGE::BOTTOM_LEFT;
+            }
+            break;
+
+        case FLAP_TEST_STAGE::BOTTOM_LEFT:
+            _flapULControl.setPosition(0);
+            _flapURControl.setPosition(0);
+            _flapDRControl.setPosition(0);
+            _flapDLControl.setPosition(angle);
+            if (_flapTestCounter > 3) {
+                _flapTestCounter = 0;
+                _flapTestStage = FLAP_TEST_STAGE::BOTTOM_RIGHT;
+            }
+            break;
+
+        case FLAP_TEST_STAGE::BOTTOM_RIGHT:
+            _flapULControl.setPosition(0);
+            _flapURControl.setPosition(0);
+            _flapDRControl.setPosition(angle);
+            _flapDLControl.setPosition(0);
+            if (_flapTestCounter > 4) {
+                _flapTestCounter = 0;
+                _flapTestStage = FLAP_TEST_STAGE::TOP_LEFT;
+            }
+            break;
+        
+        default:
+            break;
+        }
 
         Vector direction = Quaternion(Vector(0,0,1), float(millis())/1000.0f).rotateVector(Vector(1,0,1));//_navigationData->attitude.copy().conjugate().rotateVector(Vector(0,0,1));
 
         //calculate TVC angles
         float TVC1, TVC2, TVC3, TVC4;
-        float twist = 0;//45*DEGREES*sin((float)millis()/300);
+        float twist = 45*DEGREES*sin((float)millis()/300);
         _getTVCAngles(direction, twist, TVC1, TVC2, TVC3, TVC4);
 
         _TVCServo1.setAngle(TVC1);
         _TVCServo2.setAngle(TVC2);
         _TVCServo3.setAngle(TVC3);
         _TVCServo4.setAngle(TVC4);
+
+        _motorCW.setChannel(0);
+        _motorCCW.setChannel(0);
         
     }
 
@@ -85,10 +136,6 @@ void StarshipDynamics::thread() {
     _flapULControl.thread();
     _flapDRControl.thread();
     _flapURControl.thread();
-
-    _motorCW.setChannel(0);
-    _motorCCW.setChannel(0);
-
 
 }
 
@@ -110,9 +157,26 @@ void StarshipDynamics::_getTVCAngles(const Vector &direction, const float &twist
 
 void StarshipDynamics::init() {
 
-    _flapDLControl.setPosition(0);
-    _flapULControl.setPosition(0);
-    _flapDRControl.setPosition(0);
-    _flapURControl.setPosition(0);
+    _flapDLControl.setPosition(90*DEGREES);
+    _flapULControl.setPosition(90*DEGREES);
+    _flapDRControl.setPosition(90*DEGREES);
+    _flapURControl.setPosition(90*DEGREES);
+
+    _TVCServo1.activateChannel();
+    _TVCServo2.activateChannel();
+    _TVCServo3.activateChannel();
+    _TVCServo4.activateChannel();
+    _flapDL.activateChannel();
+    _flapUL.activateChannel();
+    _flapDR.activateChannel();
+    _flapUR.activateChannel();
+
+    _motorCW.activateChannel();
+    _motorCCW.activateChannel();
+
+    _motorCW.setChannel(0);
+    _motorCCW.setChannel(0);
+
+    _TVCCalculator.setDynamicConstraints(MAX_TVC_FORCE, MAX_TVC_ANGLE);
 
 }

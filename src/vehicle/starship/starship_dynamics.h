@@ -12,6 +12,7 @@
 #include "definitions.h"
 
 #include "starship_properties.h"
+#include "starship_data.h"
 
 #include "outputs/rgb_led.h"
 
@@ -32,6 +33,10 @@
 #define FLAP_MAX_VELOCITY 5
 #define TOPFLAP_MAX_ACCEL 30
 #define BOTTOMFLAP_MAX_ACCEL 30
+
+//TVC constraints
+#define MAX_TVC_ANGLE 10*DEGREES
+#define MAX_TVC_FORCE 14 //In newtons
 
 //Actuator mapping for manual control
 #define STARSHIP_ACTUATOR_FLAPUL 0
@@ -65,6 +70,16 @@ public:
      * @return none.
      */
     void init();
+
+    /**
+     * Tells starship which actuators to use 
+     *
+     * @param values STARSHIP_MODE.
+     * @return none.
+     */
+    void setActuatorMode(STARSHIP_MODE starshipMode) {
+        _starshipMode = starshipMode;
+    }
     
 
 private:
@@ -107,6 +122,12 @@ private:
 
     FLAP_TEST_STAGE _flapTestStage = FLAP_TEST_STAGE::TOP_LEFT;
     uint8_t _flapTestCounter = 0;
+
+    //Tells system which actuators to use
+    STARSHIP_MODE _starshipMode = STARSHIP_MODE::TVC_CONTROL;
+
+    //Helps with calculating TVC stuff
+    TVCDynamics _TVCCalculator = TVCDynamics(Vector(0,0,-0.4), Vector(0,0,-1));
 
 
     void _getTVCAngles(const Vector &direction, const float &twist, float &tvc1, float &tvc2, float &tvc3, float &tvc4);

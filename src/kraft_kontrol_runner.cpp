@@ -1,8 +1,8 @@
-#include "kraft_kontrol.h"
+#include "kraft_kontrol_runner.h"
 
 
 
-namespace KraftKontrol {
+namespace KraftKontrolRunner {
 
     Vehicle* kraft = nullptr;
     ControlProfile* controlProfile = nullptr;
@@ -16,7 +16,7 @@ namespace KraftKontrol {
 
 
 
-void KraftKontrol::vehicleThread() {
+void KraftKontrolRunner::vehicleThread() {
 
     if (kraft != nullptr) kraft->thread(); //Make sure not to run a nullptr
 
@@ -24,7 +24,7 @@ void KraftKontrol::vehicleThread() {
 
 
 
-void KraftKontrol::vehicleControlThread() {
+void KraftKontrolRunner::vehicleControlThread() {
 
     if (controlProfile != nullptr) controlProfile->thread(); //Make sure not to run a nullptr
 
@@ -32,7 +32,7 @@ void KraftKontrol::vehicleControlThread() {
 
 
 
-void KraftKontrol::initialise() {
+void KraftKontrolRunner::initialise() {
 
 
     #ifdef WAIT_FOR_SERIAL
@@ -50,9 +50,6 @@ void KraftKontrol::initialise() {
     delay(500);
 
 
-    controlProfile->setVehiclePointer(kraft);
-
-
     systemScheduler.attachFunction(IMU::deviceThread, 32000, TASK_PRIORITY::PRIORITY_REALTIME);
     systemScheduler.attachFunction(AirData::deviceThread, 200, TASK_PRIORITY::PRIORITY_HIGH);
     systemScheduler.attachFunction(LORA_2_4::deviceThread, 500, TASK_PRIORITY::PRIORITY_MIDDLE);
@@ -68,7 +65,7 @@ void KraftKontrol::initialise() {
 
 
 
-void KraftKontrol::loop() {
+void KraftKontrolRunner::loop() {
 
     systemScheduler.tick();
 

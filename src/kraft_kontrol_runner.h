@@ -15,7 +15,7 @@
 #include "outputs/rgb_led.h"
 
 #include "vehicle/vehicle_template.h"
-#include "vehicle_control/control_profile_template.h"
+#include "flight_profiles/control_profile_template.h"
 
 #include "utils/interval_control.h"
 
@@ -27,7 +27,7 @@
 
 
 
-namespace KraftKontrol {
+namespace KraftKontrolRunner {
 
     //This is the vehicle that will be use by KraftKontrol. Set it to the reference of the to be controlled vehicle.
     extern Vehicle* kraft;

@@ -13,7 +13,7 @@
 
 #include "outputs/rgb_led.h"
 
-#include "kraft_kontrol.h"
+#include "kraft_kontrol_runner.h"
 
 #include "interval_control.h"
 
@@ -26,7 +26,7 @@ void systemMonitor() {
     if (!intervalControl.isTimeToRun()) return; //Only run every 100ms (10Hz)
     
 
-    Vehicle* vehicle = KraftKontrol::kraft;
+    Vehicle* vehicle = KraftKontrolRunner::kraft;
 
     KinematicData vehicleKinetics = vehicle->getNavigationData();
     KinematicData vehicleSetpoints = vehicle->getGuidanceData();

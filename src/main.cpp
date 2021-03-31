@@ -4,14 +4,14 @@
 
 #include "system_monitor.h"
 
-#include "kraft_kontrol.h"
+#include "kraft_kontrol_runner.h"
 
 #include "vehicle/starship/starship.h"
-#include "vehicle_control/manual/manual_profile.h"
+#include "flight_profiles/starship/starship_testing_profile.h"
 
 
 Starship starship;
-ManualControlProfile manualControl;
+StarshipTestingProfile testingProfile;
 
 
 ActuatorSetting actuator;
@@ -171,7 +171,7 @@ void musicControl() {
         break;
     }
 
-    KraftKontrol::kraft->getDynamicsPointer()->setActuatorsRawData(actuator);
+    KraftKontrolRunner::kraft->getDynamicsPointer()->setActuatorsRawData(actuator);
 
 }
 
@@ -181,13 +181,12 @@ void setup() {
 
     Serial.begin(115200);
 
-    KraftKontrol::controlProfile = &manualControl;
-    KraftKontrol::kraft = &starship;
-    KraftKontrol::controlProfile = &manualControl;
-    KraftKontrol::kraft->getDynamicsPointer()->setActuatorTesting();
-    //KraftKontrol::kraft->getDynamicsPointer()->setActuatorManualMode();
+    KraftKontrolRunner::controlProfile = &testingProfile;
+    KraftKontrolRunner::kraft = &starship;
 
-    KraftKontrol::initialise();
+    KraftKontrolRunner::initialise();
+
+    testingProfile.setVehiclePointer(&starship);
 
     //music.attachFunction(musicControl, 1000);
     //music.initialise();
@@ -196,7 +195,7 @@ void setup() {
 
 void loop() {
 
-    KraftKontrol::loop();
+    KraftKontrolRunner::loop();
 
     //music.tick();
 

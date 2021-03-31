@@ -3,7 +3,7 @@
 
 
 
-#include "vehicle_control/control_profile_template.h"
+#include "flight_profiles/control_profile_template.h"
 
 #include "modules/guidance_modules/guidance_flybywire.h"
 
@@ -25,6 +25,23 @@ public:
      * @return none.
      */
     void thread();
+    
+
+    /**
+     * Gives the vehicle control module the vehicle to control
+     *
+     * @param values vehiclePointer.
+     * @return none.
+     */
+    void setVehiclePointer(Vehicle* vehiclePointer) {_vehicle = vehiclePointer;}
+
+    /**
+     * Returns vehicle being used by the control module
+     *
+     * @param values none.
+     * @return vehiclePointer.
+     */
+    Vehicle* getVehiclePointer() {return _vehicle;}
 
 
 
@@ -40,6 +57,9 @@ private:
 
     //Guidance module given to vehicle to be used.
     GuidanceFlyByWire _guidanceFBW;
+
+    //Vehicle to be controlled
+    Vehicle* _vehicle;
 
     
 };

@@ -44,21 +44,25 @@ public:
      * Sets the control factor.
      * 
      * Limit is the value that if reached, the intergrator will stop integrating and also reduce for anti-windup
+     * 
+     * If passThrough is set to true then the output of this controller will be added to controller modules output. Otherwise its output will be added to the next controllers setpoint.
      *
      * @param values factor.
      * @return none.
      */
-    void setAngularVelocityPIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1) {_angVelPF = factorP; _angVelIF = factorI; _angVelDF = factorD; _angVelLimit = limit;}
+    void setAngularVelocityPIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1, const bool &passThrough = false) {_angVelPF = factorP; _angVelIF = factorI; _angVelDF = factorD; _angVelLimit = limit, _angVelPassThrough = passThrough;}
 
     /**
      * Sets the control factor.
      * 
      * Limit is the value that if reached, the intergrator will stop integrating and also reduce for anti-windup
+     * 
+     * If passThrough is set to true then the output of this controller will be added to controller modules output. Otherwise its output will be added to the next controllers setpoint.
      *
      * @param values factor.
      * @return none.
      */
-    void setAttitudePIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1) {_attitudePF = factorP; _attitudeIF = factorI; _attitudeDF = factorD; _attitudeLimit = limit;}
+    void setAttitudePIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1, const bool &passThrough = false) {_attitudePF = factorP; _attitudeIF = factorI; _attitudeDF = factorD; _attitudeLimit = limit, _attitudePassThrough = passThrough;}
 
     /**
      * Sets the control factor.
@@ -74,21 +78,25 @@ public:
      * Sets the control factor.
      * 
      * Limit is the value that if reached, the intergrator will stop integrating and also reduce for anti-windup
+     * 
+     * If passThrough is set to true then the output of this controller will be added to controller modules output. Otherwise its output will be added to the next controllers setpoint.
      *
      * @param values factor.
      * @return none.
      */
-    void setVelocityPIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1) {_velocityPF = factorP; _velocityIF = factorI; _velocityDF = factorD; _velocityLimit = limit;}
+    void setVelocityPIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1, const bool &passThrough = false) {_velocityPF = factorP; _velocityIF = factorI; _velocityDF = factorD; _velocityLimit = limit, _velocityPassThrough = passThrough;}
 
     /**
      * Sets the control factor.
      * 
      * Limit is the value that if reached, the intergrator will stop integrating and also reduce for anti-windup
+     * 
+     * If passThrough is set to true then the output of this controller will be added to controller modules output. Otherwise its output will be added to the next controllers setpoint.
      *
      * @param values factor.
      * @return none.
      */
-    void setPositionPIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1) {_positionPF = factorP; _positionIF = factorI; _positionDF = factorD; _positionLimit = limit;}
+    void setPositionPIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1, const bool &passThrough = false) {_positionPF = factorP; _positionIF = factorI; _positionDF = factorD; _positionLimit = limit, _positionPassThrough = passThrough;}
 
 
 private:
@@ -114,6 +122,8 @@ private:
     Vector _angVelLimit = 1;
     //I value for angular velocity
     Vector _angVelIValue = 0; 
+    //If true, then this controller will directly add its output to the controllers output
+    bool _angVelPassThrough = false; 
 
     //P factor for attitude 
     Vector _attitudePF = 0;
@@ -125,6 +135,8 @@ private:
     Vector _attitudeLimit = 1;
     //I value for attitude
     Vector _attitudeIValue = 0; 
+    //If true, then this controller will directly add its output to the controllers output
+    bool _attitudePassThrough = false; 
 
     //P factor for acceleration 
     Vector _accelPF = 0;
@@ -147,6 +159,8 @@ private:
     Vector _velocityLimit = 1;
     //I value for velocity
     Vector _velocityIValue = 0; 
+    //If true, then this controller will directly add its output to the controllers output
+    bool _velocityPassThrough = false; 
 
     //P factor for position 
     Vector _positionPF = 0;
@@ -158,6 +172,8 @@ private:
     Vector _positionLimit = 1;
     //I value for position
     Vector _positionIValue = 0; 
+    //If true, then this controller will directly add its output to the controllers output
+    bool _positionPassThrough = false; 
 
 
     

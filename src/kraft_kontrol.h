@@ -35,6 +35,9 @@ namespace KraftKontrol {
     //This is the control profile that will be use by KraftKontrol. Set it to the reference of the to be used control profile.
     extern ControlProfile* controlProfile;
 
+    //This is the scheduler used by kraftkontrol. Only make changes if you really know what you're doing
+    extern Scheduler systemScheduler;
+
     void initialise();
 
     void loop();

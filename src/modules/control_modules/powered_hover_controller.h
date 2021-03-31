@@ -11,7 +11,7 @@
 #include "modules/control_modules/control_template.h"
 
 
-class SimplePIDController: public Control {
+class HoverController: public Control {
 public:
 
     /**

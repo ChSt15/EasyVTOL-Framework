@@ -35,7 +35,7 @@ public:
      * @return bool.
      */
     bool toPoint(const KinematicData &endPoint) {
-
+        return false;
     }
 
     /**

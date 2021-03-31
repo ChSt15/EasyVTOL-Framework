@@ -1,9 +1,9 @@
-#include "simple_pid_controller.h"
+#include "powered_hover_controller.h"
 
 
 
 
-void SimplePIDController::thread() {
+void HoverController::thread() {
 
     
     //Attitude control section
@@ -119,6 +119,6 @@ void SimplePIDController::thread() {
 
 
 
-void SimplePIDController::init() {
+void HoverController::init() {
 
 }

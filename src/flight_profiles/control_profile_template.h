@@ -3,7 +3,7 @@
 
 
 
-#include "modules/templates/module_template.h"
+#include "modules/module_template.h"
 
 #include "vehicle/vehicle_template.h"
 

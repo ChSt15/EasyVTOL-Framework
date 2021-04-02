@@ -13,7 +13,7 @@
 
 #include "outputs/rgb_led.h"
 
-#include "kraft_kontrol.h"
+#include "kraft_kontrol_runner.h"
 
 #include "interval_control.h"
 

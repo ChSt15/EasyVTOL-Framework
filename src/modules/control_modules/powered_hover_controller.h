@@ -3,8 +3,6 @@
 
 
 
-#include "modules/templates/module_template.h"
-
 #include "data_containers/control_data.h"
 #include "data_containers/navigation_data.h"
 

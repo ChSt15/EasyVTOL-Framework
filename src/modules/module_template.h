@@ -3,7 +3,7 @@
 
 
 
-#include "stdint.h"
+#include "definitions.h"
 
 #include "data_containers/vehicle_mode.h"
 

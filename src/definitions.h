@@ -8,7 +8,8 @@
  */
 
 
-#include "boards/board_v_1_0.h" //Board version for pins etc.
+//#include "boards/board_v_1_0.h" //Board version for pins etc.
+#include "connections/starship_v_1_0.h"
 
 #include "3d_math.h"
 

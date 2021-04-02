@@ -3,8 +3,6 @@
 
 
 
-#include "Arduino.h"
-
 #include "definitions.h"
 
 #include "utils/device_status.h"

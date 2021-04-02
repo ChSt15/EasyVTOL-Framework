@@ -11,7 +11,7 @@
 
 #include "definitions.h"
 
-#include "starship_properties.h"
+#include "connections/starship_v_1_0.h"
 #include "starship_data.h"
 
 #include "outputs/rgb_led.h"

@@ -3,8 +3,6 @@
 
 
 
-#include "definitions.h"
-
 #include "utils/interval_control.h"
 
 #include "data_containers/navigation_data.h"

@@ -3,6 +3,8 @@
 
 
 
+#include "definitions.h"
+
 #include "data_containers/kinematic_data.h"
 #include "data_containers/vehicle_mode.h"
 

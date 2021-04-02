@@ -25,7 +25,7 @@ void HoverController::thread() {
 
         Vector outputTotal(0);
 
-        if (setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_POSITION || setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_VELOCITY_POSITION || setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_VELOCITY_POSITION) {
+        if (setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_POSITION || setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_VELOCITY_POSITION || setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_ACCELERATION_VELOCITY_POSITION) {
 
             Vector error = (setpoint.attitude*_navigationData->attitude.copy().conjugate()).toVector(); //Error is calculated here already in local coordinate system.
 
@@ -69,7 +69,7 @@ void HoverController::thread() {
 
         if (setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_VELOCITY || setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_VELOCITY_POSITION || setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_ACCELERATION_VELOCITY_POSITION) {
 
-            Vector error = _navigationData->attitude.rotateVector(setpoint.angularRate - _navigationData->angularRate); //Calculate setpoint error and then rotate to local coordinate system.
+            Vector error = _navigationData->attitude.copy().conjugate().rotateVector(setpoint.angularRate - _navigationData->angularRate); //Calculate setpoint error and then rotate to local coordinate system.
 
             _angVelIValue += error.compWiseMulti(_angVelIF);
 
@@ -112,7 +112,7 @@ void HoverController::thread() {
 
         if (setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_ACCELERATION || setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_ACCELERATION_VELOCITY || setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_ACCELERATION_VELOCITY_POSITION) {
 
-            Vector error = _navigationData->attitude.rotateVector(setpoint.angularAcceleration - _navigationData->angularAcceleration); //Calculate setpoint error and then rotate to local coordinate system.
+            Vector error = _navigationData->attitude.copy().conjugate().rotateVector(setpoint.angularAcceleration - _navigationData->angularAcceleration); //Calculate setpoint error and then rotate to local coordinate system.
 
             _angAccelIValue += error.compWiseMulti(_angAccelIF);
 
@@ -152,6 +152,8 @@ void HoverController::thread() {
         _controlOutput.torqe = outputTotal;
 
     }
+
+    _controlOutput.force = Vector(0,0,9.81)*1; //Multiplied by vehicle mass
 
 }
 

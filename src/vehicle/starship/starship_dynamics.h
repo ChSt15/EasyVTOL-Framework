@@ -35,8 +35,8 @@
 #define BOTTOMFLAP_MAX_ACCEL 30
 
 //TVC constraints
-#define MAX_TVC_ANGLE 10*DEGREES
-#define MAX_TVC_FORCE 14 //In newtons
+#define MAX_TVC_ANGLE 45*DEGREES
+#define MAX_TVC_FORCE 20 //In newtons
 
 //Actuator mapping for manual control
 #define STARSHIP_ACTUATOR_FLAPUL 0

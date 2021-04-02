@@ -4,8 +4,6 @@
 
 void StarshipTestingProfile::thread() {
 
-    return; //just for vehicle testing
-
     if (_vehicle == nullptr) return; //Leave if no vehicle given.
 
     
@@ -13,11 +11,15 @@ void StarshipTestingProfile::thread() {
     _vehicleSetpoint.angularAcceleration = 0;
     _vehicleSetpoint.angularRate = 0;
 
+    _vehicleSetpoint.attitudeControlMode = CONTROL_MODE::CONTROL_ACCELERATION_VELOCITY_POSITION;
+
+    _vehicle->getControlPointer()->setControlSetpoint(_vehicleSetpoint);
+
 }
 
 
 void StarshipTestingProfile::init() {
 
-    _vehicle->getControlPointer()->linkControlSetpointPointer(&_vehicleSetpoint); //Link starship control setpoint to testing setpoint.
+    //_vehicle->getControlPointer()->linkControlSetpointPointer(&_vehicleSetpoint); //Link starship control setpoint to testing setpoint.
 
 }

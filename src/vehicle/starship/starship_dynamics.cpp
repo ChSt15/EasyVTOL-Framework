@@ -15,15 +15,22 @@ void StarshipDynamics::thread() {
     if (!_actuatorManualMode && !_actuatorTesting) {   
 
         float force = 0;
-        Vector direction = Vector(0,0,1);
+        Vector directionBuf = Vector(0,0,1);
 
         _TVCCalculator.dynamicsSetpoint(*_dynamicSetpoint);
-        _TVCCalculator.getTVCSettings(force, direction);
+        _TVCCalculator.getTVCSettings(force, directionBuf);
+
+        Vector direction;
+        direction.z = directionBuf.z;
+        direction.x = -directionBuf.y;
+        direction.y = directionBuf.x;
 
         //calculate TVC angles
         float TVC1, TVC2, TVC3, TVC4;
-        float twist = constrain(_dynamicSetpoint->torqe.z, -45*DEGREES, 45*DEGREES);
+        float twist = -constrain(_dynamicSetpoint->torqe.z, -45*DEGREES, 45*DEGREES);
         _getTVCAngles(direction, twist, TVC1, TVC2, TVC3, TVC4);
+
+        //Serial.println(_dynamicSetpoint->torqe.z);
 
         _TVCServo1.setAngle(TVC1);
         _TVCServo2.setAngle(TVC2);
@@ -178,5 +185,6 @@ void StarshipDynamics::init() {
     _motorCCW.setChannel(0);
 
     _TVCCalculator.setDynamicConstraints(MAX_TVC_FORCE, MAX_TVC_ANGLE);
+    _TVCCalculator.setTVCParameters(Vector(0,0,-0.4), Vector(0,0,1));
 
 }

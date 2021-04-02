@@ -32,7 +32,7 @@ void Starship::init() {
     _dynamics->init(&_vehicleMode);
 
     //Setup hover controller
-    _hoveringController.setAngularVelocityPIDFactors(Vector(1,1,1), Vector(0), Vector(0), Vector(0), true);
+    _hoveringController.setAngularVelocityPIDFactors(Vector(1,1,0.1), Vector(0), Vector(0), Vector(1000), true);
 
     //Mark that vehicle has been initialized.
     _vehicleInitialized = true;

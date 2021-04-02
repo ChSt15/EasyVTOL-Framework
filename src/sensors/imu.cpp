@@ -70,7 +70,7 @@ void IMU::deviceThread() {
 
             imu.readSensor();
 
-            Vector bufVec(-imu.getGyroX_rads(), -imu.getGyroY_rads(), imu.getGyroZ_rads());
+            Vector bufVec(-imu.getGyroX_rads(), imu.getGyroY_rads(), -imu.getGyroZ_rads());
             if (lastGyro != bufVec) {
                 gyroFifo.unshift(bufVec);
                 gyroTimestampFifo.unshift(newDataTimestamp);
@@ -78,7 +78,7 @@ void IMU::deviceThread() {
                 gyroCounter++;
             }
 
-            bufVec = Vector(imu.getAccelX_mss(), imu.getAccelY_mss(), -imu.getAccelZ_mss());
+            bufVec = Vector(imu.getAccelX_mss(), -imu.getAccelY_mss(), imu.getAccelZ_mss());
             if (lastAccel != bufVec) {
                 //bufVec = bufVec*0.001f + lastAccel*0.999f;
                 accelFifo.unshift(bufVec);
@@ -87,7 +87,7 @@ void IMU::deviceThread() {
                 accelCounter++;
             }
 
-            bufVec = Vector(-imu.getMagX_uT(), -imu.getMagY_uT(), imu.getMagZ_uT());
+            bufVec = Vector(-imu.getMagX_uT(), imu.getMagY_uT(), -imu.getMagZ_uT());
             if (lastMag != bufVec) {
                 magFifo.unshift(bufVec);
                 magTimestampFifo.unshift(newDataTimestamp);
@@ -199,7 +199,7 @@ void IMU::deviceThread() {
             //###################### Following will be changed in the future to allow higher rates #####################
             imu.setSrd(0);
             imu.setDlpfBandwidth(MPU9250::DlpfBandwidth::DLPF_BANDWIDTH_184HZ);
-            imu.setStupidSpeeeds();
+            //imu.setStupidSpeeeds();
 
             imu.setMagCalX(18.26, 1.0f);
             imu.setMagCalY(39.14, 1.0f);

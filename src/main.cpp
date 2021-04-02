@@ -188,6 +188,8 @@ void setup() {
 
     testingProfile.setVehiclePointer(&starship);
 
+    delay(1000);
+
     //music.attachFunction(musicControl, 1000);
     //music.initialise();
 
@@ -199,6 +201,6 @@ void loop() {
 
     //music.tick();
 
-    //systemMonitor(); //Monitors data and sends it to usb serial port
+    systemMonitor(); //Monitors data and sends it to usb serial port
 
 }

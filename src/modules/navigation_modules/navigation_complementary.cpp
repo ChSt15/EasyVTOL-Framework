@@ -67,7 +67,7 @@ void NavigationComplementary::thread() {
             float beta = 1.0f;
 
             //Z-Axis correction
-            Vector zAxisIs = Vector(0,0,1);
+            Vector zAxisIs = Vector(0,0,-1);
             Vector zAxisSet = (_navigationData.attitude*accelVector*_navigationData.attitude.copy().conjugate()).toVector();
 
             Vector zAxisRotationAxis = zAxisSet.cross(zAxisIs);
@@ -83,7 +83,7 @@ void NavigationComplementary::thread() {
 
             //Update acceleration
             _navigationData.acceleration = (_navigationData.attitude*accelVector*_navigationData.attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
-            _navigationData.linearAcceleration = _navigationData.acceleration - Vector(0,0,9.81);
+            _navigationData.linearAcceleration = _navigationData.acceleration - Vector(0,0,-9.81);
 
         } else if (_gyroInitialized) {
             
@@ -92,7 +92,7 @@ void NavigationComplementary::thread() {
             _lastAccelTimestamp = timestamp;
 
             //Set Attitude
-            Vector zAxisIs = Vector(0,0,1);
+            Vector zAxisIs = Vector(0,0,-1);
             Vector zAxisSet = (_navigationData.attitude*accelVector*_navigationData.attitude.copy().conjugate()).toVector();
 
             Vector zAxisRotationAxis = zAxisSet.cross(zAxisIs);

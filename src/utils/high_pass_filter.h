@@ -76,6 +76,18 @@ public:
 
     }
 
+    /**
+     * Sets the value to given parameter
+     *
+     * @param values input value
+     * @return none.
+     */
+    void setValue(const T &input) {
+        
+        _lastOutputValue = _lastInputValue = input;
+
+    }
+
 
 private:
 

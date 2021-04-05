@@ -15,7 +15,7 @@ class ManualControlProfile: public ControlProfile {
 public:
 
     ManualControlProfile() {
-        loopRate_Hz = 100;
+        _loopRate_Hz = 100;
     }
 
     /**

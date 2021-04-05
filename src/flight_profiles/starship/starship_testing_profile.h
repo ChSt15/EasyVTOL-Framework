@@ -13,7 +13,7 @@ class StarshipTestingProfile: public ControlProfile {
 public:
 
     StarshipTestingProfile() {
-        loopRate_Hz = 100;
+        _loopRate_Hz = 100;
     }
 
     /**

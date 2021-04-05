@@ -5,7 +5,7 @@
 
 #include "definitions.h"
 
-#include "sensors/imu.h"
+#include "modules/sensor_modules/mpu9250_driver.h"
 #include "sensors/air_data.h"
 #include "sensors/gps.h"
 
@@ -36,13 +36,15 @@ void systemMonitor() {
 
     static Vector Gyro;
     static uint32_t timestamp = 0;
+
+    //vehicleKinetics.angularRate = vehicleKinetics.attitude.copy().conjugate().rotateVector(vehicleKinetics.angularRate);
     
     //if (IMU::gyroAvailable()) IMU::getGyro(&Gyro, &timestamp);
 
     //Serial.println();
-    //Serial.println("LoopRate: " + String(IMU::getLoopRate()) + ", GyroRate: " + String(IMU::getGyroRate()) + ", AccelRate: " + String(IMU::getAccelRate()) + ", MagRate: " + String(IMU::getMagRate()));
-    //Serial.println("vehicle attitude: w: " + String(vehicleKinetics.attitude.w) + ", x: " + String(vehicleKinetics.attitude.x) + ", y: " + String(vehicleKinetics.attitude.y) + ", z: " + String(vehicleKinetics.attitude.z));
-    Serial.println("vehicle angularRate: x: " + String(vehicleKinetics.angularRate.x) + ", y: " + String(vehicleKinetics.angularRate.y) + ", z: " + String(vehicleKinetics.angularRate.z));
+    //Serial.println("LoopRate: " + String(IMU.loopRate()) + ", GyroRate: " + String(IMU.gyroRate()) + ", AccelRate: " + String(IMU.accelRate()) + ", MagRate: " + String(IMU.magRate()));
+    Serial.println("vehicle attitude: w: " + String(vehicleKinetics.attitude.w) + ", x: " + String(vehicleKinetics.attitude.x) + ", y: " + String(vehicleKinetics.attitude.y) + ", z: " + String(vehicleKinetics.attitude.z));
+    //Serial.println("vehicle angularRate: x: " + String(vehicleKinetics.angularRate.x) + ", y: " + String(vehicleKinetics.angularRate.y) + ", z: " + String(vehicleKinetics.angularRate.z));
     //Serial.println("vehicle angularRate setpoint: x: " + String(vehicleSetpoints.angularRate.x) + ", y: " + String(vehicleSetpoints.angularRate.y) + ", z: " + String(vehicleSetpoints.angularRate.z));
     //Serial.println("vehicle attitude setpoint: w: " + String(vehicleSetpoints.attitude.w) + ", x: " + String(vehicleSetpoints.attitude.x) + ", y: " + String(vehicleSetpoints.attitude.y) + ", z: " + String(vehicleSetpoints.attitude.z));
     //Serial.println("IMU Rate: " + String(IMU::getGyroRate()));

@@ -17,7 +17,7 @@
 
 #include "navigation_template.h"
 
-#include "sensors/imu.h"
+#include "modules/sensor_modules/mpu9250_driver.h"
 
 #include "utils/high_pass_filter.h"
 #include "utils/low_pass_filter.h"
@@ -69,7 +69,7 @@ public:
 private:
 
     //Filter data
-    //HighPassFilter<Vector> gyroHPF = HighPassFilter<Vector>(0.01);
+    HighPassFilter<Vector> _gyroHPF = HighPassFilter<Vector>(0.001);
 
     uint32_t _lastGyroTimestamp = 0;
     uint32_t _lastAccelTimestamp = 0;
@@ -78,6 +78,13 @@ private:
     uint32_t _lastLoopTimestamp = 0;
 
     Vector _lastGyroValue = 0;
+    //Vector _gyroOffset = 0;
+
+    Vector _magOffset = Vector(-40.24, 56.43, -42.97);
+    Vector _magScale = Vector(1.01, 1.03, 0.96);
+
+    Vector _accelOffset = 0;
+    Vector _accelScale = 1;
 
     //System information flagges
     bool _angularRateValid = false;

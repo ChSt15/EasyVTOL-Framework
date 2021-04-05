@@ -5,7 +5,7 @@
 
 #include "definitions.h"
 
-#include "sensors/imu.h"
+#include "modules/sensor_modules/mpu9250_driver.h"
 #include "sensors/air_data.h"
 #include "sensors/gps.h"
 

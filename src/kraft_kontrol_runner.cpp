@@ -12,6 +12,8 @@ namespace KraftKontrolRunner {
     void vehicleThread();
     void vehicleControlThread();
 
+    void imuThread();
+
 }
 
 
@@ -27,6 +29,13 @@ void KraftKontrolRunner::vehicleThread() {
 void KraftKontrolRunner::vehicleControlThread() {
 
     if (controlProfile != nullptr) controlProfile->thread(); //Make sure not to run a nullptr
+
+}
+
+
+void KraftKontrolRunner::imuThread() {
+
+    IMU.thread();
 
 }
 
@@ -50,7 +59,7 @@ void KraftKontrolRunner::initialise() {
     delay(500);
 
 
-    systemScheduler.attachFunction(IMU::deviceThread, 32000, TASK_PRIORITY::PRIORITY_REALTIME);
+    systemScheduler.attachFunction(imuThread, 32000, TASK_PRIORITY::PRIORITY_REALTIME);
     systemScheduler.attachFunction(AirData::deviceThread, 200, TASK_PRIORITY::PRIORITY_HIGH);
     systemScheduler.attachFunction(LORA_2_4::deviceThread, 500, TASK_PRIORITY::PRIORITY_MIDDLE);
     systemScheduler.attachFunction(GPS::deviceThread, 100, TASK_PRIORITY::PRIORITY_HIGH);
@@ -59,7 +68,7 @@ void KraftKontrolRunner::initialise() {
 
     systemScheduler.attachFunction(vehicleThread, kraft->getLoopRate_Hz(), TASK_PRIORITY::PRIORITY_REALTIME);
 
-    systemScheduler.attachFunction(vehicleControlThread, controlProfile->getLoopRate_Hz(), TASK_PRIORITY::PRIORITY_REALTIME);
+    systemScheduler.attachFunction(vehicleControlThread, controlProfile->get_LoopRate_Hz(), TASK_PRIORITY::PRIORITY_REALTIME);
 
 }
 

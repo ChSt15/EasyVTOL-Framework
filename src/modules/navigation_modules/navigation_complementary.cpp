@@ -4,19 +4,19 @@
 
 void NavigationComplementary::thread() {
 
-    if (IMU::getDeviceStatus() != DeviceStatus::DEVICE_RUNNING) return;
+    if (IMU.getModuleStatus() != MODULE_STATUS::MODULE_RUNNING) return;
 
     float dTime = (float)(micros() - _lastLoopTimestamp)/1000000.0f;
     _lastLoopTimestamp = micros();
     	
     //KinematicData *_navigationData.= _vehicle;
 
-    if (IMU::gyroAvailable()) {
+    if (IMU.gyroAvailable()) {
         
         //Get IMU data
         Vector rotationVector;
         uint32_t timestamp;
-        IMU::getGyro(&rotationVector, &timestamp);
+        IMU.getGyro(&rotationVector, &timestamp);
 
         //Calulate time delta
         float dt = float(timestamp - _lastGyroTimestamp)/1000000.0f;
@@ -27,6 +27,8 @@ void NavigationComplementary::thread() {
 
         //Check if gyro initialised
         if (_gyroInitialized) {
+
+            //rotationVector = rotationVector - _gyroHPF.update(rotationVector, timestamp);
 
             //Predict system state
             if (!rotationVector.isZeroVector()) {
@@ -43,19 +45,22 @@ void NavigationComplementary::thread() {
         } else {
 
             //Gyro filter initialisation
-            _gyroInitialized = true;
+            if (rotationVector.magnitude() < 0.05) {
+                _gyroHPF.setValue(rotationVector);
+                _gyroInitialized = true;
+            }
 
         }
 
     }
 
 
-    if (IMU::accelAvailable()) {
+    if (IMU.accelAvailable()) {
 
         //Get IMU data
         Vector accelVector;
         uint32_t timestamp;
-        IMU::getAccel(&accelVector, &timestamp);
+        IMU.getAccel(&accelVector, &timestamp);
 
         //Check if accelerometer initialised
         if (_accelInitialized) {
@@ -64,7 +69,7 @@ void NavigationComplementary::thread() {
             float dt = float(timestamp - _lastAccelTimestamp)/1000000.0f;
             _lastAccelTimestamp = timestamp;
 
-            float beta = 1.0f;
+            float beta = 0.5f;
 
             //Z-Axis correction
             Vector zAxisIs = Vector(0,0,-1);
@@ -103,20 +108,61 @@ void NavigationComplementary::thread() {
             //Apply state correction and normalise attitude quaternion 
             _navigationData.attitude = zAxisCorrectionQuat*_navigationData.attitude;
             _navigationData.attitude.normalize(true);
+            //_navigationData.attitude = Quaternion(0,0,1,0);
 
         }
 
     }
 
 
-    if (IMU::magAvailable()) {
+    if (IMU.magAvailable()) {
+
+        /*static Vector max = -1000;
+        static Vector min = 1000;
+        static Vector offset = 0;
+        static Vector scale = 1;*/
 
         //Get IMU data
         Vector magVector;
         uint32_t timestamp;
-        IMU::getMag(&magVector, &timestamp);
+        IMU.getMag(&magVector, &timestamp);
 
         if (_magInitialized) {
+
+            /*if (magVector.x > max.x) {
+                max.x = magVector.x;
+            }
+            if (magVector.x < min.x) {
+                min.x = magVector.x;
+            }
+            if (magVector.y > max.y) {
+                max.y = magVector.y;
+            }
+            if (magVector.y < min.y) {
+                min.y = magVector.y;
+            }
+            if (magVector.z > max.z) {
+                max.z = magVector.z;
+            }
+            if (magVector.z < min.z) {
+                min.z = magVector.z;
+            }
+
+            offset = (min + max)/2;
+            float avg = (max.x-offset.x + max.y-offset.y + max.z-offset.z)/3;
+            scale.x = avg/(max.x-offset.x);
+            scale.y = avg/(max.y-offset.y);
+            scale.z = avg/(max.z-offset.z);
+
+            Serial.println(String("Max: x:") + max.x + ", y:" + max.y + ", z:" + max.z);
+            Serial.println(String("Min: x:") + min.x + ", y:" + min.y + ", z:" + min.z);
+            Serial.println(String("Max-offset: x:") + (max.x - offset.x) + ", y:" + (max.y - offset.y) + ", z:" + (max.z - offset.z));
+            Serial.println(String("Offset: x:") + offset.x + ", y:" + offset.y + ", z:" + offset.z);
+            Serial.println(String("Scale: x:") + scale.x + ", y:" + scale.y + ", z:" + scale.z + ", avg: " + avg);
+            Serial.println();*/
+
+
+            magVector = (magVector - _magOffset).compWiseMulti(_magScale);
 
             //Correct state prediction
             float dt = float(timestamp - _lastMagTimestamp)/1000000.0f;

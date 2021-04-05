@@ -1,122 +1,292 @@
-#ifndef CONTROL_TEMPLATE_H
-#define CONTROL_TEMPLATE_H
+#ifndef MPU9250_DRIVER_TEMPLATE_H
+#define MPU9250_DRIVER_TEMPLATE_H
 
 
+
+#include "definitions.h"
+
+#include "interval_control.h"
 
 #include "modules/module_template.h"
 
-#include "data_containers/control_data.h"
-#include "data_containers/navigation_data.h"
-#include "data_containers/dynamic_data.h"
+#include "mpu9250.h"
+#include "CircularBuffer.h"
 
 
-class Control: public Module {
+class MPU9250Driver: public Module {
 public:
 
+    
     /**
-     * Sets the control setpoint from a guidance module.
-     * 
-     * Use linkControlSetpointPointer() for data linking.
-     * 
-     * Calling this will remove the link. Data must be linked again!
-     *
-     * @param values control parameters.
-     * @return none.
-     */
-    void setControlSetpoint(const ControlData &controlSetpoint) {
-        _controlSetpoint = &_controlSetpointDefault; //Make sure pointer is set to internal data so to not change linked data.
-        *_controlSetpoint = controlSetpoint;
-    };
-
-    /**
-     * Sets the control input pointer to the inputed pointer 
-     * from a guidance module.
-     * 
-     * Allows the control module to automatically retrieve its needed
-     * data from the pointer.
-     * 
-     * This must only be called once.
-     * 
-     * returns false if failed from null pointer input.
-     *
-     * @param values control parameters.
-     * @return bool.
-     */
-    bool linkControlSetpointPointer(ControlData *controlDataPointer) {
-        if (controlDataPointer == nullptr) return false;
-        _controlSetpoint = controlDataPointer;
-        return true;
-    };
-
-    /**
-     * Sets the navigation input data from a navigation module.
-     * 
-     * Use linkNavigationDataPointer() for data linking.
-     * 
-     * Calling this will remove the link. Data must be linked again!
-     *
-     * @param values navigation data parameters.
-     * @return none.
-     */
-    void setNavigationInput(const NavigationData &navigationData) {
-        _navigationData = &_navigationDataDefault; //Make sure pointer is set to internal data so to not change linked data.
-        *_navigationData = navigationData;
-    };
-
-    /**
-     * Sets the navigation data pointer to the inputed pointer 
-     * from a navigation module.
-     * 
-     * Allows the dynamics module to automatically retrieve its needed
-     * data from the pointer.
-     * 
-     * This must only be called once.
-     * 
-     * returns false if null pointer was given.
-     *
-     * @param values navigation data pointer.
-     * @return bool.
-     */
-    bool linkNavigationDataPointer(NavigationData *navigationDataPointer) {
-        if (navigationDataPointer == nullptr) return false;
-        _navigationData = navigationDataPointer;
-        return true;
-    };
-
-    /**
-     * Returns the kinematics the system needs to achieve the desired
-     * guidance inputs.
+     * This is where all calculations are done.
      *
      * @param values none.
-     * @return kinematicSetpoint.
+     * @return none.
      */
-    virtual DynamicData getDynamicsOutput() {return _controlOutput;};
+    void thread();
 
     /**
-     * Returns the a pointer to a struct with the kinematics the system 
-     * needs to achieve the desired guidance inputs.
+     * Init function that sets the module up.
      *
      * @param values none.
-     * @return kinematicSetpoint pointer.
+     * @return none.
      */
-    virtual DynamicData* getDynamicsOutputPointer() {return &_controlOutput;};
+    void init();
 
+    /**
+     * Returns rate (in Hz) of the thread
+     *
+     * @param values none.
+     * @return uint32_t.
+     */
+    uint32_t loopRate() {return _loopRate;};
 
-protected:
+    /**
+     * Returns true if gyro data available
+     *
+     * @param values none.
+     * @return bool.
+     */
+    bool gyroAvailable() {return !_gyroFifo.isEmpty();};
 
-    static ControlData* _controlSetpoint;
-    static NavigationData* _navigationData;
+    /**
+     * Returns rate (in Hz) of the new sensor data
+     *
+     * @param values none.
+     * @return uint32_t.
+     */
+    uint32_t gyroRate() {return _gyroRate;};
 
-    static DynamicData _controlOutput;
+    /**
+     * Returns true if gyro data valid.
+     * Variables given as parameters will be overridden.
+     * This will remove sensor data from queue, peek will not.
+     *
+     * @param values Vector and uint32_t.
+     * @return bool.
+     */
+    bool getGyro(Vector* gyroData, uint32_t* gyroTimestamp) {
+
+        if (_gyroFifo.isEmpty()) return false;
+
+        *gyroData = _gyroFifo.pop();
+        *gyroTimestamp = _gyroTimestampFifo.pop();
+
+        return true;
+
+    };
+
+    /**
+     * Returns true if gyro data valid.
+     * Variables given as parameters will be overridden.
+     * Will not remove data from queue, get will.
+     *
+     * @param values Vector and uint32_t.
+     * @return bool.
+     */
+    bool peekGyro(Vector* gyroData, uint32_t* gyroTimestamp) {
+
+        if (_gyroFifo.isEmpty()) return false;
+
+        *gyroData = _gyroFifo.last();
+        *gyroTimestamp = _gyroTimestampFifo.last();
+
+        return true;
+
+    }
+
+    /**
+     * Removes all elements from queue.
+     *
+     * @param values none.
+     * @return none.
+     */
+    void flushGyro() {
+        _gyroFifo.clear();
+        _gyroTimestampFifo.clear();
+    }
+
+    /**
+     * Returns true if accel data available
+     *
+     * @param values none.
+     * @return bool.
+     */
+    bool accelAvailable() {return !_accelFifo.isEmpty();};
+
+    /**
+     * Returns rate (in Hz) of the new sensor data
+     *
+     * @param values none.
+     * @return uint32_t.
+     */
+    uint32_t accelRate() {return _accelRate;};
+
+    /**
+     * Returns true if accel data valid.
+     * Variables given as parameters will be overridden.
+     * This will remove sensor data from queue, peek will not.
+     *
+     * @param values Vector and uint32_t.
+     * @return bool.
+     */
+    bool getAccel(Vector* accelData, uint32_t* accelTimestamp) {
+
+        if (_accelFifo.isEmpty()) return false;
+
+        *accelData = _accelFifo.pop();
+        *accelTimestamp = _accelTimestampFifo.pop();
+
+        return true;
+
+    };
+
+    /**
+     * Returns true if accel data valid.
+     * Variables given as parameters will be overridden.
+     * Will not remove data from queue, get will.
+     *
+     * @param values Vector and uint32_t.
+     * @return bool.
+     */
+    bool peekAccel(Vector* accelData, uint32_t* accelTimestamp) {
+
+        if (_accelFifo.isEmpty()) return false;
+
+        *accelData = _accelFifo.last();
+        *accelTimestamp = _accelTimestampFifo.last();
+
+        return true;
+
+    };
+
+    /**
+     * Removes all elements from queue.
+     *
+     * @param values none.
+     * @return none.
+     */
+    void flushAccel() {
+        _accelFifo.clear();
+        _accelTimestampFifo.clear();
+    }
+
+    /**
+     * Returns true if Magnetometer data available
+     *
+     * @param values none.
+     * @return bool.
+     */
+    bool magAvailable() {return !_magFifo.isEmpty();};
+
+    /**
+     * Returns rate (in Hz) of the new sensor data
+     *
+     * @param values none.
+     * @return uint32_t.
+     */
+    uint32_t magRate() {return _magRate;};
+
+    /**
+     * Returns true if Magnetometer data valid.
+     * Variables given as parameters will be overridden.
+     * This will remove sensor data from queue, peek will not.
+     *
+     * @param values Vector and uint32_t.
+     * @return bool.
+     */
+    bool getMag(Vector* magData, uint32_t* magTimestamp) {
+
+        if (_magFifo.isEmpty()) return false;
+
+        *magData = _magFifo.pop();
+        *magTimestamp = _magTimestampFifo.pop();
+
+        return true;
+
+    };
+
+    /**
+     * Returns true if Magnetometer data valid.
+     * Variables given as parameters will be overridden.
+     * Will not remove data from queue, get will.
+     *
+     * @param values Vector and uint32_t.
+     * @return bool.
+     */
+    bool peekMag(Vector* magData, uint32_t* magTimestamp) {
+
+        if (_magFifo.isEmpty()) return false;
+
+        *magData = _magFifo.last();
+        *magTimestamp = _magTimestampFifo.last();
+
+        return true;
+
+    };
+
+    /**
+     * Removes all elements from queue.
+     *
+     * @param values none.
+     * @return none.
+     */
+    void flushMag() {
+        _accelFifo.clear();
+        _accelTimestampFifo.clear();
+    }
 
 
 private:
 
-    static ControlData _controlSetpointDefault;
-    static NavigationData _navigationDataDefault;
+    static void _interruptRoutine();
+
+    void _getData();
+
+
+    CircularBuffer <Vector, 100> _gyroFifo;
+    CircularBuffer <Vector, 100> _accelFifo;
+    CircularBuffer <Vector, 100> _magFifo;
+    CircularBuffer <uint32_t, 100> _gyroTimestampFifo;
+    CircularBuffer <uint32_t, 100> _accelTimestampFifo;
+    CircularBuffer <uint32_t, 100> _magTimestampFifo;
+
+    Vector _lastGyro;
+    Vector _lastAccel;
+    Vector _lastMag;
+
+    IntervalControl _rateCalcInterval = IntervalControl(1); 
+
+    Mpu9250 _imu = Mpu9250(&SPI, MPU_NCS_PIN);
+
+    uint8_t _startAttempts = 0;
+
+    uint32_t _loopRate = 0;
+    uint32_t _loopCounter = 0;
+
+    uint32_t _gyroRate = 0;
+    uint32_t _gyroCounter = 0;
+
+    uint32_t _accelRate = 0;
+    uint32_t _accelCounter = 0;
+
+    uint32_t _magRate = 0;
+    uint32_t _magCounter = 0;
+
+    uint32_t _lastMeasurement = 0;
+
+    bool _block = false;
+
+    static uint32_t _newDataTimestamp;
+    static bool _newDataInterrupt;
+
+
 
     
 };
+
+
+extern MPU9250Driver IMU;
 
 
 

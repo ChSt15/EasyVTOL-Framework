@@ -1,7 +1,7 @@
 #include "imu_DEP.h"
 
 
-namespace IMU {
+/*namespace IMU {
 
     const int imuNCS = MPU_NCS_PIN;
     const int imuInt = MPU_INT_PIN;
@@ -94,87 +94,6 @@ void IMU::deviceThread() {
                 lastMag = bufVec;
                 magCounter++;
             }
-
-            //Vector testVec = gyroFifo.first();
-            //Vector bias = Vector(imu.getAccelBiasX_mss(), imu.getAccelBiasY_mss(), imu.getAccelBiasZ_mss());
-            //Vector scale = Vector(imu.getAccelScaleFactorX(), imu.getAccelScaleFactorY(), imu.getAccelScaleFactorZ());
-
-            //Serial.println("AccelBias: x: " + String(bias.x) + ", y: " + String(bias.y) + ", z: " + String(bias.z));
-            //Serial.println("AccelScale: x: " + String(scale.x) + ", y: " + String(scale.y) + ", z: " + String(scale.z));
-
-            //Serial.println("MagBias: x: " + String(MagCal.x) + ", y: " + String(MagCal.y) + ", z: " + String(MagCal.z));
-            //Serial.println("Mag: x: " + String(lastMag.x) + ", y: " + String(lastMag.y) + ", z: " + String(lastMag.z));
-            //Serial.println("Gyro: x: " + String(testVec.x) + ", y: " + String(testVec.y) + ", z: " + String(testVec.z));
-            //Serial.println("Accel: x: " + String(lastAccel.x,5) + ", y: " + String(lastAccel.y,5) + ", z: " + String(lastAccel.z,5));
-            //Serial.println();
-
-
-            /*if (imu.readFifo()) { // read data and check if successful
-
-                float gyroX[100];
-                float gyroY[100];
-                float gyroZ[100];
-
-                float accelX[100];
-                float accelY[100];
-                float accelZ[100];
-
-                float magX[100];
-                float magY[100];
-                float magZ[100];
-
-                size_t bufferSize;
-
-                imu.getFifoGyroX_rads(&bufferSize, gyroX);
-                imu.getFifoGyroY_rads(&bufferSize, gyroY);
-                imu.getFifoGyroZ_rads(&bufferSize, gyroZ);
-
-                imu.getFifoAccelX_mss(&bufferSize, accelX);
-                imu.getFifoAccelY_mss(&bufferSize, accelY);
-                imu.getFifoAccelZ_mss(&bufferSize, accelZ);
-
-                imu.getFifoMagX_uT(&bufferSize, magX);
-                imu.getFifoMagY_uT(&bufferSize, magY);
-                imu.getFifoMagZ_uT(&bufferSize, magZ);
-
-                for (byte i = 0; i < bufferSize; i++) {
-
-                    Vector bufVec(-gyroX[i], -gyroY[i], gyroZ[i]);
-                    if (lastGyro != bufVec) {
-                        static uint32_t timestamp = micros();
-                        gyroFifo.unshift(bufVec);
-                        gyroTimestampFifo.unshift(timestamp);
-                        timestamp += 1000000/gyroRate;
-                        lastGyro = bufVec;
-                        gyroCounter++;
-                    }
-
-                    bufVec = Vector(accelX[i], accelY[i], -accelZ[i]);
-                    if (lastAccel != bufVec) {
-                        static uint32_t timestamp = micros();
-                        accelFifo.unshift(bufVec);
-                        accelTimestampFifo.unshift(timestamp);
-                        timestamp += 1000000/accelRate;
-                        lastAccel = bufVec;
-                        accelCounter++;
-                    }
-
-                    bufVec = Vector(-magX[i], -magY[i], magZ[i]);
-                    if (lastMag != bufVec) {
-                        static uint32_t timestamp = micros();
-                        magFifo.unshift(bufVec);
-                        magTimestampFifo.unshift(timestamp);
-                        timestamp += 1000000/magRate;
-                        lastMag = bufVec;
-                        magCounter++;
-                    }
-
-                }
-
-                lastMeasurement = micros();
-
-
-            } else if (micros() - lastMeasurement >= SENSOR_MEASUREMENT_TIMEOUT_US) imuStatus = DeviceStatus::DEVICE_FAILURE;*/
 
         }
 
@@ -306,6 +225,6 @@ bool IMU::getMag(Vector* mag, uint32_t* timestamp) {
     *mag = magFifo.pop();
     *timestamp = magTimestampFifo.pop();
     return true;
-}
+}*/
 
 

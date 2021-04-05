@@ -19,13 +19,13 @@ public:
      * @param values cutOffFreq and sampleRate
      * @return none.
      */
-    HighPassFilter(float cutOffFreq, uint32_t sampleRate = -1) {
+    HighPassFilter(float cutOffFreq, uint32_t sampleRate = 0) {
 
         _sampleRate = sampleRate;
         _cutOffFreq = cutOffFreq;
         _RC = 1.0/(cutOffFreq*2*3.14);
 
-        if (_sampleRate != -1) {
+        if (_sampleRate != 0) {
             float dt = 1.0/_sampleRate;
             _alpha = _RC/(_RC+dt);
         }

@@ -54,7 +54,7 @@ class Mpu9250 {
   };
   Mpu9250(TwoWire *bus, uint8_t addr);
   Mpu9250(SPIClass *bus, uint8_t cs);
-  bool Begin();
+  int Begin();
   bool EnableDrdyInt();
   bool DisableDrdyInt();
   bool ConfigAccelRange(const AccelRange range);

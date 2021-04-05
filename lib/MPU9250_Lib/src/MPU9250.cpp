@@ -38,7 +38,7 @@ Mpu9250::Mpu9250(SPIClass *bus, uint8_t cs) {
   spi_ = bus;
   conn_ = cs;
 }
-bool Mpu9250::Begin() {
+int Mpu9250::Begin() {
   if (iface_ == I2C) {
     i2c_->begin();
     i2c_->setClock(I2C_CLOCK_);
@@ -57,15 +57,15 @@ bool Mpu9250::Begin() {
   spi_clock_ = 1000000;
   /* Select clock source to gyro */
   if (!WriteRegister(PWR_MGMNT_1_, CLKSEL_PLL_)) {
-    return false;
+    return -1;
   }
   /* Enable I2C master mode */
   if (!WriteRegister(USER_CTRL_, I2C_MST_EN_)) {
-    return false;
+    return -2;
   }
   /* Set the I2C bus speed to 400 kHz */
   if (!WriteRegister(I2C_MST_CTRL_, I2C_MST_CLK_)) {
-    return false;
+    return -3;
   }
   /* Set AK8963 to power down */
   WriteAk8963Register(AK8963_CNTL1_, AK8963_PWR_DOWN_);
@@ -77,46 +77,47 @@ bool Mpu9250::Begin() {
   WriteAk8963Register(AK8963_CNTL2_, AK8963_RESET_);
   /* Select clock source to gyro */
   if (!WriteRegister(PWR_MGMNT_1_, CLKSEL_PLL_)) {
-    return false;
+    return -4;
   }
   /* Check the WHO AM I byte */
   uint8_t who_am_i;
   if (!ReadRegisters(WHOAMI_, sizeof(who_am_i), &who_am_i)) {
-    return false;
+    return -5;
   }
   if ((who_am_i != WHOAMI_MPU9250_) && (who_am_i != WHOAMI_MPU9255_)) {
-    return false;
+    return -6;
   }
   /* Enable I2C master mode */
   if (!WriteRegister(USER_CTRL_, I2C_MST_EN_)) {
-    return false;
+    return -7;
   }
   /* Set the I2C bus speed to 400 kHz */
   if (!WriteRegister(I2C_MST_CTRL_, I2C_MST_CLK_)) {
-    return false;
+    return -8;
   }
+  delay(10);
   /* Check the AK8963 WHOAMI */
   if (!ReadAk8963Registers(AK8963_WHOAMI_, sizeof(who_am_i), &who_am_i)) {
-    return false;
+    return -9;
   }
   if (who_am_i != WHOAMI_AK8963_) {
-    return false;
+    return -10;
   }
   /* Get the magnetometer calibration */
   /* Set AK8963 to power down */
   if (!WriteAk8963Register(AK8963_CNTL1_, AK8963_PWR_DOWN_)) {
-    return false;
+    return -11;
   }
   delay(100);  // long wait between AK8963 mode changes
   /* Set AK8963 to FUSE ROM access */
   if (!WriteAk8963Register(AK8963_CNTL1_, AK8963_FUSE_ROM_)) {
-    return false;
+    return -12;
   }
   delay(100);  // long wait between AK8963 mode changes
   /* Read the AK8963 ASA registers and compute magnetometer scale factors */
   uint8_t asa_buff[3];
   if (!ReadAk8963Registers(AK8963_ASA_, sizeof(asa_buff), asa_buff)) {
-    return false;
+    return -13;
   }
   mag_scale_[0] = ((static_cast<float>(asa_buff[0]) - 128.0f)
     / 256.0f + 1.0f) * 4912.0f / 32760.0f;
@@ -126,37 +127,37 @@ bool Mpu9250::Begin() {
     / 256.0f + 1.0f) * 4912.0f / 32760.0f;
   /* Set AK8963 to power down */
   if (!WriteAk8963Register(AK8963_CNTL1_, AK8963_PWR_DOWN_)) {
-    return false;
+    return -14;
   }
   /* Set AK8963 to 16 bit resolution, 100 Hz update rate */
   if (!WriteAk8963Register(AK8963_CNTL1_, AK8963_CNT_MEAS2_)) {
-    return false;
+    return -15;
   }
   delay(100);  // long wait between AK8963 mode changes
   /* Select clock source to gyro */
   if (!WriteRegister(PWR_MGMNT_1_, CLKSEL_PLL_)) {
-    return false;
+    return -16;
   }
   /* Instruct the MPU9250 to get 7 bytes from the AK8963 at the sample rate */
   uint8_t mag_data[7];
   if (!ReadAk8963Registers(AK8963_HXL_, sizeof(mag_data), mag_data)) {
-    return false;
+    return -17;
   }
   /* Set the accel range to 16G by default */
   if (!ConfigAccelRange(ACCEL_RANGE_16G)) {
-    return false;
+    return -18;
   }
   /* Set the gyro range to 2000DPS by default*/
   if (!ConfigGyroRange(GYRO_RANGE_2000DPS)) {
-    return false;
+    return -19;
   }
   /* Set the DLPF to 20HZ by default */
   if (!ConfigDlpf(DLPF_BANDWIDTH_20HZ)) {
-    return false;
+    return -20;
   }
   /* Set the SRD to 0 by default */
   if (!ConfigSrd(0)) {
-    return false;
+    return -21;
   }
   return true;
 }
@@ -408,7 +409,7 @@ bool Mpu9250::WriteRegister(uint8_t reg, uint8_t data) {
     digitalWrite(conn_, LOW);
     #endif
     #if defined(__IMXRT1062__)
-      delayNanoseconds(50);
+      delayNanoseconds(200);
     #endif
     spi_->transfer(reg);
     spi_->transfer(data);
@@ -421,12 +422,13 @@ bool Mpu9250::WriteRegister(uint8_t reg, uint8_t data) {
     digitalWrite(conn_, HIGH);
     #endif
     #if defined(__IMXRT1062__)
-      delayNanoseconds(50);
+      delayNanoseconds(200);
     #endif
     spi_->endTransaction();
   }
   delay(10);
   ReadRegisters(reg, sizeof(ret_val), &ret_val);
+  delay(10);
   if (data == ret_val) {
     return true;
   } else {
@@ -458,7 +460,7 @@ bool Mpu9250::ReadRegisters(uint8_t reg, uint8_t count, uint8_t *data) {
     digitalWrite(conn_, LOW);
     #endif
     #if defined(__IMXRT1062__)
-      delayNanoseconds(50);
+      delayNanoseconds(200);
     #endif
     spi_->transfer(reg | SPI_READ_);
     spi_->transfer(data, count);
@@ -471,7 +473,7 @@ bool Mpu9250::ReadRegisters(uint8_t reg, uint8_t count, uint8_t *data) {
     digitalWrite(conn_, LOW);
     #endif
     #if defined(__IMXRT1062__)
-      delayNanoseconds(50);
+      delayNanoseconds(200);
     #endif
     spi_->endTransaction();
     return true;

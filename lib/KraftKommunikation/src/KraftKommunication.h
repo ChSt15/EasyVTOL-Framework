@@ -8,8 +8,10 @@
 
 
 struct KraftPacket {
-    const 
-}
+    const uint8_t packetStart1 = 0xAA;
+    const uint8_t packetStart2 = 0xFF;
+    const uint8_t packetEnd = 0xFA;
+};
 
 
 

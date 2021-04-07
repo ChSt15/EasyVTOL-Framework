@@ -9,7 +9,6 @@
 #include "sensors/air_data.h"
 #include "sensors/gps.h"
 
-#include "comms/lora_2_4.h"
 #include "comms/ibus_rx.h"
 
 #include "outputs/rgb_led.h"

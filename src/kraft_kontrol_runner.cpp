@@ -61,7 +61,7 @@ void KraftKontrolRunner::initialise() {
 
     systemScheduler.attachFunction(imuThread, 32000, TASK_PRIORITY::PRIORITY_REALTIME);
     systemScheduler.attachFunction(AirData::deviceThread, 200, TASK_PRIORITY::PRIORITY_HIGH);
-    systemScheduler.attachFunction(LORA_2_4::deviceThread, 500, TASK_PRIORITY::PRIORITY_MIDDLE);
+    //systemScheduler.attachFunction(LORA_2_4::deviceThread, 500, TASK_PRIORITY::PRIORITY_MIDDLE);
     systemScheduler.attachFunction(GPS::deviceThread, 100, TASK_PRIORITY::PRIORITY_HIGH);
     systemScheduler.attachFunction(RGBLED::deviceThread, 100, TASK_PRIORITY::PRIORITY_NONE);
     systemScheduler.attachFunction(IBUSReceiver::deviceThread, 1000, TASK_PRIORITY::PRIORITY_HIGH);

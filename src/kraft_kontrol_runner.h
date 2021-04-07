@@ -6,7 +6,7 @@
 #include "definitions.h"
 
 #include "modules/sensor_modules/mpu9250_driver.h"
-#include "sensors/air_data.h"
+#include "modules/sensor_modules/bme280_driver.h"
 #include "sensors/gps.h"
 
 #include "comms/ibus_rx.h"

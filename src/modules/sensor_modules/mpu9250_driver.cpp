@@ -29,6 +29,8 @@ void MPU9250Driver::_getData() {
         _accelCounter++;
     }
 
+    if (_imu.MagnetometerFailed()) return; //Do not get mag data if mag failed to start.
+
     bufVec = Vector(-_imu.mag_x_ut(), _imu.mag_y_ut(), -_imu.mag_z_ut());
     if (_lastMag != bufVec) {
         _magFifo.unshift(bufVec);
@@ -66,23 +68,17 @@ void MPU9250Driver::thread() {
 
         if (startCode > 0) {
 
-            /*imu.setMagCalX(18.26, 1.0f);
-            imu.setMagCalY(39.14, 1.0f);
-            imu.setMagCalZ(-40.69, 1.0f);
-
-            imu.setAccelCalX(0.20268, 1.0f);
-            imu.setAccelCalY(-0.14238, 1.001f);
-            imu.setAccelCalZ(0.6755, 0.9869f);*/
+            if (_imu.MagnetometerFailed()) Serial.println("Magnetometer failed, But gyro and accel are working!!!!");
 
             _imu.ConfigAccelRange(Mpu9250::AccelRange::ACCEL_RANGE_16G);
             _imu.ConfigGyroRange(Mpu9250::GyroRange::GYRO_RANGE_2000DPS);
             _imu.EnableDrdyInt();
 
             _imu.ConfigSrd(0);
-            _imu.ConfigDlpf(Mpu9250::DlpfBandwidth::DLPF_BANDWIDTH_184HZ);
+            _imu.ConfigDlpf(Mpu9250::DlpfBandwidth::DLPF_BANDWIDTH_250HZ_4kHz);
 
 
-            attachInterrupt(MPU_INT_PIN, _interruptRoutine, HIGH);
+            attachInterrupt(MPU_INT_PIN, _interruptRoutine, RISING);
 
             _lastMeasurement = micros();
             

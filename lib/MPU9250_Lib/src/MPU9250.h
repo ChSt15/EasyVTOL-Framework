@@ -33,12 +33,14 @@
 class Mpu9250 {
  public:
   enum DlpfBandwidth : uint8_t {
+    DLPF_BANDWIDTH_250HZ_4kHz = 0x00,
     DLPF_BANDWIDTH_184HZ = 0x01,
     DLPF_BANDWIDTH_92HZ = 0x02,
     DLPF_BANDWIDTH_41HZ = 0x03,
     DLPF_BANDWIDTH_20HZ = 0x04,
     DLPF_BANDWIDTH_10HZ = 0x05,
-    DLPF_BANDWIDTH_5HZ = 0x06
+    DLPF_BANDWIDTH_5HZ = 0x06,
+    DLPF_BANDWIDTH_DISABLE_32kHz = 0xAA
   };
   enum AccelRange : uint8_t {
     ACCEL_RANGE_2G = 0x00,
@@ -54,7 +56,9 @@ class Mpu9250 {
   };
   Mpu9250(TwoWire *bus, uint8_t addr);
   Mpu9250(SPIClass *bus, uint8_t cs);
-  int Begin();
+  bool Begin(bool disableMag = false);
+  bool MagnetometerFailed() {return akFailure_;}
+  bool IMUFailed() {return mpuFailure_ || akFailure_;}
   bool EnableDrdyInt();
   bool DisableDrdyInt();
   bool ConfigAccelRange(const AccelRange range);
@@ -96,6 +100,8 @@ class Mpu9250 {
   GyroRange gyro_range_;
   DlpfBandwidth dlpf_bandwidth_;
   uint8_t srd_;
+  bool akFailure_ = false;                               //################ Keep track of the AK8963 in case something fails.
+  bool mpuFailure_ = false;                               //################ Keep track of the MPU6500 in case something fails.
   static constexpr uint8_t WHOAMI_MPU9250_ = 0x71;
   static constexpr uint8_t WHOAMI_MPU9255_ = 0x73;
   static constexpr uint8_t WHOAMI_AK8963_ = 0x48;

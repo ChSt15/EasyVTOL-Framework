@@ -38,7 +38,11 @@ Mpu9250::Mpu9250(SPIClass *bus, uint8_t cs) {
   spi_ = bus;
   conn_ = cs;
 }
-int Mpu9250::Begin() {
+bool Mpu9250::Begin(bool disableMag) {
+
+  akFailure_ = disableMag;                                              //####################### Reset in case it works again
+  mpuFailure_ = false;                                              //####################### Reset in case it works again
+
   if (iface_ == I2C) {
     i2c_->begin();
     i2c_->setClock(I2C_CLOCK_);
@@ -57,24 +61,30 @@ int Mpu9250::Begin() {
   spi_clock_ = 1000000;
   /* Select clock source to gyro */
   if (!WriteRegister(PWR_MGMNT_1_, CLKSEL_PLL_)) {
-    return -1;
+    akFailure_ = true;
+    mpuFailure_ = true; 
+    return false;
   }
   /* Enable I2C master mode */
   if (!WriteRegister(USER_CTRL_, I2C_MST_EN_)) {
-    return -2;
+    akFailure_ = true;
+    mpuFailure_ = true;
+    return false;
   }
   /* Set the I2C bus speed to 400 kHz */
   if (!WriteRegister(I2C_MST_CTRL_, I2C_MST_CLK_)) {
-    return -3;
+    akFailure_ = true;
+    mpuFailure_ = true;
+    return false;
   }
   /* Set AK8963 to power down */
-  WriteAk8963Register(AK8963_CNTL1_, AK8963_PWR_DOWN_);
+  if (!akFailure_) WriteAk8963Register(AK8963_CNTL1_, AK8963_PWR_DOWN_);
   /* Reset the MPU9250 */
   WriteRegister(PWR_MGMNT_1_, H_RESET_);
   /* Wait for MPU-9250 to come back up */
-  delay(1);
+  delay(10);                                                            //###################### increased from 1ms to 10ms
   /* Reset the AK8963 */
-  WriteAk8963Register(AK8963_CNTL2_, AK8963_RESET_);
+  if (!akFailure_) WriteAk8963Register(AK8963_CNTL2_, AK8963_RESET_);
   /* Select clock source to gyro */
   if (!WriteRegister(PWR_MGMNT_1_, CLKSEL_PLL_)) {
     return -4;
@@ -82,82 +92,123 @@ int Mpu9250::Begin() {
   /* Check the WHO AM I byte */
   uint8_t who_am_i;
   if (!ReadRegisters(WHOAMI_, sizeof(who_am_i), &who_am_i)) {
-    return -5;
+    akFailure_ = true;
+    mpuFailure_ = true;
+    return false;
   }
   if ((who_am_i != WHOAMI_MPU9250_) && (who_am_i != WHOAMI_MPU9255_)) {
-    return -6;
+    akFailure_ = true;
+    mpuFailure_ = true;
+    return false;
   }
   /* Enable I2C master mode */
   if (!WriteRegister(USER_CTRL_, I2C_MST_EN_)) {
-    return -7;
+    akFailure_ = true;
+    mpuFailure_ = true;
+    return false;
   }
   /* Set the I2C bus speed to 400 kHz */
   if (!WriteRegister(I2C_MST_CTRL_, I2C_MST_CLK_)) {
-    return -8;
+    akFailure_ = true;
+    mpuFailure_ = true;
+    return false;
   }
   delay(10);
-  /* Check the AK8963 WHOAMI */
-  if (!ReadAk8963Registers(AK8963_WHOAMI_, sizeof(who_am_i), &who_am_i)) {
-    return -9;
+  if (!akFailure_) {
+    /* Check the AK8963 WHOAMI */
+    if (!ReadAk8963Registers(AK8963_WHOAMI_, sizeof(who_am_i), &who_am_i)) {
+      akFailure_ = true;
+      mpuFailure_ = true;
+      return false;
+    }
+    if (who_am_i != WHOAMI_AK8963_) {
+      akFailure_ = true;
+    }
   }
-  if (who_am_i != WHOAMI_AK8963_) {
-    return -10;
+  /* Skip if mag failed */
+  if (!akFailure_) {
+    /* Get the magnetometer calibration */
+    /* Set AK8963 to power down */
+    if (!WriteAk8963Register(AK8963_CNTL1_, AK8963_PWR_DOWN_)) {
+        akFailure_ = true;
+        mpuFailure_ = true;
+        return false;
+    }
+    delay(100);  // long wait between AK8963 mode changes
+    /* Set AK8963 to FUSE ROM access */
+    if (!WriteAk8963Register(AK8963_CNTL1_, AK8963_FUSE_ROM_)) {
+        akFailure_ = true;
+        mpuFailure_ = true;
+        return false;
+    }
+    delay(100);  // long wait between AK8963 mode changes
+    /* Read the AK8963 ASA registers and compute magnetometer scale factors */
+    uint8_t asa_buff[3];
+    if (!ReadAk8963Registers(AK8963_ASA_, sizeof(asa_buff), asa_buff)) {
+        akFailure_ = true;
+        mpuFailure_ = true;
+        return false;
+    }
+    mag_scale_[0] = ((static_cast<float>(asa_buff[0]) - 128.0f)
+        / 256.0f + 1.0f) * 4912.0f / 32760.0f;
+    mag_scale_[1] = ((static_cast<float>(asa_buff[1]) - 128.0f)
+        / 256.0f + 1.0f) * 4912.0f / 32760.0f;
+    mag_scale_[2] = ((static_cast<float>(asa_buff[2]) - 128.0f)
+        / 256.0f + 1.0f) * 4912.0f / 32760.0f;
+    /* Set AK8963 to power down */
+    if (!WriteAk8963Register(AK8963_CNTL1_, AK8963_PWR_DOWN_)) {
+        akFailure_ = true;
+        mpuFailure_ = true;
+        return false;
+    }
+    /* Set AK8963 to 16 bit resolution, 100 Hz update rate */
+    if (!WriteAk8963Register(AK8963_CNTL1_, AK8963_CNT_MEAS2_)) {
+        akFailure_ = true;
+        mpuFailure_ = true;
+        return false;
+    }
+    delay(100);  // long wait between AK8963 mode changes
   }
-  /* Get the magnetometer calibration */
-  /* Set AK8963 to power down */
-  if (!WriteAk8963Register(AK8963_CNTL1_, AK8963_PWR_DOWN_)) {
-    return -11;
-  }
-  delay(100);  // long wait between AK8963 mode changes
-  /* Set AK8963 to FUSE ROM access */
-  if (!WriteAk8963Register(AK8963_CNTL1_, AK8963_FUSE_ROM_)) {
-    return -12;
-  }
-  delay(100);  // long wait between AK8963 mode changes
-  /* Read the AK8963 ASA registers and compute magnetometer scale factors */
-  uint8_t asa_buff[3];
-  if (!ReadAk8963Registers(AK8963_ASA_, sizeof(asa_buff), asa_buff)) {
-    return -13;
-  }
-  mag_scale_[0] = ((static_cast<float>(asa_buff[0]) - 128.0f)
-    / 256.0f + 1.0f) * 4912.0f / 32760.0f;
-  mag_scale_[1] = ((static_cast<float>(asa_buff[1]) - 128.0f)
-    / 256.0f + 1.0f) * 4912.0f / 32760.0f;
-  mag_scale_[2] = ((static_cast<float>(asa_buff[2]) - 128.0f)
-    / 256.0f + 1.0f) * 4912.0f / 32760.0f;
-  /* Set AK8963 to power down */
-  if (!WriteAk8963Register(AK8963_CNTL1_, AK8963_PWR_DOWN_)) {
-    return -14;
-  }
-  /* Set AK8963 to 16 bit resolution, 100 Hz update rate */
-  if (!WriteAk8963Register(AK8963_CNTL1_, AK8963_CNT_MEAS2_)) {
-    return -15;
-  }
-  delay(100);  // long wait between AK8963 mode changes
   /* Select clock source to gyro */
   if (!WriteRegister(PWR_MGMNT_1_, CLKSEL_PLL_)) {
-    return -16;
+    akFailure_ = true;
+    mpuFailure_ = true;
+    return false;
   }
   /* Instruct the MPU9250 to get 7 bytes from the AK8963 at the sample rate */
-  uint8_t mag_data[7];
-  if (!ReadAk8963Registers(AK8963_HXL_, sizeof(mag_data), mag_data)) {
-    return -17;
+  /* Skip if mag failed */
+  if (!akFailure_) {
+    uint8_t mag_data[7];
+    if (!ReadAk8963Registers(AK8963_HXL_, sizeof(mag_data), mag_data)) {
+        akFailure_ = true;
+        mpuFailure_ = true;
+        return false;
+    }
   }
   /* Set the accel range to 16G by default */
   if (!ConfigAccelRange(ACCEL_RANGE_16G)) {
-    return -18;
+    akFailure_ = true;
+    mpuFailure_ = true;
+    return false;
   }
   /* Set the gyro range to 2000DPS by default*/
   if (!ConfigGyroRange(GYRO_RANGE_2000DPS)) {
-    return -19;
+    akFailure_ = true;
+    mpuFailure_ = true;
+    return false;
   }
-  /* Set the DLPF to 20HZ by default */
+  
+    /* Set the DLPF to 20HZ by default */
   if (!ConfigDlpf(DLPF_BANDWIDTH_20HZ)) {
-    return -20;
+    akFailure_ = true;
+    mpuFailure_ = true;
+    return false;
   }
   /* Set the SRD to 0 by default */
   if (!ConfigSrd(0)) {
-    return -21;
+    akFailure_ = true;
+    mpuFailure_ = true;
+    return false;
   }
   return true;
 }
@@ -263,7 +314,7 @@ bool Mpu9250::ConfigSrd(const uint8_t srd) {
     return false;
   }
   /* Set the magnetometer sample rate */
-  if (srd > 9) {
+  if (srd > 9 && !akFailure_) {
     /* Set AK8963 to power down */
     WriteAk8963Register(AK8963_CNTL1_, AK8963_PWR_DOWN_);
     delay(100);  // long wait between AK8963 mode changes
@@ -277,9 +328,9 @@ bool Mpu9250::ConfigSrd(const uint8_t srd) {
     if (!ReadAk8963Registers(AK8963_HXL_, sizeof(mag_data), mag_data)) {
       return false;
     }
-  } else {
+  } else if (!akFailure_) {
     /* Set AK8963 to power down */
-    WriteAk8963Register(AK8963_CNTL1_, AK8963_PWR_DOWN_);
+    if (!akFailure_) WriteAk8963Register(AK8963_CNTL1_, AK8963_PWR_DOWN_);
     delay(100);  // long wait between AK8963 mode changes
     /* Set AK8963 to 16 bit resolution, 100 Hz update rate */
     if (!WriteAk8963Register(AK8963_CNTL1_, AK8963_CNT_MEAS2_)) {
@@ -304,6 +355,10 @@ bool Mpu9250::ConfigDlpf(const DlpfBandwidth dlpf) {
   spi_clock_ = 1000000;
   /* Check input is valid and set requested dlpf */
   switch (dlpf) {
+    case DLPF_BANDWIDTH_250HZ_4kHz: {
+      requested_dlpf = dlpf;
+      break;
+    }
     case DLPF_BANDWIDTH_184HZ: {
       requested_dlpf = dlpf;
       break;
@@ -328,16 +383,37 @@ bool Mpu9250::ConfigDlpf(const DlpfBandwidth dlpf) {
       requested_dlpf = dlpf;
       break;
     }
+    case DLPF_BANDWIDTH_DISABLE_32kHz: {
+      requested_dlpf = dlpf;
+      break;
+    }
     default: {
       return false;
     }
   }
-  /* Try setting the dlpf */
-  if (!WriteRegister(ACCEL_CONFIG2_, requested_dlpf)) {
-    return false;
-  }
-  if (!WriteRegister(CONFIG_, requested_dlpf)) {
-    return false;
+
+  if (dlpf == DLPF_BANDWIDTH_DISABLE_32kHz) {
+
+    if (!WriteRegister(ACCEL_CONFIG2_, B00001100)) {
+        return false;
+    }
+    uint8_t reg;
+    if (!ReadRegisters(GYRO_CONFIG_, 1, &reg)) {
+        return false;
+    }
+    reg &= B11111100;
+    reg |= B00000011;
+    if (!WriteRegister(GYRO_CONFIG_, reg)) {
+        return false;
+    }
+  } else {
+    /* Try setting the dlpf */
+    if (!WriteRegister(ACCEL_CONFIG2_, requested_dlpf)) {
+        return false;
+    }
+    if (!WriteRegister(CONFIG_, requested_dlpf)) {
+        return false;
+    }
   }
   /* Update stored dlpf */
   dlpf_bandwidth_ = requested_dlpf;

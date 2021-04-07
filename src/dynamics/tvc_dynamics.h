@@ -129,7 +129,7 @@ private:
             Vector Fp = (_setpoint.force - Fm).getProjectionOn(_tvcPosition);
 
             float FmMag = Fm.magnitude();
-            Vector FmDir = Fm.copy().normalize();
+            //Vector FmDir = Fm.copy().normalize();
 
             float FpMag = Fp.magnitude();
 

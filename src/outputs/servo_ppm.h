@@ -8,8 +8,9 @@
 #include "utils/device_status.h"
 
 
-
-#define DEGREES (180.0f/3.14159265f)
+#ifndef DEGREES
+    #define DEGREES (180.0f/3.14159265f)
+#endif
 
 
 

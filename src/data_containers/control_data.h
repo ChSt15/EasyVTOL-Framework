@@ -2,9 +2,6 @@
 #define CONTROL_DATA_H
 
 
-#include "definitions.h"
-
-#include "3d_math.h"
 
 #include "kinematic_data.h"
 

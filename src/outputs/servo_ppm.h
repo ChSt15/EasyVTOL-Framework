@@ -9,6 +9,10 @@
 
 
 
+#define DEGREES (180.0f/3.14159265f)
+
+
+
 /**
  * Used to transfer protocol information.
  * 

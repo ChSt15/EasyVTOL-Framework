@@ -11,6 +11,7 @@
 
 #include "mpu9250.h"
 #include "CircularBuffer.h"
+#include "3d_math.h"
 
 
 class MPU9250Driver: public Module {

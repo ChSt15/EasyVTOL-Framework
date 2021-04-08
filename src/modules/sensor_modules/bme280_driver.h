@@ -35,6 +35,16 @@ public:
     void init();
 
     /**
+     * Returns how fast the module should be ran at.
+     *
+     * @param values none.
+     * @return uint32_t.
+     */
+    virtual uint32_t get_LoopRate_Hz() {
+        return 100;
+    }
+
+    /**
      * Returns rate (in Hz) of the thread
      *
      * @param values none.

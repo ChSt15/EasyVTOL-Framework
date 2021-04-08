@@ -94,7 +94,7 @@ public:
      * @return uint32_t.
      */
     virtual uint32_t get_LoopRate_Hz() {
-        return _loopRate_Hz;
+        return 1000;
     }
 
     /**
@@ -111,8 +111,6 @@ protected:
     virtual void init() = 0;
 
     static VEHICLE_MODE* _vehicleMode;
-
-    uint32_t _loopRate_Hz = 1000;
 
     MODULE_STATUS _moduleStatus = MODULE_STATUS::MODULE_NOT_STARTED;
 

@@ -68,7 +68,6 @@ void KraftKontrolRunner::initialise() {
     Serial.println("CPU Speed: " + String(F_CPU_ACTUAL));
     delay(500);
 
-
     systemScheduler.attachFunction(imuThread, 32000, TASK_PRIORITY::PRIORITY_REALTIME);
     systemScheduler.attachFunction(baroThread, Baro.get_LoopRate_Hz(), TASK_PRIORITY::PRIORITY_HIGH);
     //systemScheduler.attachFunction(LORA_2_4::deviceThread, 500, TASK_PRIORITY::PRIORITY_MIDDLE);

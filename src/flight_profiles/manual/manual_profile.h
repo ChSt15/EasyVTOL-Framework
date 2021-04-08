@@ -14,10 +14,6 @@
 class ManualControlProfile: public ControlProfile {
 public:
 
-    ManualControlProfile() {
-        _loopRate_Hz = 100;
-    }
-
     /**
      * This is where all calculations are done.
      *
@@ -25,7 +21,16 @@ public:
      * @return none.
      */
     void thread();
-    
+
+    /**
+     * Returns how fast the module should be ran at.
+     *
+     * @param values none.
+     * @return uint32_t.
+     */
+    virtual uint32_t get_LoopRate_Hz() {
+        return 100;
+    }
 
     /**
      * Gives the vehicle control module the vehicle to control

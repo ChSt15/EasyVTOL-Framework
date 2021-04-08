@@ -7,14 +7,13 @@
 
 #include "interval_control.h"
 
-#include "modules/module_template.h"
+#include "modules/sensor_modules/imu_template.h"
 
 #include "mpu9250.h"
 #include "CircularBuffer.h"
-#include "3d_math.h"
 
 
-class MPU9250Driver: public Module {
+class MPU9250Driver: public IMUTemplate {
 public:
 
     

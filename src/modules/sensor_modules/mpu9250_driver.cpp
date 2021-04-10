@@ -21,7 +21,7 @@ void MPU9250Driver::_getData() {
         _gyroCounter++;
     }
 
-    bufVec = Vector(_imu.accel_x_mps2(), -_imu.accel_y_mps2(), _imu.accel_z_mps2());
+    bufVec = Vector(-_imu.accel_x_mps2(), _imu.accel_y_mps2(), -_imu.accel_z_mps2());
     if (_lastAccel != bufVec) {
         _accelFifo.unshift(bufVec);
         _accelTimestampFifo.unshift(_newDataTimestamp);

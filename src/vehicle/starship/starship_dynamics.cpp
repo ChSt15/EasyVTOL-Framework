@@ -30,7 +30,6 @@ void StarshipDynamics::thread() {
         float twist = -constrain(_dynamicSetpoint->torqe.z, -45*DEGREES, 45*DEGREES);
         _getTVCAngles(direction, twist, TVC1, TVC2, TVC3, TVC4);
 
-        //Serial.println(_dynamicSetpoint->torqe.z);
 
         _TVCServo1.setAngle(TVC1);
         _TVCServo2.setAngle(TVC2);

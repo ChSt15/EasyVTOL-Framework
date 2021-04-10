@@ -57,10 +57,18 @@ void NavigationComplementary::thread() {
 
     if (IMU.accelAvailable()) {
 
+        //static Vector lastValue = 0;
+
         //Get IMU data
         Vector accelVector;
         uint32_t timestamp;
         IMU.getAccel(&accelVector, &timestamp);
+
+        accelVector = (accelVector - _accelBias).compWiseMulti(_accelScale);
+
+        //accelVector = lastValue = lastValue*0.9999 + accelVector*0.0001;
+
+        //Serial.println("Accel: x: " + String(accelVector.x,4) + ", y: " + String(accelVector.y,4) + ", z: " + String(accelVector.z,4));
 
         //Check if accelerometer initialised
         if (_accelInitialized) {
@@ -72,7 +80,7 @@ void NavigationComplementary::thread() {
             float beta = 0.5f;
 
             //Z-Axis correction
-            Vector zAxisIs = Vector(0,0,-1);
+            Vector zAxisIs = Vector(0,0,1);
             Vector zAxisSet = (_navigationData.attitude*accelVector*_navigationData.attitude.copy().conjugate()).toVector();
 
             Vector zAxisRotationAxis = zAxisSet.cross(zAxisIs);
@@ -88,7 +96,7 @@ void NavigationComplementary::thread() {
 
             //Update acceleration
             _navigationData.acceleration = (_navigationData.attitude*accelVector*_navigationData.attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
-            _navigationData.linearAcceleration = _navigationData.acceleration - Vector(0,0,-9.81);
+            _navigationData.linearAcceleration = _navigationData.acceleration - Vector(0,0,9.81);
 
         } else if (_gyroInitialized) {
             
@@ -97,7 +105,7 @@ void NavigationComplementary::thread() {
             _lastAccelTimestamp = timestamp;
 
             //Set Attitude
-            Vector zAxisIs = Vector(0,0,-1);
+            Vector zAxisIs = Vector(0,0,1);
             Vector zAxisSet = (_navigationData.attitude*accelVector*_navigationData.attitude.copy().conjugate()).toVector();
 
             Vector zAxisRotationAxis = zAxisSet.cross(zAxisIs);
@@ -212,11 +220,55 @@ void NavigationComplementary::thread() {
     }
 
 
-    //################## Inertial navigation testing ###############
-
-    _navigationData.velocity = _navigationData.velocity + _navigationData.acceleration*dTime;
-
+    //integrate values for INS Dead reckoning with IMU values
+    _navigationData.velocity = _navigationData.velocity + _navigationData.linearAcceleration*dTime;
     _navigationData.position = _navigationData.position + _navigationData.velocity*dTime;
+
+
+    if (Baro.pressureAvailable()) {
+
+        //Get IMU data
+        float pressure;
+        uint32_t timestamp;
+        Baro.getPressure(&pressure, &timestamp);
+
+        //Check if accelerometer initialised
+        if (_baroInitialized) {
+            
+            //Correct state prediction
+            float dt = float(timestamp - _lastBaroTimestamp)/1000000.0f;
+            _lastBaroTimestamp = timestamp;
+
+            float beta = 0.3f;
+
+            //calculate height from new pressure value
+            float height = _getHeightFromPressure(pressure, 100e3f);
+            //calculate z velocity from new height value
+            float zVelocity = (height - _lastHeightValue)/dt;
+
+            //correct dead reckoning values with new ones.
+            _navigationData.position.z += (height - _navigationData.position.z)*beta*dt;
+            _navigationData.velocity.z += (zVelocity - _navigationData.velocity.z)*beta*dt;
+
+            //Update last Height value
+            _lastHeightValue = height;
+
+
+        } else {
+            
+            //Set flag to true
+            _baroInitialized = true;
+            
+            //Barometer filter initialisation
+            _lastBaroTimestamp = timestamp;
+            _lastHeightValue = _getHeightFromPressure(pressure, 100e3f);
+
+            //Set current calculated height as start value.
+            _navigationData.position.z = _lastHeightValue;
+
+        }
+
+    }
 
 }
 

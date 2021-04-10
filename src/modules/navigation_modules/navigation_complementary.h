@@ -18,6 +18,7 @@
 #include "navigation_template.h"
 
 #include "modules/sensor_modules/mpu9250_driver.h"
+#include "modules/sensor_modules/bme280_driver.h"
 
 #include "utils/high_pass_filter.h"
 #include "utils/low_pass_filter.h"
@@ -75,16 +76,20 @@ private:
     uint32_t _lastAccelTimestamp = 0;
     uint32_t _lastMagTimestamp = 0;
 
+    uint32_t _lastBaroTimestamp = 0;
+
     uint32_t _lastLoopTimestamp = 0;
 
     Vector _lastGyroValue = 0;
+
+    float _lastHeightValue = 0;
     //Vector _gyroOffset = 0;
 
     Vector _magOffset = Vector(-40.24, 56.43, -42.97);
     Vector _magScale = Vector(1.01, 1.03, 0.96);
 
-    Vector _accelOffset = 0;
-    Vector _accelScale = 1;
+    Vector _accelBias = 0;//Vector(-0.085,-0.07,0.105);
+    Vector _accelScale = 1;//Vector(0,0,1.00765f);
 
     //System information flagges
     bool _angularRateValid = false;
@@ -100,6 +105,18 @@ private:
     bool _gyroInitialized = false;
     bool _accelInitialized = false;
     bool _magInitialized = false;
+
+    bool _baroInitialized = false;
+
+    /**
+     * Calculates height from current pressure and pressure at sea level for reference.
+     * 
+     * @param values pressure and refPressure.
+     * @return float.
+     */
+    float _getHeightFromPressure(const float &pressure, const float &refPressure = 1000) {
+        return ((float)-44330.77)*(pow(((float)pressure/(float)refPressure), 0.190263) - (float)1);
+    }
 
 
 };

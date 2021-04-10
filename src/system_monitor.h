@@ -36,11 +36,15 @@ void systemMonitor() {
     static uint32_t timestamp = 0;
 
     //vehicleKinetics.angularRate = vehicleKinetics.attitude.copy().conjugate().rotateVector(vehicleKinetics.angularRate);
+    //vehicleKinetics.linearAcceleration = vehicleKinetics.attitude.copy().conjugate().rotateVector(vehicleKinetics.linearAcceleration);
     
     //if (IMU::gyroAvailable()) IMU::getGyro(&Gyro, &timestamp);
 
-    Serial.println();
+    //Serial.println();
     //Serial.println("LoopRate: " + String(IMU.loopRate()) + ", GyroRate: " + String(IMU.gyroRate()) + ", AccelRate: " + String(IMU.accelRate()) + ", MagRate: " + String(IMU.magRate()));
+    //Serial.println("vehicle linear accel: x: " + String(vehicleKinetics.linearAcceleration.x) + ", y: " + String(vehicleKinetics.linearAcceleration.y) + ", z: " + String(vehicleKinetics.linearAcceleration.z));
+    //Serial.println("vehicle position: x: " + String(vehicleKinetics.position.x) + ", y: " + String(vehicleKinetics.position.y) + ", z: " + String(vehicleKinetics.position.z) + ", IMU: " + IMU.gyroRate());
+    Serial.println("vehicle velocity: x: " + String(vehicleKinetics.velocity.x) + ", y: " + String(vehicleKinetics.velocity.y) + ", z: " + String(vehicleKinetics.velocity.z) + ", IMU: Gyro: " + IMU.gyroRate() + ", Accel: " + IMU.accelRate());
     //Serial.println("vehicle attitude: w: " + String(vehicleKinetics.attitude.w) + ", x: " + String(vehicleKinetics.attitude.x) + ", y: " + String(vehicleKinetics.attitude.y) + ", z: " + String(vehicleKinetics.attitude.z));
     //Serial.println("vehicle angularRate: x: " + String(vehicleKinetics.angularRate.x) + ", y: " + String(vehicleKinetics.angularRate.y) + ", z: " + String(vehicleKinetics.angularRate.z));
     //Serial.println("vehicle angularRate setpoint: x: " + String(vehicleSetpoints.angularRate.x) + ", y: " + String(vehicleSetpoints.angularRate.y) + ", z: " + String(vehicleSetpoints.angularRate.z));
@@ -51,7 +55,7 @@ void systemMonitor() {
     //Serial.println("vehicle speed: x: " + String(vehicle.getVelocity().x) + ", y: " + String(vehicle.getVelocity().y) + ", z: " + String(vehicle.getVelocity().z));
     //Serial.println("vehicle pos: x: " + String(vehicle.getPosition().x) + ", y: " + String(vehicle.getPosition().y) + ", z: " + String(vehicle.getPosition().z));
     
-    Serial.println(String("rate: ") + Baro.loopRate());
+    //Serial.println(String("rate: ") + Baro.loopRate());
 }
 
 

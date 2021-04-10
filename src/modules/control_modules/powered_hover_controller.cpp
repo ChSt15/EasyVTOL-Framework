@@ -153,7 +153,8 @@ void HoverController::thread() {
 
     }
 
-    _controlOutput.force = Vector(0,0,9.81)*1; //Multiplied by vehicle mass
+    _controlOutput.force = -_navigationData->linearAcceleration.z*1; //Multiplied by vehicle mass
+    _controlOutput.force = _navigationData->attitude.copy().conjugate().rotateVector(_controlOutput.force); //Rotate to local coordinate system
 
 }
 

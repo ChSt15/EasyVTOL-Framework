@@ -46,7 +46,82 @@ enum KRAFTPACKET_PATH_ID {
 };
 
 
-class KraftPacket_Small final {
+/**
+ * Template used for KraftPackets
+ */
+class KraftPacket_Template {
+public:
+
+    /**
+     * Returns the packet ID.
+     *
+     * @param values none.
+     * @return uint32_t.
+     */
+    uint32_t getDataID() {return _dataID;}
+
+    /**
+     * Returns the Transmitting device ID.
+     *
+     * @param values none.
+     * @return uint32_t.
+     */
+    uint32_t getTransmitterID() {return _transmitterID;}
+
+    /**
+     * Returns the Receiving device ID.
+     *
+     * @param values none.
+     * @return uint32_t.
+     */
+    uint32_t getReceiverID() {return _receiverID;}
+
+    /**
+     * Returns true if packet was a broadcast
+     *
+     * @param values none.
+     * @return bool .
+     */
+    bool isBroadcast() {return _receiverID == KRAFTPACKET_PATH_BROADCAST_ID;}
+
+    /**
+     * Sets the packets receiver ID. Basically adding an address to whom the packet is supposed to be received by.
+     *
+     * @param values receiverID.
+     * @return none.
+     */
+    void setReceiverID(const KRAFTPACKET_PATH_ID &receiverID) {_receiverID = receiverID;}
+
+    /**
+     * Sets the packets transmitter ID. Basically adding an address from who the packet was sent from.
+     *
+     * @param values receiverID.
+     * @return none.
+     */
+    void setTransmitterID(const KRAFTPACKET_PATH_ID &transmitterID) {_transmitterID = transmitterID;}
+
+
+protected:
+
+    const uint16_t _packetStart = (uint16_t)KRAFTPACKET_MARKER_STARTINTEGER + KRAFTPACKET_VERSION;
+
+    uint16_t _transmitterID = KRAFTPACKET_PATH_IGNORE_ID;
+    uint16_t _receiverID = KRAFTPACKET_PATH_BROADCAST_ID;
+
+    uint32_t _dataID = 0;
+    uint32_t _dataSize = 0;
+
+    const uint8_t _packetEnd = KRAFTPACKET_MARKER_ENDBYTE;
+
+
+};
+
+
+/**
+ * A packet to address other devices and handle data buffer.
+ * This class is the small version limited to 255 byte size, making it ideal for low bitrate systems like LoRa.
+ */
+class KraftPacket_Small final: public KraftPacket_Template {
 public:
 
     /**
@@ -141,6 +216,8 @@ public:
         _transmitterID = dataBytes[2];
         _receiverID = dataBytes[3];
 
+        if (_transmitterID == KRAFTPACKET_PATH_BROADCAST_ID) return false; //That would be pretty wierd if it were a broadcast.
+
         _dataID = dataBytes[4];
         _dataSize = dataBytes[5];
 
@@ -186,19 +263,9 @@ public:
 
 private:
 
-    const uint16_t _packetStart = (uint16_t)KRAFTPACKET_MARKER_STARTINTEGER + KRAFTPACKET_VERSION;
-
-    uint8_t _transmitterID = KRAFTPACKET_PATH_IGNORE_ID;
-    uint8_t _receiverID = KRAFTPACKET_PATH_BROADCAST_ID;
-
-    uint32_t _dataID = 0;
-    uint32_t _dataSize = 0;
-
     uint8_t _packetBytes[KRAFTPACKET_SIZE_LIMIT_BYTES];
 
     uint8_t _crc = 0;
-
-    const uint8_t _packetEnd = KRAFTPACKET_MARKER_ENDBYTE;
 
 };
 

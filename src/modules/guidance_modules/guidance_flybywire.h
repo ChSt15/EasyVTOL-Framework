@@ -132,7 +132,8 @@ public:
 
 private:
 
-    IntervalControl _interval = IntervalControl(1000); //Loop rate is at 1kHz
+    uint32_t _lastRunTimestamp = 0;
+
 
 };
 

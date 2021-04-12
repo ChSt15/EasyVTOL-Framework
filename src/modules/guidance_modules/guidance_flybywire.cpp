@@ -4,11 +4,10 @@
 
 void GuidanceFlyByWire::thread() {
 
-    uint32_t dTimeus;
 
-    if(!_interval.isTimeToRun(dTimeus)) return; //Check if its time to run
 
-    float dT = dTimeus/1000000.0f; //Get time delta in seconds
+    float dT = ((float) micros() - _lastRunTimestamp)/1000000.0f; //Get time delta in seconds
+    _lastRunTimestamp = micros(); //Save current run timestamp for next run.
 
     //Integrate speed, position and attitude
     _vehicleControlSettings.velocity += _vehicleControlSettings.linearAcceleration*dT;
@@ -23,7 +22,7 @@ void GuidanceFlyByWire::thread() {
 void GuidanceFlyByWire::init() {
 
     _vehicleControlSettings.velocity = 0;
-    _vehicleControlSettings.acceleration = GRAVITY_VECTOR;
+    _vehicleControlSettings.acceleration = -GRAVITY_VECTOR;
     _vehicleControlSettings.linearAcceleration = 0;
     _vehicleControlSettings.angularRate = 0;
 

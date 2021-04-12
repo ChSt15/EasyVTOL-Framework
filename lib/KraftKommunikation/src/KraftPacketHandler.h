@@ -31,18 +31,18 @@
 
 #define KRAFTPACKET_VERSION 0
 
-//Should stay below 255 due to most packet markers being uint8_t datatypes
-#define KRAFTPACKET_SIZE_LIMIT_BYTES 200
+//Should stay below 255 due to most packet markers being uint8_t datatypes in small KraftPacketType
+#define KRAFTPACKET_SMALL_SIZE_LIMIT_BYTES 200
 
 
 
 //Is the ID of a devide like Vehicle or basestation. Broadcast means the data is meant for all devices to receive. Also used for Transmitting device ID.
 enum KRAFTPACKET_PATH_ID {
-    KRAFTPACKET_PATH_IGNORE_ID,             //Ignore Messages with this ID
-    KRAFTPACKET_PATH_VEHICLE_ID,            //Vehicle ID
-    KRAFTPACKET_PATH_CONTROLLER_ID,         //Controllers ID. Controller is for manual control
-    KRAFTPACKET_PATH_BASESTATION_ID,        //Basestation ID. 
-    KRAFTPACKET_PATH_BROADCAST_ID           //General packet that everything can receive
+    KRAFTPACKET_PATH_IGNORE_ID = 0,                 //Ignore Messages with this ID
+    KRAFTPACKET_PATH_VEHICLE_ID = 1,                //Vehicle ID
+    KRAFTPACKET_PATH_CONTROLLER_ID = 2,             //Controllers ID. Controller is for manual control
+    KRAFTPACKET_PATH_BASESTATION_ID = 3,            //Basestation ID. 
+    KRAFTPACKET_PATH_BROADCAST_ID = 255             //General packet that everything can receive
 };
 
 
@@ -134,10 +134,10 @@ public:
      */
     uint32_t setPacketData(KraftDataType &packetData) {
 
-        if (packetData.getDataSize() > KRAFTPACKET_SIZE_LIMIT_BYTES) return 0;
+        if (packetData.getDataSize() > KRAFTPACKET_SMALL_SIZE_LIMIT_BYTES) return 0;
 
         uint8_t dataBuffer[packetData.getDataSize()]; //Make data buffer for data
-        packetData.getRawData(_packetBytes, KRAFTPACKET_SIZE_LIMIT_BYTES); //Transfer data into databuffer
+        packetData.getRawData(_packetBytes, KRAFTPACKET_SMALL_SIZE_LIMIT_BYTES); //Transfer data into databuffer
 
         _dataID = packetData.getDataTypeID();
         _dataSize = packetData.getDataSize();
@@ -161,7 +161,7 @@ public:
 
         if (packetData->getDataSize() != _dataSize || packetData->getDataTypeID() != _dataID) return false;
 
-        return packetData->setRawData(_packetBytes, KRAFTPACKET_SIZE_LIMIT_BYTES); //Transfer data into packet
+        return packetData->setRawData(_packetBytes, KRAFTPACKET_SMALL_SIZE_LIMIT_BYTES); //Transfer data into packet
 
     }
 
@@ -263,7 +263,7 @@ public:
 
 private:
 
-    uint8_t _packetBytes[KRAFTPACKET_SIZE_LIMIT_BYTES];
+    uint8_t _packetBytes[KRAFTPACKET_SMALL_SIZE_LIMIT_BYTES];
 
     uint8_t _crc = 0;
 

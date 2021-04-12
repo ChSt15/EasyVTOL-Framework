@@ -4,8 +4,6 @@
 
 void GuidanceFlyByWire::thread() {
 
-
-
     float dT = ((float) micros() - _lastRunTimestamp)/1000000.0f; //Get time delta in seconds
     _lastRunTimestamp = micros(); //Save current run timestamp for next run.
 

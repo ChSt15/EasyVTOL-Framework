@@ -11,7 +11,7 @@ enum VEHICLE_MODE {
     MODE_ERROR,
     //When this is set, the vehicle turns everything off. Should be resetable from vehicle.
     MODE_FAILSAFE,
-    //Same as failsafe but indicates no error.
+    //Same as failsafe but indicates no error and puts vehicle into safe mode.
     MODE_DISARM,
     //Vehicle prepares for flight. Move actuators into position.
     MODE_PREPARE,

@@ -12,7 +12,7 @@
 #include "definitions.h"
 
 #include "connections/starship_v_1_0.h"
-#include "starship_data.h"
+#include "starship_data_container.h"
 
 #include "outputs/rgb_led.h"
 
@@ -72,17 +72,29 @@ public:
     void init();
 
     /**
-     * Tells starship which actuators to use 
+     * Sets the vehicle data input pointer.
+     * 
+     * Allows the control module to automatically retrieve its needed
+     * data from the pointer.
+     * 
+     * This must only be called once.
+     * 
+     * returns false if failed from null pointer input.
      *
-     * @param values STARSHIP_MODE.
-     * @return none.
+     * @param values vehicleDataPointer.
+     * @return bool.
      */
-    void setActuatorMode(STARSHIP_MODE starshipMode) {
-        _starshipMode = starshipMode;
-    }
+    bool linkVehicleDataPointer(StarshipData *vehicleDataPointer) {
+        if (vehicleDataPointer == nullptr) return false;
+        _vehicleData = vehicleDataPointer;
+        return true;
+    };
     
 
 private:
+
+    //Vehicle data pointer
+    StarshipData* _vehicleData;
 
     //TVC servo in X+
     PPMChannel _TVCServo1 = PPMChannel(TVC_SERVO_PIN_1, PPM_PROTOCOL::STANDARD_1000, 0, -1);
@@ -122,9 +134,6 @@ private:
 
     FLAP_TEST_STAGE _flapTestStage = FLAP_TEST_STAGE::TOP_LEFT;
     uint8_t _flapTestCounter = 0;
-
-    //Tells system which actuators to use
-    STARSHIP_MODE _starshipMode = STARSHIP_MODE::TVC_CONTROL;
 
     //Helps with calculating TVC stuff
     TVCDynamics _TVCCalculator = TVCDynamics(Vector(0,0,-0.4), Vector(0,0,-1));

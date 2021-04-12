@@ -59,6 +59,25 @@ public:
     bool moduleReady() {return _gyroInitialized && _accelInitialized && _magInitialized;};
 
     /**
+     * Sets the vehicle data input pointer.
+     * 
+     * Allows the control module to automatically retrieve its needed
+     * data from the pointer.
+     * 
+     * This must only be called once.
+     * 
+     * returns false if failed from null pointer input.
+     *
+     * @param values vehicleDataPointer.
+     * @return bool.
+     */
+    bool linkVehicleDataPointer(VehicleData *vehicleDataPointer) {
+        if (vehicleDataPointer == nullptr) return false;
+        _vehicleData = vehicleDataPointer;
+        return true;
+    };
+
+    /**
      * Returns the current position accuracy.
      * 
      * @param values none.
@@ -68,6 +87,9 @@ public:
 
 
 private:
+
+    //Vehicle data pointer
+    VehicleData* _vehicleData = nullptr;
 
     //Filter data
     HighPassFilter<Vector> _gyroHPF = HighPassFilter<Vector>(0.001);

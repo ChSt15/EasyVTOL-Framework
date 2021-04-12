@@ -3,9 +3,18 @@
 
 
 
-enum STARSHIP_MODE {
-    TVC_CONTROL,
-    FLAP_CONTROL
+#include "data_containers/vehicle_data.h"
+
+
+
+/**
+ * Starship specific data container.
+ */
+struct StarshipData: public VehicleData {
+
+    //If true then flip to belly flop position and mainly use flaps for control.
+    bool bellyFlop = false;
+
 };
 
 

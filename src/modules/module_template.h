@@ -5,7 +5,7 @@
 
 #include "definitions.h"
 
-#include "data_containers/vehicle_mode.h"
+#include "data_containers/vehicle_data.h"
 
 /**
  * This is a template that contains all the functions that all 
@@ -74,18 +74,11 @@ public:
     /**
      * Module specific init function that sets the 
      * module up.
-     * 
-     * A pointer to the vehicles mode must be given in order to
-     * allow the module to always know if a failsafe of error has
-     * occured.
      *
-     * @param values vehicleMode.
+     * @param values none.
      * @return none.
      */
-    virtual void init(VEHICLE_MODE* vehicleMode) {
-        _vehicleMode = vehicleMode;
-        init();
-    };
+    virtual void init() = 0;
 
     /**
      * Returns how fast the module should be ran at.
@@ -107,10 +100,6 @@ public:
 
 
 protected:
-
-    virtual void init() = 0;
-
-    static VEHICLE_MODE* _vehicleMode;
 
     MODULE_STATUS _moduleStatus = MODULE_STATUS::MODULE_NOT_STARTED;
 

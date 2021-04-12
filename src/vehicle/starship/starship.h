@@ -74,6 +74,9 @@ private:
     //Default module to use at start
     HoverController _hoveringController;
 
+    //Data container for starship
+    StarshipData _starshipData;
+
 
 };
 

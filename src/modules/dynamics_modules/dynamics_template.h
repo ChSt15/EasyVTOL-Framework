@@ -7,7 +7,6 @@
 
 #include "data_containers/navigation_data.h"
 #include "data_containers/dynamic_data.h"
-#include "data_containers/vehicle_mode.h"
 
 
 /**
@@ -156,9 +155,6 @@ public:
 
 
 protected:
-
-    //Points to vehicle mode.
-    static VEHICLE_MODE *_vehicleMode;
 
     //Points to dynamics setpoint data container.
     static DynamicData* _dynamicSetpoint;

@@ -5,6 +5,7 @@
 
 #include "data_containers/control_data.h"
 #include "data_containers/navigation_data.h"
+#include "data_containers/vehicle_data.h"
 
 #include "modules/control_modules/control_template.h"
 
@@ -27,6 +28,25 @@ public:
      * @return none.
      */
     void init();
+
+    /**
+     * Sets the vehicle data input pointer.
+     * 
+     * Allows the control module to automatically retrieve its needed
+     * data from the pointer.
+     * 
+     * This must only be called once.
+     * 
+     * returns false if failed from null pointer input.
+     *
+     * @param values vehicleDataPointer.
+     * @return bool.
+     */
+    bool linkVehicleDataPointer(VehicleData *vehicleDataPointer) {
+        if (vehicleDataPointer == nullptr) return false;
+        _vehicleData = vehicleDataPointer;
+        return true;
+    };
 
     /**
      * Sets the control factor.
@@ -98,6 +118,9 @@ public:
 
 
 private:
+
+    //Vehicle Data Pointer
+    VehicleData* _vehicleData = nullptr;
 
     //P factor for angular acceleration 
     Vector _angAccelPF = 0;

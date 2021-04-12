@@ -1,5 +1,5 @@
-#ifndef VEHICLE_MODE_H
-#define VEHICLE_MODE_H
+#ifndef VEHICLE_DATA_H
+#define VEHICLE_DATA_H
 
 
 
@@ -18,6 +18,18 @@ enum VEHICLE_MODE {
     //When this is set, the vehicle turns everything on and follows flight commands.
     MODE_ARM
 };
+
+
+
+/**
+ * Struct containing all vehicle data.
+ */
+struct VehicleData {
+
+    VEHICLE_MODE vehicleMode = VEHICLE_MODE::MODE_DISARM;
+
+};
+
 
 
 

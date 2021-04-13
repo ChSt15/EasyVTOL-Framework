@@ -5,7 +5,7 @@ A flight controller software using the Arduino Framework (Specifically Teensy 4.
 Rough structure is done. Basic modules have been created for testing on actual hardware and implementation for a Starship is underway to develop more modules and test the software. 
 ## Current goal roadmap:
 - [x] Create basic structure and test on hardware.
-- [ ] Develop Communication protocols and packet handling for radio control and basestation control.
+- [ ] Develope Communication protocols and packet handling for radio control and basestation control.
 - [ ] Implement a standard library for Packets with basestation and radio.
 - [ ] Improve sensorfusion.
 - [ ] Implement Starship vehicle and test.

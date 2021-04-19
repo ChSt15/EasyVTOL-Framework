@@ -14,6 +14,7 @@
 enum KRAFTPACKET_DATA_STANDARD_ID {
     KRAFTPACKET_DATA_FAILURE_ID,
     KRAFTPACKET_DATA_HEARTBEAT_ID,
+    KRAFTPACKET_DATA_ACK_ID,
     KRAFTPACKET_DATA_STRING_ID
 };
 
@@ -38,6 +39,24 @@ class KraftDataHeartbeatPacket final: public KraftDataType {
 public:
 
     uint32_t getDataTypeID() {return KRAFTPACKET_DATA_STANDARD_ID::KRAFTPACKET_DATA_HEARTBEAT_ID;}
+
+    uint32_t getDataSize() {return 0;};
+
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize) {
+        return false;
+    }
+
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize) {
+        return false;
+    }
+
+};
+
+
+class KraftDataACKPacket final: public KraftDataType {
+public:
+
+    uint32_t getDataTypeID() {return KRAFTPACKET_DATA_STANDARD_ID::KRAFTPACKET_DATA_ACK_ID;}
 
     uint32_t getDataSize() {return 0;};
 

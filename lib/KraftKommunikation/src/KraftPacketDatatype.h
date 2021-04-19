@@ -7,9 +7,14 @@
 
 
 
-enum KRAFTPACKET_DATA_ID {
+#define KRAFTPACKET_DATA_FREE_ID 50
+
+
+
+enum KRAFTPACKET_DATA_STANDARD_ID {
     KRAFTPACKET_DATA_FAILURE_ID,
     KRAFTPACKET_DATA_HEARTBEAT_ID,
+    KRAFTPACKET_DATA_ACK_ID,
     KRAFTPACKET_DATA_STRING_ID
 };
 
@@ -21,9 +26,9 @@ public:
 
     virtual uint32_t getDataSize() = 0;
 
-    virtual bool getRawData(uint8_t* dataBytes, const uint32_t &dataByteSize) = 0;
+    virtual bool getRawData(void* dataBytes, const uint32_t &dataByteSize) = 0;
 
-    virtual bool setRawData(uint8_t* dataBytes, const uint32_t &dataByteSize) = 0;
+    virtual bool setRawData(const void* dataBytes, const uint32_t &dataByteSize) = 0;
 
 protected:
 
@@ -33,15 +38,33 @@ protected:
 class KraftDataHeartbeatPacket final: public KraftDataType {
 public:
 
-    uint32_t getDataTypeID() {return KRAFTPACKET_DATA_ID::KRAFTPACKET_DATA_HEARTBEAT_ID;}
+    uint32_t getDataTypeID() {return KRAFTPACKET_DATA_STANDARD_ID::KRAFTPACKET_DATA_HEARTBEAT_ID;}
 
     uint32_t getDataSize() {return 0;};
 
-    bool getRawData(uint8_t* dataBytes, const uint32_t &dataByteSize) {
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize) {
         return false;
     }
 
-    bool setRawData(uint8_t* dataBytes, const uint32_t &dataByteSize) {
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize) {
+        return false;
+    }
+
+};
+
+
+class KraftDataACKPacket final: public KraftDataType {
+public:
+
+    uint32_t getDataTypeID() {return KRAFTPACKET_DATA_STANDARD_ID::KRAFTPACKET_DATA_ACK_ID;}
+
+    uint32_t getDataSize() {return 0;};
+
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize) {
+        return false;
+    }
+
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize) {
         return false;
     }
 
@@ -55,7 +78,7 @@ public:
         delete stringPointer;
     }
 
-    uint32_t getDataTypeID() {return KRAFTPACKET_DATA_ID::KRAFTPACKET_DATA_STRING_ID;}
+    uint32_t getDataTypeID() {return KRAFTPACKET_DATA_STANDARD_ID::KRAFTPACKET_DATA_STRING_ID;}
 
     uint32_t getDataSize() {return 0;};
 
@@ -80,13 +103,13 @@ public:
 
     }
 
-    bool getRawData(uint8_t* dataBytes, const uint32_t &dataByteSize) {
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize) {
 
         return getString((char*)dataBytes, dataByteSize);
 
     }
 
-    bool setRawData(uint8_t* dataBytes, const uint32_t &dataByteSize) {
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize) {
 
         setString((char*)dataBytes, dataByteSize);
 

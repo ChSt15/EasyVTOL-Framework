@@ -26,10 +26,10 @@ void Starship::init() {
     _dynamics->linkNavigationDataPointer(_navigation->getNavigationDataPointer()); //Control -> Dynamics
 
     //Initialise all modules
-    _navigation->init(&_vehicleMode);
+    /*_navigation->init(&_vehicleMode);
     _guidance->init(&_vehicleMode);
     _control->init(&_vehicleMode);
-    _dynamics->init(&_vehicleMode);
+    _dynamics->init(&_vehicleMode);*/
 
     //Setup hover controller
     _hoveringController.setAngularVelocityPIDFactors(Vector(1,1,0.1), Vector(0), Vector(0), Vector(1000), true);

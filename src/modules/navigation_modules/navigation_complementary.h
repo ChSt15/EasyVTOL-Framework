@@ -31,7 +31,7 @@ class NavigationComplementary: public Navigation {
 public:
 
     NavigationComplementary() {
-        //_connectThread();
+        
     }
 
     /**

@@ -2,7 +2,7 @@
 
 
 
-void ManualControlProfile::thread() {
+/*void ManualControlProfile::thread() {
 
     return; //just for vehicle testing
 
@@ -63,7 +63,7 @@ void ManualControlProfile::thread() {
 
 
 
-}
+}*/
 
 
 void ManualControlProfile::init() {

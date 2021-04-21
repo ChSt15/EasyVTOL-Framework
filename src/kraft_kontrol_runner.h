@@ -9,8 +9,6 @@
 #include "modules/sensor_modules/bme280_driver.h"
 #include "sensors/gps.h"
 
-#include "comms/ibus_rx.h"
-
 #include "outputs/rgb_led.h"
 
 #include "vehicle/vehicle_template.h"

@@ -20,11 +20,11 @@
 class Starship: public Vehicle {
 public:
 
-    Starship() {
-        _navigation = &_navigationComp;
-        _guidance = &_guidanceFBW;
-        _dynamics = &_starshipDynamics;
-        _control = &_hoveringController;
+    Vehicle(Guidance* guidancePointer, Navigation* navigationPointer, Control* controlPointer, StarshipDynamics* dynamicsPointer) {
+        _guidance = guidancePointer;
+        _navigation = navigationPointer;
+        _control = controlPointer;
+        _dynamics = dynamicsPointer;
     }
 
     /**
@@ -59,23 +59,7 @@ public:
 
 private:
 
-    //Set to true when vehicle is ready for flight.
-    bool _vehicleInitialized = false;
 
-    //Default module to use at start
-    NavigationComplementary _navigationComp;
-
-    //Default module to use at start
-    GuidanceFlyByWire _guidanceFBW;
-
-    //Default module to use at start
-    StarshipDynamics _starshipDynamics;
-
-    //Default module to use at start
-    HoverController _hoveringController;
-
-    //Data container for starship
-    StarshipData _starshipData;
 
 
 };

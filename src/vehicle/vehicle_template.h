@@ -16,12 +16,6 @@
 #include "modules/dynamics_modules/dynamics_template.h"
 #include "modules/module_template.h"
 
-#include "modules/sensor_modules/mpu9250_driver.h"
-#include "modules/sensor_modules/bme280_driver.h"
-#include "sensors/gps.h"
-
-#include "outputs/rgb_led.h"
-
 
 
 class Vehicle: public Module {
@@ -34,6 +28,7 @@ public:
         _dynamics = dynamicsPointer;
     }
 
+
     /**
      * Thread function of the vehicle. 
      * All calculations the vehicle ever has to do for its 
@@ -44,6 +39,7 @@ public:
      */
     void thread();
 
+
     /**
      * Init function that setups the vehicle. If not called
      * then on the first Thread run this will automatically 
@@ -53,102 +49,6 @@ public:
      * @return none.
      */
     void init();
-
-    /**
-     * Returns true if vehicle is ready to be armed
-     *
-     * @param values none.
-     * @return bool.
-     */
-    virtual bool vehicleReady() {return _vehicleInitialized;}
-
-    /**
-     * Returns the navigation data.
-     *
-     * @param values none.
-     * @return navigation data.
-     */
-    virtual NavigationData getNavigationData() {return _navigation->getNavigationData();}
-
-    /**
-     * Returns the guidance output.
-     *
-     * @param values none.
-     * @return controlData.
-     */
-    virtual ControlData getGuidanceData() {return _guidance->getControlSetpoint();}
-
-    /**
-     * Returns the control output.
-     *
-     * @param values none.
-     * @return controlData.
-     */
-    virtual DynamicData getControlData() {return _control->getDynamicsOutput();}
-
-    /**
-     * Returns a pointer to the navigation module.
-     *
-     * @param values none.
-     * @return Navigation pointer.
-     */
-    virtual Navigation* getNavigationPointer() {return _navigation;}
-
-    /**
-     * Returns a pointer to the guidance module.
-     *
-     * @param values none.
-     * @return Guidance pointer.
-     */
-    virtual Guidance* getGuidancePointer() {return _guidance;}
-
-    /**
-     * Returns a pointer to the control module.
-     *
-     * @param values none.
-     * @return Guidance pointer.
-     */
-    virtual Control* getControlPointer() {return _control;}
-
-    /**
-     * Returns a pointer to the dynamics module.
-     *
-     * @param values none.
-     * @return Guidance pointer.
-     */
-    virtual Dynamics* getDynamicsPointer() {return _dynamics;}
-
-    /**
-     * Returns a pointer to the navigation module.
-     *
-     * @param values none.
-     * @return Navigation pointer.
-     */
-    virtual void setNavigationPointer(Navigation* navigationModule) {_navigation = navigationModule;}
-
-    /**
-     * Returns a pointer to the guidance module.
-     *
-     * @param values none.
-     * @return Guidance pointer.
-     */
-    virtual void setGuidancePointer(Guidance* guidanceModule) {_guidance = guidanceModule;}
-
-    /**
-     * Returns a pointer to the control module.
-     *
-     * @param values none.
-     * @return Guidance pointer.
-     */
-    virtual void setControlPointer(Control* controlModule) {_control = controlModule;}
-
-    /**
-     * Returns a pointer to the dynamics module.
-     *
-     * @param values none.
-     * @return Guidance pointer.
-     */
-    virtual void setDynamicsPointer(Dynamics* dynamicsModule) {_dynamics = dynamicsModule;}
 
 
 protected:

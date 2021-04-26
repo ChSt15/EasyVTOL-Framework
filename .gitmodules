@@ -1,6 +1,6 @@
 [submodule "lib/Math-Helper"]
 	path = lib/Math-Helper
 	url = https://github.com/ChSt98/Math-Helper.git
-[submodule "lib/Simple-Schedule"]
-	path = lib/Simple-Schedule
+[submodule "lib/SimpleSchedule"]
+	path = lib/SimpleSchedule
 	url = https://github.com/ChSt98/Simple-Schedule.git

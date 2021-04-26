@@ -9,8 +9,10 @@
 
 
 
-class IMUTemplate: public Module {
+class IMUTemplate: public Module_Abstract {
 public:
+
+    IMUTemplate(uint32_t rate, eTaskPriority_t priority) : Module_Abstract(rate, priority) {}
 
     /**
      * Returns rate (in Hz) of the thread

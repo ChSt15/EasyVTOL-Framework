@@ -15,24 +15,24 @@ void BME280Driver::_getData() {
 
     float bufMeasurement = measurements.pressure;
     if (true) {
-        _pressureFifo.unshift(bufMeasurement);
-        _pressureTimestampFifo.unshift(_newDataTimestamp);
+        _pressureFifo.push_front(bufMeasurement);
+        _pressureTimestampFifo.push_front(_newDataTimestamp);
         _lastPressure = bufMeasurement;
         _pressureCounter++;
     }
 
     bufMeasurement = measurements.temperature;
     if (true) {
-        _temperatureFifo.unshift(bufMeasurement);
-        _temperatureTimestampFifo.unshift(_newDataTimestamp);
+        _temperatureFifo.push_front(bufMeasurement);
+        _temperatureTimestampFifo.push_front(_newDataTimestamp);
         _lastTemperature = bufMeasurement;
         _temperatureCounter++;
     }
 
     bufMeasurement = measurements.humidity;
     if (true) {
-        _humidityFifo.unshift(bufMeasurement);
-        _humidityTimestampFifo.unshift(_newDataTimestamp);
+        _humidityFifo.push_front(bufMeasurement);
+        _humidityTimestampFifo.push_front(_newDataTimestamp);
         _lastHumidity = bufMeasurement;
         _humidityCounter++;
     }
@@ -47,7 +47,7 @@ void BME280Driver::thread() {
     _loopCounter++;
 
 
-    if (_moduleStatus == MODULE_STATUS::MODULE_RUNNING) {
+    if (_moduleStatus == eModuleStatus_t::eModuleStatus_Running) {
 
         if (!_bme.isMeasuring()) {
             
@@ -55,51 +55,20 @@ void BME280Driver::thread() {
 
         }
 
-    } else if (_moduleStatus == MODULE_STATUS::MODULE_NOT_STARTED || _moduleStatus == MODULE_STATUS::MODULE_RESTARTATTEMPT) {
+    } else if (_moduleStatus == eModuleStatus_t::eModuleStatus_NotStarted || _moduleStatus == eModuleStatus_t::eModuleStatus_RestartAttempt) {
         
-        //Serial.println("Test1");
-        int startCode = _bme.beginSPI(BME280_NCS_PIN);
-        //Serial.println("Test2");
+        init();
 
-
-        if (startCode > 0) {
-
-            _bme.setHumidityOverSample(1);
-            _bme.setPressureOverSample(4);
-            _bme.setTempOverSample(1);
-
-            _bme.setFilter(4);
-
-            _bme.setStandbyTime(0);
-
-            _bme.setMode(MODE_NORMAL);
-
-            _lastMeasurement = micros();
-            
-
-            //imuStatus = DeviceStatus::DEVICE_CALIBRATING;
-            _moduleStatus = MODULE_STATUS::MODULE_RUNNING;
-
-        } else {
-            _moduleStatus = MODULE_STATUS::MODULE_RESTARTATTEMPT; 
-            Serial.println("NEW! IMU Start Fail. Code: " + String(startCode));
-            delay(1000);
-        }
-
-        _startAttempts++;
-
-        if (_startAttempts >= 5 && _moduleStatus == MODULE_STATUS::MODULE_RESTARTATTEMPT) _moduleStatus = MODULE_STATUS::MODULE_FAILURE;
-
-    } else if (false/*_moduleStatus == MODULE_STATUS::MODULE_CALIBRATING*/) {
+    } else if (false/*_moduleStatus == eModuleStatus_t::MODULE_CALIBRATING*/) {
 
         //################## Following is Temporary #################
         
 
-        _moduleStatus = MODULE_STATUS::MODULE_RUNNING; 
+        _moduleStatus = eModuleStatus_t::eModuleStatus_Running; 
 
     } else { //This section is for device failure or a wierd mode that should not be set, therefore assume failure
 
-        _moduleStatus = MODULE_STATUS::MODULE_FAILURE;
+        _moduleStatus = eModuleStatus_t::eModuleStatus_Failure;
         _block = true;
         _loopRate = 0;
 
@@ -124,6 +93,34 @@ void BME280Driver::thread() {
 
 void BME280Driver::init() {
 
+    int startCode = _bme.beginSPI(BME280_NCS_PIN);
 
+    if (startCode > 0) {
+
+        _bme.setHumidityOverSample(1);
+        _bme.setPressureOverSample(4);
+        _bme.setTempOverSample(1);
+
+        _bme.setFilter(4);
+
+        _bme.setStandbyTime(0);
+
+        _bme.setMode(MODE_NORMAL);
+
+        _lastMeasurement = micros();
+        
+
+        //imuStatus = DeviceStatus::DEVICE_CALIBRATING;
+        _moduleStatus = eModuleStatus_t::eModuleStatus_Running;
+
+    } else {
+        _moduleStatus = eModuleStatus_t::eModuleStatus_RestartAttempt; 
+        Serial.println("NEW! IMU Start Fail. Code: " + String(startCode));
+        delay(1000);
+    }
+
+    _startAttempts++;
+
+    if (_startAttempts >= 5 && _moduleStatus == eModuleStatus_t::eModuleStatus_RestartAttempt) _moduleStatus = eModuleStatus_t::eModuleStatus_Failure;
 
 }

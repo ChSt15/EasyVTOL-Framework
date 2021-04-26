@@ -7,8 +7,10 @@
 
 
 
-class BarometerTemplate: public Module {
+class BarometerTemplate: public Module_Abstract {
 public:
+
+    BarometerTemplate(uint32_t rate, eTaskPriority_t priority) : Module_Abstract(rate, priority) {}
 
     /**
      * Returns rate (in Hz) of the thread

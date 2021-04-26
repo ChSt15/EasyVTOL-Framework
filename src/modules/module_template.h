@@ -3,9 +3,9 @@
 
 
 
-#include "definitions.h"
+#include "module_autorun_class.h"
 
-#include "data_containers/vehicle_data.h"
+
 
 /**
  * This is a template that contains all the functions that all 
@@ -14,38 +14,38 @@
 
 
 
-enum MODULE_STATUS {
-    MODULE_NOT_STARTED,
-    MODULE_STARTING,
-    MODULE_RUNNING,
-    MODULE_RESTARTATTEMPT,
-    MODULE_FAILURE
+enum eModuleStatus_t {
+    eModuleStatus_NotStarted,
+    eModuleStatus_Starting,
+    eModuleStatus_Running,
+    eModuleStatus_RestartAttempt,
+    eModuleStatus_Failure
 };
 
 
-inline String deviceStatusToString(MODULE_STATUS status) {
+inline String deviceStatusToString(eModuleStatus_t status) {
 
     String buff = "UNKNOWN STATE";
 
     switch (status)
     {
-    case MODULE_STATUS::MODULE_NOT_STARTED :
+    case eModuleStatus_t::eModuleStatus_NotStarted :
         buff = "Device not started";
         break;
 
-    case MODULE_STATUS::MODULE_STARTING :
+    case eModuleStatus_t::eModuleStatus_Starting :
         buff = "Device starting";
         break;
 
-    case MODULE_STATUS::MODULE_RUNNING :
+    case eModuleStatus_t::eModuleStatus_Running :
         buff = "Device running";
         break;
 
-    case MODULE_STATUS::MODULE_RESTARTATTEMPT:
+    case eModuleStatus_t::eModuleStatus_RestartAttempt :
         buff = "Device attempting restart";
         break;
 
-    case MODULE_STATUS::MODULE_FAILURE :
+    case eModuleStatus_t::eModuleStatus_Failure :
         buff = "Device failure";
         break;
     
@@ -59,17 +59,19 @@ inline String deviceStatusToString(MODULE_STATUS status) {
 }
 
 
-
-class Module {
+/**
+ * Although not here declared, void thread() must be defined in the derived class and will be automatically ran by scheduler.
+ */
+class Module_Abstract: public ModuleAutoRun_Abstract {
 public:
 
     /**
-     * This is where all calculations are done.
-     *
-     * @param values none.
-     * @return none.
+     * Creates a module based class and automatically adds it to the scheduler.
+     * 
+     * @param rate is the rate at which it will be ran at.
+     * @param priority is the priority the module will have.
      */
-    virtual void thread() = 0;
+    Module_Abstract(uint32_t rate, eTaskPriority_t priority) : ModuleAutoRun_Abstract(rate, priority) {}
 
     /**
      * Module specific init function that sets the 
@@ -81,32 +83,17 @@ public:
     virtual void init() = 0;
 
     /**
-     * Returns how fast the module should be ran at.
-     *
-     * @param values none.
-     * @return uint32_t.
-     */
-    virtual uint32_t get_LoopRate_Hz() {
-        return 1000;
-    }
-
-    /**
      * Returns the modules status
      *
      * @param values none.
      * @return MODULE_STATUS.
      */
-    virtual MODULE_STATUS getModuleStatus() {return _moduleStatus;};
+    virtual eModuleStatus_t getModuleStatus() {return _moduleStatus;};
 
 
 protected:
 
-    MODULE_STATUS _moduleStatus = MODULE_STATUS::MODULE_NOT_STARTED;
-
-
-private:
-
-
+    eModuleStatus_t _moduleStatus = eModuleStatus_t::eModuleStatus_NotStarted;
 
 
 };

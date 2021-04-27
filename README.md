@@ -3,6 +3,8 @@ A flight controller software using the Arduino Framework (Specifically Teensy 4.
 ## **This project is still under initial development and should not be used even for experimental systems as it will not work and has major bugs.**
 ## Current goal roadmap:
 - [x] Create basic structure and test on hardware.
+- [ ] Redo module and scheduler class structure.
+- [ ] Implement new flight programming system and loops.
 - [ ] Develop Communication protocols and packet handling for radio control and basestation control.
 - [ ] Implement a standard library for Packets with basestation and radio.
 - [ ] Add position/velocity and acceleration to Sensorfusion using accelerometer and GPS 

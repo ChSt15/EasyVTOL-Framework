@@ -1,19 +1,61 @@
 #include <Arduino.h>
 
+#include "modules/sensor_modules/mpu9250_driver.h"
+#include "modules/sensor_modules/bme280_driver.h"
 
-Control controlModule;
-Dynamics dynamicsModule;
-Navigation navmodule(&GPSdriver, &IMUDriver, &MagDriver, &BaroDriver);
-Guidance guidanceModule;
+#include "modules/navigation_modules/navigation_complementary.h"
+#include "modules/guidance_modules/guidance_flybywire.h"
 
-Radio radioModule; //This modules takes care of communication with the goundstation and radiocontrol. It receives waypoints or also manual control commands from controllers.
+#include "vehicle/starship/starship.h"
+#include "vehicle/starship/starship_dynamics.h"
 
-Vehicle vehicle(&guidanceModule, &navmodule, &controlModule, &dynamicsModule);
+
+
+BME280Driver Barometer;
+MPU9250Driver IMU;
+
+NavigationComplementary navigationmodule(&IMU, &IMU, &IMU, &Barometer);
+GuidanceFlyByWire guidanceModule;
+HoverController controlModule(&guidanceModule, &navigationmodule);
+StarshipDynamics dynamicsModule(&controlModule, &navigationmodule);
+
+//Radio radioModule; //This modules takes care of communication with the goundstation and radiocontrol. It receives waypoints or also manual control commands from controllers.
+
+Starship vehicle(&guidanceModule, &navigationmodule, &controlModule, &dynamicsModule);
 
 
 void vehicleProgram(); //Has all functions needed for vehicle testing, waypoints and stuff
 void idleLoop(); //Will be ran whenever free time is available. DO NOT BLOCK e.g with delay(). Things that NEED to be ran should be placed in normal loop().
-Runner runner(&vehicle, &vehicleProgram, &radioModule, &idleLoop)
+//Runner runner(&vehicle, &vehicleProgram, &radioModule, &idleLoop)
+
+
+
+class Observer: public Task_Abstract {
+public:
+
+    Observer() : Task_Abstract(20, eTaskPriority_t::eTaskPriority_Middle, true) {}
+
+    void thread() {
+
+        NavigationData navData = navigationmodule.getNavigationData();
+
+        Quaternion att = navData.attitude;
+        Vector vec = navData.attitude.copy().conjugate().rotateVector(navData.angularAcceleration);
+        float altitude = navData.position.z;
+
+        //Serial.println(String("Attitude: w: ") + att.w + ", x: " + att.x + ", y: " + att.y + ", z: " + att.z + ". Altitude: " + altitude);
+        //Serial.println(String("Vec: x: ") + vec.x + ", y: " + vec.y + ", z: " + vec.z);
+
+        Serial.println(String("Hello World! Speed: ") + F_CPU_ACTUAL + ", Rate: " + getSchedulerTickRate());
+
+    }
+
+
+};
+
+
+Observer observer;
+
 
 
 void setup() {
@@ -22,10 +64,12 @@ void setup() {
 
 }
 
+
 void loop() {
 
-    runner.tick();
-
+    //runner.tick();
+    Task_Abstract::schedulerTick();
+    
 }
 
 
@@ -38,7 +82,7 @@ void idleLoop() {
 
 void vehicleProgram() {
 
-    runner.armVehicle(); //Arms vehicle. Must be called before giving commands. This readies the vehicle.
+    /*runner.armVehicle(); //Arms vehicle. Must be called before giving commands. This readies the vehicle.
 
     runner.vehicleBusy(); //Returns false if vehicle is ready for next command. Calling a command when vehicle isnt ready will make vehicle ignore old command and start with new command
 
@@ -69,5 +113,6 @@ void vehicleProgram() {
 
 
     runner.progEnd() //Will wait and keep running vehicle indefinetely. Will disarm vehicle and stop running this vehicleprogram loop.
+    */
 
 }

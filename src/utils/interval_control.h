@@ -11,11 +11,11 @@ class IntervalControl {
 public:
 
     IntervalControl() {
-        _lastRun_us = micros();
+        _lastRun_us = 0;
     }
 
     IntervalControl(float rate) {
-        _lastRun_us = micros();
+        _lastRun_us = 0;
         if (rate != 0) setRate(rate);
     }
 
@@ -133,7 +133,7 @@ public:
         while (micros() - _lastRun_us < _interval_us || _block) callMethod();
         
         if (_limit) _lastRun_us = micros();
-        else _lastRun_us += _interval_us;
+        else _lastRun_us = micros() - (micros()%_interval_us);
 
     }
 
@@ -157,8 +157,8 @@ public:
 
         if (_block) return false;
         
-        if (micros() - _lastRun_us >= _interval_us) {
-            if (!_limit && updateClock) _lastRun_us +=_interval_us;
+        if (micros() - _lastRun_us > _interval_us) {
+            if (!_limit && updateClock) _lastRun_us = micros() - (micros()%_interval_us);//{while(_lastRun_us + _interval_us < micros()) _lastRun_us += _interval_us;}
             else if (updateClock) _lastRun_us = micros();
             return true;
         } else return false;
@@ -189,8 +189,8 @@ public:
         if (_block) return false;
         
         timeDelta = micros() - _lastRun_us;
-        if (timeDelta >= _interval_us) {
-            if (!_limit && updateClock) _lastRun_us +=_interval_us;
+        if (timeDelta > _interval_us) {
+            if (!_limit && updateClock) _lastRun_us = micros() - (micros()%_interval_us);
             else if (updateClock) _lastRun_us = micros();
             return true;
         } else return false;

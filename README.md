@@ -10,6 +10,10 @@ A flight controller framework using the Arduino Framework (Current development i
 - [ ] Improve sensorfusion algorithm and auto-adjustment algorithm for filter factors.
 - [ ] Implement Starship vehicle and test.
 - [ ] Implement standard modules for common vehicle types.
+- [ ] Optimise everything.
+- [ ] Clean code.
+- [ ] Improve comments in code.
+- [ ] Create documentation.
 - [ ] Idk, you tell me...
 ## TRL: 3
 ## Installation Commands:

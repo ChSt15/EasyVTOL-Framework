@@ -3,13 +3,11 @@
 
 
 
-#include "modules/module_template.h"
-
 #include "vehicle/vehicle_template.h"
 
 
 
-class ControlProfile: public Module {
+class ControlProfile {
 public:
 
     ControlProfile(Vehicle* vehiclePointer) {

@@ -4,26 +4,24 @@
 
 void NavigationComplementary::thread() {
 
-    if (IMU.getModuleStatus() != MODULE_STATUS::MODULE_RUNNING) return;
-
     float dTime = (float)(micros() - _lastLoopTimestamp)/1000000.0f;
     _lastLoopTimestamp = micros();
     	
-    //KinematicData *_navigationData.= _vehicle;
+    //KinematicData *navigationData_.= _vehicle;
 
-    if (IMU.gyroAvailable()) {
+    while (gyro_->gyroAvailable()) {
         
         //Get IMU data
         Vector rotationVector;
         uint32_t timestamp;
-        IMU.getGyro(&rotationVector, &timestamp);
+        gyro_->getGyro(&rotationVector, &timestamp);
 
         //Calulate time delta
         float dt = float(timestamp - _lastGyroTimestamp)/1000000.0f;
         _lastGyroTimestamp = timestamp;
 
         //Calulate derivitive of gyro for angular acceleration
-        _navigationData.angularAcceleration = (rotationVector - _lastGyroValue)/dt;
+        navigationData_.angularAcceleration = (rotationVector - _lastGyroValue)/dt;
 
         //Check if gyro initialised
         if (_gyroInitialized) {
@@ -35,12 +33,12 @@ void NavigationComplementary::thread() {
 
                 Quaternion rotationQuat = Quaternion(rotationVector, rotationVector.magnitude()*dt);
 
-                _navigationData.attitude = _navigationData.attitude*rotationQuat;
+                navigationData_.attitude = navigationData_.attitude*rotationQuat;
 
             }
 
             //Update angularRate
-            _navigationData.angularRate = (_navigationData.attitude*rotationVector*_navigationData.attitude.copy().conjugate()).toVector(); //Transform angular rate into world coordinate system
+            navigationData_.angularRate = (navigationData_.attitude*rotationVector*navigationData_.attitude.copy().conjugate()).toVector(); //Transform angular rate into world coordinate system
 
         } else {
 
@@ -55,14 +53,14 @@ void NavigationComplementary::thread() {
     }
 
 
-    if (IMU.accelAvailable()) {
+    while (accel_->accelAvailable()) {
 
         //static Vector lastValue = 0;
 
         //Get IMU data
         Vector accelVector;
         uint32_t timestamp;
-        IMU.getAccel(&accelVector, &timestamp);
+        accel_->getAccel(&accelVector, &timestamp);
 
         accelVector = (accelVector - _accelBias).compWiseMulti(_accelScale);
 
@@ -81,7 +79,7 @@ void NavigationComplementary::thread() {
 
             //Z-Axis correction
             Vector zAxisIs = Vector(0,0,1);
-            Vector zAxisSet = (_navigationData.attitude*accelVector*_navigationData.attitude.copy().conjugate()).toVector();
+            Vector zAxisSet = (navigationData_.attitude*accelVector*navigationData_.attitude.copy().conjugate()).toVector();
 
             Vector zAxisRotationAxis = zAxisSet.cross(zAxisIs);
             float zAxisRotationAngle = zAxisSet.getAngleTo(zAxisIs);
@@ -90,13 +88,17 @@ void NavigationComplementary::thread() {
 
 
             //Apply state correction and normalise attitude quaternion 
-            _navigationData.attitude = zAxisCorrectionQuat*_navigationData.attitude;
-            _navigationData.attitude.normalize(true);
+            navigationData_.attitude = zAxisCorrectionQuat*navigationData_.attitude;
+            navigationData_.attitude.normalize(true);
 
 
             //Update acceleration
-            _navigationData.acceleration = (_navigationData.attitude*accelVector*_navigationData.attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
-            _navigationData.linearAcceleration = _navigationData.acceleration - Vector(0,0,9.81);
+            navigationData_.acceleration = (navigationData_.attitude*accelVector*navigationData_.attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
+            navigationData_.linearAcceleration = navigationData_.acceleration - Vector(0,0,9.81);
+
+            //integrate values for INS Dead reckoning with IMU values
+            navigationData_.velocity = navigationData_.velocity + navigationData_.linearAcceleration*dt;
+            navigationData_.position = navigationData_.position + navigationData_.velocity*dt;
 
         } else if (_gyroInitialized) {
             
@@ -106,7 +108,7 @@ void NavigationComplementary::thread() {
 
             //Set Attitude
             Vector zAxisIs = Vector(0,0,1);
-            Vector zAxisSet = (_navigationData.attitude*accelVector*_navigationData.attitude.copy().conjugate()).toVector();
+            Vector zAxisSet = (navigationData_.attitude*accelVector*navigationData_.attitude.copy().conjugate()).toVector();
 
             Vector zAxisRotationAxis = zAxisSet.cross(zAxisIs);
             float zAxisRotationAngle = zAxisSet.getAngleTo(zAxisIs);
@@ -114,16 +116,16 @@ void NavigationComplementary::thread() {
             Quaternion zAxisCorrectionQuat = Quaternion(zAxisRotationAxis, zAxisRotationAngle);
 
             //Apply state correction and normalise attitude quaternion 
-            _navigationData.attitude = zAxisCorrectionQuat*_navigationData.attitude;
-            _navigationData.attitude.normalize(true);
-            //_navigationData.attitude = Quaternion(0,0,1,0);
+            navigationData_.attitude = zAxisCorrectionQuat*navigationData_.attitude;
+            navigationData_.attitude.normalize(true);
+            //navigationData_.attitude = Quaternion(0,0,1,0);
 
         }
 
     }
 
 
-    if (IMU.magAvailable()) {
+    while (mag_->magAvailable()) {
 
         /*static Vector max = -1000;
         static Vector min = 1000;
@@ -133,7 +135,7 @@ void NavigationComplementary::thread() {
         //Get IMU data
         Vector magVector;
         uint32_t timestamp;
-        IMU.getMag(&magVector, &timestamp);
+        mag_->getMag(&magVector, &timestamp);
 
         if (_magInitialized) {
 
@@ -180,7 +182,7 @@ void NavigationComplementary::thread() {
 
             //X-Axis correction
             Vector xAxisIs(1,0,0);
-            Vector xAxisSet = (_navigationData.attitude*magVector*_navigationData.attitude.copy().conjugate()).toVector();
+            Vector xAxisSet = (navigationData_.attitude*magVector*navigationData_.attitude.copy().conjugate()).toVector();
             xAxisSet.z = 0;
             xAxisSet.normalize();
 
@@ -191,8 +193,8 @@ void NavigationComplementary::thread() {
 
 
             //Apply state correction and normalise attitude quaternion 
-            _navigationData.attitude = xAxisCorrectionQuat*_navigationData.attitude;
-            _navigationData.attitude.normalize(true);
+            navigationData_.attitude = xAxisCorrectionQuat*navigationData_.attitude;
+            navigationData_.attitude.normalize(true);
 
         } else if (_accelInitialized) {
 
@@ -202,7 +204,7 @@ void NavigationComplementary::thread() {
 
             //Set heading
             Vector xAxisIs(1,0,0);
-            Vector xAxisSet = (_navigationData.attitude*magVector*_navigationData.attitude.copy().conjugate()).toVector();
+            Vector xAxisSet = (navigationData_.attitude*magVector*navigationData_.attitude.copy().conjugate()).toVector();
             xAxisSet.z = 0;
             xAxisSet.normalize();
 
@@ -212,25 +214,20 @@ void NavigationComplementary::thread() {
             Quaternion xAxisCorrectionQuat = Quaternion(xAxisRotationAxis, xAxisRotationAngle);
 
             //Apply state correction and normalise attitude quaternion 
-            _navigationData.attitude = xAxisCorrectionQuat*_navigationData.attitude;
-            _navigationData.attitude.normalize(true);
+            navigationData_.attitude = xAxisCorrectionQuat*navigationData_.attitude;
+            navigationData_.attitude.normalize(true);
 
         }
 
     }
 
 
-    //integrate values for INS Dead reckoning with IMU values
-    _navigationData.velocity = _navigationData.velocity + _navigationData.linearAcceleration*dTime;
-    _navigationData.position = _navigationData.position + _navigationData.velocity*dTime;
-
-
-    if (Baro.pressureAvailable()) {
+    if (baro_->pressureAvailable()) {
 
         //Get IMU data
         float pressure;
         uint32_t timestamp;
-        Baro.getPressure(&pressure, &timestamp);
+        baro_->getPressure(&pressure, &timestamp);
 
         //Check if accelerometer initialised
         if (_baroInitialized) {
@@ -239,7 +236,7 @@ void NavigationComplementary::thread() {
             float dt = float(timestamp - _lastBaroTimestamp)/1000000.0f;
             _lastBaroTimestamp = timestamp;
 
-            float beta = 0.3f;
+            float beta = 0.8f;
 
             //calculate height from new pressure value
             float height = _getHeightFromPressure(pressure, 100e3f);
@@ -247,8 +244,8 @@ void NavigationComplementary::thread() {
             float zVelocity = (height - _lastHeightValue)/dt;
 
             //correct dead reckoning values with new ones.
-            _navigationData.position.z += (height - _navigationData.position.z)*beta*dt;
-            _navigationData.velocity.z += (zVelocity - _navigationData.velocity.z)*beta*dt;
+            navigationData_.position.z += (height - navigationData_.position.z)*beta*dt;
+            navigationData_.velocity.z += (zVelocity - navigationData_.velocity.z)*beta*dt;
 
             //Update last Height value
             _lastHeightValue = height;
@@ -264,16 +261,12 @@ void NavigationComplementary::thread() {
             _lastHeightValue = _getHeightFromPressure(pressure, 100e3f);
 
             //Set current calculated height as start value.
-            _navigationData.position.z = _lastHeightValue;
+            navigationData_.position.z = _lastHeightValue;
 
         }
 
     }
 
-}
+    navigationData_.timestamp = micros();
 
-
-
-void NavigationComplementary::init() {
-    
 }

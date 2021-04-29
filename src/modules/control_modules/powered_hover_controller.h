@@ -3,15 +3,31 @@
 
 
 
+#include "task_autorun_class.h"
+
+#include "modules/module_abstract.h"
+
 #include "data_containers/control_data.h"
 #include "data_containers/navigation_data.h"
 #include "data_containers/vehicle_data.h"
 
-#include "modules/control_modules/control_template.h"
+#include "modules/control_modules/control_interface.h"
+#include "modules/navigation_modules/navigation_interface.h"
 
 
-class HoverController: public Control {
+class HoverController: public Control_Interface, public Module_Abstract, public Task_Abstract {
 public:
+
+    /**
+     * Creates a module based class and automatically adds it to the scheduler.
+     * 
+     * @param rate is the rate at which it will be ran at.
+     * @param priority is the priority the module will have.
+     */
+    HoverController(Guidance_Interface* guidanceModule, Navigation_Interface* navigationModule) : Task_Abstract(1000, eTaskPriority_t::eTaskPriority_High, true) {
+        controlSetpoint_ = guidanceModule->getControlSetpointPointer();
+        navigationData_ = navigationModule->getNavigationDataPointer();
+    }
 
     /**
      * This is where all calculations are done.
@@ -22,179 +38,171 @@ public:
     void thread();
 
     /**
-     * Init function that sets the module up.
+     * Sets the control factor.
+     * 
+     * Limit is the value that if reached, the intergrator will stop integrating and also reduce for anti-windup
+     *
+     * @param values factor.
+     * @return none.
+     */
+    void setAngularAccelerationPIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1) {angAccelPF_ = factorP; angAccelIF_ = factorI; angAccelDF_ = factorD; angAccelLimit_ = limit;}
+
+    /**
+     * Sets the control factor.
+     * 
+     * Limit is the value that if reached, the intergrator will stop integrating and also reduce for anti-windup
+     * 
+     * If passThrough is set to true then the output of this controller will be added to controller modules output. Otherwise its output will be added to the next controllers setpoint.
+     *
+     * @param values factor.
+     * @return none.
+     */
+    void setAngularVelocityPIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1, const bool &passThrough = false) {angVelPF_ = factorP; angVelIF_ = factorI; angVelDF_ = factorD; angVelLimit_ = limit, angVelPassThrough_ = passThrough;}
+
+    /**
+     * Sets the control factor.
+     * 
+     * Limit is the value that if reached, the intergrator will stop integrating and also reduce for anti-windup
+     * 
+     * If passThrough is set to true then the output of this controller will be added to controller modules output. Otherwise its output will be added to the next controllers setpoint.
+     *
+     * @param values factor.
+     * @return none.
+     */
+    void setAttitudePIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1, const bool &passThrough = false) {attitudePF_ = factorP; attitudeIF_ = factorI; attitudeDF_ = factorD; attitudeLimit_ = limit, attitudePassThrough_ = passThrough;}
+
+    /**
+     * Sets the control factor.
+     * 
+     * Limit is the value that if reached, the intergrator will stop integrating and also reduce for anti-windup
+     *
+     * @param values factor.
+     * @return none.
+     */
+    void setAccelerationPIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1) {accelPF_ = factorP; accelIF_ = factorI; accelDF_ = factorD; accelLimit_ = limit;}
+
+    /**
+     * Sets the control factor.
+     * 
+     * Limit is the value that if reached, the intergrator will stop integrating and also reduce for anti-windup
+     * 
+     * If passThrough is set to true then the output of this controller will be added to controller modules output. Otherwise its output will be added to the next controllers setpoint.
+     *
+     * @param values factor.
+     * @return none.
+     */
+    void setVelocityPIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1, const bool &passThrough = false) {velocityPF_ = factorP; velocityIF_ = factorI; velocityDF_ = factorD; velocityLimit_ = limit, velocityPassThrough_ = passThrough;}
+
+    /**
+     * Sets the control factor.
+     * 
+     * Limit is the value that if reached, the intergrator will stop integrating and also reduce for anti-windup
+     * 
+     * If passThrough is set to true then the output of this controller will be added to controller modules output. Otherwise its output will be added to the next controllers setpoint.
+     *
+     * @param values factor.
+     * @return none.
+     */
+    void setPositionPIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1, const bool &passThrough = false) {positionPF_ = factorP; positionIF_ = factorI; positionDF_ = factorD; positionLimit_ = limit, positionPassThrough_ = passThrough;}
+
+    /**
+     * Returns the kinematics the system needs to achieve the desired
+     * guidance inputs.
      *
      * @param values none.
-     * @return none.
+     * @return kinematicSetpoint.
      */
-    void init();
+    DynamicData getDynamicsOutput() {return controlOutput_;};
 
     /**
-     * Sets the vehicle data input pointer.
-     * 
-     * Allows the control module to automatically retrieve its needed
-     * data from the pointer.
-     * 
-     * This must only be called once.
-     * 
-     * returns false if failed from null pointer input.
+     * Returns the a pointer to a struct with the kinematics the system 
+     * needs to achieve the desired guidance inputs.
      *
-     * @param values vehicleDataPointer.
-     * @return bool.
+     * @param values none.
+     * @return kinematicSetpoint pointer.
      */
-    bool linkVehicleDataPointer(VehicleData *vehicleDataPointer) {
-        if (vehicleDataPointer == nullptr) return false;
-        _vehicleData = vehicleDataPointer;
-        return true;
-    };
-
-    /**
-     * Sets the control factor.
-     * 
-     * Limit is the value that if reached, the intergrator will stop integrating and also reduce for anti-windup
-     *
-     * @param values factor.
-     * @return none.
-     */
-    void setAngularAccelerationPIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1) {_angAccelPF = factorP; _angAccelIF = factorI; _angAccelDF = factorD; _angAccelLimit = limit;}
-
-    /**
-     * Sets the control factor.
-     * 
-     * Limit is the value that if reached, the intergrator will stop integrating and also reduce for anti-windup
-     * 
-     * If passThrough is set to true then the output of this controller will be added to controller modules output. Otherwise its output will be added to the next controllers setpoint.
-     *
-     * @param values factor.
-     * @return none.
-     */
-    void setAngularVelocityPIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1, const bool &passThrough = false) {_angVelPF = factorP; _angVelIF = factorI; _angVelDF = factorD; _angVelLimit = limit, _angVelPassThrough = passThrough;}
-
-    /**
-     * Sets the control factor.
-     * 
-     * Limit is the value that if reached, the intergrator will stop integrating and also reduce for anti-windup
-     * 
-     * If passThrough is set to true then the output of this controller will be added to controller modules output. Otherwise its output will be added to the next controllers setpoint.
-     *
-     * @param values factor.
-     * @return none.
-     */
-    void setAttitudePIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1, const bool &passThrough = false) {_attitudePF = factorP; _attitudeIF = factorI; _attitudeDF = factorD; _attitudeLimit = limit, _attitudePassThrough = passThrough;}
-
-    /**
-     * Sets the control factor.
-     * 
-     * Limit is the value that if reached, the intergrator will stop integrating and also reduce for anti-windup
-     *
-     * @param values factor.
-     * @return none.
-     */
-    void setAccelerationPIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1) {_accelPF = factorP; _accelIF = factorI; _accelDF = factorD; _accelLimit = limit;}
-
-    /**
-     * Sets the control factor.
-     * 
-     * Limit is the value that if reached, the intergrator will stop integrating and also reduce for anti-windup
-     * 
-     * If passThrough is set to true then the output of this controller will be added to controller modules output. Otherwise its output will be added to the next controllers setpoint.
-     *
-     * @param values factor.
-     * @return none.
-     */
-    void setVelocityPIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1, const bool &passThrough = false) {_velocityPF = factorP; _velocityIF = factorI; _velocityDF = factorD; _velocityLimit = limit, _velocityPassThrough = passThrough;}
-
-    /**
-     * Sets the control factor.
-     * 
-     * Limit is the value that if reached, the intergrator will stop integrating and also reduce for anti-windup
-     * 
-     * If passThrough is set to true then the output of this controller will be added to controller modules output. Otherwise its output will be added to the next controllers setpoint.
-     *
-     * @param values factor.
-     * @return none.
-     */
-    void setPositionPIDFactors(const Vector &factorP = 0, const Vector &factorI = 0, const Vector &factorD = 0, const Vector &limit = 1, const bool &passThrough = false) {_positionPF = factorP; _positionIF = factorI; _positionDF = factorD; _positionLimit = limit, _positionPassThrough = passThrough;}
-
+    DynamicData* getDynamicsOutputPointer() {return &controlOutput_;}
 
 private:
 
-    //Vehicle Data Pointer
-    VehicleData* _vehicleData = nullptr;
+    ControlData* controlSetpoint_;
+    NavigationData* navigationData_;
+
+    DynamicData controlOutput_;
 
     //P factor for angular acceleration 
-    Vector _angAccelPF = 0;
+    Vector angAccelPF_ = 0;
     //I factor for angular acceleration 
-    Vector _angAccelIF = 0;
+    Vector angAccelIF_ = 0;
     //D factor for angular acceleration 
-    Vector _angAccelDF = 0;
+    Vector angAccelDF_ = 0;
     //I limit for angular acceleration 
-    Vector _angAccelLimit = 1;
+    Vector angAccelLimit_ = 1;
     //I value for angular acceleration
-    Vector _angAccelIValue = 0; 
+    Vector angAccelIValue_ = 0; 
 
     //P factor for angular velocity 
-    Vector _angVelPF = 0;
+    Vector angVelPF_ = 0;
     //I factor for angular velocity 
-    Vector _angVelIF = 0;
+    Vector angVelIF_ = 0;
     //D factor for angular velocity 
-    Vector _angVelDF = 0;
+    Vector angVelDF_ = 0;
     //I limit for angular velocity 
-    Vector _angVelLimit = 1;
+    Vector angVelLimit_ = 1;
     //I value for angular velocity
-    Vector _angVelIValue = 0; 
+    Vector angVelIValue_ = 0; 
     //If true, then this controller will directly add its output to the controllers output
-    bool _angVelPassThrough = false; 
+    bool angVelPassThrough_ = false; 
 
     //P factor for attitude 
-    Vector _attitudePF = 0;
+    Vector attitudePF_ = 0;
     //I factor for attitude 
-    Vector _attitudeIF = 0;
+    Vector attitudeIF_ = 0;
     //D factor for attitude  
-    Vector _attitudeDF = 0;
+    Vector attitudeDF_ = 0;
     //I limit for attitude
-    Vector _attitudeLimit = 1;
+    Vector attitudeLimit_ = 1;
     //I value for attitude
-    Vector _attitudeIValue = 0; 
+    Vector attitudeIValue_ = 0; 
     //If true, then this controller will directly add its output to the controllers output
-    bool _attitudePassThrough = false; 
+    bool attitudePassThrough_ = false; 
 
     //P factor for acceleration 
-    Vector _accelPF = 0;
+    Vector accelPF_ = 0;
     //I factor for acceleration 
-    Vector _accelIF = 0;
+    Vector accelIF_ = 0;
     //D factor for acceleration  
-    Vector _accelDF = 0;
+    Vector accelDF_ = 0;
     //I limit for acceleration
-    Vector _accelLimit = 1;
+    Vector accelLimit_ = 1;
     //I value for acceleration
-    Vector _accelIValue = 0; 
+    Vector accelIValue_ = 0; 
 
     //P factor for velocity 
-    Vector _velocityPF = 0;
+    Vector velocityPF_ = 0;
     //I factor for velocity 
-    Vector _velocityIF = 0;
+    Vector velocityIF_ = 0;
     //D factor for velocity  
-    Vector _velocityDF = 0;
+    Vector velocityDF_ = 0;
     //I limit for velocity
-    Vector _velocityLimit = 1;
+    Vector velocityLimit_ = 1;
     //I value for velocity
-    Vector _velocityIValue = 0; 
+    Vector velocityIValue_ = 0; 
     //If true, then this controller will directly add its output to the controllers output
-    bool _velocityPassThrough = false; 
+    bool velocityPassThrough_ = false; 
 
     //P factor for position 
-    Vector _positionPF = 0;
+    Vector positionPF_ = 0;
     //I factor for position 
-    Vector _positionIF = 0;
+    Vector positionIF_ = 0;
     //D factor for position  
-    Vector _positionDF = 0;
+    Vector positionDF_ = 0;
     //I limit for position
-    Vector _positionLimit = 1;
+    Vector positionLimit_ = 1;
     //I value for position
-    Vector _positionIValue = 0; 
+    Vector positionIValue_ = 0; 
     //If true, then this controller will directly add its output to the controllers output
-    bool _positionPassThrough = false; 
+    bool positionPassThrough_ = false; 
 
 
     

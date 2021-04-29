@@ -3,11 +3,15 @@
 
 
 
-#include "guidance_template.h"
+#include "task_autorun_class.h"
+
+#include "guidance_interface.h"
+
+#include "modules/module_abstract.h"
 
 #include "data_containers/kinematic_data.h"
 
-#include "CircularBuffer.h"
+#include "utils/circular_buffer.h"
 
 #include "interval_control.h"
 
@@ -18,8 +22,16 @@
  * of points (inlcuding all kinematic data like attitude).
  * This can be used to also hover and stay stationary.
  */
-class GuidancePath: public Guidance {
+class GuidancePath: public Guidance_Interface, Task_Abstract {
 public:
+
+    /**
+     * Creates a module based class and automatically adds it to the scheduler.
+     * 
+     * @param rate is the rate at which it will be ran at.
+     * @param priority is the priority the module will have.
+     */
+    GuidancePath() : Task_Abstract(1000, eTaskPriority_t::eTaskPriority_High, true) {}
 
     /**
      * Tells guidance to go to a certain point, speed, attitude etc.
@@ -54,20 +66,12 @@ public:
      */
     void thread();
 
-    /**
-     * Init function that sets the module up.
-     *
-     * @param values none.
-     * @return none.
-     */
-    void init();
-
 
 private:
 
-    CircularBuffer<KinematicData, 100> _path;
+    Circular_Buffer<KinematicData, 100> _path;
 
-    IntervalControl _interval = IntervalControl(1000);
+    ControlData vehicleControlSettings_;
 
 
 };

@@ -1,16 +1,10 @@
-#ifndef BAROMETER_TEMPLATE_H
-#define BAROMETER_TEMPLATE_H
+#ifndef BAROMETER_INTERFACE_H
+#define BAROMETER_INTERFACE_H
 
 
 
-#include "modules/module_template.h"
-
-
-
-class BarometerTemplate: public Module_Abstract {
+class Barometer_Interface {
 public:
-
-    BarometerTemplate(uint32_t rate, eTaskPriority_t priority) : Module_Abstract(rate, priority) {}
 
     /**
      * Returns rate (in Hz) of the thread

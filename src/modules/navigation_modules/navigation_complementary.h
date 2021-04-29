@@ -15,10 +15,16 @@
 
 #include "Arduino.h"
 
-#include "navigation_template.h"
+#include "task_autorun_class.h"
 
-#include "modules/sensor_modules/mpu9250_driver.h"
-#include "modules/sensor_modules/bme280_driver.h"
+#include "modules/module_abstract.h"
+
+#include "navigation_interface.h"
+
+#include "modules/sensor_modules/gyroscope_interface.h"
+#include "modules/sensor_modules/accelerometer_interface.h"
+#include "modules/sensor_modules/magnetometer_interface.h"
+#include "modules/sensor_modules/barometer_interface.h"
 
 #include "utils/high_pass_filter.h"
 #include "utils/low_pass_filter.h"
@@ -27,11 +33,22 @@
 
 
 
-class NavigationComplementary: public Navigation {
+class NavigationComplementary: public Navigation_Interface, public Task_Abstract {
 public:
 
-    NavigationComplementary() {
-        
+    /**
+     * Creates a Navigation module using complementary filters.
+     * 
+     * @param gyro module to use.
+     * @param accel module to use.
+     * @param mag module to use.
+     * @param baro module to use.
+     */
+    NavigationComplementary(Gyroscope_Interface* gyro, Accelerometer_Interface* accel, Magnetometer_Interface* mag, Barometer_Interface* baro) : Task_Abstract(8000, eTaskPriority_t::eTaskPriority_VeryHigh, true) {
+        gyro_ = gyro;
+        accel_ = accel;
+        mag_ = mag;
+        baro_ = baro;
     }
 
     /**
@@ -43,53 +60,57 @@ public:
     void thread();
 
     /**
-     * Init function that sets the module up.
+     * Returns a struct containing all the vehicles
+     * current navigation parameters.
+     * If only the kinematic parameters are needed
+     * then use getKinematicData().
      *
-     * @param values none.
-     * @return none.
+     * @return navigation paramenters.
      */
-    void init();
+    virtual NavigationData getNavigationData() {return navigationData_;};
 
     /**
-     * Returns true if module is ready.
+     * Returns a pointer to a struct containing all 
+     * the vehicles current kinematic parameters.
+     * 
+     * This is usefull for data linking instead of 
+     * always having to pass data manually.
      *
-     * @param values none.
-     * @return bool.
+     * @return kinematic parameter pointer.
      */
-    bool moduleReady() {return _gyroInitialized && _accelInitialized && _magInitialized;};
+    virtual NavigationData* getNavigationDataPointer() {return &navigationData_;};
+
 
     /**
-     * Sets the vehicle data input pointer.
+     * Returns the current position accuracy in meters.
+     * Returns -1.0 if unsupported.
      * 
-     * Allows the control module to automatically retrieve its needed
-     * data from the pointer.
-     * 
-     * This must only be called once.
-     * 
-     * returns false if failed from null pointer input.
-     *
-     * @param values vehicleDataPointer.
-     * @return bool.
-     */
-    bool linkVehicleDataPointer(VehicleData *vehicleDataPointer) {
-        if (vehicleDataPointer == nullptr) return false;
-        _vehicleData = vehicleDataPointer;
-        return true;
-    };
-
-    /**
-     * Returns the current position accuracy.
-     * 
-     * @param values none.
      * @return float.
      */
-    //float getPositionAccuracy() {return 50.0f;}
+    //virtual float getPositionAccuracy() {return -1.0f;}
+
+    /**
+     * Returns the current attitude accuracy in radians.
+     * Returns -1.0 if unsupported.
+     * 
+     * @return float.
+     */
+    //virtual float getAttitudeAccuracy() {return -1.0f;}
 
 
 private:
 
-    //Vehicle data pointer
-    VehicleData* _vehicleData = nullptr;
+    //Gyro that will be used by Navigation module
+    Gyroscope_Interface* gyro_;
+    //Accelerometer that will be used by Navigation module
+    Accelerometer_Interface* accel_;
+    //Magnetometer that will be used by Navigation module
+    Magnetometer_Interface* mag_;
+    //Barometer that will be used by Navigation module
+    Barometer_Interface* baro_;
+
+    //Storage container for navigationData
+    NavigationData navigationData_;
 
     //Filter data
     HighPassFilter<Vector> _gyroHPF = HighPassFilter<Vector>(0.001);

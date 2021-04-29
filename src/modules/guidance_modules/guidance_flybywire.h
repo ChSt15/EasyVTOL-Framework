@@ -3,10 +3,13 @@
 
 
 
-#include "guidance_template.h"
+#include "task_autorun_class.h"
+
+#include "guidance_interface.h"
+
+#include "modules/module_abstract.h"
 
 #include "3d_math.h"
-#include "interval_control.h"
 
 #include "data_containers/kinematic_data.h"
 
@@ -17,8 +20,16 @@
  * flybywire system. Its a very simple way of
  * transfering manual control to to vehicle.
  */
-class GuidanceFlyByWire: public Guidance {
+class GuidanceFlyByWire: public Guidance_Interface, Task_Abstract {
 public:
+
+    /**
+     * Creates a module based class and automatically adds it to the scheduler.
+     * 
+     * @param rate is the rate at which it will be ran at.
+     * @param priority is the priority the module will have.
+     */
+    GuidanceFlyByWire() : Task_Abstract(1000, eTaskPriority_t::eTaskPriority_High, true) {}
 
     /**
      * Tells the guidance to rotate vehicle at set rate.
@@ -27,7 +38,7 @@ public:
      * @return none.
      */
     void setAngularRate(const Vector &rate) {
-        _vehicleControlSettings.angularRate = rate;
+        vehicleControlSettings_.angularRate = rate;
     }
 
     /**
@@ -37,7 +48,7 @@ public:
      * @return none.
      */
     void setAttitude(const Quaternion &attitude) {
-        _vehicleControlSettings.attitude = attitude;
+        vehicleControlSettings_.attitude = attitude;
     }
 
     /**
@@ -47,7 +58,7 @@ public:
      * @return none.
      */
     void setVelocity(const Vector &velocity) {
-        _vehicleControlSettings.velocity = velocity;
+        vehicleControlSettings_.velocity = velocity;
     }
 
     /**
@@ -57,7 +68,7 @@ public:
      * @return none.
      */
     void setPosition(const Vector &position) {
-        _vehicleControlSettings.position = position;
+        vehicleControlSettings_.position = position;
     }
 
     /**
@@ -67,9 +78,9 @@ public:
      * @return none.
      */
     void stopVehicle() {
-        _vehicleControlSettings.angularRate = 0;
-        _vehicleControlSettings.velocity = 0;
-        _vehicleControlSettings.acceleration = 0;
+        vehicleControlSettings_.angularRate = 0;
+        vehicleControlSettings_.velocity = 0;
+        vehicleControlSettings_.acceleration = 0;
     }
 
     /**
@@ -86,15 +97,15 @@ public:
      * @param values attitudeControlMode.
      * @return none.
      */
-    void setAttitudeControlMode(const CONTROL_MODE &attitudeControlMode) {_vehicleControlSettings.attitudeControlMode = attitudeControlMode;};
+    void setAttitudeControlMode(const eControlMode_t &attitudeControlMode) {vehicleControlSettings_.attitudeControlMode = attitudeControlMode;};
 
     /**
      * Gets the attitude control mode
      *
      * @param values none.
-     * @return CONTROL_MODE.
+     * @return eControlMode_t.
      */
-    CONTROL_MODE getAttitudeControlMode() {return _vehicleControlSettings.attitudeControlMode;};
+    eControlMode_t getAttitudeControlMode() {return vehicleControlSettings_.attitudeControlMode;};
 
     /**
      * Sets the position control mode
@@ -102,15 +113,34 @@ public:
      * @param values positionControlMode.
      * @return none.
      */
-    void setPositionControlMode(const CONTROL_MODE &positionControlMode) {_vehicleControlSettings.positionControlMode = positionControlMode;};
+    void setPositionControlMode(const eControlMode_t &positionControlMode) {vehicleControlSettings_.positionControlMode = positionControlMode;};
 
     /**
      * Gets the postion control mode
      *
      * @param values none.
-     * @return CONTROL_MODE.
+     * @return eControlMode_t.
      */
-    CONTROL_MODE getPositionControlMode() {return _vehicleControlSettings.positionControlMode;};
+    eControlMode_t getPositionControlMode() {return vehicleControlSettings_.positionControlMode;};
+
+    /**
+     * Returns a struct containing all the vehicles
+     * setpoint data that feeds to the controller.
+     *
+     * @return control parameters.
+     */
+    virtual ControlData getControlSetpoint() {return vehicleControlSettings_;}
+
+    /**
+     * Returns a pointer to a struct containing all the 
+     * vehicles setpoint data that feeds to the controller.
+     * 
+     * Using pointers allows for data linking instead of
+     * always passing data.
+     *
+     * @return control parameter pointer.
+     */
+    virtual ControlData* getControlSetpointPointer() {return &vehicleControlSettings_;}
 
     /**
      * This is where all calculations are done.
@@ -132,7 +162,11 @@ public:
 
 private:
 
+    ControlData vehicleControlSettings_;
+
     uint32_t _lastRunTimestamp = 0;
+
+    bool initialised = false;
 
 
 };

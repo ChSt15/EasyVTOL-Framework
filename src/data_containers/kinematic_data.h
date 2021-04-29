@@ -27,6 +27,9 @@ struct KinematicData {
     Vector angularRate;
     //Angular acceleration in radians/s/s.
     Vector angularAcceleration;
+
+    //Data timestamp in microseconds
+    uint32_t timestamp = 0;
     
 };
 

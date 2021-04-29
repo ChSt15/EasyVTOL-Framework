@@ -8,16 +8,16 @@ void HoverController::thread() {
     
     //Attitude control section
 
-    if (_controlSetpoint->attitudeControlMode == CONTROL_MODE::CONTROL_DISABLED) {
+    if (controlSetpoint_->attitudeControlMode == eControlMode_t::eControlMode_Disable) {
 
-        _controlOutput.force = 0;
-        _controlOutput.torqe = 0;
+        controlOutput_.force = 0;
+        controlOutput_.torqe = 0;
 
     } else {    
 
-        _controlOutput.torqe = 0;
+        controlOutput_.torqe = 0;
 
-        ControlData setpoint = *_controlSetpoint;
+        ControlData setpoint = *controlSetpoint_;
 
         Vector attitudeOutput(0);
         Vector angVelOutput(0);
@@ -25,141 +25,140 @@ void HoverController::thread() {
 
         Vector outputTotal(0);
 
-        if (setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_POSITION || setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_VELOCITY_POSITION || setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_ACCELERATION_VELOCITY_POSITION) {
+        if (setpoint.attitudeControlMode == eControlMode_t::eControlMode_Position || setpoint.attitudeControlMode == eControlMode_t::eControlMode_Velocity_Position || setpoint.attitudeControlMode == eControlMode_t::eControlMode_Acceleration_Velocity_Position) {
 
-            Vector error = (setpoint.attitude*_navigationData->attitude.copy().conjugate()).toVector(); //Error is calculated here already in local coordinate system.
+            Vector error = (setpoint.attitude*navigationData_->attitude.copy().conjugate()).toVector(); //Error is calculated here already in local coordinate system.
 
-            _attitudeIValue += error.compWiseMulti(_attitudeIF);
+            attitudeIValue_ += error.compWiseMulti(attitudeIF_);
 
-            Vector attitudeOutput = error.compWiseMulti(_attitudePF) + (setpoint.angularRate - _navigationData->angularRate).compWiseMulti(_attitudeDF) + _attitudeIValue;
+            Vector attitudeOutput = error.compWiseMulti(attitudePF_) + (setpoint.angularRate - navigationData_->angularRate).compWiseMulti(attitudeDF_) + attitudeIValue_;
 
-            if (attitudeOutput.x > _attitudeLimit.x) {
-                _attitudeIValue.x -= attitudeOutput.x - _attitudeLimit.x; //Remove saturation from I according to overthreshold
-                _attitudeIValue.x = max(_attitudeIValue.x, 0.0f); //Make sure not to remove so much that it goes negative
-            } else if (attitudeOutput.x < -_attitudeLimit.x) {
-                _attitudeIValue.x -= attitudeOutput.x + _attitudeLimit.x; //Remove saturation from I according to overthreshold
-                _attitudeIValue.x = min(_attitudeIValue.x, 0.0f); //Make sure not to remove so much that it goes negative
+            if (attitudeOutput.x > attitudeLimit_.x) {
+                attitudeIValue_.x -= attitudeOutput.x - attitudeLimit_.x; //Remove saturation from I according to overthreshold
+                attitudeIValue_.x = max(attitudeIValue_.x, 0.0f); //Make sure not to remove so much that it goes negative
+            } else if (attitudeOutput.x < -attitudeLimit_.x) {
+                attitudeIValue_.x -= attitudeOutput.x + attitudeLimit_.x; //Remove saturation from I according to overthreshold
+                attitudeIValue_.x = min(attitudeIValue_.x, 0.0f); //Make sure not to remove so much that it goes negative
             }
-            if (attitudeOutput.y > _attitudeLimit.y) {
-                _attitudeIValue.y -= attitudeOutput.y - _attitudeLimit.y; //Remove saturation from I according to overthreshold
-                _attitudeIValue.y = max(_attitudeIValue.y, 0.0f); //Make sure not to remove so much that it goes negative
-            } else if (attitudeOutput.y < -_attitudeLimit.y) {
-                _attitudeIValue.y -= attitudeOutput.y + _attitudeLimit.y; //Remove saturation from I according to overthreshold
-                _attitudeIValue.y = min(_attitudeIValue.y, 0.0f); //Make sure not to remove so much that it goes negative
+            if (attitudeOutput.y > attitudeLimit_.y) {
+                attitudeIValue_.y -= attitudeOutput.y - attitudeLimit_.y; //Remove saturation from I according to overthreshold
+                attitudeIValue_.y = max(attitudeIValue_.y, 0.0f); //Make sure not to remove so much that it goes negative
+            } else if (attitudeOutput.y < -attitudeLimit_.y) {
+                attitudeIValue_.y -= attitudeOutput.y + attitudeLimit_.y; //Remove saturation from I according to overthreshold
+                attitudeIValue_.y = min(attitudeIValue_.y, 0.0f); //Make sure not to remove so much that it goes negative
             }
-            if (attitudeOutput.z > _attitudeLimit.z) {
-                _attitudeIValue.z -= attitudeOutput.z - _attitudeLimit.z; //Remove saturation from I according to overthreshold
-                _attitudeIValue.z = max(_attitudeIValue.z, 0.0f); //Make sure not to remove so much that it goes negative
-            } else if (attitudeOutput.z < -_attitudeLimit.z) {
-                _attitudeIValue.z -= attitudeOutput.z + _attitudeLimit.z; //Remove saturation from I according to overthreshold
-                _attitudeIValue.z = min(_attitudeIValue.z, 0.0f); //Make sure not to remove so much that it goes negative
+            if (attitudeOutput.z > attitudeLimit_.z) {
+                attitudeIValue_.z -= attitudeOutput.z - attitudeLimit_.z; //Remove saturation from I according to overthreshold
+                attitudeIValue_.z = max(attitudeIValue_.z, 0.0f); //Make sure not to remove so much that it goes negative
+            } else if (attitudeOutput.z < -attitudeLimit_.z) {
+                attitudeIValue_.z -= attitudeOutput.z + attitudeLimit_.z; //Remove saturation from I according to overthreshold
+                attitudeIValue_.z = min(attitudeIValue_.z, 0.0f); //Make sure not to remove so much that it goes negative
             }
 
-            attitudeOutput = error.compWiseMulti(_attitudePF) + (setpoint.angularRate - _navigationData->angularRate).compWiseMulti(_attitudeDF) + _attitudeIValue; //Recalculate new output
+            attitudeOutput = error.compWiseMulti(attitudePF_) + (setpoint.angularRate - navigationData_->angularRate).compWiseMulti(attitudeDF_) + attitudeIValue_; //Recalculate new output
 
             //Constrain output
-            attitudeOutput.x = constrain(attitudeOutput.x, -_attitudeLimit.x, _attitudeLimit.x);
-            attitudeOutput.y = constrain(attitudeOutput.y, -_attitudeLimit.y, _attitudeLimit.y);
-            attitudeOutput.z = constrain(attitudeOutput.z, -_attitudeLimit.z, _attitudeLimit.z);
+            attitudeOutput.x = constrain(attitudeOutput.x, -attitudeLimit_.x, attitudeLimit_.x);
+            attitudeOutput.y = constrain(attitudeOutput.y, -attitudeLimit_.y, attitudeLimit_.y);
+            attitudeOutput.z = constrain(attitudeOutput.z, -attitudeLimit_.z, attitudeLimit_.z);
 
-            if (_attitudePassThrough) outputTotal += attitudeOutput;
+            if (attitudePassThrough_) outputTotal += attitudeOutput;
             else setpoint.angularRate += attitudeOutput;
 
         }
 
-        if (setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_VELOCITY || setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_VELOCITY_POSITION || setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_ACCELERATION_VELOCITY_POSITION) {
+        if (setpoint.attitudeControlMode == eControlMode_t::eControlMode_Velocity || setpoint.attitudeControlMode == eControlMode_t::eControlMode_Velocity_Position || setpoint.attitudeControlMode == eControlMode_t::eControlMode_Acceleration_Velocity_Position) {
 
-            Vector error = _navigationData->attitude.copy().conjugate().rotateVector(setpoint.angularRate - _navigationData->angularRate); //Calculate setpoint error and then rotate to local coordinate system.
+            Vector error = navigationData_->attitude.copy().conjugate().rotateVector(setpoint.angularRate - navigationData_->angularRate); //Calculate setpoint error and then rotate to local coordinate system.
 
-            _angVelIValue += error.compWiseMulti(_angVelIF);
+            angVelIValue_ += error.compWiseMulti(angVelIF_);
 
-            Vector angVelOutput = error.compWiseMulti(_angVelPF) + (setpoint.angularAcceleration - _navigationData->angularAcceleration).compWiseMulti(_angVelDF) + _angVelIValue;
+            Vector angVelOutput = error.compWiseMulti(angVelPF_) + (setpoint.angularAcceleration - navigationData_->angularAcceleration).compWiseMulti(angVelDF_) + angVelIValue_;
 
-            if (angVelOutput.x > _angVelLimit.x) {
-                _angVelIValue.x -= angVelOutput.x - _angVelLimit.x; //Remove saturation from I according to overthreshold
-                _angVelIValue.x = max(_angVelIValue.x, 0.0f); //Make sure not to remove so much that it goes negative
-            } else if (angVelOutput.x < -_angVelLimit.x) {
-                _angVelIValue.x -= angVelOutput.x + _angVelLimit.x; //Remove saturation from I according to overthreshold
-                _angVelIValue.x = min(_angVelIValue.x, 0.0f); //Make sure not to remove so much that it goes negative
+            if (angVelOutput.x > angVelLimit_.x) {
+                angVelIValue_.x -= angVelOutput.x - angVelLimit_.x; //Remove saturation from I according to overthreshold
+                angVelIValue_.x = max(angVelIValue_.x, 0.0f); //Make sure not to remove so much that it goes negative
+            } else if (angVelOutput.x < -angVelLimit_.x) {
+                angVelIValue_.x -= angVelOutput.x + angVelLimit_.x; //Remove saturation from I according to overthreshold
+                angVelIValue_.x = min(angVelIValue_.x, 0.0f); //Make sure not to remove so much that it goes negative
             }
-            if (angVelOutput.y > _angVelLimit.y) {
-                _angVelIValue.y -= angVelOutput.y - _angVelLimit.y; //Remove saturation from I according to overthreshold
-                _angVelIValue.y = max(_angVelIValue.y, 0.0f); //Make sure not to remove so much that it goes negative
-            } else if (angVelOutput.y < -_angVelLimit.y) {
-                _angVelIValue.y -= angVelOutput.y + _angVelLimit.y; //Remove saturation from I according to overthreshold
-                _angVelIValue.y = min(_angVelIValue.y, 0.0f); //Make sure not to remove so much that it goes negative
+            if (angVelOutput.y > angVelLimit_.y) {
+                angVelIValue_.y -= angVelOutput.y - angVelLimit_.y; //Remove saturation from I according to overthreshold
+                angVelIValue_.y = max(angVelIValue_.y, 0.0f); //Make sure not to remove so much that it goes negative
+            } else if (angVelOutput.y < -angVelLimit_.y) {
+                angVelIValue_.y -= angVelOutput.y + angVelLimit_.y; //Remove saturation from I according to overthreshold
+                angVelIValue_.y = min(angVelIValue_.y, 0.0f); //Make sure not to remove so much that it goes negative
             }
-            if (angVelOutput.z > _angVelLimit.z) {
-                _angVelIValue.z -= angVelOutput.z - _angVelLimit.z; //Remove saturation from I according to overthreshold
-                _angVelIValue.z = max(_angVelIValue.z, 0.0f); //Make sure not to remove so much that it goes negative
-            } else if (angVelOutput.z < -_angVelLimit.z) {
-                _angVelIValue.z -= angVelOutput.z + _angVelLimit.z; //Remove saturation from I according to overthreshold
-                _angVelIValue.z = min(_angVelIValue.z, 0.0f); //Make sure not to remove so much that it goes negative
+            if (angVelOutput.z > angVelLimit_.z) {
+                angVelIValue_.z -= angVelOutput.z - angVelLimit_.z; //Remove saturation from I according to overthreshold
+                angVelIValue_.z = max(angVelIValue_.z, 0.0f); //Make sure not to remove so much that it goes negative
+            } else if (angVelOutput.z < -angVelLimit_.z) {
+                angVelIValue_.z -= angVelOutput.z + angVelLimit_.z; //Remove saturation from I according to overthreshold
+                angVelIValue_.z = min(angVelIValue_.z, 0.0f); //Make sure not to remove so much that it goes negative
             }
 
-            angVelOutput = error.compWiseMulti(_angVelPF) + (setpoint.angularAcceleration - _navigationData->angularAcceleration).compWiseMulti(_angVelDF) + _angVelIValue; //Recalculate new output
+            angVelOutput = error.compWiseMulti(angVelPF_) + (setpoint.angularAcceleration - navigationData_->angularAcceleration).compWiseMulti(angVelDF_) + angVelIValue_; //Recalculate new output
 
             //Constrain output
-            angVelOutput.x = constrain(angVelOutput.x, -_angVelLimit.x, _angVelLimit.x);
-            angVelOutput.y = constrain(angVelOutput.y, -_angVelLimit.y, _angVelLimit.y);
-            angVelOutput.z = constrain(angVelOutput.z, -_angVelLimit.z, _angVelLimit.z);
+            angVelOutput.x = constrain(angVelOutput.x, -angVelLimit_.x, angVelLimit_.x);
+            angVelOutput.y = constrain(angVelOutput.y, -angVelLimit_.y, angVelLimit_.y);
+            angVelOutput.z = constrain(angVelOutput.z, -angVelLimit_.z, angVelLimit_.z);
 
-            if (_angVelPassThrough) outputTotal += angVelOutput;
+            if (angVelPassThrough_) outputTotal += angVelOutput;
             else setpoint.angularAcceleration += angVelOutput;
             
 
         }
 
-        if (setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_ACCELERATION || setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_ACCELERATION_VELOCITY || setpoint.attitudeControlMode == CONTROL_MODE::CONTROL_ACCELERATION_VELOCITY_POSITION) {
+        if (setpoint.attitudeControlMode == eControlMode_t::eControlMode_Acceleration || setpoint.attitudeControlMode == eControlMode_t::eControlMode_Acceleration_Velocity || setpoint.attitudeControlMode == eControlMode_t::eControlMode_Acceleration_Velocity_Position) {
 
-            Vector error = _navigationData->attitude.copy().conjugate().rotateVector(setpoint.angularAcceleration - _navigationData->angularAcceleration); //Calculate setpoint error and then rotate to local coordinate system.
+            Vector error = navigationData_->attitude.copy().conjugate().rotateVector(setpoint.angularAcceleration - navigationData_->angularAcceleration); //Calculate setpoint error and then rotate to local coordinate system.
 
-            _angAccelIValue += error.compWiseMulti(_angAccelIF);
+            angAccelIValue_ += error.compWiseMulti(angAccelIF_);
 
-            Vector angAccelOutput = error.compWiseMulti(_angAccelPF)/* + (setpoint.angularAcceleration - _navigationData->angularAcceleration).compWiseMulti(_angVelDF) currently not implemented */ + _angAccelIValue;
+            Vector angAccelOutput = error.compWiseMulti(angAccelPF_)/* + (setpoint.angularAcceleration - navigationData_->angularAcceleration).compWiseMulti(angVelDF_) currently not implemented */ + angAccelIValue_;
 
-            if (angAccelOutput.x > _angAccelLimit.x) {
-                _angAccelIValue.x -= angAccelOutput.x - _angAccelLimit.x; //Remove saturation from I according to overthreshold
-                _angAccelIValue.x = max(_angAccelIValue.x, 0.0f); //Make sure not to remove so much that it goes negative
-            } else if (angAccelOutput.x < -_angAccelLimit.x) {
-                _angAccelIValue.x -= angAccelOutput.x + _angAccelLimit.x; //Remove saturation from I according to overthreshold
-                _angAccelIValue.x = min(_angAccelIValue.x, 0.0f); //Make sure not to remove so much that it goes negative
+            if (angAccelOutput.x > angAccelLimit_.x) {
+                angAccelIValue_.x -= angAccelOutput.x - angAccelLimit_.x; //Remove saturation from I according to overthreshold
+                angAccelIValue_.x = max(angAccelIValue_.x, 0.0f); //Make sure not to remove so much that it goes negative
+            } else if (angAccelOutput.x < -angAccelLimit_.x) {
+                angAccelIValue_.x -= angAccelOutput.x + angAccelLimit_.x; //Remove saturation from I according to overthreshold
+                angAccelIValue_.x = min(angAccelIValue_.x, 0.0f); //Make sure not to remove so much that it goes negative
             }
-            if (angAccelOutput.y > _angAccelLimit.y) {
-                _angAccelIValue.y -= angAccelOutput.y - _angAccelLimit.y; //Remove saturation from I according to overthreshold
-                _angAccelIValue.y = max(_angAccelIValue.y, 0.0f); //Make sure not to remove so much that it goes negative
-            } else if (angAccelOutput.y < -_angAccelLimit.y) {
-                _angAccelIValue.y -= angAccelOutput.y + _angAccelLimit.y; //Remove saturation from I according to overthreshold
-                _angAccelIValue.y = min(_angAccelIValue.y, 0.0f); //Make sure not to remove so much that it goes negative
+            if (angAccelOutput.y > angAccelLimit_.y) {
+                angAccelIValue_.y -= angAccelOutput.y - angAccelLimit_.y; //Remove saturation from I according to overthreshold
+                angAccelIValue_.y = max(angAccelIValue_.y, 0.0f); //Make sure not to remove so much that it goes negative
+            } else if (angAccelOutput.y < -angAccelLimit_.y) {
+                angAccelIValue_.y -= angAccelOutput.y + angAccelLimit_.y; //Remove saturation from I according to overthreshold
+                angAccelIValue_.y = min(angAccelIValue_.y, 0.0f); //Make sure not to remove so much that it goes negative
             }
-            if (angAccelOutput.z > _angAccelLimit.z) {
-                _angAccelIValue.z -= angAccelOutput.z - _angAccelLimit.z; //Remove saturation from I according to overthreshold
-                _angAccelIValue.z = max(_angAccelIValue.z, 0.0f); //Make sure not to remove so much that it goes negative
-            } else if (angAccelOutput.z < -_angAccelLimit.z) {
-                _angAccelIValue.z -= angAccelOutput.z + _angAccelLimit.z; //Remove saturation from I according to overthreshold
-                _angAccelIValue.z = min(_angAccelIValue.z, 0.0f); //Make sure not to remove so much that it goes negative
+            if (angAccelOutput.z > angAccelLimit_.z) {
+                angAccelIValue_.z -= angAccelOutput.z - angAccelLimit_.z; //Remove saturation from I according to overthreshold
+                angAccelIValue_.z = max(angAccelIValue_.z, 0.0f); //Make sure not to remove so much that it goes negative
+            } else if (angAccelOutput.z < -angAccelLimit_.z) {
+                angAccelIValue_.z -= angAccelOutput.z + angAccelLimit_.z; //Remove saturation from I according to overthreshold
+                angAccelIValue_.z = min(angAccelIValue_.z, 0.0f); //Make sure not to remove so much that it goes negative
             }
 
-            angAccelOutput = error.compWiseMulti(_angAccelPF)/* + (setpoint.angularAcceleration - _navigationData->angularAcceleration).compWiseMulti(_angVelDF) currently not implemented */ + _angAccelIValue; //Recalculate new output
+            angAccelOutput = error.compWiseMulti(angAccelPF_)/* + (setpoint.angularAcceleration - navigationData_->angularAcceleration).compWiseMulti(angVelDF_) currently not implemented */ + angAccelIValue_; //Recalculate new output
 
             //Constrain output
-            angAccelOutput.x = constrain(angAccelOutput.x, -_angAccelLimit.x, _angAccelLimit.x);
-            angAccelOutput.y = constrain(angAccelOutput.y, -_angAccelLimit.y, _angAccelLimit.y);
-            angAccelOutput.z = constrain(angAccelOutput.z, -_angAccelLimit.z, _angAccelLimit.z);
+            angAccelOutput.x = constrain(angAccelOutput.x, -angAccelLimit_.x, angAccelLimit_.x);
+            angAccelOutput.y = constrain(angAccelOutput.y, -angAccelLimit_.y, angAccelLimit_.y);
+            angAccelOutput.z = constrain(angAccelOutput.z, -angAccelLimit_.z, angAccelLimit_.z);
 
         }
 
-        _controlOutput.torqe = outputTotal;
+        controlOutput_.torqe = outputTotal;
 
     }
 
-    _controlOutput.force = -_navigationData->linearAcceleration.z*1; //Multiplied by vehicle mass
-    _controlOutput.force = _navigationData->attitude.copy().conjugate().rotateVector(_controlOutput.force); //Rotate to local coordinate system
+    controlOutput_.force = -navigationData_->linearAcceleration.z*1; //Multiplied by vehicle mass
+    controlOutput_.force = navigationData_->attitude.copy().conjugate().rotateVector(controlOutput_.force); //Rotate to local coordinate system
 
-}
+    //Update control output timestamp
+    controlOutput_.timestamp = micros();
 
 
-
-void HoverController::init() {
 
 }

@@ -2,10 +2,6 @@
 
 
 
-BME280Driver Baro; //For outside use
-
-
-
 void BME280Driver::_getData() {
 
     BME280_SensorMeasurements measurements;
@@ -47,7 +43,7 @@ void BME280Driver::thread() {
     _loopCounter++;
 
 
-    if (_moduleStatus == eModuleStatus_t::eModuleStatus_Running) {
+    if (moduleStatus_ == eModuleStatus_t::eModuleStatus_Running) {
 
         if (!_bme.isMeasuring()) {
             
@@ -55,20 +51,20 @@ void BME280Driver::thread() {
 
         }
 
-    } else if (_moduleStatus == eModuleStatus_t::eModuleStatus_NotStarted || _moduleStatus == eModuleStatus_t::eModuleStatus_RestartAttempt) {
+    } else if (moduleStatus_ == eModuleStatus_t::eModuleStatus_NotStarted || moduleStatus_ == eModuleStatus_t::eModuleStatus_RestartAttempt) {
         
         init();
 
-    } else if (false/*_moduleStatus == eModuleStatus_t::MODULE_CALIBRATING*/) {
+    } else if (false/*moduleStatus_ == eModuleStatus_t::MODULE_CALIBRATING*/) {
 
         //################## Following is Temporary #################
         
 
-        _moduleStatus = eModuleStatus_t::eModuleStatus_Running; 
+        moduleStatus_ = eModuleStatus_t::eModuleStatus_Running; 
 
     } else { //This section is for device failure or a wierd mode that should not be set, therefore assume failure
 
-        _moduleStatus = eModuleStatus_t::eModuleStatus_Failure;
+        moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
         _block = true;
         _loopRate = 0;
 
@@ -111,16 +107,16 @@ void BME280Driver::init() {
         
 
         //imuStatus = DeviceStatus::DEVICE_CALIBRATING;
-        _moduleStatus = eModuleStatus_t::eModuleStatus_Running;
+        moduleStatus_ = eModuleStatus_t::eModuleStatus_Running;
 
     } else {
-        _moduleStatus = eModuleStatus_t::eModuleStatus_RestartAttempt; 
+        moduleStatus_ = eModuleStatus_t::eModuleStatus_RestartAttempt; 
         Serial.println("NEW! IMU Start Fail. Code: " + String(startCode));
         delay(1000);
     }
 
     _startAttempts++;
 
-    if (_startAttempts >= 5 && _moduleStatus == eModuleStatus_t::eModuleStatus_RestartAttempt) _moduleStatus = eModuleStatus_t::eModuleStatus_Failure;
+    if (_startAttempts >= 5 && moduleStatus_ == eModuleStatus_t::eModuleStatus_RestartAttempt) moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
 
 }

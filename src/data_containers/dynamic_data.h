@@ -16,6 +16,8 @@ struct DynamicData {
     Vector force;
     //Torqe in Nm.
     Vector torqe;
+    //Data timestamp in microseconds
+    uint32_t timestamp = 0;
     
 };
 

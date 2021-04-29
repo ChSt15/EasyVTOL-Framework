@@ -1,5 +1,5 @@
-#ifndef CONTROL_DATA_H
-#define CONTROL_DATA_H
+#ifndef eControlMode_DATA_H
+#define eControlMode_DATA_H
 
 
 
@@ -10,21 +10,21 @@
 /**
  * This enum is for the Control setting
  */
-enum CONTROL_MODE {
+enum eControlMode_t {
     //Disable control.
-    CONTROL_DISABLED,
+    eControlMode_Disable,
     //Control acceleration/rate acceleration
-    CONTROL_ACCELERATION,
+    eControlMode_Acceleration,
     //Control velocity/rate
-    CONTROL_VELOCITY,
+    eControlMode_Velocity,
     //Control both velocity/rate and acceleration/rate acceleration
-    CONTROL_ACCELERATION_VELOCITY,
+    eControlMode_Acceleration_Velocity,
     //Control position
-    CONTROL_POSITION,
+    eControlMode_Position,
     //Control velocity/rate and position
-    CONTROL_VELOCITY_POSITION,
+    eControlMode_Velocity_Position,
     //Control acceleration/rate acceleration and velocity/rate and position
-    CONTROL_ACCELERATION_VELOCITY_POSITION
+    eControlMode_Acceleration_Velocity_Position
 };
 
 
@@ -34,8 +34,10 @@ enum CONTROL_MODE {
  */
 struct ControlData: public KinematicData {
 
-    CONTROL_MODE positionControlMode = CONTROL_MODE::CONTROL_DISABLED;
-    CONTROL_MODE attitudeControlMode = CONTROL_MODE::CONTROL_DISABLED;
+    //Position controller mode
+    eControlMode_t positionControlMode = eControlMode_t::eControlMode_Disable;
+    //Attitude controller mode
+    eControlMode_t attitudeControlMode = eControlMode_t::eControlMode_Disable;
     
 };
 

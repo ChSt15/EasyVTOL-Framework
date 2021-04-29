@@ -2,17 +2,12 @@
 #define STARSHIP_DYNAMICS_H
 
 
-/**
- * This is where the vehicle takes the dynamics outputs and controls the actuators. 
- * Because this class can be augmented by the simulator, this structure also allows for very
- * easy testing of the vehicle code in the simulator in a "drag and drop" type way.
-*/
 
+#include "task_autorun_class.h"
 
 #include "definitions.h"
 
 #include "connections/starship_v_1_0.h"
-#include "starship_data_container.h"
 
 #include "outputs/rgb_led.h"
 
@@ -23,7 +18,10 @@
 #include "dynamics/servo_dynamics.h"
 #include "dynamics/tvc_dynamics.h"
 
-#include "modules/dynamics_modules/dynamics_template.h"
+#include "modules/dynamics_modules/dynamics_interface.h"
+#include "modules/navigation_modules/navigation_interface.h"
+#include "modules/control_modules/control_interface.h"
+#include "modules/module_abstract.h"
 
 #include "data_containers/navigation_data.h"
 #include "data_containers/dynamic_data.h"
@@ -39,90 +37,158 @@
 #define MAX_TVC_FORCE 30 //In newtons
 
 //Actuator mapping for manual control
-#define STARSHIP_ACTUATOR_FLAPUL 0
-#define STARSHIP_ACTUATOR_FLAPUR 1
-#define STARSHIP_ACTUATOR_FLAPDR 2
-#define STARSHIP_ACTUATOR_FLAPDL 3
+#define STARSHIP_ACTUATORFLAPUL 0
+#define STARSHIP_ACTUATORFLAPUR 1
+#define STARSHIP_ACTUATORFLAPDR 2
+#define STARSHIP_ACTUATORFLAPDL 3
 #define STARSHIP_ACTUATOR_TVC1 4
 #define STARSHIP_ACTUATOR_TVC2 5
 #define STARSHIP_ACTUATOR_TVC3 6
 #define STARSHIP_ACTUATOR_TVC4 7
-#define STARSHIP_ACTUATOR_MOTORCW 8
-#define STARSHIP_ACTUATOR_MOTORCCW 9
+#define STARSHIP_ACTUATORMOTORCW 8
+#define STARSHIP_ACTUATORMOTORCCW 9
 
 
 
-class StarshipDynamics: public Dynamics {
+class StarshipDynamics: public Dynamics_Interface, public Module_Abstract, public Task_Abstract {
 public:
+
+    /**
+     * Creates a module based class and automatically adds it to the scheduler.
+     * 
+     * @param controlModule is the module from which control data will be received.
+     * @param navigationModule is the module from which navigation data will be received.
+     */
+    StarshipDynamics(Control_Interface* controlModule, Navigation_Interface* navigationModule) : Task_Abstract(1000, eTaskPriority_t::eTaskPriority_High, true) {
+        controlModule_ = controlModule;
+        navigationModule_ = navigationModule;
+    }
 
     /**
      * This is where all calculations are done.
      *
-     * @param values none.
-     * @return none.
      */
     void thread();
 
     /**
      * Init function that sets the module up.
      *
-     * @param values none.
-     * @return none.
      */
     void init();
 
     /**
-     * Sets the vehicle data input pointer.
-     * 
-     * Allows the control module to automatically retrieve its needed
-     * data from the pointer.
-     * 
-     * This must only be called once.
-     * 
-     * returns false if failed from null pointer input.
+     * Returns the forces the acuators need to produce in total
+     * on the vehicle in order to achieve the kinematic setpoints. 
      *
-     * @param values vehicleDataPointer.
-     * @return bool.
+     * @return DynamicData.
      */
-    bool linkVehicleDataPointer(StarshipData *vehicleDataPointer) {
-        if (vehicleDataPointer == nullptr) return false;
-        _vehicleData = vehicleDataPointer;
-        return true;
-    };
+    virtual DynamicData getDynamicSetpoint() {return controlModule_->getDynamicsOutput();}
+
+    /**
+     * Returns a pointer towards a struct containing the forces 
+     * the acuators need to produce in total on the vehicle in 
+     * order to achieve the kinematic setpoints. 
+     * 
+     * Using pointers allows for data linking.
+     *
+     * @return DynamicData pointer.
+     */
+    virtual DynamicData* getDynamicSetpointPointer() {return controlModule_->getDynamicsOutputPointer();}
+
+    /**
+     * Tells dynamics module to test all actuators. 
+     * Giving false will stop testing.
+     *
+     * @param testing Default is true
+     */
+    virtual void setActuatorTesting(bool testing = true) {
+        actuatorTesting_ = testing;
+    }
+
+    /**
+     * Returns if actuators are being tested.
+     *
+     * @returns boolean.
+     */
+    virtual bool getActuatorTesting() {
+        return actuatorTesting_;
+    }
+
+    /**
+     * Tells dynamics module to enter manual mode
+     * Giving false will stop testing.
+     *
+     * @param values bool.
+     */
+    virtual void setActuatorManualMode(bool testing = true) {
+        actuatorManualMode_ = testing;
+    }
+
+    /**
+     * Returns if currently in actuator tesing mode.
+     *
+     * @returns boolean.
+     */
+    virtual bool getActuatorManualMode() {
+        return actuatorManualMode_ = false;
+    }
+
+    /**
+     * Used to send raw actuator commands to actuators.
+     * Only valid if in actuator manual mode. Call _enterActuatorManualMode()
+     * to enter this mode.
+     *
+     * @param values ActuatorSetting.
+     */
+    virtual void setActuatorsRawData(const ActuatorSetting &actuatorSetpoint) {
+        actuatorManualSetpoint_ = actuatorSetpoint;
+    }
     
 
 private:
 
-    //Vehicle data pointer
-    StarshipData* _vehicleData;
+    //Whether the vehicle has been initialised
+    bool initialised_ = false;
+
+    //Points to dynamics setpoint data container.
+    Control_Interface* controlModule_;
+
+    //Points to navigation data container.
+    Navigation_Interface* navigationModule_;
+
+    //When true then start tesing all actuators. Can be set to true by module when testing is finished.
+    bool actuatorTesting_ = false;
+
+    //When true then ignore dynamic setpoints and only use manual setpoints
+    bool actuatorManualMode_ = false;
+
+    //Contains actuator manual raw setpoints. Should only be used when in manual mode.
+    ActuatorSetting actuatorManualSetpoint_;
 
     //TVC servo in X+
-    PPMChannel _TVCServo1 = PPMChannel(TVC_SERVO_PIN_1, PPM_PROTOCOL::STANDARD_1000, 0, -1);
+    PPMChannel TVCServo1_ = PPMChannel(TVC_SERVO_PIN_1, ePPMProtocol_t::ePPMProtocol_Standard_1000us, 0, -1);
     //TVC servo in Y+
-    PPMChannel _TVCServo2 = PPMChannel(TVC_SERVO_PIN_2, PPM_PROTOCOL::STANDARD_1000, 0, -1);
+    PPMChannel TVCServo2_ = PPMChannel(TVC_SERVO_PIN_2, ePPMProtocol_t::ePPMProtocol_Standard_1000us, 0, -1);
     //TVC servo in X-
-    PPMChannel _TVCServo3 = PPMChannel(TVC_SERVO_PIN_3, PPM_PROTOCOL::STANDARD_1000, 0, 1);
+    PPMChannel TVCServo3_ = PPMChannel(TVC_SERVO_PIN_3, ePPMProtocol_t::ePPMProtocol_Standard_1000us, 0, 1);
     //TVC servo in Y-
-    PPMChannel _TVCServo4 = PPMChannel(TVC_SERVO_PIN_4, PPM_PROTOCOL::STANDARD_1000, -0.1, 1);
+    PPMChannel TVCServo4_ = PPMChannel(TVC_SERVO_PIN_4, ePPMProtocol_t::ePPMProtocol_Standard_1000us, -0.1, 1);
     //CW motor control.
-    PPMChannel _motorCW = PPMChannel(MOTOR_PIN_CW, PPM_PROTOCOL::ONESHOT_125, -1, 2);
+    PPMChannel motorCW_ = PPMChannel(MOTOR_PIN_CW, ePPMProtocol_t::ePPMProtocol_Oneshot_125us, -1, 2);
     //CCW motor control.
-    PPMChannel _motorCCW = PPMChannel(MOTOR_PIN_CCW, PPM_PROTOCOL::ONESHOT_125, -1, 2);
+    PPMChannel motorCCW_ = PPMChannel(MOTOR_PIN_CCW, ePPMProtocol_t::ePPMProtocol_Oneshot_125us, -1, 2);
     //Up Left flap servo.
-    PPMChannel _flapUL = PPMChannel(FLAP_SERVO_PIN_UL, PPM_PROTOCOL::STANDARD_1000, 1, -1);
-    ServoDynamics _flapULControl = ServoDynamics(&_flapUL, 1*DEGREES, FLAP_MAX_VELOCITY, TOPFLAP_MAX_ACCEL);
+    PPMChannel flapUL_ = PPMChannel(FLAP_SERVO_PIN_UL, ePPMProtocol_t::ePPMProtocol_Standard_1000us, 1, -1);
+    ServoDynamics flapULControl_ = ServoDynamics(&flapUL_, 1*DEGREES, FLAP_MAX_VELOCITY, TOPFLAP_MAX_ACCEL);
     //Up Right flap servo.
-    PPMChannel _flapUR = PPMChannel(FLAP_SERVO_PIN_UR, PPM_PROTOCOL::STANDARD_1000, -1, 1);
-    ServoDynamics _flapURControl = ServoDynamics(&_flapUR, -5*DEGREES, FLAP_MAX_VELOCITY, TOPFLAP_MAX_ACCEL);
+    PPMChannel flapUR_ = PPMChannel(FLAP_SERVO_PIN_UR, ePPMProtocol_t::ePPMProtocol_Standard_1000us, -1, 1);
+    ServoDynamics flapURControl_ = ServoDynamics(&flapUR_, -5*DEGREES, FLAP_MAX_VELOCITY, TOPFLAP_MAX_ACCEL);
     //Down Left flap servo.
-    PPMChannel _flapDL = PPMChannel(FLAP_SERVO_PIN_DL, PPM_PROTOCOL::STANDARD_1000, -1, 1);
-    ServoDynamics _flapDLControl = ServoDynamics(&_flapDL, -7*DEGREES, FLAP_MAX_VELOCITY, BOTTOMFLAP_MAX_ACCEL);
+    PPMChannel flapDL_ = PPMChannel(FLAP_SERVO_PIN_DL, ePPMProtocol_t::ePPMProtocol_Standard_1000us, -1, 1);
+    ServoDynamics flapDLControl_ = ServoDynamics(&flapDL_, -7*DEGREES, FLAP_MAX_VELOCITY, BOTTOMFLAP_MAX_ACCEL);
     //Down Right flap servo.
-    PPMChannel _flapDR = PPMChannel(FLAP_SERVO_PIN_DR, PPM_PROTOCOL::STANDARD_1000, 1, -1);
-    ServoDynamics _flapDRControl = ServoDynamics(&_flapDR, 1*DEGREES, FLAP_MAX_VELOCITY, BOTTOMFLAP_MAX_ACCEL);
-
-    //Controls loop rate
-    IntervalControl _interval = IntervalControl(1000);
+    PPMChannel flapDR_ = PPMChannel(FLAP_SERVO_PIN_DR, ePPMProtocol_t::ePPMProtocol_Standard_1000us, 1, -1);
+    ServoDynamics flapDRControl_ = ServoDynamics(&flapDR_, 1*DEGREES, FLAP_MAX_VELOCITY, BOTTOMFLAP_MAX_ACCEL);
 
     //Enum for flap testing
     enum FLAP_TEST_STAGE {
@@ -132,14 +198,14 @@ private:
         BOTTOM_RIGHT
     };
 
-    FLAP_TEST_STAGE _flapTestStage = FLAP_TEST_STAGE::TOP_LEFT;
-    uint8_t _flapTestCounter = 0;
+    FLAP_TEST_STAGE flapTestStage_ = FLAP_TEST_STAGE::TOP_LEFT;
+    uint8_t flapTestCounter_ = 0;
 
     //Helps with calculating TVC stuff
-    TVCDynamics _TVCCalculator = TVCDynamics(Vector(0,0,-0.4), Vector(0,0,-1));
+    TVCDynamics TVCCalculator_ = TVCDynamics(Vector(0,0,-0.4), Vector(0,0,-1));
 
 
-    void _getTVCAngles(const Vector &direction, const float &twist, float &tvc1, float &tvc2, float &tvc3, float &tvc4);
+    void getTVCAngles(const Vector &direction, const float &twist, float &tvc1, float &tvc2, float &tvc3, float &tvc4);
     
     
 };

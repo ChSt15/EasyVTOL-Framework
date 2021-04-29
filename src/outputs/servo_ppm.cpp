@@ -2,7 +2,7 @@
 
 
 
-PPMChannel::PPMChannel(int16_t pin, const PPM_PROTOCOL &protocol, float offset, float scaler) {
+PPMChannel::PPMChannel(int16_t pin, const ePPMProtocol_t &protocol, float offset, float scaler) {
     _pin = pin;
     _offset = offset;
     _scaler = scaler;
@@ -112,30 +112,30 @@ float PPMChannel::getChannel() {return _percent;}
     * @param values min, max, protocol
     * @return none.
 */
-void PPMChannel::_getProtocolTiming(uint32_t &min, uint32_t max, const PPM_PROTOCOL &protocol) {
+void PPMChannel::_getProtocolTiming(uint32_t &min, uint32_t max, const ePPMProtocol_t &protocol) {
     
     switch (protocol) {
-    case PPM_PROTOCOL::STANDARD_1000 :
+    case ePPMProtocol_t::ePPMProtocol_Standard_1000us :
         min = 1000;
         max = 2000;
         break;
 
-    case PPM_PROTOCOL::ONESHOT_125 :
+    case ePPMProtocol_t::ePPMProtocol_Oneshot_125us :
         min = 125;
         max = 250;
         break;
 
-    case PPM_PROTOCOL::ONESHOT_42 :
+    case ePPMProtocol_t::ePPMProtocol_Oneshot_42us :
         min = 42;
         max = 82;
         break;
 
-    case PPM_PROTOCOL::MULTISHOT :
+    case ePPMProtocol_t::ePPMProtocol_Multishot_5us :
         min = 5;
         max = 25;
         break;
     
-    default: //Default will set timing to standard 1500us
+    default: //Default will set timing to standard 1000us
         min = 1000;
         max = 2000;
         break;
@@ -151,7 +151,7 @@ void PPMChannel::_getProtocolTiming(uint32_t &min, uint32_t max, const PPM_PROTO
     * @param values protocol
     * @return none.
 */
-void PPMChannel::setProtocol(const PPM_PROTOCOL &protocol) {
+void PPMChannel::setProtocol(const ePPMProtocol_t &protocol) {
 
     if (_pin == -1) return; //Make sure a pin has been selected
 

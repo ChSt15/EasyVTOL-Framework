@@ -13,52 +13,20 @@
 
 
 
-#include "modules/module_template.h"
-
 #include "data_containers/navigation_data.h"
 
 
 
-class Navigation: public Module {
+class Navigation_Interface {
 public:
 
     /**
      * Returns a struct containing all the vehicles
      * current navigation parameters.
-     * If only the kinematic parameters are needed
-     * then use getKinematicData().
      *
-     * @param values none.
      * @return navigation paramenters.
      */
-    virtual NavigationData getNavigationData() {return _navigationData;};
-
-    /**
-     * Returns a struct containing all the vehicles
-     * current kinematic parameters.
-     *
-     * @param values none.
-     * @return kinematic paramenters.
-     */
-    virtual KinematicData getKinematicData() {return _navigationData;};
-
-    /**
-     * Returns the current position accuracy in meters.
-     * Returns -1.0 if unsupported.
-     * 
-     * @param values none.
-     * @return float.
-     */
-    virtual float getPositionAccuracy() {return -1.0f;}
-
-    /**
-     * Returns the current attitude accuracy in radians.
-     * Returns -1.0 if unsupported.
-     * 
-     * @param values none.
-     * @return float.
-     */
-    virtual float getAttitudeAccuracy() {return -1.0f;}
+    virtual NavigationData getNavigationData() = 0;
 
     /**
      * Returns a pointer to a struct containing all 
@@ -67,18 +35,25 @@ public:
      * This is usefull for data linking instead of 
      * always having to pass data manually.
      *
-     * @param values none.
      * @return kinematic parameter pointer.
      */
-    virtual NavigationData* getNavigationDataPointer() {return &_navigationData;};
-
-
-protected:
+    virtual NavigationData* getNavigationDataPointer() = 0;
 
     /**
-     * This pointer points to the global navigation data kinematic data container
+     * Returns the current position accuracy in meters.
+     * Returns -1.0 if unsupported.
+     * 
+     * @return float.
      */
-    static NavigationData _navigationData;
+    virtual float getPositionAccuracy() {return -1.0f;}
+
+    /**
+     * Returns the current attitude accuracy in radians.
+     * Returns -1.0 if unsupported.
+     * 
+     * @return float.
+     */
+    virtual float getAttitudeAccuracy() {return -1.0f;}
 
 };
 

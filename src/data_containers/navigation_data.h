@@ -10,35 +10,35 @@
 /**
  * This enum is for the navigation attitude solution
  */
-enum NAV_ATTITUDE_MODE {
+enum eNavAttitudeMode_t {
     //No attitude solution.
-    NO_ATTITUDE_SOLUTION,
+    eNavAttitudeMode_None,
     //Only angular rate can be measured.
-    ANGULAR_RATE,
+    eNavAttitudeMode_AngularRate,
     //Attitude solution but no heading (No yaw reference).
-    ATTITUDE,
+    eNavAttitudeMode_Attitude,
     //Attitude and heading solution.
-    AHRS
+    eNavAttitudeMode_AHRS
 };
 
 /**
  * This enum is for the navigation position solution
  */
-enum NAV_POSITION_MODE {
+enum eNavPositionMode_t {
     //No position solution.
-    NO_POSITION_SOLUTION,
+    eNavPositionMode_None,
     //Solution using only barometer data. No position available. Height accuracy is medium.
-    BAROMETER,
+    eNavPositionMode_BarometerOnly,
     //Solution using only GNSS data. Position and height available. Height and position accuracy is low.
-    GNSS,
+    eNavPositionMode_GNSSOnly,
     //Solution using both GNSS and barometer data. Position and height available. Height accuracy is medium and position accuracy is medium.
-    GNSS_BAROMETER,
+    eNavPositionMode_GNSSAndBarometer,
     //Solution using GNSS and IMU data. Position and height available. Height accuracy is medium and position is high.
-    GNSS_IMU,
+    eNavPositionMode_GNSSAndIMU,
     //Solution using barometer and IMU data. Only height available. Height accuracy is high.
-    BAROMETER_IMU,
+    eNavPositionMode_BarometerAndIMU,
     //Solution using GNSS, barometer and IMU data. Position and height available. Height and position accuracy is high.
-    GNSS_BAROMETER_IMU,
+    eNavPositionMode_GNSSAndBarometerAndIMU,
 };
 
 
@@ -48,9 +48,9 @@ enum NAV_POSITION_MODE {
 struct NavigationData: public KinematicData {
 
     //Current attitude solution state.
-    NAV_ATTITUDE_MODE attitudeMode = NAV_ATTITUDE_MODE::NO_ATTITUDE_SOLUTION;
+    eNavAttitudeMode_t attitudeMode = eNavAttitudeMode_t::eNavAttitudeMode_None;
     //Current position solution state.
-    NAV_POSITION_MODE positionMode = NAV_POSITION_MODE::NO_POSITION_SOLUTION;
+    eNavPositionMode_t positionMode = eNavPositionMode_t::eNavPositionMode_None;
     
 };
 

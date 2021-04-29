@@ -7,17 +7,24 @@
 
 #include "interval_control.h"
 
-#include "modules/sensor_modules/imu_template.h"
+#include "task_autorun_class.h"
+
+#include "gyroscope_interface.h"
+#include "accelerometer_interface.h"
+#include "magnetometer_interface.h"
+
+#include "modules/module_abstract.h"
 
 #include "mpu9250.h"
 
 #include "utils/circular_buffer.h"
 
 
-class MPU9250Driver: public IMUTemplate {
+
+class MPU9250Driver: public Gyroscope_Interface, public Accelerometer_Interface, public Magnetometer_Interface, public Module_Abstract, public Task_Abstract {
 public:
 
-    MPU9250Driver() : IMUTemplate(35000, eTaskPriority_t::eTaskPriority_Realtime) {}
+    MPU9250Driver() : Task_Abstract(35000, eTaskPriority_t::eTaskPriority_Realtime, true) {}
     
     /**
      * This is where all calculations are done.
@@ -286,11 +293,6 @@ private:
 
     
 };
-
-
-extern MPU9250Driver IMU;
-
-
 
 
 

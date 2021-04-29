@@ -20,11 +20,11 @@
  * To add a new protocol add the name to to this and add the protocol 
  * timings to the switch statement in _setProtocolTiming() function.
  */
-enum PPM_PROTOCOL {
-    STANDARD_1000,
-    ONESHOT_125,
-    ONESHOT_42,
-    MULTISHOT
+enum ePPMProtocol_t {
+    ePPMProtocol_Standard_1000us,
+    ePPMProtocol_Oneshot_125us,
+    ePPMProtocol_Oneshot_42us,
+    ePPMProtocol_Multishot_5us
 };
 
 
@@ -38,7 +38,7 @@ enum PPM_PROTOCOL {
 class PPMChannel {
 public:
 
-    PPMChannel(int16_t pin, const PPM_PROTOCOL &protocol, float offset = 0, float scaler = 1);
+    PPMChannel(int16_t pin, const ePPMProtocol_t &protocol, float offset = 0, float scaler = 1);
     ~PPMChannel();
 
     bool setAngle(const float &angle, const bool &limit = true);
@@ -49,13 +49,13 @@ public:
     void activateChannel(const bool &activate = true);
     bool getActive();
 
-    void setProtocol(const PPM_PROTOCOL &protocol);
+    void setProtocol(const ePPMProtocol_t &protocol);
 
     bool setPin(int16_t pin);
 
 private:
 
-    void _getProtocolTiming(uint32_t &min, uint32_t max, const PPM_PROTOCOL &protocol);
+    void _getProtocolTiming(uint32_t &min, uint32_t max, const ePPMProtocol_t &protocol);
 
     int16_t _pin = -1;  
 

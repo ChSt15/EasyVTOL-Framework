@@ -5,7 +5,6 @@
 uint32_t MPU9250Driver::_newDataTimestamp = 0;
 bool MPU9250Driver::_newDataInterrupt = false;
 
-MPU9250Driver IMU; //For outside use
 
 
 void MPU9250Driver::_getData() {
@@ -49,7 +48,7 @@ void MPU9250Driver::thread() {
     _loopCounter++;
 
 
-    if (_moduleStatus == eModuleStatus_t::eModuleStatus_Running) {
+    if (moduleStatus_ == eModuleStatus_t::eModuleStatus_Running) {
 
         if (_newDataInterrupt) { //If true then data is ready in the imu FIFO
             _newDataInterrupt = false;
@@ -59,11 +58,11 @@ void MPU9250Driver::thread() {
 
         }
 
-    } else if (_moduleStatus == eModuleStatus_t::eModuleStatus_NotStarted || _moduleStatus == eModuleStatus_t::eModuleStatus_RestartAttempt) {
+    } else if (moduleStatus_ == eModuleStatus_t::eModuleStatus_NotStarted || moduleStatus_ == eModuleStatus_t::eModuleStatus_RestartAttempt) {
         
         init();
 
-    } else if (false/*_moduleStatus == eModuleStatus_t::MODULE_CALIBRATING*/) {
+    } else if (false/*moduleStatus_ == eModuleStatus_t::MODULE_CALIBRATING*/) {
 
         //################## Following is Temporary #################
         Serial.println("CALIBRATING IMU");
@@ -74,24 +73,25 @@ void MPU9250Driver::thread() {
             //_imu.calibrateAccel();
         }
 
-        _moduleStatus = eModuleStatus_t::eModuleStatus_Running; 
+        moduleStatus_ = eModuleStatus_t::eModuleStatus_Running; 
         //else imuStatus = DeviceStatus::DEVICE_FAILURE; 
 
     } else { //This section is for device failure or a wierd mode that should not be set, therefore assume failure
 
-        _moduleStatus = eModuleStatus_t::eModuleStatus_Failure;
+        moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
         _block = true;
         _loopRate = 0;
 
     }
 
 
-
-    if (_rateCalcInterval.isTimeToRun()) {
-        _loopRate = _loopCounter;
-        _gyroRate = _gyroCounter;
-        _accelRate = _accelCounter;
-        _magRate = _magCounter;
+    uint32_t dTime;
+    if (_rateCalcInterval.isTimeToRun(dTime)) {
+        float dTime_s = (float)dTime/1000000.0f;
+        _loopRate = _loopCounter/dTime_s;
+        _gyroRate = _gyroCounter/dTime_s;
+        _accelRate = _accelCounter/dTime_s;
+        _magRate = _magCounter/dTime_s;
         _gyroCounter = 0;
         _accelCounter = 0;
         _magCounter = 0;
@@ -134,16 +134,16 @@ void MPU9250Driver::init() {
         
 
         //imuStatus = DeviceStatus::DEVICE_CALIBRATING;
-        _moduleStatus = eModuleStatus_t::eModuleStatus_Running;
+        moduleStatus_ = eModuleStatus_t::eModuleStatus_Running;
 
     } else {
-        _moduleStatus = eModuleStatus_t::eModuleStatus_RestartAttempt; 
+        moduleStatus_ = eModuleStatus_t::eModuleStatus_RestartAttempt; 
         Serial.println("NEW! IMU Start Fail. Code: " + String(startCode));
         delay(1000);
     }
 
     _startAttempts++;
 
-    if (_startAttempts >= 5 && _moduleStatus == eModuleStatus_t::eModuleStatus_RestartAttempt) _moduleStatus = eModuleStatus_t::eModuleStatus_Failure;
+    if (_startAttempts >= 5 && moduleStatus_ == eModuleStatus_t::eModuleStatus_RestartAttempt) moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
 
 }

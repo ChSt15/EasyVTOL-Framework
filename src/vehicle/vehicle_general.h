@@ -1,33 +1,34 @@
-#ifndef STARSHIP_H
-#define STARSHIP_H
+#ifndef VEHICLE_GENERAL_H
+#define VEHICLE_GENERAL_H
 
 
 
 #include "task_autorun_class.h"
 
-#include "utils/interval_control.h"
+#include "data_containers/kinematic_data.h"
+#include "data_containers/vehicle_data.h"
 
-#include "data_containers/navigation_data.h"
+#include "modules/module_abstract.h"
 
-#include "vehicle/vehicle_interface.h"
+#include "modules/guidance_modules/guidance_interface.h"
+#include "modules/navigation_modules/navigation_interface.h"
+#include "modules/control_modules/control_interface.h"
+#include "modules/dynamics_modules/dynamics_interface.h"
 
-#include "modules/navigation_modules/navigation_complementary.h"
-#include "modules/guidance_modules/guidance_flybywire.h"
-#include "modules/control_modules/powered_hover_controller.h"
-
-#include "starship_dynamics.h"
-
+#include "vehicle_interface.h"
 
 
-class Starship: public Vehicle_Interface, Task_Abstract {
+
+class VehicleGeneral: public Vehicle_Interface, public Module_Abstract, public Task_Abstract {
 public:
 
-    Starship(Guidance_Interface* guidancePointer, Navigation_Interface* navigationPointer, HoverController* controlPointer, StarshipDynamics* dynamicsPointer) : Task_Abstract(8000, eTaskPriority_t::eTaskPriority_High, true) {
+    VehicleGeneral(Guidance_Interface* guidancePointer, Navigation_Interface* navigationPointer, Control_Interface* controlPointer, Dynamics_Interface* dynamicsPointer) : Task_Abstract(8000, eTaskPriority_t::eTaskPriority_High, true) {
         guidance_ = guidancePointer;
         navigation_ = navigationPointer;
         control_ = controlPointer;
         dynamics_ = dynamicsPointer;
     }
+
 
     /**
      * Thread function of the vehicle. 
@@ -37,17 +38,7 @@ public:
      * @param values none.
      * @return none.
      */
-    void thread();
-
-    /**
-     * Init function that setups the vehicle. If not called
-     * then on the first Thread run this will automatically 
-     * be called.
-     *
-     * @param values none.
-     * @return none.
-     */
-    void init();
+    virtual void thread() {}
 
     /**
      * Not really needed for modules like these, but still needs to be defined.
@@ -79,8 +70,9 @@ public:
     Dynamics_Interface* getDynamicsModulePointer() {return dynamics_;}
 
 
-private:
+protected:
 
+    //Set to true when vehicle is ready for flight.
     bool vehicleInitialized_ = false;
 
     //Points to the navigation module to use.
@@ -90,14 +82,13 @@ private:
     Guidance_Interface* guidance_;
 
     //Points to the control module to use.
-    HoverController* control_;
+    Control_Interface* control_;
 
     //Points to the dynamics module to use.
-    StarshipDynamics* dynamics_;
+    Dynamics_Interface* dynamics_;
 
 
 };
-
 
 
 

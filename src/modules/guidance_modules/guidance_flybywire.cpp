@@ -4,14 +4,16 @@
 
 void GuidanceFlyByWire::thread() {
 
+    if (!initialised) init();
+
     float dT = ((float) micros() - _lastRunTimestamp)/1000000.0f; //Get time delta in seconds
     _lastRunTimestamp = micros(); //Save current run timestamp for next run.
 
     //Integrate speed, position and attitude
-    _vehicleControlSettings.velocity += _vehicleControlSettings.linearAcceleration*dT;
-    _vehicleControlSettings.position += _vehicleControlSettings.velocity*dT;
+    vehicleControlSettings_.velocity += vehicleControlSettings_.linearAcceleration*dT;
+    vehicleControlSettings_.position += vehicleControlSettings_.velocity*dT;
 
-    _vehicleControlSettings.attitude = _vehicleControlSettings.attitude*Quaternion(_vehicleControlSettings.angularRate.copy().normalize(), _vehicleControlSettings.angularRate.magnitude()*dT);
+    vehicleControlSettings_.attitude = vehicleControlSettings_.attitude*Quaternion(vehicleControlSettings_.angularRate.copy().normalize(), vehicleControlSettings_.angularRate.magnitude()*dT);
 
 }
 
@@ -19,9 +21,11 @@ void GuidanceFlyByWire::thread() {
 
 void GuidanceFlyByWire::init() {
 
-    _vehicleControlSettings.velocity = 0;
-    _vehicleControlSettings.acceleration = -GRAVITY_VECTOR;
-    _vehicleControlSettings.linearAcceleration = 0;
-    _vehicleControlSettings.angularRate = 0;
+    initialised = true;
+
+    vehicleControlSettings_.velocity = 0;
+    vehicleControlSettings_.acceleration = -GRAVITY_VECTOR;
+    vehicleControlSettings_.linearAcceleration = 0;
+    vehicleControlSettings_.angularRate = 0;
 
 }

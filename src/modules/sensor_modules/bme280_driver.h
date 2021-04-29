@@ -7,7 +7,11 @@
 
 #include "interval_control.h"
 
-#include "barometer_template.h"
+#include "task_autorun_class.h"
+
+#include "barometer_interface.h"
+
+#include "modules/module_abstract.h"
 
 #include "SparkFunBME280.h"
 
@@ -15,10 +19,10 @@
 
 
 
-class BME280Driver: public BarometerTemplate {
+class BME280Driver: public Barometer_Interface, public Module_Abstract, public Task_Abstract {
 public:
 
-    BME280Driver() : BarometerTemplate(100, eTaskPriority_t::eTaskPriority_Realtime) {}
+    BME280Driver() : Task_Abstract(100, eTaskPriority_t::eTaskPriority_Realtime, true) {}
     
     /**
      * This is where all calculations are done.
@@ -282,9 +286,6 @@ private:
 
     
 };
-
-
-extern BME280Driver Baro;
 
 
 

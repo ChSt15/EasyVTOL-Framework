@@ -112,7 +112,6 @@ void BME280Driver::init() {
     } else {
         moduleStatus_ = eModuleStatus_t::eModuleStatus_RestartAttempt; 
         Serial.println("NEW! IMU Start Fail. Code: " + String(startCode));
-        delay(1000);
     }
 
     _startAttempts++;

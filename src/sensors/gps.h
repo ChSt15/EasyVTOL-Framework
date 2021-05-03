@@ -1,12 +1,11 @@
 #ifndef GPS_H
 #define GPS_H
 
+/*
 #include "Arduino.h"
 
-#include "definitions.h"
-
-#include "SparkFun_Ublox_Arduino_Library.h"
-#include "3d_math.h"
+#include "lib/SparkFun_u-blox/src/SparkFun_Ublox_Arduino_Library.h"
+#include "lib/Math-Helper/src/3d_math.h"
 #include "CircularBuffer.h"
 
 #include "interval_control.h"
@@ -39,7 +38,7 @@ namespace GPS {
     DeviceStatus getDeviceStatus();
     
 } 
-
+*/
 
 
 

@@ -2,15 +2,13 @@
 #define RGB_LED_H
 
 
-
+/*
 #include "Arduino.h"
 
 #include "FastLED.h"
 
 #include "utils/interval_control.h"
 #include "utils/device_status.h"
-
-#include "definitions.h"
 
 
 
@@ -30,7 +28,7 @@ namespace RGBLED {
     
 } 
 
-
+*/
 
 
 

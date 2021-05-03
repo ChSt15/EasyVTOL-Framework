@@ -15,16 +15,16 @@
 
 #include "Arduino.h"
 
-#include "task_autorun_class.h"
+#include "lib/Simple-Schedule/src/task_autorun_class.h"
 
 #include "modules/module_abstract.h"
 
 #include "navigation_interface.h"
 
-#include "modules/sensor_modules/gyroscope_interface.h"
-#include "modules/sensor_modules/accelerometer_interface.h"
-#include "modules/sensor_modules/magnetometer_interface.h"
-#include "modules/sensor_modules/barometer_interface.h"
+#include "modules/sensor_modules/gyroscope_modules/gyroscope_interface.h"
+#include "modules/sensor_modules/accelerometer_modules/accelerometer_interface.h"
+#include "modules/sensor_modules/magnetometer_modules/magnetometer_interface.h"
+#include "modules/sensor_modules/barometer_modules/barometer_interface.h"
 
 #include "utils/high_pass_filter.h"
 #include "utils/low_pass_filter.h"

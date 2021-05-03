@@ -3,9 +3,8 @@
 
 
 
-#include "definitions.h"
+#include "Arduino.h"
 
-#include "CircularBuffer.h"
 
 
 template<typename T>

@@ -5,14 +5,10 @@
 
 #include "Arduino.h"
 
-#include "definitions.h"
+#include "lib/KraftKommunikation/src/kraft_link.h"
+#include "lib/SX12XX-LoRa-master/src/SX128XLT.h"
 
-#include "kraft_link.h"
-#include "SX128XLT.h"
-
-#include "interval_control.h"
-
-#include "task_autorun_class.h"
+#include "lib/Simple-Schedule/src/task_autorun_class.h"
 
 #include "modules/module_abstract.h"
 
@@ -42,7 +38,15 @@
 class SX1280Driver: public KraftLink_Interface, public Module_Abstract, public Task_Abstract {
 public:
 
-    SX1280Driver() : Task_Abstract(200, eTaskPriority_t::eTaskPriority_Middle, true) {}
+    SX1280Driver(int busyPin, int txenPin, int rxenPin, int dio1Pin, int nResetPin, int nssPin/*, SPIClass* spiBus*/) : Task_Abstract(200, eTaskPriority_t::eTaskPriority_Middle, true) {
+        nssPin_ = nssPin;
+        busyPin_ = busyPin;
+        txenPin_ = txenPin;
+        rxenPin_ = rxenPin;
+        dio1Pin_ = dio1Pin;
+        resetPin_ = nResetPin;
+        //spiBus_ = spiBus;
+    }
     
     /**
      * This is where all calculations are done.
@@ -139,6 +143,13 @@ private:
 
     IntervalControl rateCalcInterval_ = IntervalControl(1); 
 
+    int nssPin_;
+    int busyPin_;
+    int resetPin_;
+    int txenPin_;
+    int rxenPin_;
+    int dio1Pin_;
+    //SPIClass* spiBus_;
     SX128XLT radio_;      
 
     uint8_t startAttempts_ = 0;

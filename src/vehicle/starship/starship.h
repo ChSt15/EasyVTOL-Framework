@@ -3,9 +3,7 @@
 
 
 
-#include "task_autorun_class.h"
-
-#include "utils/interval_control.h"
+#include "lib/Simple-Schedule/src/task_autorun_class.h"
 
 #include "data_containers/navigation_data.h"
 

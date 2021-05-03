@@ -3,7 +3,7 @@
 
 
 
-#include "task_autorun_class.h"
+#include "lib/Simple-Schedule/src/task_autorun_class.h"
 
 #include "guidance_interface.h"
 
@@ -12,8 +12,6 @@
 #include "data_containers/kinematic_data.h"
 
 #include "utils/circular_buffer.h"
-
-#include "interval_control.h"
 
 
 

@@ -1,5 +1,5 @@
 #include "gps.h"
-
+/*
 
 namespace GPS {
 
@@ -122,3 +122,4 @@ uint32_t GPS::getMeasurementRate() {
 DeviceStatus GPS::getDeviceStatus() {return gpsStatus;}
 
 
+*/

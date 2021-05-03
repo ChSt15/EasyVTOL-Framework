@@ -3,8 +3,6 @@
 
 
 
-#include "definitions.h"
-
 #include "outputs/servo_ppm.h"
 
 

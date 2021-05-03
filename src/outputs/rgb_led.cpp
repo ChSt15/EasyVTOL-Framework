@@ -1,6 +1,6 @@
 #include "rgb_led.h"
 
-
+/*
 namespace RGBLED {
 
     const int ledPin = RGBLED_PIN;
@@ -74,4 +74,4 @@ uint32_t RGBLED::getRate() {
 
 DeviceStatus RGBLED::getDeviceStatus() {return ledStatus;}
 
-
+*/

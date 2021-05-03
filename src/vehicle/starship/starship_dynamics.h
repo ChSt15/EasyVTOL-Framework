@@ -3,15 +3,11 @@
 
 
 
-#include "task_autorun_class.h"
+#include "Arduino.h"
 
-#include "definitions.h"
+#include "lib/Simple-Schedule/src/task_autorun_class.h"
 
 #include "connections/starship_v_1_0.h"
-
-#include "outputs/rgb_led.h"
-
-#include "utils/interval_control.h"
 
 #include "outputs/servo_ppm.h"
 

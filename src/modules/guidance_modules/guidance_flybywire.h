@@ -3,13 +3,11 @@
 
 
 
-#include "task_autorun_class.h"
+#include "lib/Simple-Schedule/src/task_autorun_class.h"
 
 #include "guidance_interface.h"
 
 #include "modules/module_abstract.h"
-
-#include "3d_math.h"
 
 #include "data_containers/kinematic_data.h"
 

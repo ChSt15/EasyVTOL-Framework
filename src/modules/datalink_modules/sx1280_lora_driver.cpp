@@ -47,7 +47,7 @@ void SX1280Driver::thread() {
 void SX1280Driver::internalLoop() {
 
 
-    if (digitalRead(SX1280_DIO1_PIN)) { //Something triggered interrupt
+    if (digitalRead(dio1Pin_)) { //Something triggered interrupt
 
         #ifdef SX1280_DEBUG
             Serial.println("Radio triggered interrupt");
@@ -66,9 +66,6 @@ void SX1280Driver::internalLoop() {
             byte packetL = radio_.readRXPacketL();
 
             if (packetL != 0) { // make sure packet is okay
-
-                int8_t SNR = radio_.readPacketSNR();
-                int8_t RSSI = radio_.readPacketRSSI();
 
                 radio_.startReadSXBuffer(0);
 
@@ -149,7 +146,7 @@ void SX1280Driver::init() {
 
     //SPI.begin();
 
-    if (radio_.begin(SX1280_NSS_PIN, SX1280_NRESET_PIN, SX1280_RFBUSY_PIN, SX1280_DIO1_PIN, SX1280_RXEN_PIN, SX1280_TXEN_PIN, DEVICE_SX1280)) {
+    if (radio_.begin(nssPin_, resetPin_, busyPin_, dio1Pin_, rxenPin_, txenPin_, DEVICE_SX1280)) {
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Running;
 

@@ -3,9 +3,8 @@
 
 
 
-#include "definitions.h"
+#include "Arduino.h"
 
-#include "utils/device_status.h"
 
 
 #ifndef DEGREES

@@ -8,7 +8,9 @@ PPMChannel::PPMChannel(int16_t pin, const ePPMProtocol_t &protocol, float offset
     _scaler = scaler;
     setProtocol(protocol);
     pinMode(_pin, OUTPUT);
-    analogWriteResolution(_resolution);
+    #ifndef ESP32 
+        analogWriteResolution(_resolution);
+    #endif
     setChannel(-1);
 }
 
@@ -16,7 +18,9 @@ PPMChannel::PPMChannel(int16_t pin, const ePPMProtocol_t &protocol, float offset
 PPMChannel::~PPMChannel() {
 
     if (_pin == -1) return;
-    analogWrite(_pin, 0);
+    #ifndef ESP32 
+        analogWrite(_pin, 0);
+    #endif
     digitalWrite(_pin, LOW);
 
 }
@@ -41,11 +45,13 @@ bool PPMChannel::setChannel(const float &percent, const bool &limit) {
 
     dutyCycle = constrain(dutyCycle, 0.0f, 1.0f);
 
+    #ifndef ESP32 
     if (_active) analogWrite(_pin, dutyCycle*_maxValue);
     else {
         analogWrite(_pin, 0);
         digitalWrite(_pin, LOW);
     }
+    #endif
 
     return true;
 
@@ -162,7 +168,9 @@ void PPMChannel::setProtocol(const ePPMProtocol_t &protocol) {
     _periodUS = 1000000/frequencyHZ;
     _deltaHighUS = _highMaxUS - _highMinUS;
 
-    analogWriteFrequency(_pin, frequencyHZ); //Update frequency
+    #ifndef ESP32 
+        analogWriteFrequency(_pin, frequencyHZ); //Update frequency
+    #endif
 
 }
 
@@ -185,8 +193,10 @@ bool PPMChannel::setPin(int16_t pin) {
 
     pinMode(_pin, OUTPUT); //add new pin to channel
 
-    analogWriteResolution(_resolution);
-    analogWriteFrequency(_pin, 1000000/_periodUS);
+    #ifndef ESP32 
+        analogWriteResolution(_resolution);
+        analogWriteFrequency(_pin, 1000000/_periodUS);
+    #endif
     
     setChannel(_percent); //Update channel
 

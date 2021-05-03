@@ -160,6 +160,8 @@ void SX1280Driver::init() {
         radio_.setDioIrqParams(IRQ_RADIO_ALL, IRQ_RADIO_ALL, 0, 0);
         radio_.setHighSensitivity();
 
+        radio_.receive(receivedData_, SX1280_DATA_BUFFER_SIZE, 0, NO_WAIT);
+
     } else {
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_RestartAttempt; 

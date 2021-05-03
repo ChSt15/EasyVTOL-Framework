@@ -121,7 +121,7 @@ private:
             _tvcDirection = -_tvcPosition.copy().normalize(); //Rotate vector to gimble angle.
 
             _tvcForce = _setpoint.force*(-_tvcPosition.copy()).normalize(); //Project to get force.
-            _tvcForce = max(min(_tvcForce, _maxForce), 0); //Limit to force constraint.
+            _tvcForce = constrain(_tvcForce, _maxForce, 0.0f); //Limit to force constraint.
 
         } else {
 
@@ -149,7 +149,7 @@ private:
                 _tvcForce = _maxForce;
             } else {
                 _tvcForce = FmMag/sin(ang); //Project to get force.
-                _tvcForce = max(min(_tvcForce, _maxForce), 0); //Limit to force constraint.
+                _tvcForce = constrain(_tvcForce, _maxForce, 0.0f); //Limit to force constraint.
             }
 
             _tvcDirection.z *= -1;

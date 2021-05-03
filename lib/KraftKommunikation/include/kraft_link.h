@@ -12,16 +12,6 @@
  */
 class KraftLink_Interface {
 public:
-
-    /**
-     * Gives radio time to set itsself up.
-     */
-    virtual void begin() = 0;
-
-    /**
-     * Gives radio time to do whatever it needs to do. All other functions should be made to reduce execution time, but move operations to this function.
-     */
-    virtual void loop() = 0;
     
 
     /**
@@ -31,6 +21,7 @@ public:
      */
     virtual bool busy() = 0;
 
+
     /**
      * Gives radio data to send.
      * 
@@ -38,7 +29,7 @@ public:
      * @param size is a uint8_t integer giving the amount of data to send from the buffer pointer.
      * @returns number of bytes sent. Will be 0 if failed.
      */
-    virtual uint8_t sendBuffer(uint8_t* buffer, uint8_t size);
+    virtual uint8_t sendBuffer(uint8_t* buffer, uint8_t size) = 0;
 
 
     /**
@@ -55,7 +46,7 @@ public:
      * @param size is the max size of buffer.
      * @returns number of bytes placed into buffer.
      */
-    virtual uint8_t receiveBuffer(uint8_t* buffer, uint8_t size);
+    virtual uint8_t receiveBuffer(uint8_t* buffer, uint8_t size) = 0;
 
 
 };

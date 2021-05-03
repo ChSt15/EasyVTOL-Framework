@@ -1,7 +1,11 @@
 #include <Arduino.h>
 
+#include "kraft_kommunication.h"
+
 #include "modules/sensor_modules/mpu9250_driver.h"
 #include "modules/sensor_modules/bme280_driver.h"
+
+#include "modules/datalink_modules/sx1280_lora_driver.h"
 
 #include "modules/navigation_modules/navigation_complementary.h"
 #include "modules/guidance_modules/guidance_flybywire.h"
@@ -9,7 +13,13 @@
 #include "vehicle/starship/starship.h"
 #include "vehicle/starship/starship_dynamics.h"
 
+#include "kraft_kommunication.h"
+#include "kraft_message.h"
 
+
+
+SX1280Driver radio;
+KraftKommunication commsPort(&radio, eKraftPacketNodeID_t::eKraftPacketNodeID_vehicle);
 
 BME280Driver Barometer;
 MPU9250Driver IMU;
@@ -46,13 +56,73 @@ public:
         //Serial.println(String("Attitude: w: ") + att.w + ", x: " + att.x + ", y: " + att.y + ", z: " + att.z + ". Altitude: " + altitude);
         //Serial.println(String("Vec: x: ") + vec.x + ", y: " + vec.y + ", z: " + vec.z);
 
-        Serial.println(String("Hello World! Speed: ") + F_CPU_ACTUAL + ", Rate: " + getSchedulerTickRate());
+        //Serial.println(String("Hello World! Speed: ") + F_CPU_ACTUAL + ", Rate: " + getSchedulerTickRate());
 
     }
 
 
 };
 
+
+class NetworkingReceiver: public Task_Abstract {
+public:
+
+    NetworkingReceiver() : Task_Abstract(100, eTaskPriority_t::eTaskPriority_Middle, true) {}
+
+    void thread() {
+
+        commsPort.loop();
+
+        if (commsPort.messageAvailable()) {
+
+            MessageData messageInfo = commsPort.getMessageInformation();
+
+            if (messageInfo.payloadID == eKraftMessageType_t::eKraftMessageType_String_ID) {
+
+                KraftMessageStringPacket stringPacket;
+
+                commsPort.getMessage(&stringPacket);
+
+                char string[stringPacket.getStringLength()];
+
+                stringPacket.getString(string, sizeof(string));
+
+                Serial.println(string);
+
+            }
+
+        }
+
+    }
+
+
+};
+
+
+
+class NetworkingTransmitter: public Task_Abstract {
+public:
+
+    NetworkingTransmitter() : Task_Abstract(1, eTaskPriority_t::eTaskPriority_Middle, true) {}
+
+    void thread() {
+
+        KraftMessageStringPacket stringPacket((String("Hello im ") + commsPort.getSelfID() + "! Time is: " + millis()).c_str());
+
+        commsPort.sendMessage(&stringPacket, eKraftPacketNodeID_t::eKraftPacketNodeID_broadcast);
+
+        Serial.println("Sending: " + String("Hello im ") + commsPort.getSelfID() + "! Time is: " + millis());
+
+        //stopTaskThreading();
+
+    }
+
+
+};
+
+
+NetworkingTransmitter transmitter;
+NetworkingReceiver receiver;
 
 Observer observer;
 

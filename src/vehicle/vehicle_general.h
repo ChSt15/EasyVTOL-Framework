@@ -69,11 +69,36 @@ public:
      */
     Dynamics_Interface* getDynamicsModulePointer() {return dynamics_;}
 
+    /**
+     * Arms vehicle. Vehicle will ready itsself and then go into flight mode.
+     */
+    void armVehicle() {
+        if(vehicleData_.vehicleMode != eVehicleMode_t::eVehicleMode_Error && vehicleData_.vehicleMode != eVehicleMode_t::eVehicleMode_Arm) vehicleData_.vehicleMode = eVehicleMode_t::eVehicleMode_Prepare;
+    }
+
+    /**
+     * Disarms vehicle. Vehicle should shutdown immediately
+     */
+    void disarmVehicle() {
+        if(vehicleData_.vehicleMode != eVehicleMode_t::eVehicleMode_Error) vehicleData_.vehicleMode = eVehicleMode_t::eVehicleMode_Disarm;
+        
+    }
+
+    /**
+     * Gets the vehicle data.
+     * 
+     * @returns VehicleData of vehicle
+     */
+    VehicleData getVehicleData() {return vehicleData_;}
+
 
 protected:
 
     //Set to true when vehicle is ready for flight.
     bool vehicleInitialized_ = false;
+
+    //Contains vehicle data.
+    VehicleData vehicleData_;
 
     //Points to the navigation module to use.
     Navigation_Interface* navigation_;

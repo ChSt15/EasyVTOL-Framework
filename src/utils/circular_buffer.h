@@ -50,6 +50,7 @@ class Circular_Buffer {
         void write(const T *buffer, uint16_t length);
         void push_front(const T *buffer, uint16_t length);
         T peek(uint16_t pos = 0);
+        T* peekPointer(uint16_t pos = 0);
         T peekBytes(T *buffer, uint16_t length);
         T read();
         T pop_front(T *buffer, uint16_t length) { return readBytes(buffer,length); }
@@ -325,7 +326,7 @@ T Circular_Buffer<T,_size,multi>::pop_back() {
     tail = ((tail - 1)&(2*_size-1));
     return _cbuf[((tail)&(_size-1))];
   }
-  return -1;
+  return _cbuf[((tail)&(_size-1))];
 }
 
 template<typename T, uint16_t _size, uint16_t multi>
@@ -488,6 +489,13 @@ T Circular_Buffer<T,_size,multi>::peek(uint16_t pos) {
   if ( multi ) return 0;
   if ( pos > _size ) return 0;
   return _cbuf[((head+pos)&(_size-1))];
+}
+
+template<typename T, uint16_t _size, uint16_t multi>
+T* Circular_Buffer<T,_size,multi>::peekPointer(uint16_t pos) {
+  if ( multi ) return 0;
+  if ( pos > _size ) return 0;
+  return &_cbuf[((head+pos)&(_size-1))];
 }
 
 template<typename T, uint16_t _size, uint16_t multi>

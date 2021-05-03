@@ -57,6 +57,29 @@ public:
     }
 
     /**
+     * Resets the internal system when thread was not ran for a long time
+     * 
+     * @param position Is the Value the position will be set to.
+     */
+    void reset(const float &position = 0) {
+        _setPosition = position;
+        _currentPosition = position;
+        _currentSpeed = 0;
+        initialised_ = false;
+    }
+
+    /**
+     * Gives new accel and speed parameters
+     * 
+     * @param maxSpeed_radPerSec Max speed in radians per second
+     * @param maxAccel_radPerSecPerSec Max accel in radian per second squared
+     */
+    void setParameters(const float &maxSpeed_radPerSec, const float maxAccel_radPerSecPerSec) {
+        _maxSpeed = maxSpeed_radPerSec;
+        _maxAccel = maxAccel_radPerSecPerSec;
+    }
+
+    /**
      * Lets the module calculate the new servoPosition.
      *
      * @param values none
@@ -66,6 +89,8 @@ public:
 
         float dTime = float(micros() - _lastThreadRunTimestamp_us)/1000000.0f;
         _lastThreadRunTimestamp_us = micros();
+
+        if (dTime > 100000 || !initialised_) dTime = 0;
 
 
         float error = _setPosition - _currentPosition;
@@ -80,6 +105,8 @@ public:
         float acceleration = (speedLimit - _currentSpeed)/dTime;
         acceleration = constrain(acceleration, -_maxAccel, _maxAccel);
 
+        if (dTime == 0) acceleration = 0;
+
         _currentSpeed += acceleration*dTime;
         _currentSpeed = constrain(_currentSpeed, -_maxSpeed, _maxSpeed);
 
@@ -87,6 +114,8 @@ public:
         _currentPosition = constrain(_currentPosition, _minPosition, _maxPosition);
 
         _channel->setAngle(_currentPosition + _positionOffset, false);
+
+        initialised_ = true;
 
     }
 
@@ -123,6 +152,7 @@ public:
 
 private:
 
+    bool initialised_ = false;
     
     PPMChannel* _channel;
 

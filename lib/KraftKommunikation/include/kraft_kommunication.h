@@ -3,6 +3,8 @@
 
 
 
+#include "Arduino.h"
+
 #include "stdint.h"
 
 #include "circular_buffer.h"
@@ -39,6 +41,8 @@ namespace {
     const uint8_t c_sendAttempts = 10;
     //Amount of microseconds to wait for an ack before resending after the link says the packet was sent, not when given the packet.
     const uint32_t c_sendTimeout = 500; 
+    //Default power to send packets at.
+    const uint8_t c_sendPowerDefault = 10;
 
 }  
 
@@ -46,19 +50,19 @@ namespace {
 
 
 //Is the ID of a devide like Vehicle or basestation. Broadcast means the data is meant for all devices to receive. Also used for Transmitting device ID.
-enum kraftPacketNodeID_t : uint8_t {
-    kraftPacketNodeID_vehicle = 1,                //Vehicle ID
-    kraftPacketNodeID_controller = 2,             //Controllers ID. Controller is for manual control
-    kraftPacketNodeID_basestation = 3,            //Basestation ID. 
-    kraftPacketNodeID_broadcast = 255             //General packet that everything can receive. Basically a broadcast.
+enum eKraftPacketNodeID_t : uint8_t {
+    eKraftPacketNodeID_vehicle = 1,                //Vehicle ID
+    eKraftPacketNodeID_controller = 2,             //Controllers ID. Controller is for manual control
+    eKraftPacketNodeID_basestation = 3,            //Basestation ID. 
+    eKraftPacketNodeID_broadcast = 255             //General packet that everything can receive. Basically a broadcast.
 };
 
 
 
 struct MessageData {
 
-    kraftPacketNodeID_t transmitterID;
-    kraftPacketNodeID_t receiverID;
+    eKraftPacketNodeID_t transmitterID;
+    eKraftPacketNodeID_t receiverID;
     uint8_t payloadID = 0;
     uint8_t messageCounter = 0;
 
@@ -77,7 +81,7 @@ public:
      * 
      * @param dataLink is a radio class that inherets from KraftLink_Interface that will be used to send and receive packets 
      */
-    KraftKommunication(KraftLink_Interface* dataLink, kraftPacketNodeID_t selfID) {
+    KraftKommunication(KraftLink_Interface* dataLink, eKraftPacketNodeID_t selfID) {
         dataLink_ = dataLink;
         selfID_ = selfID;
     }
@@ -88,21 +92,21 @@ public:
      * @param kraftMessage is a KraftMessage_Interface class containing the data to be sent.
      * @returns false if queue is full. loop() needs to be ran to give link time to send data and make room.
      */
-    bool sendMessage(KraftMessage_Interface* kraftMessage);
+    bool sendMessage(KraftMessage_Interface* kraftMessage, const eKraftPacketNodeID_t &receiveNodeID, const bool &requiresAck = false);
 
     /**
      * Checks if a message is available.
      * 
-     * @returns true if message is available. Use getMessageInformation() to find out what KraftMessage_Interface derivetive needs to be given to work.
+     * @returns Number of messages available
      */
-    bool messageAvailable();
+    uint16_t messageAvailable() {return receivedPackets_.available();}
 
     /**
      * Returns latest received message data. Use this to find out what KraftMessage_Interface class needs to be given.
      * 
      * @returns MessageData struct.
      */
-    MessageData getMessageInformation();
+    MessageData getMessageInformation() {return receivedPackets_.peek_back()->messageData;};
 
     /**
      * Returns latest received message data. Use this to find out what KraftMessage_Interface class needs to be given.
@@ -112,6 +116,13 @@ public:
      * @returns true if message valid.
      */
     bool getMessage(KraftMessage_Interface* kraftMessage, const bool &peek = false);
+
+    /**
+     * Gets the nodes ID it uses when communicating with other transceivers
+     * 
+     * @return nodes ID.
+     */
+    uint16_t getSelfID() {return selfID_;}
 
     /**
      * Gives system time to do things.
@@ -130,17 +141,22 @@ private:
 
     };
 
-    //Struct for storing packet information till picked up by application
+    //Struct for storing packets that will be sent. 
     struct SendPacketData {
 
         uint8_t dataBuffer[255];
+        uint32_t bufferSize = 0;
 
         uint8_t power_dB = 0;
 
         bool waitforAck = false;
 
+        eKraftPacketNodeID_t receivingNodeID = eKraftPacketNodeID_t::eKraftPacketNodeID_broadcast;
+
         uint32_t sendTimestamp = 0;
         uint8_t sendAttempts = 0;
+
+        uint32_t sendInterval = 0;
 
     };
 
@@ -152,6 +168,9 @@ private:
 
         //Counter for all packets that have been lost.
         uint32_t packetsLost = 0;
+
+        //Points to packet that its waiting for. Should be nullptr when not waiting
+        SendPacketData* waitingOnPacket = nullptr;
 
     };
 
@@ -167,15 +186,19 @@ private:
 
     KraftLink_Interface* dataLink_; //Link used for sending receiving packets
 
-    Circular_Buffer<ReceivedPayloadData, 10> receivedPackets_; //Queue containing all received messages.
+    //Queue containing all received packets.
+    Circular_Buffer<ReceivedPayloadData, 10> receivedPackets_;
+    //Queue containing all packets to send.
     Circular_Buffer<SendPacketData, 10> sendPackets_;
+    //Queue containing all packets to send that require an ACK. These must wait until the one before it is finished
+    Circular_Buffer<SendPacketData, 10> sendPacketsACK_;
 
     NodeData nodeData_[255];
 
     //Index corresponds to node that should receive packet.
     uint32_t sentPacketsCounter_[255];
 
-    kraftPacketNodeID_t selfID_;
+    eKraftPacketNodeID_t selfID_;
 
 
 };

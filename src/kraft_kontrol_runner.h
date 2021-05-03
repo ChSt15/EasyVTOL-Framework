@@ -3,7 +3,7 @@
 
 
 
-#include "vehicle/vehicle_template.h"
+#include "vehicle/vehicle_interface.h"
 
 
 
@@ -14,10 +14,10 @@
 class KraftKontrolRunner {
 public:
 
-    KraftKontrolRunner(Vehicle *vehicle, void (*vehicleProgram)(void), )
+    KraftKontrolRunner(void (*vehicleProgram)(uint32_t* runCounter));
 
 
-}
+};
 
 
 

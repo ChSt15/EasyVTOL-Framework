@@ -16,8 +16,6 @@
 class Vehicle_Interface {
 public:
 
-    //Vehicle_Interface(uint32_t rate, eTaskPriority_t priority) : Task_Abstract(rate, priority) {}
-
     /**
      * Returns pointer to the navigation module the vehicle uses. 
      * @returns Navigation_Interface
@@ -41,6 +39,23 @@ public:
      * @returns Dynamics_Interface
      */
     virtual Dynamics_Interface* getDynamicsModulePointer() = 0;
+
+    /**
+     * Arms vehicle. Vehicle will ready itsself and then go into flight mode.
+     */
+    virtual void armVehicle() = 0;
+
+    /**
+     * Disarms vehicle. Vehicle should shutdown immediately
+     */
+    virtual void disarmVehicle() = 0;
+
+    /**
+     * Gets the vehicle data.
+     * 
+     * @returns VehicleData of vehicle
+     */
+    virtual VehicleData getVehicleData() = 0;
 
 
 };

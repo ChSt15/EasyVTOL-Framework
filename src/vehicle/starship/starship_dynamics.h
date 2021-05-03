@@ -29,8 +29,10 @@
 
 //Flap servo accel and velocity maximums
 #define FLAP_MAX_VELOCITY 5
-#define TOPFLAP_MAX_ACCEL 30
-#define BOTTOMFLAP_MAX_ACCEL 30
+#define FLAP_MAX_ACCEL 30
+
+#define FLAP_START_MAX_ACCEL 5
+#define FLAP_START_MAX_VELOCITY 1
 
 //TVC constraints
 #define MAX_TVC_ANGLE 30*DEGREES
@@ -82,7 +84,7 @@ public:
      *
      * @return DynamicData.
      */
-    virtual DynamicData getDynamicSetpoint() {return controlModule_->getDynamicsOutput();}
+    DynamicData getDynamicSetpoint() {return controlModule_->getDynamicsOutput();}
 
     /**
      * Returns a pointer towards a struct containing the forces 
@@ -93,7 +95,7 @@ public:
      *
      * @return DynamicData pointer.
      */
-    virtual DynamicData* getDynamicSetpointPointer() {return controlModule_->getDynamicsOutputPointer();}
+    DynamicData* getDynamicSetpointPointer() {return controlModule_->getDynamicsOutputPointer();}
 
     /**
      * Tells dynamics module to test all actuators. 
@@ -101,7 +103,7 @@ public:
      *
      * @param testing Default is true
      */
-    virtual void setActuatorTesting(bool testing = true) {
+    void setActuatorTesting(bool testing = true) {
         actuatorTesting_ = testing;
     }
 
@@ -110,7 +112,7 @@ public:
      *
      * @returns boolean.
      */
-    virtual bool getActuatorTesting() {
+    bool getActuatorTesting() {
         return actuatorTesting_;
     }
 
@@ -120,7 +122,7 @@ public:
      *
      * @param values bool.
      */
-    virtual void setActuatorManualMode(bool testing = true) {
+    void setActuatorManualMode(bool testing = true) {
         actuatorManualMode_ = testing;
     }
 
@@ -129,7 +131,7 @@ public:
      *
      * @returns boolean.
      */
-    virtual bool getActuatorManualMode() {
+    bool getActuatorManualMode() {
         return actuatorManualMode_ = false;
     }
 
@@ -138,17 +140,66 @@ public:
      * Only valid if in actuator manual mode. Call _enterActuatorManualMode()
      * to enter this mode.
      *
-     * @param values ActuatorSetting.
+     * @param actuatorSetpoint Actuator Setting.
+     * @return none.
      */
-    virtual void setActuatorsRawData(const ActuatorSetting &actuatorSetpoint) {
+    void setActuatorsRawData(const ActuatorSetting &actuatorSetpoint) {
         actuatorManualSetpoint_ = actuatorSetpoint;
     }
+
+    /**
+     * Used to send raw actuator commands to actuators.
+     * Only valid if in actuator manual mode. Call _enterActuatorManualMode()
+     * to enter this mode.
+     *
+     * @param actuatorSetpoint Actuator Setting.
+     * @param actuatorNum actuator to change.
+     * @return none.
+     */
+    void setActuatorsRawData(const float &actuatorSetpoint, const uint16_t &actuatorNum) {
+        actuatorManualSetpoint_.actuatorSetting[actuatorNum] = actuatorSetpoint;
+    }
+
+    /**
+     * Used to send raw actuator commands to actuators.
+     * Only valid if in actuator manual mode. Call _enterActuatorManualMode()
+     * to enter this mode.
+     *
+     * @returns actuator setting.
+     */
+    ActuatorSetting getActuatorsRawData() {return actuatorManualSetpoint_;}
+
+    /**
+     * Used to send raw actuator commands to actuators.
+     * Only valid if in actuator manual mode. Call _enterActuatorManualMode()
+     * to enter this mode.
+     *
+     * @param actuatorNum actuator to get.
+     * @returns actuator setting.
+     */
+    float getActuatorsRawData(const uint16_t &actuatorNum) {return actuatorManualSetpoint_.actuatorSetting[actuatorNum];}
+
+    /**
+     * Sets the actuator status. 
+     * @param actuatorStatus Actuator mode to set to.
+     */
+    void setActuatorStatus(const eActuatorStatus_t &actuatorStatus) {actuatorStatusSetpoint_ = actuatorStatus;}
+
+    /**
+     * Checks if module is ready. Should only return true if all actuators are in position and ready to follow commands.
+     */
+    eActuatorStatus_t getActuatorStatus() {return actuatorStatus_;}
     
 
 private:
 
     //Whether the vehicle has been initialised
     bool initialised_ = false;
+
+    //Enum for actuator status
+    eActuatorStatus_t actuatorStatus_ = eActuatorStatus_t::eActuatorStatus_Disabled;
+    eActuatorStatus_t actuatorStatusLast_ = eActuatorStatus_t::eActuatorStatus_Disabled;
+    eActuatorStatus_t actuatorStatusSetpoint_ = eActuatorStatus_t::eActuatorStatus_Disabled;
 
     //Points to dynamics setpoint data container.
     Control_Interface* controlModule_;
@@ -179,16 +230,16 @@ private:
     PPMChannel motorCCW_ = PPMChannel(MOTOR_PIN_CCW, ePPMProtocol_t::ePPMProtocol_Oneshot_125us, -1, 2);
     //Up Left flap servo.
     PPMChannel flapUL_ = PPMChannel(FLAP_SERVO_PIN_UL, ePPMProtocol_t::ePPMProtocol_Standard_1000us, 1, -1);
-    ServoDynamics flapULControl_ = ServoDynamics(&flapUL_, 1*DEGREES, FLAP_MAX_VELOCITY, TOPFLAP_MAX_ACCEL);
+    ServoDynamics flapULControl_ = ServoDynamics(&flapUL_, 1*DEGREES, FLAP_MAX_VELOCITY, FLAP_MAX_ACCEL);
     //Up Right flap servo.
     PPMChannel flapUR_ = PPMChannel(FLAP_SERVO_PIN_UR, ePPMProtocol_t::ePPMProtocol_Standard_1000us, -1, 1);
-    ServoDynamics flapURControl_ = ServoDynamics(&flapUR_, -5*DEGREES, FLAP_MAX_VELOCITY, TOPFLAP_MAX_ACCEL);
+    ServoDynamics flapURControl_ = ServoDynamics(&flapUR_, -5*DEGREES, FLAP_MAX_VELOCITY, FLAP_MAX_ACCEL);
     //Down Left flap servo.
     PPMChannel flapDL_ = PPMChannel(FLAP_SERVO_PIN_DL, ePPMProtocol_t::ePPMProtocol_Standard_1000us, -1, 1);
-    ServoDynamics flapDLControl_ = ServoDynamics(&flapDL_, -7*DEGREES, FLAP_MAX_VELOCITY, BOTTOMFLAP_MAX_ACCEL);
+    ServoDynamics flapDLControl_ = ServoDynamics(&flapDL_, -7*DEGREES, FLAP_MAX_VELOCITY, FLAP_MAX_ACCEL);
     //Down Right flap servo.
     PPMChannel flapDR_ = PPMChannel(FLAP_SERVO_PIN_DR, ePPMProtocol_t::ePPMProtocol_Standard_1000us, 1, -1);
-    ServoDynamics flapDRControl_ = ServoDynamics(&flapDR_, 1*DEGREES, FLAP_MAX_VELOCITY, BOTTOMFLAP_MAX_ACCEL);
+    ServoDynamics flapDRControl_ = ServoDynamics(&flapDR_, 1*DEGREES, FLAP_MAX_VELOCITY, FLAP_MAX_ACCEL);
 
     //Enum for flap testing
     enum FLAP_TEST_STAGE {

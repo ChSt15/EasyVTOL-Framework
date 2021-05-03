@@ -9,18 +9,18 @@
 
 
 
-//Indicates the type of packet. Use kraftMessageType_StandardEnd_ID and up for custom Packets
-enum kraftMessageType_t {
+//Indicates the type of packet. Use eKraftMessageType_StandardEnd_ID and up for custom Packets
+enum eKraftMessageType_t : uint8_t {
     //Simply signals that connection is still there. Should be send at 1Hz rate.
-    kraftMessageType_Heartbeat_ID,
+    eKraftMessageType_Heartbeat_ID,
     //To be returned to signal succesfull receive when requiested.
-    kraftMessageType_Ack_ID,
+    eKraftMessageType_Ack_ID,
     //Generic packet with parameters for updating RadioSettings.
-    kraftMessageType_RadioSettings_ID,
+    eKraftMessageType_RadioSettings_ID,
     //Used for sending strings.
-    kraftMessageType_String_ID,
+    eKraftMessageType_String_ID,
     //Use numbers higher than this for custom IDs
-    kraftMessageType_StandardEnd_ID
+    eKraftMessageType_StandardEnd_ID
 };
 
 
@@ -36,8 +36,6 @@ public:
 
     virtual bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) = 0;
 
-protected:
-
 };
 
 
@@ -45,7 +43,7 @@ protected:
 class KraftMessageHeartbeat final: public KraftMessage_Interface {
 public:
 
-    uint32_t getDataTypeID() {return kraftMessageType_t::kraftMessageType_Heartbeat_ID;}
+    uint32_t getDataTypeID() {return eKraftMessageType_t::eKraftMessageType_Heartbeat_ID;}
 
     uint32_t getDataSize() {return 0;};
 
@@ -64,7 +62,7 @@ public:
 class KraftMessageACK final: public KraftMessage_Interface {
 public:
 
-    uint32_t getDataTypeID() {return kraftMessageType_t::kraftMessageType_Ack_ID;}
+    uint32_t getDataTypeID() {return eKraftMessageType_t::eKraftMessageType_Ack_ID;}
 
     uint32_t getDataSize() {return 0;};
 
@@ -128,7 +126,9 @@ private:
 class KraftMessageStringPacket final: public KraftMessage_Interface {
 public:
 
-    KraftMessageStringPacket(char string[]) {
+    KraftMessageStringPacket() {}
+
+    KraftMessageStringPacket(const char string[]) {
         setString(string);
     }
 
@@ -136,7 +136,7 @@ public:
         delete stringPointer;
     }
 
-    uint32_t getDataTypeID() {return kraftMessageType_t::kraftMessageType_String_ID;}
+    uint32_t getDataTypeID() {return eKraftMessageType_t::eKraftMessageType_String_ID;}
 
     uint32_t getDataSize() {return sizeStringPointer;};
 
@@ -152,7 +152,7 @@ public:
 
     }
 
-    void setString(char string[]) {
+    void setString(const char string[]) {
         
         delete stringPointer;
 

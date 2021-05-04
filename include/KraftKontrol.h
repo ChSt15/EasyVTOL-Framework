@@ -24,14 +24,20 @@
 #include "modules/navigation_modules/navigation_complementary.h"
 
 #include "modules/sensor_modules/gyroscope_modules/gyroscope_interface.h"
+
 #include "modules/sensor_modules/accelerometer_modules/accelerometer_interface.h"
+
 #include "modules/sensor_modules/magnetometer_modules/magnetometer_interface.h"
 
 #include "modules/sensor_modules/imu_modules/mpu9250_driver.h"
 
+#include "modules/sensor_modules/barometer_modules/barometer_interface.h"
 #include "modules/sensor_modules/barometer_modules/bme280_driver.h"
 
 #include "modules/sensor_modules/gnss_modules/gnss_interface.h"
+
+#include "modules/sensor_modules/adc_modules/adc_interface.h"
+#include "modules/sensor_modules/adc_modules/ads1115_driver.h"
 
 
 

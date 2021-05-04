@@ -161,7 +161,6 @@ public:
         sizeStringPointer = strlen(string);
         stringPointer = new char[sizeStringPointer];
 
-        //memcpy(stringPointer, string, sizeStringPointer);
         strcpy(stringPointer, string);
 
     }

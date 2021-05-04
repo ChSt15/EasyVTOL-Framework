@@ -14,7 +14,7 @@ void SX1280Driver::thread() {
         internalLoop();
 
     } else if (moduleStatus_ == eModuleStatus_t::eModuleStatus_NotStarted || moduleStatus_ == eModuleStatus_t::eModuleStatus_RestartAttempt) {
-        
+
         init();
 
     } else if (false/*moduleStatus_ == eModuleStatus_t::MODULE_CALIBRATING*/) {
@@ -36,6 +36,8 @@ void SX1280Driver::thread() {
 
 
     if (rateCalcInterval_.isTimeToRun()) {
+        //Check radio is still working
+        if (!radio_.checkDevice()) moduleStatus_ = eModuleStatus_RestartAttempt; 
         loopRate_ = loopCounter_;
         loopCounter_ = 0;
     }
@@ -165,6 +167,8 @@ void SX1280Driver::init() {
 
         Serial.println("SX1280 start success!");
 
+        startAttempts_ = 0;
+
     } else {
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_RestartAttempt; 
@@ -175,7 +179,7 @@ void SX1280Driver::init() {
 
     startAttempts_++;
 
-    //if (startAttempts_ >= 5 && moduleStatus_ == eModuleStatus_t::eModuleStatus_RestartAttempt) moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
+    if (startAttempts_ >= 5 && moduleStatus_ == eModuleStatus_t::eModuleStatus_RestartAttempt) moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
 
 }
 

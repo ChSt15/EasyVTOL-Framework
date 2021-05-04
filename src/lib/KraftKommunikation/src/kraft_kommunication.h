@@ -103,6 +103,22 @@ public:
     uint16_t messageAvailable() {return receivedPackets_.available();}
 
     /**
+     * Checks if transmitter buffers are full. Sending a packet when buffers are full will fail or erase oldest message in buffer waiting to be sent.
+     * 
+     * @see networkAckBusy() for ack buffer
+     * @returns Whether the buffer is full
+     */
+    bool networkBusy() {return (sendPackets_.capacity() - sendPackets_.available()) == 0;}
+
+    /**
+     * Checks if transmitter buffers are full. Sending a packet when buffers are full will fail or erase oldest message in buffer waiting to be sent.
+     * 
+     * @see networkBusy() for nona ack buffer
+     * @returns Whether the buffer is full
+     */
+    bool networkAckBusy() {return (sendPacketsACK_.capacity() - sendPacketsACK_.available()) == 0;}
+
+    /**
      * Returns latest received message data. Use this to find out what KraftMessage_Interface class needs to be given.
      * 
      * @returns MessageData struct.

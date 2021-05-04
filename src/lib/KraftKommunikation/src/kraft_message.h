@@ -81,12 +81,11 @@ public:
 /**
  * Not recommended. Please create a class that inherets from KraftMessagePacket_Abstract
  */
-/*
 template<typename T>
 class KraftMessageTemplate final: public KraftMessage_Interface {
 public:
 
-    KraftMessageTemplatePacket(const T &data, eKraftMessageType_t messageID) {
+    KraftMessageTemplate(const T &data, eKraftMessageType_t messageID) {
         data_ = data;
         messageID_ = messageID_;
     }
@@ -120,7 +119,7 @@ private:
     T data_;
     uint32_t messageID_ = 0;
 
-};*/
+};
 
 
 

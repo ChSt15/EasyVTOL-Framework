@@ -36,8 +36,6 @@ void SX1280Driver::thread() {
 
 
     if (rateCalcInterval_.isTimeToRun()) {
-        //Check radio is still working
-        if (!radio_.checkDevice()) moduleStatus_ = eModuleStatus_RestartAttempt; 
         loopRate_ = loopCounter_;
         loopCounter_ = 0;
     }

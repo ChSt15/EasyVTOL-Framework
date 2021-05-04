@@ -134,7 +134,7 @@ public:
     }
 
     ~KraftMessageStringPacket() {
-        delete stringPointer;
+        delete[] stringPointer;
     }
 
     uint32_t getDataTypeID() {return eKraftMessageType_t::eKraftMessageType_String_ID;}
@@ -156,9 +156,9 @@ public:
 
     void setString(const char string[]) {
         
-        delete stringPointer;
+        if (stringPointer != nullptr) delete[] stringPointer;
 
-        sizeStringPointer = strlen(string);
+        sizeStringPointer = strlen(string)+1;
         stringPointer = new char[sizeStringPointer];
 
         //memcpy(stringPointer, string, sizeStringPointer);

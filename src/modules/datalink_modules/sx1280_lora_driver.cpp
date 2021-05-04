@@ -144,7 +144,8 @@ void SX1280Driver::internalLoop() {
 
 void SX1280Driver::init() {
 
-    //SPI.begin();
+    SPI.begin();
+    //SPI.setFrequency(10000000);
 
     if (radio_.begin(nssPin_, resetPin_, busyPin_, dio1Pin_, rxenPin_, txenPin_, DEVICE_SX1280)) {
 
@@ -162,15 +163,19 @@ void SX1280Driver::init() {
 
         radio_.receive(receivedData_, SX1280_DATA_BUFFER_SIZE, 0, NO_WAIT);
 
+        Serial.println("SX1280 start success!");
+
     } else {
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_RestartAttempt; 
+
+        Serial.println("SX1280 start failure!");
 
     }
 
     startAttempts_++;
 
-    if (startAttempts_ >= 5 && moduleStatus_ == eModuleStatus_t::eModuleStatus_RestartAttempt) moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
+    //if (startAttempts_ >= 5 && moduleStatus_ == eModuleStatus_t::eModuleStatus_RestartAttempt) moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
 
 }
 

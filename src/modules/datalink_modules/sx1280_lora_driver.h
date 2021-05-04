@@ -4,6 +4,7 @@
 
 
 #include "Arduino.h"
+#include "SPI.h"
 
 #include "lib/KraftKommunikation/src/kraft_link.h"
 #include "lib/SX12XX-LoRa-master/src/SX128XLT.h"

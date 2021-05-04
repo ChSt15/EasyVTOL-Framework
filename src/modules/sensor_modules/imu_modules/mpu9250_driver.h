@@ -15,8 +15,6 @@
 
 #include "lib/MPU9250_Lib/src/mpu9250.h"
 
-#include "boards/board_v_1_0.h"
-
 #include "utils/circular_buffer.h"
 
 

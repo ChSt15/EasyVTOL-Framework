@@ -24,7 +24,6 @@
   Add support for printPacketStatus for FLRC
   
 **************************************************************************/
-
 class SX128XLT  {
 
   public:

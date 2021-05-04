@@ -151,13 +151,7 @@ void SX1280Driver::init() {
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Running;
 
-        radio_.setMode(MODE_STDBY_RC);
-        radio_.setRegulatorMode(USE_LDO);
-        radio_.setPacketType(PACKET_TYPE_LORA);
-        radio_.setRfFrequency(SX1280_FREQUENCY, 0);
-        radio_.setBufferBaseAddress(0, 0);
-        radio_.setModulationParams(SX1280_SPREADFACTOR, SX1280_BANDWIDTH, SX1280_CODINGRATE);
-        radio_.setPacketParams(12, LORA_PACKET_VARIABLE_LENGTH, 255, LORA_CRC_ON, LORA_IQ_NORMAL, 0, 0);
+        radio_.setupLoRa(SX1280_FREQUENCY, 0, SX1280_SPREADFACTOR, SX1280_BANDWIDTH, SX1280_CODINGRATE);
         radio_.setDioIrqParams(IRQ_RADIO_ALL, IRQ_RADIO_ALL, 0, 0);
         radio_.setHighSensitivity();
 

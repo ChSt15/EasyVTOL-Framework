@@ -64,6 +64,7 @@ struct MessageData {
     eKraftPacketNodeID_t transmitterID;
     eKraftPacketNodeID_t receiverID;
     uint8_t payloadID = 0;
+    uint8_t payloadSize = 0;
     uint8_t messageCounter = 0;
 
     uint8_t signalRSSI = 0;

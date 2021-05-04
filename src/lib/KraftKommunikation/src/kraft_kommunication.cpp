@@ -19,15 +19,16 @@ bool KraftKommunication::decodeMessageFromBuffer(ReceivedPayloadData* payloadDat
     
     payloadData->messageData.messageCounter = buffer[6];
 
-    uint32_t payloadSize = buffer[7];
+    payloadData->messageData.payloadSize = buffer[7];
 
-    if (payloadSize > bufferSize) return false;
+    if (payloadData->messageData.payloadSize > bufferSize) return false;
     
-    for (uint32_t i = 0; i < payloadSize; i++) payloadData->dataBuffer[i] = buffer[8+i]; //Move data from buffer into output
 
-    uint8_t crc = buffer[8+payloadSize];
+    for (uint32_t i = 0; i < payloadData->messageData.payloadSize; i++) payloadData->dataBuffer[i] = buffer[8+i]; //Move data from buffer into output
 
-    if (buffer[9+payloadSize] != c_kraftPacketEndMarker) return false;
+    uint8_t crc = buffer[8+payloadData->messageData.payloadSize];
+
+    if (buffer[9+payloadData->messageData.payloadSize] != c_kraftPacketEndMarker) return false;
 
     //if (crc != calculateCRC(buffer, payloadSize + 7)) return false; //Commented for testing, Should be readded and tested later!
 
@@ -60,7 +61,7 @@ uint32_t KraftKommunication::encodeMessageToBuffer(KraftMessage_Interface* messa
 
     messagePointer->getRawData(messageData, messageSize);
     
-    for (uint32_t i = 0; i < sizeof(bufferSize) && messageSize; i++) buffer[8+i] = messageData[i]; //Move data from buffer into output
+    for (uint32_t i = 0; i < bufferSize && messageSize; i++) buffer[8+i] = messageData[i]; //Move data from buffer into output
 
     buffer[messageSize + 8] = calculateCRC(buffer, messageSize + 7);
 
@@ -119,7 +120,7 @@ bool KraftKommunication::getMessage(KraftMessage_Interface* kraftMessage, const 
     if (!peek) payloadData = receivedPackets_.pop_back();
     else payloadData = *receivedPackets_.peek_back();
 
-    return kraftMessage->setRawData(payloadData.dataBuffer, sizeof(payloadData.dataBuffer));
+    return kraftMessage->setRawData(payloadData.dataBuffer, payloadData.messageData.payloadSize);
 
 }
 
@@ -178,13 +179,13 @@ void KraftKommunication::loop() {
 
     if (dataLink_->available()) {
 
-        Serial.println("Kraftkomm sees packet is available!");
+        //Serial.println("Kraftkomm sees packet is available!");
 
         uint8_t packet[dataLink_->available()];
 
         uint32_t bytes = dataLink_->receiveBuffer(packet, sizeof(packet));
 
-        Serial.println("Kraft komm sees packet is " + String(bytes) + " bytes long!");
+        //Serial.println("Kraft komm sees packet is " + String(bytes) + " bytes long!");
 
         if (bytes > 0) { //Only continue if receive worked.
 
@@ -201,25 +202,25 @@ void KraftKommunication::loop() {
                         sendPacketsACK_.pop_back();
                         nodeData_[message.messageData.transmitterID].waitingOnPacket = nullptr; 
 
-                        Serial.println("Packet was an ACK");
+                        //Serial.println("Packet was an ACK");
 
                         break;
 
                     case eKraftMessageType_t::eKraftMessageType_Heartbeat_ID:
 
-                        Serial.println("Packet was a heartbeat");
+                       // Serial.println("Packet was a heartbeat");
 
                         break;
 
                     case eKraftMessageType_t::eKraftMessageType_RadioSettings_ID:
 
-                        Serial.println("Packet was for radiosettings");
+                        //Serial.println("Packet was for radiosettings");
 
                         break;
 
                     default:
 
-                        Serial.println("Packet was of an unkown type: " + String(message.messageData.payloadID) + ". Placing in buffer.");
+                        //Serial.println("Packet was of an unkown type: " + String(message.messageData.payloadID) + ". Placing in buffer.");
                         receivedPackets_.push_front(message);
                         
                         break;

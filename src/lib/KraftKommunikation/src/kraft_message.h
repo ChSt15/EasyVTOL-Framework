@@ -147,8 +147,7 @@ public:
 
         if (sizeStringDest < sizeStringPointer || stringPointer == nullptr) return false;
 
-        //for (uint32_t i = 0; i < sizeStringDest && i < sizeStringPointer; i++) string[i] = stringPointer[i];
-        strcpy(string, stringPointer);
+        memcpy(string, stringPointer, sizeStringPointer);
 
         return true;
 
@@ -161,7 +160,7 @@ public:
         sizeStringPointer = strlen(string)+1;
         stringPointer = new char[sizeStringPointer];
 
-        strcpy(stringPointer, string);
+        memcpy(stringPointer, string, sizeStringPointer);
 
     }
 

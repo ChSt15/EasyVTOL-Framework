@@ -158,7 +158,7 @@ public:
         
         delete stringPointer;
 
-        sizeStringPointer = strlen(string);
+        sizeStringPointer = strlen(string)+1;
         stringPointer = new char[sizeStringPointer];
 
         strcpy(stringPointer, string);

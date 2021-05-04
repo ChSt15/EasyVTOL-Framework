@@ -444,7 +444,7 @@ T Circular_Buffer<T,_size,multi>::read() {
   if ( multi ) {
     head = ((head + 1)&(2*_size-1));
     if ( _available ) _available--;
-    return 0;
+    //return value;
   }
   if ( _available ) _available--;
   T value = _cbuf[((head)&(_size-1))];

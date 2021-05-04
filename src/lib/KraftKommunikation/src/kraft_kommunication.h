@@ -106,7 +106,11 @@ public:
      * 
      * @returns MessageData struct.
      */
-    MessageData getMessageInformation() {return receivedPackets_.peek_back()->messageData;};
+    MessageData getMessageInformation() {
+        ReceivedPayloadData buf = receivedPackets_.pop_back();
+        receivedPackets_.push_back(buf);
+        return buf.messageData;
+    };
 
     /**
      * Returns latest received message data. Use this to find out what KraftMessage_Interface class needs to be given.
@@ -116,6 +120,15 @@ public:
      * @returns true if message valid.
      */
     bool getMessage(KraftMessage_Interface* kraftMessage, const bool &peek = false);
+
+    /**
+     * Returns latest received message data. Use this to find out what KraftMessage_Interface class needs to be given.
+     * 
+     * @param kraftMessage is a pointer to a class that inherets from KraftMessage_Interface.
+     * @param peek is a bool. If set to true then the message will not be removed from queue. Default value if false.
+     * @returns true if message valid.
+     */
+    void removeMessage() {if (messageAvailable()) receivedPackets_.pop_back();}
 
     /**
      * Gets the nodes ID it uses when communicating with other transceivers

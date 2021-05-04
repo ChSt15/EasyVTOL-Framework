@@ -178,9 +178,13 @@ void KraftKommunication::loop() {
 
     if (dataLink_->available()) {
 
+        Serial.println("Kraftkomm sees packet is available!");
+
         uint8_t packet[dataLink_->available()];
 
         uint32_t bytes = dataLink_->receiveBuffer(packet, sizeof(packet));
+
+        Serial.println("Kraft komm sees packet is " + String(bytes) + " bytes long!");
 
         if (bytes > 0) { //Only continue if receive worked.
 
@@ -194,33 +198,43 @@ void KraftKommunication::loop() {
                     switch (message.messageData.payloadID) {
                     case eKraftMessageType_t::eKraftMessageType_Ack_ID:
                         
-                        for (uint32_t i = 0; i < sendPackets_.available(); i++) {
+                        sendPacketsACK_.pop_back();
+                        nodeData_[message.messageData.transmitterID].waitingOnPacket = nullptr; 
 
-                            if (sendPackets_.peekPointer() == nodeData_[message.messageData.transmitterID].waitingOnPacket) {
-                                nodeData_[message.messageData.transmitterID].waitingOnPacket = nullptr;
-                                sendPackets_.remove(i);
-                                break;
-                            }
+                        Serial.println("Packet was an ACK");
 
-                        }  
                         break;
 
                     case eKraftMessageType_t::eKraftMessageType_Heartbeat_ID:
+
+                        Serial.println("Packet was a heartbeat");
 
                         break;
 
                     case eKraftMessageType_t::eKraftMessageType_RadioSettings_ID:
 
+                        Serial.println("Packet was for radiosettings");
+
                         break;
 
                     default:
 
+                        Serial.println("Packet was of an unkown type: " + String(message.messageData.payloadID) + ". Placing in buffer.");
                         receivedPackets_.push_front(message);
+                        
                         break;
 
                     } 
 
+                } else {
+
+                    Serial.println("Packet wasnt for me");
+
                 }
+
+            } else {
+
+                Serial.println("DECODE FAILED!");
 
             }
 

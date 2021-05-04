@@ -208,7 +208,10 @@ uint8_t SX1280Driver::receiveBuffer(uint8_t* buffer, uint8_t size) {
     if (receivedDataSize_ > size) return 0;
 
     for (uint16_t i = 0; i < receivedDataSize_; i++) buffer[i] = receivedData_[i];
+
+    uint8_t sizePacket = receivedDataSize_;
+    receivedDataSize_ = 0;
     
-    return receivedDataSize_;
+    return sizePacket;
 
 }

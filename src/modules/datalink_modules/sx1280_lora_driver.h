@@ -19,7 +19,7 @@
 
 //Lora radio settings.
 #define SX1280_FREQUENCY        2445000000UL    
-#define SX1280_SPREADFACTOR     LORA_SF6        
+#define SX1280_SPREADFACTOR     LORA_SF5        
 #define SX1280_BANDWIDTH        LORA_BW_1600
 #define SX1280_CODINGRATE       LORA_CR_4_5
 

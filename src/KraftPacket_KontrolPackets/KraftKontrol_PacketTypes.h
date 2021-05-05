@@ -17,6 +17,10 @@ enum eKraftMessageType_KraftKontrol_t {
 class KraftDataAttitude final: public KraftMessage_Interface {
 public:
 
+    KraftDataAttitude(const Quaternion &attitude) {
+        attitude_ = attitude;
+    }
+
     uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_Attitude;}
 
     uint32_t getDataSize() {return sizeof(Quaternion);}
@@ -25,7 +29,7 @@ public:
 
         if (dataByteSize < sizeof(Quaternion)) return false;
 
-        memcpy(dataBytes, &attitude_, sizeof(Quaternion));
+        memcpy(dataBytes, (void*)&attitude_, sizeof(Quaternion));
 
         return true;
 
@@ -35,7 +39,7 @@ public:
 
         if (dataByteSize < sizeof(Quaternion)) return false;
 
-        memcpy(&attitude_, &dataBytes, sizeof(Quaternion));
+        memcpy((void*)&attitude_, &dataBytes, sizeof(Quaternion));
 
         return true;
 

@@ -39,6 +39,9 @@
 #include "modules/sensor_modules/adc_modules/adc_interface.h"
 #include "modules/sensor_modules/adc_modules/ads1115_driver.h"
 
+#include "modules/hid_modules/display_modules/display_interface.h"
+#include "modules/hid_modules/display_modules/st7735_driver.h"
+
 
 
 #endif 

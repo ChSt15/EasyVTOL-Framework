@@ -17,6 +17,8 @@ enum eKraftMessageType_KraftKontrol_t {
 class KraftDataAttitude final: public KraftMessage_Interface {
 public:
 
+    KraftDataAttitude() {}
+
     KraftDataAttitude(const Quaternion &attitude) {
         attitude_ = attitude;
     }

@@ -21,6 +21,8 @@ public:
 
     uint32_t getDataSize() {return sizeof(Quaternion);}
 
+    Quaternion getAttitude() {return attitude_;}
+
     bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
 
         if (dataByteSize < sizeof(Quaternion)) return false;

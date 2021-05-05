@@ -3,48 +3,39 @@
 
 
 
-#include "KraftPacketDatatype.h"
+#include "lib/KraftKommunikation/src/kraft_message.h"
 
-#include "3d_math.h"
+#include "lib/Math-Helper/src/3d_math.h"
 
 
 
-enum KRAFTPACKET_KONTROL_DATA_ID {
-    KRAFTPACKET_KONTROL_DATA_ATTITUDE_ID = KRAFTPACKET_DATA_FREE_ID, //Set first to ID of free not reserved IDs.
-    KRAFTPACKET_KONTROL_DATA_RCCHANNELS_ID
+enum eKraftMessageType_KraftKontrol_t {
+    eKraftMessageType_KraftKontrol_Attitude = eKraftMessageType_t::eKraftMessageType_StandardEnd_ID, //Set first to ID of free not reserved IDs.
 };
 
 
-class KraftDataAttitude final: public KraftDataType {
+class KraftDataAttitude final: public KraftMessage_Interface {
 public:
 
-    uint32_t getDataTypeID() {return KRAFTPACKET_KONTROL_DATA_ID::KRAFTPACKET_KONTROL_DATA_ATTITUDE_ID;}
+    uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_Attitude;}
 
     uint32_t getDataSize() {return sizeof(Quaternion);}
 
-    Quaternion getAttitude() {return _attitude;}
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
 
-    void setAttitude(const Quaternion &attitude) {
-        
-        _attitude = attitude;
+        if (dataByteSize < sizeof(Quaternion)) return false;
 
-    }
-
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize) {
-
-        if (dataByteSize != sizeof(Quaternion)) return false;
-
-        memcpy(dataBytes, &_attitude, sizeof(Quaternion));
+        memcpy(dataBytes, &attitude_, sizeof(Quaternion));
 
         return true;
 
     }
 
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize) {
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
 
-        if (dataByteSize != sizeof(Quaternion)) return false;
+        if (dataByteSize < sizeof(Quaternion)) return false;
 
-        memcpy(&_attitude, dataBytes, sizeof(Quaternion));
+        memcpy(&attitude_, &dataBytes, sizeof(Quaternion));
 
         return true;
 
@@ -53,7 +44,7 @@ public:
 
 private:
 
-    Quaternion _attitude;
+    Quaternion attitude_;
 
 };
 

@@ -17,12 +17,12 @@ enum eKraftMessageType_KraftKontrol_t {
 
 
 
-class KraftDataAttitude final: public KraftMessage_Interface {
+class KraftMessageAttitude final: public KraftMessage_Interface {
 public:
 
-    KraftDataAttitude() {}
+    KraftMessageAttitude() {}
 
-    KraftDataAttitude(const Quaternion &attitude) {
+    KraftMessageAttitude(const Quaternion &attitude) {
         attitude_ = attitude;
     }
 
@@ -63,12 +63,12 @@ private:
 
 
 
-class KraftDataPosition final: public KraftMessage_Interface {
+class KraftMessagePosition final: public KraftMessage_Interface {
 public:
 
-    KraftDataPosition() {}
+    KraftMessagePosition() {}
 
-    KraftDataPosition(const Vector &position, const uint32_t &timestamp) {
+    KraftMessagePosition(const Vector &position, const uint32_t &timestamp) {
         position_ = position;
         timestamp_ = timestamp;
     }
@@ -111,12 +111,12 @@ private:
 };
 
 
-class KraftDataFullKinematics final: public KraftMessage_Interface {
+class KraftMessageFullKinematics final: public KraftMessage_Interface {
 public:
 
-    KraftDataFullKinematics() {}
+    KraftMessageFullKinematics() {}
 
-    KraftDataFullKinematics(const KinematicData &kinematics) {
+    KraftMessageFullKinematics(const KinematicData &kinematics) {
         kinematics_ = kinematics;
     }
 

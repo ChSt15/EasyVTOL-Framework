@@ -122,7 +122,7 @@ public:
 
     uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_Position;}
 
-    uint32_t getDataSize() {return sizeof(KinematicData) + sizeof(kinematics_);}
+    uint32_t getDataSize() {return sizeof(KinematicData);}
 
     KinematicData getKinematics() {return kinematics_;}
 

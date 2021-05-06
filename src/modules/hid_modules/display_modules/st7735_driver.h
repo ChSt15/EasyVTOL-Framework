@@ -88,6 +88,16 @@ public:
         else digitalWrite(backlightPin_, LOW);
     }
 
+    /**
+     * Puts display into sleep mode
+     *
+     * @param sleep True to put display into sleep, false to get out of sleep
+     */
+    void enableSleep(bool sleep = true) {
+        if (sleep) display_.writecommand(ST7735_DISPOFF);
+        else display_.writecommand(ST7735_DISPON);
+    }
+
 
 private:
 

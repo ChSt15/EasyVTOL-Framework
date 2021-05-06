@@ -47,6 +47,7 @@ public:
      */
     bool startTaskThreading(const int32_t &numberRuns = -1) {
         if (rate_ == 0) return false;
+        if (attached_) return true; //Keep from attaching itsself multiple times
         return g_scheduler.attachFunction(this, rate_, priority_, numberRuns);
     }
 
@@ -54,6 +55,7 @@ public:
      * Stops threading for task.
      */
     void stopTaskThreading() {
+        if (!attached_) return; //Dont need to remove itsself if not attached
         g_scheduler.detachFunction(this);
     }
 
@@ -134,6 +136,7 @@ private:
 
     uint32_t rate_ = 0;
     eTaskPriority_t priority_ = eTaskPriority_t::eTaskPriority_None;
+    bool attached_ = false;
 
 };
 

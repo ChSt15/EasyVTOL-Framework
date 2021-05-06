@@ -40,7 +40,9 @@
 #include "modules/sensor_modules/adc_modules/ads1115_driver.h"
 
 #include "modules/hid_modules/display_modules/display_interface.h"
-#include "modules/hid_modules/display_modules/st7735_driver.h"
+#ifdef ESP32
+    #include "modules/hid_modules/display_modules/st7735_driver.h"
+#endif
 
 #include "KraftPacket_KontrolPackets/KraftKontrol_PacketTypes.h"
 

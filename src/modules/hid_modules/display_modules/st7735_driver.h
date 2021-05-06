@@ -1,6 +1,8 @@
 #ifndef ST7735_DRIVER_H
 #define ST7735_DRIVER_H
 
+#ifdef ESP32
+
 
 
 #include "Arduino.h"
@@ -128,5 +130,5 @@ private:
 
 
 
-
+#endif
 #endif

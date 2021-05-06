@@ -1,3 +1,4 @@
+#ifdef ESP32
 #include "st7735_driver.h"
 
 
@@ -100,3 +101,6 @@ void ST7735Driver::init() {
     if (startAttempts_ >= 5 && moduleStatus_ == eModuleStatus_t::eModuleStatus_RestartAttempt) moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
 
 }
+
+
+#endif

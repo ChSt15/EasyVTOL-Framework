@@ -12,12 +12,14 @@
 enum eKraftMessageType_KraftKontrol_t {
     eKraftMessageType_KraftKontrol_Attitude = eKraftMessageType_t::eKraftMessageType_StandardEnd_ID, //Set first to ID of free not reserved IDs.
     eKraftMessageType_KraftKontrol_Position,
-    eKraftMessageType_KraftKontrol_FullKinematics
+    eKraftMessageType_KraftKontrol_FullKinematics,
+    eKraftMessageType_KraftKontrol_VehicleModeSet,
+    eKraftMessageType_KraftKontrol_VehicleModeIs,
 };
 
 
 
-class KraftMessageAttitude final: public KraftMessage_Interface {
+class KraftMessageAttitude: public KraftMessage_Interface {
 public:
 
     KraftMessageAttitude() {}
@@ -63,7 +65,7 @@ private:
 
 
 
-class KraftMessagePosition final: public KraftMessage_Interface {
+class KraftMessagePosition: public KraftMessage_Interface {
 public:
 
     KraftMessagePosition() {}
@@ -111,7 +113,7 @@ private:
 };
 
 
-class KraftMessageFullKinematics final: public KraftMessage_Interface {
+class KraftMessageFullKinematics: public KraftMessage_Interface {
 public:
 
     KraftMessageFullKinematics() {}
@@ -150,6 +152,65 @@ public:
 private:
 
     KinematicData kinematics_;
+
+};
+
+
+
+class KraftMessageVehicleModeSet: public KraftMessage_Interface {
+public:
+
+    KraftMessageVehicleModeSet() {}
+
+    KraftMessageVehicleModeSet(const eVehicleMode_t &vehicleMode) {
+        vehicleMode_ = vehicleMode;
+    }
+
+    virtual uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_VehicleModeSet;}
+
+    uint32_t getDataSize() {return sizeof(eVehicleMode_t);}
+
+    eVehicleMode_t getVehicleMode() {return vehicleMode_;}
+
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+
+        if (dataByteSize < sizeof(eVehicleMode_t)) return false;
+
+        memcpy(dataBytes, &vehicleMode_, sizeof(eVehicleMode_t));
+
+        return true;
+
+    }
+
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
+
+        if (dataByteSize < sizeof(eVehicleMode_t)) return false;
+
+        memcpy(&vehicleMode_, dataBytes, sizeof(eVehicleMode_t));
+
+        return true;
+
+    }
+
+
+protected:
+
+    eVehicleMode_t vehicleMode_;
+
+};
+
+
+//Inheret from other class to simplify stuff
+class KraftMessageVehicleModeIs: public KraftMessageVehicleModeSet {
+public:
+
+    KraftMessageVehicleModeIs() {}
+
+    KraftMessageVehicleModeIs(const eVehicleMode_t &vehicleMode) {
+        vehicleMode_ = vehicleMode;
+    }
+
+    uint32_t getDataTypeID() override {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_VehicleModeIs;}
 
 };
 

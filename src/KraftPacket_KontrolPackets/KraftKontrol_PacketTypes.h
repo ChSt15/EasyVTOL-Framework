@@ -120,7 +120,7 @@ public:
         kinematics_ = kinematics;
     }
 
-    uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_Position;}
+    uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_FullKinematics;}
 
     uint32_t getDataSize() {return sizeof(KinematicData);}
 

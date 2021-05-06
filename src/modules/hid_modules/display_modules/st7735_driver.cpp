@@ -10,6 +10,7 @@ void ST7735Driver::drawString(String string, int16_t x, int16_t y) {
     if (x > display_.width()) x = 0;
     if (y > 160 - display_.fontHeight()) y = 0;
 
+    display_.setCursor(x, y);
     display_.drawString(string, x, y);
     //display_.print(string);
 

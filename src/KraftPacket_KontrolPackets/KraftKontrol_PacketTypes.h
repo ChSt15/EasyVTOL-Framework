@@ -11,7 +11,8 @@
 
 enum eKraftMessageType_KraftKontrol_t {
     eKraftMessageType_KraftKontrol_Attitude = eKraftMessageType_t::eKraftMessageType_StandardEnd_ID, //Set first to ID of free not reserved IDs.
-    eKraftMessageType_KraftKontrol_Position
+    eKraftMessageType_KraftKontrol_Position,
+    eKraftMessageType_KraftKontrol_FullKinematics
 };
 
 
@@ -76,15 +77,15 @@ public:
 
     uint32_t getDataSize() {return sizeof(Vector) + sizeof(timestamp_);}
 
-    Vector getPositiion() {return position_;}
+    Vector getPosition() {return position_;}
     uint32_t getTimestamp() {return timestamp_;}
 
     bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
 
         if (dataByteSize < sizeof(Vector)) return false;
 
-        memcpy(dataBytes, (void*)&position_, sizeof(Vector));
-        memcpy(dataBytes + sizeof(Vector), (void*)&timestamp_, sizeof(uint32_t));
+        memcpy(dataBytes, &position_, sizeof(Vector));
+        memcpy(dataBytes + sizeof(Vector), &timestamp_, sizeof(uint32_t));
 
         return true;
 
@@ -94,8 +95,8 @@ public:
 
         if (dataByteSize < sizeof(Vector)) return false;
 
-        memcpy((void*)&position_, &dataBytes, sizeof(Vector));
-        memcpy((void*)&timestamp_, &dataBytes + sizeof(Vector), sizeof(uint32_t));
+        memcpy(&position_, dataBytes, sizeof(Vector));
+        memcpy(&timestamp_, dataBytes + sizeof(Vector), sizeof(uint32_t));
 
         return true;
 
@@ -106,6 +107,49 @@ private:
 
     Vector position_;
     uint32_t timestamp_;
+
+};
+
+
+class KraftDataFullKinematics final: public KraftMessage_Interface {
+public:
+
+    KraftDataFullKinematics() {}
+
+    KraftDataFullKinematics(const KinematicData &kinematics) {
+        kinematics_ = kinematics;
+    }
+
+    uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_Position;}
+
+    uint32_t getDataSize() {return sizeof(KinematicData) + sizeof(kinematics_);}
+
+    KinematicData getKinematics() {return kinematics_;}
+
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+
+        if (dataByteSize < sizeof(KinematicData)) return false;
+
+        memcpy(dataBytes, &kinematics_, sizeof(KinematicData));
+
+        return true;
+
+    }
+
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
+
+        if (dataByteSize < sizeof(KinematicData)) return false;
+
+        memcpy(&kinematics_, dataBytes, sizeof(KinematicData));
+
+        return true;
+
+    }
+
+
+private:
+
+    KinematicData kinematics_;
 
 };
 

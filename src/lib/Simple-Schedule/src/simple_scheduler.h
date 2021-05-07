@@ -119,6 +119,11 @@ public:
     void tick();
 
     /**
+     * Calls all initialisation functions that are attached
+     */
+    void initializeTasks();
+
+    /**
      * Calling this will pause the thread until the given time was reached.
      * e.g. waitUntil(micros() + 1000) will delay the program for 1000 microseconds.
      * If no thread is currently running the this will immediatly return. 
@@ -148,12 +153,12 @@ public:
      * 
      * Will return false if fails to add function to scheduler.
      * 
-     * e.g. attachFunction(FunctionToBeCalled, 1000, eTaskPriority_t::eTaskPriority_realtime);
+     * e.g. attachTask(FunctionToBeCalled, 1000, eTaskPriority_t::eTaskPriority_realtime);
      *
      * @param values function pointer, rate_Hz, priority
      * @return bool.
      */
-    bool attachFunction(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority = eTaskPriority_t::eTaskPriority_Middle, int32_t numberRuns = -1);
+    bool attachTask(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority = eTaskPriority_t::eTaskPriority_Middle, int32_t numberRuns = -1);
 
     /**
      * Will run a function for a given amount of time (in microseconds)
@@ -165,12 +170,12 @@ public:
      * 
      * Will return false if fails to add function to scheduler.
      * 
-     * e.g. attachFunction(FunctionToBeCalled, 1000, eTaskPriority_t::eTaskPriority_realtime);
+     * e.g. attachTask(FunctionToBeCalled, 1000, eTaskPriority_t::eTaskPriority_realtime);
      *
      * @param values function pointer, rate_Hz, priority
      * @return bool.
      */
-    bool attachFunction(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority, uint32_t time_us, int32_t numberRuns = -1);
+    bool attachTask(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority, uint32_t time_us, int32_t numberRuns = -1);
 
     /**
      * This removes a function from the scheduler.
@@ -180,7 +185,7 @@ public:
      * @param values none.
      * @return none.
      */
-    bool detachFunction(Thread_Interface* function);
+    bool detachTask(Thread_Interface* function);
 
     /**
      * Used to get how often per second tick() is called. Can be used to see how the systems performance is.

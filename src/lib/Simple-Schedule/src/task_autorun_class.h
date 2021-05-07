@@ -36,7 +36,7 @@ public:
      * Will remove Task from scheduler.
      */
     ~Task_Abstract() {
-        g_scheduler.detachFunction(this);
+        g_scheduler.detachTask(this);
     }
 
     /**
@@ -48,7 +48,7 @@ public:
     bool startTaskThreading(const int32_t &numberRuns = -1) {
         if (rate_ == 0) return false;
         if (attached_) return true; //Keep from attaching itsself multiple times
-        return g_scheduler.attachFunction(this, rate_, priority_, numberRuns);
+        return g_scheduler.attachTask(this, rate_, priority_, numberRuns);
     }
 
     /**
@@ -56,7 +56,7 @@ public:
      */
     void stopTaskThreading() {
         if (!attached_) return; //Dont need to remove itsself if not attached
-        g_scheduler.detachFunction(this);
+        g_scheduler.detachTask(this);
     }
 
     /**
@@ -109,10 +109,13 @@ public:
     /**
      * Static function to give internal scheduler time to run tasks.
      * This needs to be ran as often and fast as possible to give all tasks time.
-     * 
-     * Use Task_Abstract::tasksSchedulerTick() to run independent of instantiated tasks.
      */
     static void schedulerTick() {g_scheduler.tick();}
+
+    /**
+     * Static function that talls scheduler to initialize all attached tasks.
+     */
+    static void schedulerInitTasks() {g_scheduler.initializeTasks();}
 
     /**
      * Used to get how often per second tick() from the scheduler is called. Can be used to see how the systems performance is.

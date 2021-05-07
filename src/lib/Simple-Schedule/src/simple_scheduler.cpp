@@ -33,7 +33,7 @@ void Scheduler::tick() {
             if (currentTask->item.limited) {
                 if (micros() - currentTask->item.creationTimestamp_us >= currentTask->item.removeThreshold_us) {
                     currentTask->item.thread->removal(); //Run removal function before removing.
-                    detachFunction(currentTask->item.thread);
+                    detachTask(currentTask->item.thread);
                 }
             } else if (currentTask->item.interval.isTimeToRun()) {
                 currentTask->item.thread->thread();
@@ -41,7 +41,7 @@ void Scheduler::tick() {
                 if (currentTask->item.numberRunsLeft > 0) currentTask->item.numberRunsLeft--;
                 if (currentTask->item.numberRunsLeft == 0) {
                     currentTask->item.thread->removal(); //Run removal function before removing.
-                    detachFunction(currentTask->item.thread);
+                    detachTask(currentTask->item.thread);
                 }
             }
         //}
@@ -65,7 +65,7 @@ void Scheduler::tick() {
             if (currentTask->item.limited) {
                 if (micros() - currentTask->item.creationTimestamp_us >= currentTask->item.removeThreshold_us) {
                     currentTask->item.thread->removal(); //Run removal function before removing.
-                    detachFunction(currentTask->item.thread);
+                    detachTask(currentTask->item.thread);
                 }
             } else if (currentTask->item.interval.isTimeToRun()) {
                 currentTask->item.thread->thread();
@@ -73,7 +73,7 @@ void Scheduler::tick() {
                 if (currentTask->item.numberRunsLeft > 0) currentTask->item.numberRunsLeft--;
                 if (currentTask->item.numberRunsLeft == 0) {
                     currentTask->item.thread->removal(); //Run removal function before removing.
-                    detachFunction(currentTask->item.thread);
+                    detachTask(currentTask->item.thread);
                 }
             }
         //}
@@ -96,7 +96,7 @@ void Scheduler::tick() {
             if (currentTask->item.limited) {
                 if (micros() - currentTask->item.creationTimestamp_us >= currentTask->item.removeThreshold_us) {
                     currentTask->item.thread->removal(); //Run removal function before removing.
-                    detachFunction(currentTask->item.thread);
+                    detachTask(currentTask->item.thread);
                 }
             } else if (currentTask->item.interval.isTimeToRun()) {
                 currentTask->item.thread->thread();
@@ -104,7 +104,7 @@ void Scheduler::tick() {
                 if (currentTask->item.numberRunsLeft > 0) currentTask->item.numberRunsLeft--;
                 if (currentTask->item.numberRunsLeft == 0) {
                     currentTask->item.thread->removal(); //Run removal function before removing.
-                    detachFunction(currentTask->item.thread);
+                    detachTask(currentTask->item.thread);
                 }
             }
         //}
@@ -127,7 +127,7 @@ void Scheduler::tick() {
             if (currentTask->item.limited) {
                 if (micros() - currentTask->item.creationTimestamp_us >= currentTask->item.removeThreshold_us) {
                     currentTask->item.thread->removal(); //Run removal function before removing.
-                    detachFunction(currentTask->item.thread);
+                    detachTask(currentTask->item.thread);
                 }
             } else if (currentTask->item.interval.isTimeToRun()) {
                 currentTask->item.thread->thread();
@@ -135,7 +135,7 @@ void Scheduler::tick() {
                 if (currentTask->item.numberRunsLeft > 0) currentTask->item.numberRunsLeft--;
                 if (currentTask->item.numberRunsLeft == 0) {
                     currentTask->item.thread->removal(); //Run removal function before removing.
-                    detachFunction(currentTask->item.thread);
+                    detachTask(currentTask->item.thread);
                 }
             }
         //}
@@ -158,7 +158,7 @@ void Scheduler::tick() {
             if (currentTask->item.limited) {
                 if (micros() - currentTask->item.creationTimestamp_us >= currentTask->item.removeThreshold_us) {
                     currentTask->item.thread->removal(); //Run removal function before removing.
-                    detachFunction(currentTask->item.thread);
+                    detachTask(currentTask->item.thread);
                 }
             } else if (currentTask->item.interval.isTimeToRun()) {
                 currentTask->item.thread->thread();
@@ -166,7 +166,7 @@ void Scheduler::tick() {
                 if (currentTask->item.numberRunsLeft > 0) currentTask->item.numberRunsLeft--;
                 if (currentTask->item.numberRunsLeft == 0) {
                     currentTask->item.thread->removal(); //Run removal function before removing.
-                    detachFunction(currentTask->item.thread);
+                    detachTask(currentTask->item.thread);
                 }
             }
         //}
@@ -189,7 +189,7 @@ void Scheduler::tick() {
             if (currentTask->item.limited) {
                 if (micros() - currentTask->item.creationTimestamp_us >= currentTask->item.removeThreshold_us) {
                     currentTask->item.thread->removal(); //Run removal function before removing.
-                    detachFunction(currentTask->item.thread);
+                    detachTask(currentTask->item.thread);
                 }
             } else if (currentTask->item.interval.isTimeToRun()) {
                 currentTask->item.thread->thread();
@@ -197,7 +197,7 @@ void Scheduler::tick() {
                 if (currentTask->item.numberRunsLeft > 0) currentTask->item.numberRunsLeft--;
                 if (currentTask->item.numberRunsLeft == 0) {
                     currentTask->item.thread->removal(); //Run removal function before removing.
-                    detachFunction(currentTask->item.thread);
+                    detachTask(currentTask->item.thread);
                 }
             }
         //}
@@ -220,7 +220,7 @@ void Scheduler::tick() {
             if (currentTask->item.limited) {
                 if (micros() - currentTask->item.creationTimestamp_us >= currentTask->item.removeThreshold_us) {
                     currentTask->item.thread->removal(); //Run removal function before removing.
-                    detachFunction(currentTask->item.thread);
+                    detachTask(currentTask->item.thread);
                 }
             } else if (currentTask->item.interval.isTimeToRun()) {
                 currentTask->item.thread->thread();
@@ -228,7 +228,7 @@ void Scheduler::tick() {
                 if (currentTask->item.numberRunsLeft > 0) currentTask->item.numberRunsLeft--;
                 if (currentTask->item.numberRunsLeft == 0) {
                     currentTask->item.thread->removal(); //Run removal function before removing.
-                    detachFunction(currentTask->item.thread);
+                    detachTask(currentTask->item.thread);
                 }
             }
         //}
@@ -239,6 +239,29 @@ void Scheduler::tick() {
 
 }
 
+void Scheduler::initializeTasks() {
+
+    for (uint8_t i = 0; i < 7; i++) {
+
+        ChainObject<Task>* currentTask = tasks_[i].getChainStart(); //Switch to next priority
+
+        while(currentTask != nullptr) {
+            ChainObject<Task>* nextTask = currentTask->nextObject; // Must be selected before it is removed
+
+            if (!currentTask->item.initWasCalled) {
+                currentTask->item.thread->init();
+                currentTask->item.initWasCalled = true;
+            }
+            
+            currentTask = nextTask;
+
+        }
+
+    }
+
+
+}
+
 /**
  * This adds a function to the scheduler.
  * 
@@ -246,12 +269,12 @@ void Scheduler::tick() {
  * 
  * Will return false if fails to add function to scheduler.
  * 
- * e.g. attachFunction(FunctionToBeCalled, 1000, eTaskPriority_t::eTaskPriority_Realtime);
+ * e.g. attachTask(FunctionToBeCalled, 1000, eTaskPriority_t::eTaskPriority_Realtime);
  *
  * @param values function pointer, rate_Hz, priority
  * @return bool.
  */
-bool Scheduler::attachFunction(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority, int32_t numberRuns) {
+bool Scheduler::attachTask(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority, int32_t numberRuns) {
 
     counter++;
 
@@ -304,12 +327,12 @@ bool Scheduler::attachFunction(Thread_Interface* function, uint32_t rate_Hz, eTa
  * 
  * Will return false if fails to add function to scheduler.
  * 
- * e.g. attachFunction(FunctionToBeCalled, 1000, eTaskPriority_t::eTaskPriority_Realtime);
+ * e.g. attachTask(FunctionToBeCalled, 1000, eTaskPriority_t::eTaskPriority_Realtime);
  *
  * @param values function pointer, rate_Hz, priority
  * @return bool.
  */
-bool Scheduler::attachFunction(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority, uint32_t time_us, int32_t numberRuns) {
+bool Scheduler::attachTask(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority, uint32_t time_us, int32_t numberRuns) {
 
     Task task;
     task.thread = function;
@@ -362,7 +385,7 @@ bool Scheduler::attachFunction(Thread_Interface* function, uint32_t rate_Hz, eTa
  * @param values none.
  * @return none.
  */
-bool Scheduler::detachFunction(Thread_Interface* function) {
+bool Scheduler::detachTask(Thread_Interface* function) {
 
     Task toBeRemoved;
     toBeRemoved.thread = function;

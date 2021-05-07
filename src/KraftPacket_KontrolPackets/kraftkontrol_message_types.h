@@ -13,13 +13,14 @@
 
 
 
-enum eKraftMessageType_KraftKontrol_t {
+enum eKraftMessageType_KraftKontrol_t : uint8_t {
     eKraftMessageType_KraftKontrol_Attitude = eKraftMessageType_t::eKraftMessageType_StandardEnd_ID, //Set first to ID of free not reserved IDs.
     eKraftMessageType_KraftKontrol_Position,
     eKraftMessageType_KraftKontrol_FullKinematics,
     eKraftMessageType_KraftKontrol_VehicleModeSet,
     eKraftMessageType_KraftKontrol_VehicleModeIs,
-    eKraftMessageType_KraftKontrol_VehicleStatus
+    eKraftMessageType_KraftKontrol_VehicleStatus,
+    eKraftMessageType_KraftKontrol_RCChannels
 };
 
 
@@ -259,6 +260,59 @@ public:
 protected:
 
     VehicleData vehicleData_;
+
+};
+
+
+
+class KraftMessageRCChannels: public KraftMessage_Interface {
+public:
+
+    KraftMessageRCChannels() {}
+
+    /**
+     * Constructor for array as input
+     * @param channels Pointer to a int16_t array.
+     * @param numChannels Number of channels to copy from channels.
+     */
+    KraftMessageRCChannels(int16_t* channels, const uint8_t &numChannels) {
+        for (uint8_t i = 0; i < numChannels && i < sizeof(channels_)/sizeof(int16_t); i++) channels_[i] = channels[i];
+    }
+
+    virtual uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_RCChannels;}
+
+    uint32_t getDataSize() {return sizeof(channels_);}
+
+    float getChannel(const uint8_t &channel) {return channels_[constrain(channel, 0, 20)];}
+
+    void getChannelAll(int16_t* channelArray, uint8_t numChannels = 15) {for (uint8_t i = 0; i < numChannels; i++) channelArray[i] = channels_[i];}
+
+    void setChannel(const int16_t &value, const uint8_t &channel) {channels_[constrain(channel, 0, 20)] = value;}
+
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+
+        if (dataByteSize < sizeof(channels_)) return false;
+
+        memcpy(dataBytes, channels_, sizeof(channels_));
+
+        return true;
+
+    }
+
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
+
+        if (dataByteSize < sizeof(channels_)) return false;
+
+        memcpy(channels_, dataBytes, sizeof(channels_));
+
+        return true;
+
+    }
+
+
+protected:
+
+    int16_t channels_[15];
 
 };
 

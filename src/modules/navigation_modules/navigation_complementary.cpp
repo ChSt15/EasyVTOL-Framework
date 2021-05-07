@@ -2,7 +2,7 @@
 
 
 
-void NavigationComplementary::thread() {
+void NavigationComplementaryFilter::thread() {
 
     float dTime = (float)(micros() - _lastLoopTimestamp)/1000000.0f;
     _lastLoopTimestamp = micros();

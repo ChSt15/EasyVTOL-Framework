@@ -33,7 +33,7 @@
 
 
 
-class NavigationComplementary: public Navigation_Interface, public Task_Abstract {
+class NavigationComplementaryFilter: public Navigation_Interface, public Task_Abstract {
 public:
 
     /**
@@ -44,7 +44,7 @@ public:
      * @param mag module to use.
      * @param baro module to use.
      */
-    NavigationComplementary(Gyroscope_Interface* gyro, Accelerometer_Interface* accel, Magnetometer_Interface* mag, Barometer_Interface* baro) : Task_Abstract(8000, eTaskPriority_t::eTaskPriority_VeryHigh, true) {
+    NavigationComplementaryFilter(Gyroscope_Interface* gyro, Accelerometer_Interface* accel, Magnetometer_Interface* mag, Barometer_Interface* baro) : Task_Abstract(8000, eTaskPriority_t::eTaskPriority_VeryHigh, true) {
         gyro_ = gyro;
         accel_ = accel;
         mag_ = mag;

@@ -25,8 +25,11 @@ enum eVehicleMode_t {
  * Struct containing all vehicle data.
  */
 struct VehicleData {
-
+    
     eVehicleMode_t vehicleMode = eVehicleMode_t::eVehicleMode_Disarm;
+
+    //Is true when vehicle is ready to be armed
+    bool vehicleReady = false;
 
 };
 

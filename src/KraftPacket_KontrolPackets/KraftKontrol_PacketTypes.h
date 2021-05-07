@@ -15,6 +15,7 @@ enum eKraftMessageType_KraftKontrol_t {
     eKraftMessageType_KraftKontrol_FullKinematics,
     eKraftMessageType_KraftKontrol_VehicleModeSet,
     eKraftMessageType_KraftKontrol_VehicleModeIs,
+    eKraftMessageType_KraftKontrol_VehicleStatus
 };
 
 
@@ -68,8 +69,6 @@ private:
 class KraftMessagePosition: public KraftMessage_Interface {
 public:
 
-    KraftMessagePosition() {}
-
     KraftMessagePosition(const Vector &position, const uint32_t &timestamp) {
         position_ = position;
         timestamp_ = timestamp;
@@ -115,8 +114,6 @@ private:
 
 class KraftMessageFullKinematics: public KraftMessage_Interface {
 public:
-
-    KraftMessageFullKinematics() {}
 
     KraftMessageFullKinematics(const KinematicData &kinematics) {
         kinematics_ = kinematics;
@@ -201,7 +198,7 @@ protected:
 
 
 //Inheret from other class to simplify stuff
-class KraftMessageVehicleModeIs: public KraftMessageVehicleModeSet {
+class KraftMessageVehicleModeIs: KraftMessageVehicleModeSet {
 public:
 
     KraftMessageVehicleModeIs() {}
@@ -214,6 +211,46 @@ public:
 
 };
 
+
+class KraftMessageVehicleStatus: public KraftMessage_Interface {
+public:
+
+    KraftMessageVehicleStatus(const VehicleData &vehicleData) {
+        vehicleData_ = vehicleData;
+    }
+
+    virtual uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_VehicleStatus;}
+
+    uint32_t getDataSize() {return sizeof(VehicleData);}
+
+    VehicleData getVehicleStatus() {return vehicleData_;}
+
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+
+        if (dataByteSize < sizeof(VehicleData)) return false;
+
+        memcpy(dataBytes, &vehicleData_, sizeof(VehicleData));
+
+        return true;
+
+    }
+
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
+
+        if (dataByteSize < sizeof(VehicleData)) return false;
+
+        memcpy(&vehicleData_, dataBytes, sizeof(VehicleData));
+
+        return true;
+
+    }
+
+
+protected:
+
+    VehicleData vehicleData_;
+
+};
 
 
 #endif 

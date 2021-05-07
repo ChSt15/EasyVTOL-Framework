@@ -11,7 +11,7 @@
 
 #include "modules/module_abstract.h"
 
-#include "KraftPacket_KontrolPackets/KraftKontrol_PacketTypes.h"
+#include "KraftPacket_KontrolPackets/kraftkontrol_message_types.h"
 
 
 

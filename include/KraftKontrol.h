@@ -44,7 +44,7 @@
     #include "modules/hid_modules/display_modules/st7735_driver.h"
 #endif
 
-#include "KraftPacket_KontrolPackets/KraftKontrol_PacketTypes.h"
+#include "KraftPacket_KontrolPackets/kraftkontrol_message_types.h"
 
 
 

@@ -7,6 +7,10 @@
 
 #include "lib/Math-Helper/src/3d_math.h"
 
+#include "data_containers/control_data.h"
+#include "data_containers/navigation_data.h"
+#include "data_containers/vehicle_data.h"
+
 
 
 enum eKraftMessageType_KraftKontrol_t {

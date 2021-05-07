@@ -3,15 +3,14 @@ A flight controller framework using the Arduino Framework (Current development i
 ## **This project is still under initial development and should not be used even for experimental systems as it will not work and has major bugs.**
 ## Current goal roadmap:
 - [x] Create basic structure and test on hardware.
-- [ ] Redo module and scheduler class structure.
-- [ ] Implement new flight programming system and loops.
-- [ ] Develop Communication protocols and packet handling for radio control and basestation control.
-- [ ] Implement a standard library for Packets with basestation and radio.
+- [x] Develop Communication protocols and packet handling for radio control and basestation control.
+- [x] Implement a standard library for Packets with basestation and radio.
 - [ ] Add position/velocity and acceleration to Sensorfusion using accelerometer and GPS 
+- [ ] Prepare for first alpha version to be released.
 - [ ] Release first alpha version. Yay!
 - [ ] Improve sensorfusion algorithm and auto-adjustment algorithm for filter factors.
 - [ ] Implement Starship vehicle and test.
-- [ ] Implement standard modules for common vehicle types.
+- [ ] Implement standard modules for common vehicle types. (E.g. Quadcopter, Plane)
 - [ ] Optimise everything.
 - [ ] Clean code.
 - [ ] Improve comments in code.

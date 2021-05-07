@@ -46,6 +46,8 @@
 
 #include "KraftPacket_KontrolPackets/kraftkontrol_message_types.h"
 
+#include "modules/networking_modules/kraft_konnect_network.h"
+
 
 
 #endif 

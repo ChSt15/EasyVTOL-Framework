@@ -1,5 +1,5 @@
-#ifndef SX1280_LORA_DRIVER_H
-#define SX1280_LORA_DRIVER_H
+#ifndef KRAFTKONNECT_NETWORK_DRIVER_H
+#define KRAFTKONNECT_NETWORK_DRIVER_H
 
 
 
@@ -47,15 +47,15 @@ public:
      * Given function will be called when message is received.
      * 
      * @param eventHandler Pointer to the function to be called.
-     * @param eventMessageType What message to trigger event.
+     * @param eventMessageType What message to trigger event. Should be a message type
      */
-    void setEventHandler(void (*eventHandler)(void), eKraftMessageType_t eventMessageType) {eventHandlers_[eventMessageType] = eventHandler;}
+    void setEventHandler(void (*eventHandler)(void), uint8_t eventMessageType) {eventHandlers_[constrain(eventMessageType, 0, 255)] = eventHandler;}
 
 
 private:
 
     //Receive handlers. These are called when a certain message type was received.
-    void (*eventHandlers_[UINT16_MAX])(void);
+    void (*eventHandlers_[255])(void);
 
     KraftKommunication* commsPort_ = nullptr;
 

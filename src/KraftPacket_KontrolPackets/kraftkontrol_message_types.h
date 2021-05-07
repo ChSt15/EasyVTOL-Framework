@@ -73,6 +73,8 @@ private:
 class KraftMessagePosition: public KraftMessage_Interface {
 public:
 
+    KraftMessagePosition() {}
+
     KraftMessagePosition(const Vector &position, const uint32_t &timestamp) {
         position_ = position;
         timestamp_ = timestamp;
@@ -118,6 +120,8 @@ private:
 
 class KraftMessageFullKinematics: public KraftMessage_Interface {
 public:
+
+    KraftMessageFullKinematics() {}
 
     KraftMessageFullKinematics(const KinematicData &kinematics) {
         kinematics_ = kinematics;
@@ -218,6 +222,8 @@ public:
 
 class KraftMessageVehicleStatus: public KraftMessage_Interface {
 public:
+
+    KraftMessageVehicleStatus() {}
 
     KraftMessageVehicleStatus(const VehicleData &vehicleData) {
         vehicleData_ = vehicleData;

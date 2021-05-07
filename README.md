@@ -10,7 +10,7 @@ A flight controller framework using the Arduino Framework (Current development i
 - [ ] Release first alpha version. Yay!
 - [ ] Improve sensorfusion algorithm and auto-adjustment algorithm for filter factors.
 - [ ] Implement Starship vehicle and test.
-- [ ] Implement standard modules for common vehicle types.
+- [ ] Implement standard modules for common vehicle types. (E.g. Quadcopter, Plane)
 - [ ] Optimise everything.
 - [ ] Clean code.
 - [ ] Improve comments in code.

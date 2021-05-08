@@ -41,26 +41,32 @@ void StarshipDynamics::thread() {
             TVCCalculator_.dynamicsSetpoint(dynamicSetpoint);
             TVCCalculator_.getTVCSettings(force, directionBuf);
 
+            //Something seems to be wrong, i dont know why. This remapping seems to fix the issue.
             Vector direction;
             direction.z = directionBuf.z;
             direction.x = -directionBuf.y;
             direction.y = directionBuf.x;
 
+            direction = Vector(0,0,1); //Uncomment this for yaw testing.
+
+            //TVC adjustment scalers.
+            const float yawTorqeScaler = 1.0; //Used for adjusting yaw torqe.
+            const float angleScaler = 1.0; //Used to scale TVC angle. Some systems like fins need to be adjusted
+
             //calculate TVC angles
             float TVC1, TVC2, TVC3, TVC4;
-            float twist = -constrain(dynamicSetpoint.torqe.z, -45*DEGREES, 45*DEGREES);
+            float twist = -constrain(dynamicSetpoint.torqe.z*yawTorqeScaler/angleScaler/force, -45*DEGREES, 45*DEGREES);
             getTVCAngles(direction, twist, TVC1, TVC2, TVC3, TVC4);
 
+            TVCServo1_.setAngle(TVC1*angleScaler);
+            TVCServo2_.setAngle(TVC2*angleScaler);
+            TVCServo3_.setAngle(TVC3*angleScaler);
+            TVCServo4_.setAngle(TVC4*angleScaler);
 
-            TVCServo1_.setAngle(TVC1);
-            TVCServo2_.setAngle(TVC2);
-            TVCServo3_.setAngle(TVC3);
-            TVCServo4_.setAngle(TVC4);
-
-            flapULControl_.setPosition(0*DEGREES);
-            flapURControl_.setPosition(0*DEGREES);
-            flapDRControl_.setPosition(0*DEGREES);
-            flapDLControl_.setPosition(0*DEGREES);
+            flapULControl_.setPosition(90*DEGREES);
+            flapURControl_.setPosition(90*DEGREES);
+            flapDRControl_.setPosition(90*DEGREES);
+            flapDLControl_.setPosition(90*DEGREES);
 
             motorCW_.setChannel(force/MAX_TVC_FORCE);
             motorCCW_.setChannel(force/MAX_TVC_FORCE);

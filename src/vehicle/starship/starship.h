@@ -11,16 +11,16 @@
 
 #include "modules/navigation_modules/navigation_complementary.h"
 #include "modules/guidance_modules/guidance_flybywire.h"
-#include "modules/control_modules/powered_hover_controller.h"
 
 #include "starship_dynamics.h"
+#include "starship_control.h"
 
 
 
 class Starship: public Vehicle_Interface, Task_Abstract {
 public:
 
-    Starship(Guidance_Interface* guidancePointer, Navigation_Interface* navigationPointer, HoverController* controlPointer, StarshipDynamics* dynamicsPointer) : Task_Abstract(8000, eTaskPriority_t::eTaskPriority_High, true) {
+    Starship(Guidance_Interface* guidancePointer, Navigation_Interface* navigationPointer, StarshipControl* controlPointer, StarshipDynamics* dynamicsPointer) : Task_Abstract(8000, eTaskPriority_t::eTaskPriority_High, true) {
         guidance_ = guidancePointer;
         navigation_ = navigationPointer;
         control_ = controlPointer;
@@ -109,7 +109,7 @@ private:
     Guidance_Interface* guidance_;
 
     //Points to the control module to use.
-    HoverController* control_;
+    StarshipControl* control_;
 
     //Points to the dynamics module to use.
     StarshipDynamics* dynamics_;

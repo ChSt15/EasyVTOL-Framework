@@ -11,6 +11,15 @@ void KraftKonnectNetwork::thread() {
 
     if (moduleStatus_ == eModuleStatus_t::eModuleStatus_Running) {
 
+        commsPort_->loop();
+
+        if (!commsPort_->networkBusy() && heartbeatInterval_.isTimeToRun()) {
+
+            KraftMessageHeartbeat message;
+            commsPort_->sendMessage(&message, eKraftPacketNodeID_t::eKraftPacketNodeID_broadcast);
+
+        }
+
         if (commsPort_->messageAvailable()) {
 
             MessageData messageData = commsPort_->getMessageInformation();

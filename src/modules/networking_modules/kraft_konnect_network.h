@@ -60,6 +60,7 @@ private:
     KraftKommunication* commsPort_ = nullptr;
 
     IntervalControl rateCalcInterval_ = IntervalControl(1);   
+    IntervalControl heartbeatInterval_ = IntervalControl(5);
 
     uint8_t startAttempts_ = 0;
 

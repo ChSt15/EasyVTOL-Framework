@@ -43,9 +43,29 @@ enum eNavPositionMode_t {
 
 
 /**
+ * Contains position data used for world coordinates.
+ * Usefull for setting home points.
+ */
+struct WorldPosition {
+    //In radians
+    double latitude;
+    //In radians
+    double longitude;
+    //In meters above MSL
+    float height;
+};
+
+
+/**
  * Inherits from Kinematic but add ability to show what the current state of attitude and position solution.
  */
 struct NavigationData: public KinematicData {
+
+    //Current home position. Output is in reference to this position
+    WorldPosition homePosition;
+
+    //Current absolute position
+    WorldPosition absolutePosition;
 
     //Current attitude solution state.
     eNavAttitudeMode_t attitudeMode = eNavAttitudeMode_t::eNavAttitudeMode_None;

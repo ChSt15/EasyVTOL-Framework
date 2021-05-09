@@ -207,7 +207,7 @@ protected:
 
 
 //Inheret from other class to simplify stuff
-class KraftMessageVehicleModeIs: KraftMessageVehicleModeSet {
+class KraftMessageVehicleModeIs: public KraftMessageVehicleModeSet {
 public:
 
     KraftMessageVehicleModeIs() {}

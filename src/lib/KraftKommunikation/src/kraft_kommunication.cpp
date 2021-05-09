@@ -196,6 +196,9 @@ void KraftKommunication::loop() {
 
                 if (message.messageData.receiverID == selfID_ || message.messageData.receiverID == eKraftPacketNodeID_t::eKraftPacketNodeID_broadcast) { //Make sure packet is for us.
 
+                    nodeData_[message.messageData.transmitterID].lastPacketTimestamp = millis();
+                    nodeData_[message.messageData.transmitterID].online = true;
+
                     switch (message.messageData.payloadID) {
                     case eKraftMessageType_t::eKraftMessageType_Ack_ID:
                         
@@ -229,15 +232,27 @@ void KraftKommunication::loop() {
 
                 } else {
 
-                    Serial.println("Packet wasnt for me");
+                    //Serial.println("Packet wasnt for me");
 
                 }
 
             } else {
 
-                Serial.println("DECODE FAILED!");
+                //Serial.println("DECODE FAILED!");
 
             }
+
+        }
+
+    }
+
+
+    //Check for timeout on all nodes.
+    for (uint8_t i = 0; i < 0; i++) {
+
+        if (millis() - nodeData_[i].lastPacketTimestamp >= 500) {
+            
+            nodeData_[i].online = false;
 
         }
 

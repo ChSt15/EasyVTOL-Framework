@@ -119,6 +119,14 @@ public:
     bool networkAckBusy() {return (sendPacketsACK_.capacity() - sendPacketsACK_.available()) == 0;}
 
     /**
+     * Checks if node is online.
+     * Offline status usually is checked if no message was received from a node for 500ms.
+     * @param node Node to check.
+     * @returns node status
+     */
+    bool getNodeStatus(eKraftPacketNodeID_t node) {return nodeData_[constrain(node, 0, 255)].online;}
+
+    /**
      * Returns latest received message data. Use this to find out what KraftMessage_Interface class needs to be given.
      * 
      * @returns MessageData struct.
@@ -192,6 +200,12 @@ private:
 
     //Struct to store information about a node
     struct NodeData {
+
+        //Stores the last time a packet was received. Used to see if still connected.
+        uint32_t lastPacketTimestamp = 0;
+
+        //Whether the node is online. 
+        bool online = false;
 
         //Stores last packetcounter for counting amount of lost packets.
         uint8_t lastPacketCounter = 0;

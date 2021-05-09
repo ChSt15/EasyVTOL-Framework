@@ -136,6 +136,10 @@ void SX1280Driver::internalLoop() {
 
         radio_.transmit(toSendData_, toSendDataSize_, 0, SX1280_POWER_dB, NO_WAIT);
 
+        #ifdef SX1280_DEBUG
+            Serial.println("Sending data packet!");
+        #endif
+
     }
 
 }

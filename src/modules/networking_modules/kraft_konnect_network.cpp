@@ -9,6 +9,9 @@ void KraftKonnectNetwork::thread() {
     loopCounter_++;
 
 
+    if (commsPort_ == nullptr) return;
+
+
     if (moduleStatus_ == eModuleStatus_t::eModuleStatus_Running) {
 
         commsPort_->loop();
@@ -68,7 +71,7 @@ void KraftKonnectNetwork::thread() {
 
 void KraftKonnectNetwork::init() {
 
-    for (uint16_t i = 0; i < sizeof(eventHandlers_); i++) eventHandlers_[i] = nullptr;
+    for (uint16_t i = 0; i < sizeof(eventHandlers_)/sizeof(eventHandlers_[0]); i++) eventHandlers_[i] = nullptr;
 
     moduleStatus_ = eModuleStatus_t::eModuleStatus_Running;
 

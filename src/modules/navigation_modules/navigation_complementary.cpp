@@ -239,16 +239,20 @@ void NavigationComplementaryFilter::thread() {
             float beta = 0.8f;
 
             //calculate height from new pressure value
-            float height = _getHeightFromPressure(pressure, 100e3f);
+            float heightAbsolute = _getHeightFromPressure(pressure, 100e3f);
+            float heightRelative = heightAbsolute - navigationData_.absolutePosition.height;
             //calculate z velocity from new height value
-            float zVelocity = (height - _lastHeightValue)/dt;
+            float zVelocity = (heightRelative - _lastHeightValue)/dt;
 
             //correct dead reckoning values with new ones.
-            navigationData_.position.z += (height - navigationData_.position.z)*beta*dt;
+            navigationData_.position.z += (heightRelative - navigationData_.position.z)*beta*dt;
             navigationData_.velocity.z += (zVelocity - navigationData_.velocity.z)*beta*dt;
 
+            //Update absolute position.
+            navigationData_.absolutePosition.height = navigationData_.position.z + navigationData_.homePosition.height;
+
             //Update last Height value
-            _lastHeightValue = height;
+            _lastHeightValue = heightRelative;
 
 
         } else {

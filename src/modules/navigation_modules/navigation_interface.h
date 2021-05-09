@@ -40,6 +40,14 @@ public:
     virtual NavigationData* getNavigationDataPointer() = 0;
 
     /**
+     * Sets the home position.
+     * All position data will be in refernce to this home position.
+     *
+     * @param homePosition Is the position to be used as home.
+     */
+    virtual void setHome(WorldPosition homePosition) = 0;
+
+    /**
      * Returns the current position accuracy in meters.
      * Returns -1.0 if unsupported.
      * 

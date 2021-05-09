@@ -6,6 +6,8 @@ void Starship::thread() {
 
     if (!vehicleInitialized_) init();
 
+    NavigationData navData = navigation_->getNavigationData();
+
     //Handle mode changes
     switch (vehicleData_.vehicleMode) {
 
@@ -27,7 +29,7 @@ void Starship::thread() {
         }
 
     case eVehicleMode_t::eVehicleMode_Prepare:
-        NavigationData navData = navigation_->getNavigationData();
+        
         if (navData.linearAcceleration.magnitude() < 0.1 && navData.velocity.magnitude() < 0.2 ) {
             navigation_->setHome(navData.absolutePosition);
             if (dynamics_->getActuatorStatus() == eActuatorStatus_t::eActuatorStatus_Disabled) dynamics_->setActuatorStatus(eActuatorStatus_t::eActuatorStatus_Ready);

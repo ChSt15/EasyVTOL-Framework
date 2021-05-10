@@ -150,6 +150,7 @@ void StarshipControl::thread() {
         }
 
         controlOutput_.torqe = outputTotal;
+        //Serial.println(String("Test: x: ") + controlOutput_.torqe.x + ", y: " + controlOutput_.torqe.y + ", z: " + controlOutput_.torqe.z);
 
     }
 

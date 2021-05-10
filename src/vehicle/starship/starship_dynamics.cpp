@@ -83,7 +83,7 @@ void StarshipDynamics::thread() {
 
             force = dynamicSetpoint.force.z;
 
-            force = max(force, 0);
+            force = max(force, float(0));
 
             Serial.println(force);
 

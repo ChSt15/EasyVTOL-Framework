@@ -26,11 +26,14 @@ void Starship::thread() {
 
         }
 
+        break;
+
     case eVehicleMode_t::eVehicleMode_Prepare:
         NavigationData navData = navigation_->getNavigationData();
-        if (navData.linearAcceleration.magnitude() < 0.1 && navData.velocity.magnitude() < 0.2 ) {
+        if (/*navData.linearAcceleration.magnitude() < 0.5 && navData.velocity.magnitude() < 0.5*/ true ) {
             navigation_->setHome(navData.absolutePosition);
-            if (dynamics_->getActuatorStatus() == eActuatorStatus_t::eActuatorStatus_Disabled) dynamics_->setActuatorStatus(eActuatorStatus_t::eActuatorStatus_Ready);
+            //if (dynamics_->getActuatorStatus() == eActuatorStatus_t::eActuatorStatus_Disabled) dynamics_->setActuatorStatus(eActuatorStatus_t::eActuatorStatus_Ready);
+            vehicleData_.vehicleMode = eVehicleMode_t::eVehicleMode_Arm;
         }
         break;
 
@@ -46,7 +49,9 @@ void Starship::thread() {
 void Starship::init() {
 
     //Setup hover controller
-    control_->setAngularVelocityPIDFactors(Vector(1,1,0.1), Vector(0), Vector(0), Vector(1000), true);
+    //control_->setAngularVelocityPIDFactors(Vector(1,1,0.1), Vector(0), Vector(0), Vector(1000), true);
+    control_->setAttitudePIDFactors(Vector(1,1,0.1), Vector(0), Vector(0), Vector(1000), true);
+    control_->setPositionPIDFactors(Vector(0,0,20), Vector(0), Vector(0), Vector(1000), true);
 
     //Mark that vehicle has been initialized.
     vehicleInitialized_ = true;

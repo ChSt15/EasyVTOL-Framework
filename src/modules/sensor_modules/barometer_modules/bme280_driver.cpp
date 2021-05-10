@@ -92,7 +92,10 @@ void BME280Driver::init() {
     int startCode;
 
     if (useSPI_) startCode = _bme.beginSPI(chipSelectPin_);
-    else startCode = _bme.beginI2C(*i2cBus_);
+    else {
+        _bme.setI2CAddress(i2cAddress_);
+        startCode = _bme.beginI2C(*i2cBus_);
+    }
 
     if (startCode > 0) {
 

@@ -26,8 +26,9 @@ public:
         useSPI_ = true;
     }
 
-    BME280Driver(TwoWire* i2cBus) : Task_Abstract(200, eTaskPriority_t::eTaskPriority_Realtime, true) {
+    BME280Driver(TwoWire* i2cBus, int address) : Task_Abstract(200, eTaskPriority_t::eTaskPriority_Realtime, true) {
         i2cBus_ = i2cBus;
+        i2cAddress_ = address;
         useSPI_ = false;
     }
     
@@ -275,6 +276,7 @@ private:
     bool useSPI_ = false;
 
     TwoWire* i2cBus_;
+    int i2cAddress_;
 
     BME280 _bme;
 

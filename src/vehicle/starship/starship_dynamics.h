@@ -221,9 +221,9 @@ private:
     //TVC servo in Y-
     PPMChannel TVCServo4_ = PPMChannel(TVC_SERVO_PIN_4, ePPMProtocol_t::ePPMProtocol_Standard_1000us, -0.1, 1);
     //CW motor control.
-    PPMChannel motorCW_ = PPMChannel(MOTOR_PIN_CW, ePPMProtocol_t::ePPMProtocol_Oneshot_125us, -1, 2);
+    PPMChannel motorCW_ = PPMChannel(MOTOR_PIN_CW, ePPMProtocol_t::ePPMProtocol_Standard_1000us, -1, 2);
     //CCW motor control.
-    PPMChannel motorCCW_ = PPMChannel(MOTOR_PIN_CCW, ePPMProtocol_t::ePPMProtocol_Oneshot_125us, -1, 2);
+    PPMChannel motorCCW_ = PPMChannel(MOTOR_PIN_CCW, ePPMProtocol_t::ePPMProtocol_Standard_1000us, -1, 2);
     //Up Left flap servo.
     PPMChannel flapUL_ = PPMChannel(FLAP_SERVO_PIN_UL, ePPMProtocol_t::ePPMProtocol_Standard_1000us, 1, -1);
     ServoDynamics flapULControl_ = ServoDynamics(&flapUL_, 1*DEGREES, FLAP_MAX_VELOCITY, FLAP_MAX_ACCEL);

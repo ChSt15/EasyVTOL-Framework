@@ -27,6 +27,9 @@ void StarshipDynamics::thread() {
             TVCServo3_.activateChannel();
             TVCServo4_.activateChannel();
 
+            motorCW_.activateChannel();
+            motorCCW_.activateChannel();
+
             actuatorStatus_ = eActuatorStatus_t::eActuatorStatus_Enabled;
 
         }
@@ -41,13 +44,16 @@ void StarshipDynamics::thread() {
             TVCCalculator_.dynamicsSetpoint(dynamicSetpoint);
             TVCCalculator_.getTVCSettings(force, directionBuf);
 
+            //Serial.println(String("Force: x: ") + dynamicSetpoint.force.x + ", y: " + dynamicSetpoint.force.y + ", z: " + dynamicSetpoint.force.z);
+            //Serial.println(String("Torqe: x: ") + directionBuf.x + ", y: " + directionBuf.y + ", z: " + directionBuf.z);
+
             //Something seems to be wrong, i dont know why. This remapping seems to fix the issue.
             Vector direction;
             direction.z = directionBuf.z;
             direction.x = -directionBuf.y;
             direction.y = directionBuf.x;
 
-            direction = Vector(0,0,1); //Uncomment this for yaw testing.
+            //direction = Vector(0,0,1); //Uncomment this for yaw testing.
 
             //TVC adjustment scalers.
             const float yawTorqeScaler = 1.0; //Used for adjusting yaw torqe.
@@ -63,10 +69,23 @@ void StarshipDynamics::thread() {
             TVCServo3_.setAngle(TVC3*angleScaler);
             TVCServo4_.setAngle(TVC4*angleScaler);
 
-            flapULControl_.setPosition(90*DEGREES);
-            flapURControl_.setPosition(90*DEGREES);
-            flapDRControl_.setPosition(90*DEGREES);
-            flapDLControl_.setPosition(90*DEGREES);
+            flapULControl_.setPosition(0*DEGREES);
+            flapURControl_.setPosition(0*DEGREES);
+            flapDRControl_.setPosition(0*DEGREES);
+            flapDLControl_.setPosition(0*DEGREES);
+
+
+            //force = force/MAX_TVC_FORCE;
+
+            //force = min(force, 0);
+
+            //Serial.println(force);
+
+            force = dynamicSetpoint.force.z;
+
+            force = max(force, 0);
+
+            Serial.println(force);
 
             motorCW_.setChannel(force/MAX_TVC_FORCE);
             motorCCW_.setChannel(force/MAX_TVC_FORCE);
@@ -89,7 +108,7 @@ void StarshipDynamics::thread() {
             if (millis() - lastswitch >= 1000) {
                 lastswitch = millis();
 
-                if (angle == 90.0f*DEGREES) {
+                if (angle > 50.0f*DEGREES) {
                     angle = 0.0f*DEGREES;
                 } else {
                     angle = 90.0f*DEGREES;
@@ -98,6 +117,8 @@ void StarshipDynamics::thread() {
 
             }
 
+            Serial.println(flapTestStage_);
+
             switch (flapTestStage_) {
 
             case FLAP_TEST_STAGE::TOP_LEFT:
@@ -105,7 +126,7 @@ void StarshipDynamics::thread() {
                 flapURControl_.setPosition(0);
                 flapDRControl_.setPosition(0);
                 flapDLControl_.setPosition(0);
-                if (flapTestCounter_ > 1) {
+                if (flapTestCounter_ > 0) {
                     flapTestCounter_ = 0;
                     flapTestStage_ = FLAP_TEST_STAGE::TOP_RIGHT;
                 }
@@ -116,7 +137,7 @@ void StarshipDynamics::thread() {
                 flapURControl_.setPosition(angle);
                 flapDRControl_.setPosition(0);
                 flapDLControl_.setPosition(0);
-                if (flapTestCounter_ > 2) {
+                if (flapTestCounter_ > 1) {
                     flapTestCounter_ = 0;
                     flapTestStage_ = FLAP_TEST_STAGE::BOTTOM_LEFT;
                 }
@@ -127,7 +148,7 @@ void StarshipDynamics::thread() {
                 flapURControl_.setPosition(0);
                 flapDRControl_.setPosition(0);
                 flapDLControl_.setPosition(angle);
-                if (flapTestCounter_ > 3) {
+                if (flapTestCounter_ > 1) {
                     flapTestCounter_ = 0;
                     flapTestStage_ = FLAP_TEST_STAGE::BOTTOM_RIGHT;
                 }
@@ -138,13 +159,15 @@ void StarshipDynamics::thread() {
                 flapURControl_.setPosition(0);
                 flapDRControl_.setPosition(angle);
                 flapDLControl_.setPosition(0);
-                if (flapTestCounter_ > 4) {
+                if (flapTestCounter_ > 1) {
                     flapTestCounter_ = 0;
                     flapTestStage_ = FLAP_TEST_STAGE::TOP_LEFT;
                 }
                 break;
             
             default:
+                flapTestStage_ = FLAP_TEST_STAGE::TOP_LEFT;
+                flapTestCounter_ = 0;
                 break;
             }
 
@@ -160,8 +183,8 @@ void StarshipDynamics::thread() {
             TVCServo3_.setAngle(TVC3);
             TVCServo4_.setAngle(TVC4);
 
-            motorCW_.setChannel(0);
-            motorCCW_.setChannel(0);
+            motorCW_.setChannel(-0.0);
+            motorCCW_.setChannel(-0.0);
             
         }
 
@@ -185,6 +208,9 @@ void StarshipDynamics::thread() {
             TVCServo3_.activateChannel();
             TVCServo4_.activateChannel();
 
+            motorCW_.activateChannel();
+            motorCCW_.activateChannel();
+
         }
 
         TVCServo1_.setAngle(0);
@@ -192,8 +218,8 @@ void StarshipDynamics::thread() {
         TVCServo3_.setAngle(0);
         TVCServo4_.setAngle(0);
 
-        motorCW_.setChannel(0);
-        motorCCW_.setChannel(0);
+        motorCW_.setChannel(-0.0);
+        motorCCW_.setChannel(-0.0);
 
         //Get sum of positions. Should be at 0 when all flaps are in position
         float position = flapULControl_.getPosition() + flapURControl_.getPosition() + flapDRControl_.getPosition() + flapDLControl_.getPosition();
@@ -222,19 +248,24 @@ void StarshipDynamics::thread() {
             TVCServo3_.activateChannel(false);
             TVCServo4_.activateChannel(false);
 
+            motorCW_.activateChannel();
+            motorCCW_.activateChannel();
+
             actuatorStatus_ = eActuatorStatus_t::eActuatorStatus_Disabled;
 
         }
 
-        motorCW_.setChannel(0);
-        motorCCW_.setChannel(0);
+        motorCW_.setChannel(-0.0);
+        motorCCW_.setChannel(-0.0);
 
     }
 
-    flapDLControl_.thread();
-    flapULControl_.thread();
-    flapDRControl_.thread();
-    flapURControl_.thread();
+    //flapDLControl_.thread();
+    //flapULControl_.thread();
+    //flapDRControl_.thread();
+    //flapURControl_.thread();
+
+    //Serial.println(String("Motor: x: ") + motorCW_.getChannel());
 
 }
 
@@ -258,11 +289,6 @@ void StarshipDynamics::init() {
 
     initialised_ = true;
 
-    flapDLControl_.setPosition(90*DEGREES);
-    flapULControl_.setPosition(90*DEGREES);
-    flapDRControl_.setPosition(90*DEGREES);
-    flapURControl_.setPosition(90*DEGREES);
-
     TVCServo1_.activateChannel();
     TVCServo2_.activateChannel();
     TVCServo3_.activateChannel();
@@ -275,8 +301,18 @@ void StarshipDynamics::init() {
     motorCW_.activateChannel();
     motorCCW_.activateChannel();
 
-    motorCW_.setChannel(0);
-    motorCCW_.setChannel(0);
+    motorCW_.setChannel(-0.0);
+    motorCCW_.setChannel(-0.0);
+
+    flapDLControl_.setPosition(90*DEGREES);
+    flapULControl_.setPosition(90*DEGREES);
+    flapDRControl_.setPosition(90*DEGREES);
+    flapURControl_.setPosition(90*DEGREES);
+
+    TVCServo1_.setAngle(0);
+    TVCServo2_.setAngle(0);
+    TVCServo3_.setAngle(0);
+    TVCServo4_.setAngle(0);
 
     TVCCalculator_.setDynamicConstraints(MAX_TVC_FORCE, MAX_TVC_ANGLE);
     TVCCalculator_.setTVCParameters(Vector(0,0,-0.4), Vector(0,0,1));

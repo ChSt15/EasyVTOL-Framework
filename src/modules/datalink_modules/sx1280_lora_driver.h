@@ -30,7 +30,7 @@
 #define SX1280_DATA_BUFFER_SIZE 255
 
 //Uncomment this to enable serial data output
-#define SX1280_DEBUG  
+//#define SX1280_DEBUG  
 
 
 

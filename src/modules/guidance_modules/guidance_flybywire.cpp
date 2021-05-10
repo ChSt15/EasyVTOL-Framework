@@ -15,7 +15,7 @@ void GuidanceFlyByWire::thread() {
 
     vehicleControlSettings_.attitude = vehicleControlSettings_.attitude*Quaternion(vehicleControlSettings_.angularRate.copy().normalize(), vehicleControlSettings_.angularRate.magnitude()*dT);
 
-}
+}   
 
 
 
@@ -27,5 +27,7 @@ void GuidanceFlyByWire::init() {
     vehicleControlSettings_.acceleration = -GRAVITY_VECTOR;
     vehicleControlSettings_.linearAcceleration = 0;
     vehicleControlSettings_.angularRate = 0;
+
+    vehicleControlSettings_.attitudeControlMode = eControlMode_t::eControlMode_Acceleration_Velocity_Position;
 
 }

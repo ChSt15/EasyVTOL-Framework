@@ -6,7 +6,7 @@
 /**
  * Enum containing all vehicle modes.
  */
-enum eVehicleMode_t {
+enum eVehicleMode_t : uint8_t {
     //When this is set, the vehicle turns everything off due to a critical error in a subsystem. Should only be resetable from power reset.
     eVehicleMode_Error,
     //When this is set, the vehicle turns everything off. Should be resetable from vehicle.

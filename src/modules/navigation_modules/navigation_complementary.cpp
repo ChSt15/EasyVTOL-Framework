@@ -98,7 +98,9 @@ void NavigationComplementaryFilter::thread() {
 
             //integrate values for INS Dead reckoning with IMU values
             navigationData_.velocity = navigationData_.velocity + navigationData_.linearAcceleration*dt;
-            navigationData_.position = navigationData_.position + navigationData_.velocity*dt;
+            navigationData_.absolutePosition.height = navigationData_.absolutePosition.height + navigationData_.velocity.z*dt;
+
+            navigationData_.position.z = navigationData_.absolutePosition.height - navigationData_.homePosition.height;
 
         } else if (_gyroInitialized) {
             
@@ -240,19 +242,19 @@ void NavigationComplementaryFilter::thread() {
 
             //calculate height from new pressure value
             float heightAbsolute = _getHeightFromPressure(pressure, 100e3f);
-            float heightRelative = heightAbsolute - navigationData_.absolutePosition.height;
+            //float heightRelative = heightAbsolute - navigationData_.absolutePosition.height;
             //calculate z velocity from new height value
-            float zVelocity = (heightRelative - _lastHeightValue)/dt;
+            float zVelocity = (heightAbsolute - _lastHeightValue)/dt;
 
             //correct dead reckoning values with new ones.
-            navigationData_.position.z += (heightRelative - navigationData_.position.z)*beta*dt;
+            navigationData_.absolutePosition.height += (heightAbsolute - navigationData_.absolutePosition.height)*beta*dt;
             navigationData_.velocity.z += (zVelocity - navigationData_.velocity.z)*beta*dt;
 
-            //Update absolute position.
-            navigationData_.absolutePosition.height = navigationData_.position.z + navigationData_.homePosition.height;
+            //Update relative position
+            navigationData_.position.z = navigationData_.absolutePosition.height - navigationData_.homePosition.height;
 
             //Update last Height value
-            _lastHeightValue = heightRelative;
+            _lastHeightValue = heightAbsolute;
 
 
         } else {
@@ -265,7 +267,7 @@ void NavigationComplementaryFilter::thread() {
             _lastHeightValue = _getHeightFromPressure(pressure, 100e3f);
 
             //Set current calculated height as start value.
-            navigationData_.position.z = _lastHeightValue;
+            navigationData_.absolutePosition.height = _lastHeightValue;
 
         }
 

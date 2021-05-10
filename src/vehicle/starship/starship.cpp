@@ -6,6 +6,8 @@ void Starship::thread() {
 
     if (!vehicleInitialized_) init();
 
+    NavigationData navData = navigation_->getNavigationData();
+
     //Handle mode changes
     switch (vehicleData_.vehicleMode) {
 

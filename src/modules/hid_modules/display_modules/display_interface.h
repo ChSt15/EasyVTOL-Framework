@@ -34,6 +34,11 @@ public:
     virtual void clearDisplay() = 0;
 
     /**
+     * Updates display with new changes.
+     */
+    virtual void updateDisplay() = 0;
+
+    /**
      * Returns true if pressure data available
      *
      * @param greyscaleBitmap Pointer to array of bytes containing greyscale of each pixel

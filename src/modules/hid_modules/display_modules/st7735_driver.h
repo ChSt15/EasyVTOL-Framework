@@ -69,6 +69,8 @@ public:
      */
     void clearDisplay();
 
+    void updateDisplay() {}
+
     /**
      * Returns true if pressure data available
      *

@@ -20,9 +20,15 @@
 class BME280Driver: public Barometer_Interface, public Module_Abstract, public Task_Abstract {
 public:
 
-    BME280Driver(int chipSelectPin, SPIClass* spiBus) : Task_Abstract(100, eTaskPriority_t::eTaskPriority_Realtime, true) {
+    BME280Driver(int chipSelectPin, SPIClass* spiBus) : Task_Abstract(200, eTaskPriority_t::eTaskPriority_Realtime, true) {
         chipSelectPin_ = chipSelectPin;
         spiBus_ = spiBus;
+        useSPI_ = true;
+    }
+
+    BME280Driver(TwoWire* i2cBus) : Task_Abstract(200, eTaskPriority_t::eTaskPriority_Realtime, true) {
+        i2cBus_ = i2cBus;
+        useSPI_ = false;
     }
     
     /**
@@ -263,8 +269,13 @@ private:
 
     IntervalControl _rateCalcInterval = IntervalControl(1); 
 
+
     int chipSelectPin_ = 0;
     SPIClass* spiBus_;
+    bool useSPI_ = false;
+
+    TwoWire* i2cBus_;
+
     BME280 _bme;
 
     uint8_t _startAttempts = 0;

@@ -89,7 +89,10 @@ void BME280Driver::thread() {
 
 void BME280Driver::init() {
 
-    int startCode = _bme.beginSPI(chipSelectPin_);
+    int startCode;
+
+    if (useSPI_) startCode = _bme.beginSPI(chipSelectPin_);
+    else startCode = _bme.beginI2C(*i2cBus_);
 
     if (startCode > 0) {
 
@@ -101,7 +104,7 @@ void BME280Driver::init() {
 
         _bme.setStandbyTime(0);
 
-        _bme.setMode(MODE_NORMAL);
+        _bme.setMode(MODE_FORCED);
 
         _lastMeasurement = micros();
         

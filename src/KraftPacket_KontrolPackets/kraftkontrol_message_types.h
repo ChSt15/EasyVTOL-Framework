@@ -207,7 +207,7 @@ protected:
 
 
 //Inheret from other class to simplify stuff
-class KraftMessageVehicleModeIs: public KraftMessageVehicleModeSet {
+class KraftMessageVehicleModeIs: public KraftMessage_Interface {
 public:
 
     KraftMessageVehicleModeIs() {}
@@ -216,7 +216,37 @@ public:
         vehicleMode_ = vehicleMode;
     }
 
-    uint32_t getDataTypeID() override {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_VehicleModeIs;}
+    virtual uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_VehicleModeIs;}
+
+    uint32_t getDataSize() {return sizeof(eVehicleMode_t);}
+
+    eVehicleMode_t getVehicleMode() {return vehicleMode_;}
+
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+
+        if (dataByteSize < sizeof(eVehicleMode_t)) return false;
+
+        memcpy(dataBytes, &vehicleMode_, sizeof(eVehicleMode_t));
+
+        return true;
+
+    }
+
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
+
+        if (dataByteSize < sizeof(eVehicleMode_t)) return false;
+
+        memcpy(&vehicleMode_, dataBytes, sizeof(eVehicleMode_t));
+
+        return true;
+
+    }
+
+
+protected:
+
+    eVehicleMode_t vehicleMode_;
+
 
 };
 

@@ -8,7 +8,7 @@
 
 
 #ifndef DEGREES
-    #define DEGREES (180.0f/3.14159265f)
+    #define DEGREES (3.14159265f/180.0f)
 #endif
 
 

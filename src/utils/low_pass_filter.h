@@ -104,6 +104,19 @@ public:
     T getValue() {return _lastValue;}
 
 
+    /**
+     * Sets the value to given parameter
+     *
+     * @param values input value
+     * @return none.
+     */
+    void setValue(const T &input) {
+        
+        _lastValue = input;
+
+    }
+
+
 
 private:
 

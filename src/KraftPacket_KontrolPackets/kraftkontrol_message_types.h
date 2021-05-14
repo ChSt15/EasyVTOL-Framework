@@ -376,8 +376,8 @@ public:
 
         if (dataByteSize < getDataSize()) return false;
 
-        memcpy(dataBytes, &position_, sizeof(position_));
-        memcpy(dataBytes + sizeof(position_), &sats_, sizeof(sats_));
+        memcpy(dataBytes, &sats_, sizeof(sats_));
+        memcpy(dataBytes + sizeof(sats_), &position_, sizeof(position_));
 
         return true;
 
@@ -387,8 +387,8 @@ public:
 
         if (dataByteSize < getDataSize()) return false;
 
-        memcpy(&position_, dataBytes, sizeof(position_));
-        memcpy(&sats_, dataBytes + sizeof(position_), sizeof(sats_));
+        memcpy(&sats_, dataBytes, sizeof(sats_));
+        memcpy(&position_, dataBytes + sizeof(sats_), sizeof(position_));
 
         return true;
 

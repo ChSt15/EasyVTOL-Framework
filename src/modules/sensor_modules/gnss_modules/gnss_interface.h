@@ -5,6 +5,8 @@
 
 #include "stdint.h"
 
+#include "data_containers/navigation_data.h"
+
 
 
 class GNSS_Interface {
@@ -20,9 +22,9 @@ public:
     /**
      * This is only for horizontal position. Even if this is true then that does not mean height is available
      *
-     * @returns true if horizontal position available.
+     * @returns number of measurements available in buffer.
      */
-    virtual bool positionAvailable() = 0;
+    virtual uint16_t positionAvailable() = 0;
 
     /**
      * Returns rate (in Hz) of new sensor data
@@ -35,26 +37,29 @@ public:
      * Variables given as parameters will be overridden.
      * This will remove sensor data from queue, peek will not.
      *
-     * @param latitude is the latitude data and is a double. Unit is in radians.
-     * @param longitude is the longitude data and is a double. Unit is in radians.
+     * @param position Struct to be overritten with position data.
      * @returns true if position data valid.
      */
-    virtual bool getPosition(double* latitude, double* longitude, uint32_t* positionTimestamp) = 0;
+    virtual bool getPosition(WorldPosition* position, uint32_t* positionTimestamp) = 0;
 
     /**
      * Variables given as parameters will be overridden.
      * This will remove sensor data from queue, peek will not.
      *
-     * @param latitude is the latitude data and is a double. Unit is in radians.
-     * @param longitude is the longitude data and is a double. Unit is in radians.
+     * @param position Struct to be overritten with position data.
      * @returns true if position data valid.
      */
-    virtual bool peekPosition(double* latitude, double* longitude, uint32_t* positionTimestamp) = 0;
+    virtual bool peekPosition(WorldPosition* position, uint32_t* positionTimestamp) = 0;
 
     /**
-     * @returns the Position accuracy. If unsupported will return -1;
+     * @returns the Position accuracy. If unsupported or altitude not available will return -1;
      */
     virtual float getPositionAccuracy() {return -1;}
+
+    /**
+     * @returns the altitude accuracy. If unsupported or altitude not available will return -1;
+     */
+    virtual float getAltitudeAccuracy() {return -1;}
 
     /**
      * Removes all elements from queue.
@@ -64,9 +69,9 @@ public:
     /**
      * This is only for horizontal position. Even if this is true then that does not mean height is available
      *
-     * @returns true if horizontal position available.
+     * @returns number of measurements available in buffer.
      */
-    virtual bool velocityAvailable() = 0;
+    virtual uint16_t velocityAvailable() = 0;
 
     /**
      * Returns rate (in Hz) of new sensor data
@@ -79,23 +84,19 @@ public:
      * Variables given as parameters will be overridden.
      * This will remove sensor data from queue, peek will not.
      *
-     * @param north is the velocity in north direction
-     * @param east is the velocity in east direction
-     * @param down is the velocity in down direction
+     * @param velocity is the velocity.
      * @returns true if position data valid.
      */
-    virtual bool getVelocity(float* north, float* east, float* down, uint32_t* velocityTimestamp) = 0;
+    virtual bool getVelocity(Vector* velocity, uint32_t* velocityTimestamp) = 0;
 
     /**
      * Variables given as parameters will be overridden.
      * This will remove sensor data from queue, peek will not.
      *
-     * @param north is the velocity in north direction
-     * @param east is the velocity in east direction
-     * @param down is the velocity in down direction
+     * @param velocity is the velocity.
      * @returns true if position data valid.
      */
-    virtual bool peekVelocity(float* north, float* east, float* down, uint32_t* velocityTimestamp) = 0;
+    virtual bool peekVelocity(Vector* velocity, uint32_t* velocityTimestamp) = 0;
 
     /**
      * Removes all elements from queue.
@@ -103,51 +104,9 @@ public:
     virtual void flushVelocity() = 0;
 
     /**
-     * Checks if altitude data available.
-     *
-     * @returns true if altitude data available.
-     */
-    virtual bool altitudeAvailable() = 0;
-
-    /**
-     * Returns rate (in Hz) of new sensor data
-     *
-     * @return uint32_t.
-     */
-    virtual uint32_t altitudeRate() = 0;
-
-    /**
-     * Variables given as parameters will be overridden.
-     * This will remove sensor data from queue, peek will not.
-     *
-     * @param altitude is the latitude data.
-     * @returns true if altitude data valid.
-     */
-    virtual bool getAltitude(float* altitude, uint32_t* altitudeTimestamp) = 0;
-
-    /**
-     * Variables given as parameters will be overridden.
-     * This will remove sensor data from queue, peek will not.
-     *
-     * @param altitude is the latitude data.
-     * @returns true if altitude data valid.
-     */
-    virtual bool peekAltitude(float* altitude, uint32_t* altitudeTimestamp) = 0;
-
-    /**
-     * @returns the altitude accuracy. If unsupported will return -1;
-     */
-    virtual float getAltitudeAccuracy() {return -1;}
-
-    /**
-     * Removes all elements from queue.
-     */
-    virtual void flushAltitude() = 0;
-
-    /**
      * @returns the number of satellites used.
      */
-    virtual void numberSatellites() = 0;
+    virtual uint8_t numberSatellites() = 0;
 
     
 };

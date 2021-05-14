@@ -10,7 +10,7 @@ void BME280Driver::_getData() {
     _bme.readAllMeasurements(&measurements);
 
     float bufMeasurement = measurements.pressure;
-    if (true) {
+    if (bufMeasurement > 100) {
         _pressureFifo.push_front(bufMeasurement);
         _pressureTimestampFifo.push_front(_newDataTimestamp);
         _lastPressure = bufMeasurement;
@@ -45,7 +45,7 @@ void BME280Driver::thread() {
 
     if (moduleStatus_ == eModuleStatus_t::eModuleStatus_Running) {
 
-        if (!_bme.isMeasuring()) {
+        if (/*!_bme.isMeasuring()*/true) {
             
             _getData();
 
@@ -103,9 +103,9 @@ void BME280Driver::init() {
         _bme.setPressureOverSample(4);
         _bme.setTempOverSample(1);
 
-        _bme.setFilter(4);
+        _bme.setFilter(3);
 
-        _bme.setStandbyTime(0);
+        _bme.setStandbyTime(6);
 
         _bme.setMode(MODE_FORCED);
 

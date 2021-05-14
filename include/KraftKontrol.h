@@ -35,6 +35,7 @@
 #include "modules/sensor_modules/barometer_modules/bme280_driver.h"
 
 #include "modules/sensor_modules/gnss_modules/gnss_interface.h"
+#include "modules/sensor_modules/gnss_modules/ublox_serial_gnss.h"
 
 #include "modules/sensor_modules/adc_modules/adc_interface.h"
 #include "modules/sensor_modules/adc_modules/ads1115_driver.h"

@@ -125,6 +125,7 @@ public:
      */
     void setPosition(const float &position) {
         _setPosition = position;
+        _channel->setAngle(position);
     }
 
     /**

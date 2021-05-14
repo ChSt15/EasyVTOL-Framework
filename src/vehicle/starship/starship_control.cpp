@@ -29,6 +29,8 @@ void StarshipControl::thread() {
 
             Vector error = (setpoint.attitude*navigationData_->attitude.copy().conjugate()).toVector(); //Error is calculated here already in local coordinate system.
 
+            //Serial.println(String("Error: x: ") + error.x + ", y: " + error.y + ", z: " + error.z);
+
             attitudeIValue_ += error.compWiseMulti(attitudeIF_);
 
             Vector attitudeOutput = error.compWiseMulti(attitudePF_) + (setpoint.angularRate - navigationData_->angularRate).compWiseMulti(attitudeDF_) + attitudeIValue_;

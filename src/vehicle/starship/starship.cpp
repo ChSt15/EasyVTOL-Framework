@@ -52,7 +52,7 @@ void Starship::init() {
 
     //Setup hover controller
     //control_->setAngularVelocityPIDFactors(Vector(1,1,0.1), Vector(0), Vector(0), Vector(1000), true);
-    control_->setAttitudePIDFactors(Vector(1,1,0.1), Vector(0), Vector(0), Vector(1000), true);
+    control_->setAttitudePIDFactors(Vector(10,10,5), Vector(0), Vector(0), Vector(1000), true);
     control_->setPositionPIDFactors(Vector(0,0,20), Vector(0), Vector(0), Vector(1000), true);
 
     //Mark that vehicle has been initialized.

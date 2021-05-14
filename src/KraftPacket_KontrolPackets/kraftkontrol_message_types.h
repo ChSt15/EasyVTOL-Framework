@@ -20,7 +20,8 @@ enum eKraftMessageType_KraftKontrol_t : uint8_t {
     eKraftMessageType_KraftKontrol_VehicleModeSet,
     eKraftMessageType_KraftKontrol_VehicleModeIs,
     eKraftMessageType_KraftKontrol_VehicleStatus,
-    eKraftMessageType_KraftKontrol_RCChannels
+    eKraftMessageType_KraftKontrol_RCChannels,
+    eKraftMessageType_KraftKontrol_GNSSData
 };
 
 
@@ -343,6 +344,61 @@ public:
 protected:
 
     int16_t channels_[15];
+
+};
+
+
+
+class KraftMessageGNSSData: public KraftMessage_Interface {
+public:
+
+    KraftMessageGNSSData() {}
+
+    /**
+     * Constructor for array as input
+     * @param channels Pointer to a int16_t array.
+     * @param numChannels Number of channels to copy from channels.
+     */
+    KraftMessageGNSSData(WorldPosition position, uint8_t sats) {
+        position_ = position;
+        sats_ = sats;
+    }
+
+    virtual uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_GNSSData;}
+
+    uint32_t getDataSize() {return sizeof(position_) + sizeof(sats_);}
+
+    WorldPosition getPosition() {return position_;}
+
+    uint8_t getNumSats() {return sats_;}
+
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+
+        if (dataByteSize < getDataSize()) return false;
+
+        memcpy(dataBytes, &position_, sizeof(position_));
+        memcpy(dataBytes + sizeof(position_), &sats_, sizeof(sats_));
+
+        return true;
+
+    }
+
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
+
+        if (dataByteSize < getDataSize()) return false;
+
+        memcpy(&position_, dataBytes, sizeof(position_));
+        memcpy(&sats_, dataBytes + sizeof(position_), sizeof(sats_));
+
+        return true;
+
+    }
+
+
+protected:
+
+    WorldPosition position_;
+    uint8_t sats_ = 0;
 
 };
 

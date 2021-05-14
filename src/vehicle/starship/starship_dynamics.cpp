@@ -40,23 +40,39 @@ void StarshipDynamics::thread() {
 
             float force = 0;
             Vector directionBuf = Vector(0,0,1);
+            Vector direction;
 
-            TVCCalculator_.dynamicsSetpoint(dynamicSetpoint);
-            TVCCalculator_.getTVCSettings(force, directionBuf);
+            //TVCCalculator_.dynamicsSetpoint(dynamicSetpoint);
+            //TVCCalculator_.getTVCSettings(force, directionBuf);
+
+            Vector forceVector;
+
+            forceVector = dynamicSetpoint.torqe.cross(-Vector(0,0,1/0.35));
+            forceVector += dynamicSetpoint.force.getProjectionOn(Vector(0,0,1));
+
+            direction.x = -forceVector.y;
+            direction.y = forceVector.x;
+            direction.z = forceVector.z;
+            direction.normalize();
+            force = forceVector.magnitude();
+
+            force = min(force, MAX_TVC_FORCE);
 
             //Serial.println(String("Force: x: ") + dynamicSetpoint.force.x + ", y: " + dynamicSetpoint.force.y + ", z: " + dynamicSetpoint.force.z);
-            //Serial.println(String("Torqe: x: ") + directionBuf.x + ", y: " + directionBuf.y + ", z: " + directionBuf.z);
+            //Serial.println(String("Torqe dyn: x: ") + dynamicSetpoint.torqe.x + ", y: " + dynamicSetpoint.torqe.y + ", z: " + dynamicSetpoint.torqe.z);
 
             //Something seems to be wrong, i dont know why. This remapping seems to fix the issue.
-            Vector direction;
+            /*Vector direction;
             direction.z = directionBuf.z;
             direction.x = -directionBuf.y;
-            direction.y = directionBuf.x;
+            direction.y = directionBuf.x;*/
+
+            //Serial.println(String("Direction: x: ") + direction.x + ", y: " + direction.y + ", z: " + direction.z + ", force: " + force);
 
             //direction = Vector(0,0,1); //Uncomment this for yaw testing.
 
             //TVC adjustment scalers.
-            const float yawTorqeScaler = 1.0; //Used for adjusting yaw torqe.
+            const float yawTorqeScaler = 10.0; //Used for adjusting yaw torqe.
             const float angleScaler = 1.0; //Used to scale TVC angle. Some systems like fins need to be adjusted
 
             //calculate TVC angles
@@ -69,10 +85,15 @@ void StarshipDynamics::thread() {
             TVCServo3_.setAngle(TVC3*angleScaler);
             TVCServo4_.setAngle(TVC4*angleScaler);
 
-            flapULControl_.setPosition(0*DEGREES);
-            flapURControl_.setPosition(0*DEGREES);
-            flapDRControl_.setPosition(0*DEGREES);
-            flapDLControl_.setPosition(0*DEGREES);
+            /*TVCServo1_.setAngle(0*DEGREES);
+            TVCServo2_.setAngle(0*DEGREES);
+            TVCServo3_.setAngle(0*DEGREES);
+            TVCServo4_.setAngle(90*DEGREES);*/
+
+            flapULControl_.setPosition(90*DEGREES);
+            flapURControl_.setPosition(90*DEGREES);
+            flapDRControl_.setPosition(90*DEGREES);
+            flapDLControl_.setPosition(90*DEGREES);
 
 
             //force = force/MAX_TVC_FORCE;
@@ -85,7 +106,7 @@ void StarshipDynamics::thread() {
 
             force = max(force, float(0));
 
-            Serial.println(force);
+            //Serial.println(force);
 
             motorCW_.setChannel(force/MAX_TVC_FORCE);
             motorCCW_.setChannel(force/MAX_TVC_FORCE);
@@ -238,10 +259,10 @@ void StarshipDynamics::thread() {
             flapDRControl_.setParameters(FLAP_START_MAX_VELOCITY, FLAP_START_MAX_ACCEL);
             flapDLControl_.setParameters(FLAP_START_MAX_VELOCITY, FLAP_START_MAX_ACCEL);
 
-            flapULControl_.setPosition(90*DEGREES);
-            flapURControl_.setPosition(90*DEGREES);
-            flapDRControl_.setPosition(90*DEGREES);
-            flapDLControl_.setPosition(90*DEGREES);
+            flapULControl_.setPosition(0*DEGREES);
+            flapURControl_.setPosition(0*DEGREES);
+            flapDRControl_.setPosition(0*DEGREES);
+            flapDLControl_.setPosition(0*DEGREES);
 
             TVCServo1_.activateChannel(false);
             TVCServo2_.activateChannel(false);

@@ -25,6 +25,8 @@
 #define MOTOR_PIN_CW 8
 #define MOTOR_PIN_CCW 7
 
+#define NEO_M8Q_SERIALPORT Serial5
+
 
 
 #endif

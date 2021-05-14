@@ -37,6 +37,15 @@ void UbloxSerialGNSS::_getData() {
 void UbloxSerialGNSS::thread() {
 
 
+    if (usbPassthrough_) {
+        
+        while (serialPort_->available()) Serial.write(serialPort_->read());
+        while (Serial.available()) serialPort_->write(Serial.read());
+        
+        return;
+    }
+
+
     loopCounter_++;
 
 
@@ -81,6 +90,12 @@ void UbloxSerialGNSS::thread() {
 
 
 void UbloxSerialGNSS::init() {
+
+    if (usbPassthrough_) {
+        serialPort_->begin(115200);
+        moduleStatus_ = eModuleStatus_t::eModuleStatus_Running;
+        return;
+    }
 
     if (moduleStatus_ == eModuleStatus_t::eModuleStatus_NotStarted) serialPort_->begin(115200);
     else serialPort_->begin(9600*max(serialBaudMulti_,1));

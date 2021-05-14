@@ -106,7 +106,7 @@ public:
     /**
      * @returns the number of satellites used.
      */
-    virtual uint8_t numberSatellites() = 0;
+    virtual uint8_t getNumSatellites() = 0;
 
     
 };

@@ -20,8 +20,13 @@
 class UbloxSerialGNSS: public GNSS_Interface, public Module_Abstract, public Task_Abstract  {
 public:
 
-    UbloxSerialGNSS(HardwareSerial* serialPort) : Task_Abstract(50, eTaskPriority_t::eTaskPriority_Realtime, true) {
+    /**
+     * @param serialPort Pointer to serial port to use. If non default pins used then setup before init run.
+     * @param usbPassthrough If true then gps wont be setup and serial data will be passed to USB serial.
+     */
+    UbloxSerialGNSS(HardwareSerial* serialPort, bool usbPassthrough = false) : Task_Abstract(50, eTaskPriority_t::eTaskPriority_Realtime, true) {
         serialPort_ = serialPort;
+        usbPassthrough_ = usbPassthrough;
     }
 
     /**
@@ -176,7 +181,7 @@ public:
     /**
      * @returns the number of satellites used.
      */
-    uint8_t numberSatellites() {return numSats_;}
+    uint8_t getNumSatellites() {return numSats_;}
 
 
 private:
@@ -199,6 +204,7 @@ private:
 
     HardwareSerial* serialPort_;
     uint32_t serialBaudMulti_ = 1;
+    bool usbPassthrough_;
 
     SFE_UBLOX_GNSS gnss_;
 

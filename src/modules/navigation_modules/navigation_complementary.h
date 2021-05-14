@@ -127,6 +127,8 @@ private:
     //Filter data
     HighPassFilter<Vector> _gyroHPF = HighPassFilter<Vector>(0.001);
 
+    LowPassFilter<Vector> accelLPF_ = LowPassFilter<Vector>(0.2);
+
     uint32_t _lastGyroTimestamp = 0;
     uint32_t _lastAccelTimestamp = 0;
     uint32_t _lastMagTimestamp = 0;

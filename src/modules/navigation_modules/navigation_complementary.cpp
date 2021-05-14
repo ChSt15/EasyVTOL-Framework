@@ -94,13 +94,12 @@ void NavigationComplementaryFilter::thread() {
 
             //Update acceleration
             navigationData_.acceleration = (navigationData_.attitude*accelVector*navigationData_.attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
-            navigationData_.linearAcceleration = navigationData_.acceleration - Vector(0,0,9.81);
+            Vector filtered = accelLPF_.update(navigationData_.acceleration - Vector(0,0,9.81));
+            navigationData_.linearAcceleration = navigationData_.acceleration - Vector(0,0,9.81) - filtered;//accelHPF_.update(navigationData_.acceleration/* - Vector(0,0,9.81)*/);
 
-            //integrate values for INS Dead reckoning with IMU values
-            navigationData_.velocity = navigationData_.velocity + navigationData_.linearAcceleration*dt;
-            navigationData_.absolutePosition.height = navigationData_.absolutePosition.height + navigationData_.velocity.z*dt;
-
-            navigationData_.position.z = navigationData_.absolutePosition.height - navigationData_.homePosition.height;
+            //Serial.println(String("Accel: x: ") + navigationData_.linearAcceleration.x + ", y: " + navigationData_.linearAcceleration.y + ", z: " + navigationData_.linearAcceleration.z);
+            
+            
 
         } else if (_gyroInitialized) {
             
@@ -121,6 +120,8 @@ void NavigationComplementaryFilter::thread() {
             navigationData_.attitude = zAxisCorrectionQuat*navigationData_.attitude;
             navigationData_.attitude.normalize(true);
             //navigationData_.attitude = Quaternion(0,0,1,0);
+
+            accelLPF_.setValue(navigationData_.acceleration - Vector(0,0,9.81));
 
         }
 
@@ -238,7 +239,7 @@ void NavigationComplementaryFilter::thread() {
             float dt = float(timestamp - _lastBaroTimestamp)/1000000.0f;
             _lastBaroTimestamp = timestamp;
 
-            float beta = 0.8f;
+            float beta = 0.06f;
 
             //calculate height from new pressure value
             float heightAbsolute = _getHeightFromPressure(pressure, 100e3f);
@@ -247,8 +248,9 @@ void NavigationComplementaryFilter::thread() {
             float zVelocity = (heightAbsolute - _lastHeightValue)/dt;
 
             //correct dead reckoning values with new ones.
-            navigationData_.absolutePosition.height += (heightAbsolute - navigationData_.absolutePosition.height)*beta*dt;
-            navigationData_.velocity.z += (zVelocity - navigationData_.velocity.z)*beta*dt;
+            float heightError = (heightAbsolute - navigationData_.absolutePosition.height);
+            navigationData_.absolutePosition.height += heightError*beta;
+            navigationData_.velocity.z += (zVelocity - navigationData_.velocity.z)*beta*2;
 
             //Update relative position
             navigationData_.position.z = navigationData_.absolutePosition.height - navigationData_.homePosition.height;
@@ -272,6 +274,15 @@ void NavigationComplementaryFilter::thread() {
         }
 
     }
+
+
+    navigationData_.velocity = navigationData_.velocity + navigationData_.linearAcceleration*dTime;
+    navigationData_.position.x += navigationData_.velocity.x*dTime;
+    navigationData_.position.y += navigationData_.velocity.y*dTime;
+
+    navigationData_.absolutePosition.height = navigationData_.absolutePosition.height + navigationData_.velocity.z*dTime;
+
+    navigationData_.position.z = navigationData_.absolutePosition.height - navigationData_.homePosition.height;
 
     navigationData_.timestamp = micros();
 

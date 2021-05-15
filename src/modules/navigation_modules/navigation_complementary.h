@@ -45,11 +45,12 @@ public:
      * @param mag module to use.
      * @param baro module to use.
      */
-    NavigationComplementaryFilter(Gyroscope_Interface* gyro, Accelerometer_Interface* accel, Magnetometer_Interface* mag, Barometer_Interface* baro) : Task_Abstract(8000, eTaskPriority_t::eTaskPriority_VeryHigh, true) {
+    NavigationComplementaryFilter(Gyroscope_Interface* gyro, Accelerometer_Interface* accel, Magnetometer_Interface* mag = nullptr, Barometer_Interface* baro = nullptr, GNSS_Interface* gnss = nullptr) : Task_Abstract(8000, eTaskPriority_t::eTaskPriority_VeryHigh, true) {
         gyro_ = gyro;
         accel_ = accel;
         mag_ = mag;
         baro_ = baro;
+        gnss_ = gnss;
     }
 
     /**

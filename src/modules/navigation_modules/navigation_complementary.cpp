@@ -34,6 +34,11 @@ void NavigationComplementaryFilter::thread() {
         uint32_t timestamp;
         gyro_->getGyro(&rotationVector, &timestamp);
 
+        if (rotationVector.magnitude() < 0.1) {
+            gyroLPF_.update(rotationVector);
+        }
+        rotationVector = rotationVector - gyroLPF_.getValue();
+
         //Calulate time delta
         float dt = float(timestamp - _lastGyroTimestamp)/1000000.0f;
         _lastGyroTimestamp = timestamp;
@@ -62,7 +67,7 @@ void NavigationComplementaryFilter::thread() {
 
             //Gyro filter initialisation
             if (rotationVector.magnitude() < 0.05) {
-                _gyroHPF.setValue(rotationVector);
+                gyroLPF_.setValue(rotationVector);
                 _gyroInitialized = true;
             }
 
@@ -82,6 +87,8 @@ void NavigationComplementaryFilter::thread() {
 
         accelVector = (accelVector - _accelBias).compWiseMulti(_accelScale);
 
+        accelVector = accelLPF_.update(accelVector);
+
         //accelVector = lastValue = lastValue*0.9999 + accelVector*0.0001;
 
         //Serial.println("Accel: x: " + String(accelVector.x,4) + ", y: " + String(accelVector.y,4) + ", z: " + String(accelVector.z,4));
@@ -93,7 +100,7 @@ void NavigationComplementaryFilter::thread() {
             float dt = float(timestamp - _lastAccelTimestamp)/1000000.0f;
             _lastAccelTimestamp = timestamp;
 
-            float beta = 0.5f;
+            float beta = 0.1f;
 
             //Z-Axis correction
             Vector zAxisIs = Vector(0,0,1);
@@ -112,7 +119,7 @@ void NavigationComplementaryFilter::thread() {
 
             //Update acceleration
             navigationData_.acceleration = (navigationData_.attitude*accelVector*navigationData_.attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
-            Vector filtered = accelLPF_.update(navigationData_.acceleration - Vector(0,0,9.81));
+            Vector filtered = accelBiasLPF_.update(navigationData_.acceleration - Vector(0,0,9.81));
             navigationData_.linearAcceleration = navigationData_.acceleration - Vector(0,0,9.81) - filtered;//accelHPF_.update(navigationData_.acceleration/* - Vector(0,0,9.81)*/);
 
             //Serial.println(String("Accel: x: ") + navigationData_.linearAcceleration.x + ", y: " + navigationData_.linearAcceleration.y + ", z: " + navigationData_.linearAcceleration.z);
@@ -139,7 +146,7 @@ void NavigationComplementaryFilter::thread() {
             navigationData_.attitude.normalize(true);
             //navigationData_.attitude = Quaternion(0,0,1,0);
 
-            accelLPF_.setValue(navigationData_.acceleration - Vector(0,0,9.81));
+            accelBiasLPF_.setValue(navigationData_.acceleration - Vector(0,0,9.81));
 
         }
 
@@ -264,7 +271,7 @@ void NavigationComplementaryFilter::thread() {
                 float dt = float(timestamp - _lastBaroTimestamp)/1000000.0f;
                 _lastBaroTimestamp = timestamp;
 
-                float beta = 0.06f;
+                float beta = 0.01f;
 
                 //calculate height from new pressure value
                 float heightAbsolute = _getHeightFromPressure(pressure, 100e3f);
@@ -274,8 +281,8 @@ void NavigationComplementaryFilter::thread() {
 
                 //correct dead reckoning values with new ones.
                 float heightError = (heightAbsolute - navigationData_.absolutePosition.height);
-                navigationData_.absolutePosition.height += heightError*beta;
-                navigationData_.velocity.z += (zVelocity - navigationData_.velocity.z)*beta*2;
+                navigationData_.absolutePosition.height += heightError*0.03;
+                navigationData_.velocity.z += (zVelocity - navigationData_.velocity.z)*0.02;
 
                 //Update relative position
                 navigationData_.position.z = navigationData_.absolutePosition.height - navigationData_.homePosition.height;

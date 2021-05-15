@@ -120,7 +120,7 @@ public:
 
 private:
 
-    uint32_t _sampleRate;
+    int32_t _sampleRate;
     float _cutOffFreq;
     float _RC;
 

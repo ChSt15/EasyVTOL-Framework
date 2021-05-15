@@ -44,6 +44,7 @@ public:
      * @param accel module to use.
      * @param mag module to use.
      * @param baro module to use.
+     * @param gnss module to use.
      */
     NavigationComplementaryFilter(Gyroscope_Interface* gyro, Accelerometer_Interface* accel, Magnetometer_Interface* mag = nullptr, Barometer_Interface* baro = nullptr, GNSS_Interface* gnss = nullptr) : Task_Abstract(8000, eTaskPriority_t::eTaskPriority_VeryHigh, true) {
         gyro_ = gyro;
@@ -122,7 +123,7 @@ private:
     Magnetometer_Interface* mag_ = nullptr;
     //Barometer that will be used by Navigation module
     Barometer_Interface* baro_ = nullptr;
-    //GNSS module to use
+    //GNSS module that will be used by Navigation module.
     GNSS_Interface* gnss_ = nullptr;
     
 

@@ -120,7 +120,7 @@ void MPU9250Driver::init() {
 
         if (_imu.MagnetometerFailed()) Serial.println("Magnetometer failed, But gyro and accel are working!!!!");
 
-        _imu.ConfigAccelRange(Mpu9250::AccelRange::ACCEL_RANGE_4G);
+        _imu.ConfigAccelRange(Mpu9250::AccelRange::ACCEL_RANGE_8G);
         _imu.ConfigGyroRange(Mpu9250::GyroRange::GYRO_RANGE_2000DPS);
         _imu.EnableDrdyInt();
 

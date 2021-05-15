@@ -4,11 +4,29 @@
 
 void NavigationComplementaryFilter::thread() {
 
+    if (gyro_ == nullptr || accel_ == nullptr) {
+
+        stopTaskThreading();
+
+    }
+
+    //Calculate time delta from last run
     float dTime = (float)(micros() - _lastLoopTimestamp)/1000000.0f;
     _lastLoopTimestamp = micros();
     	
-    //KinematicData *navigationData_.= _vehicle;
+    //Predict current state
+    //NavigationData prediction = navigationData_;
+    navigationData_.velocity = navigationData_.velocity + navigationData_.linearAcceleration*dTime;
+    navigationData_.position.x += navigationData_.velocity.x*dTime;
+    navigationData_.position.y += navigationData_.velocity.y*dTime;
 
+    navigationData_.absolutePosition.height = navigationData_.absolutePosition.height + navigationData_.velocity.z*dTime;
+
+    navigationData_.position.z = navigationData_.absolutePosition.height - navigationData_.homePosition.height;
+
+
+
+    //Correct with sensor values
     while (gyro_->gyroAvailable()) {
         
         //Get IMU data
@@ -128,161 +146,194 @@ void NavigationComplementaryFilter::thread() {
     }
 
 
-    while (mag_->magAvailable()) {
+    if (mag_ != nullptr) {
 
-        /*static Vector max = -1000;
-        static Vector min = 1000;
-        static Vector offset = 0;
-        static Vector scale = 1;*/
+        while (mag_->magAvailable()) {
 
-        //Get IMU data
-        Vector magVector;
-        uint32_t timestamp;
-        mag_->getMag(&magVector, &timestamp);
+            /*static Vector max = -1000;
+            static Vector min = 1000;
+            static Vector offset = 0;
+            static Vector scale = 1;*/
 
-        if (_magInitialized) {
+            //Get IMU data
+            Vector magVector;
+            uint32_t timestamp;
+            mag_->getMag(&magVector, &timestamp);
 
-            /*if (magVector.x > max.x) {
-                max.x = magVector.x;
+            if (_magInitialized) {
+
+                /*if (magVector.x > max.x) {
+                    max.x = magVector.x;
+                }
+                if (magVector.x < min.x) {
+                    min.x = magVector.x;
+                }
+                if (magVector.y > max.y) {
+                    max.y = magVector.y;
+                }
+                if (magVector.y < min.y) {
+                    min.y = magVector.y;
+                }
+                if (magVector.z > max.z) {
+                    max.z = magVector.z;
+                }
+                if (magVector.z < min.z) {
+                    min.z = magVector.z;
+                }
+
+                offset = (min + max)/2;
+                float avg = (max.x-offset.x + max.y-offset.y + max.z-offset.z)/3;
+                scale.x = avg/(max.x-offset.x);
+                scale.y = avg/(max.y-offset.y);
+                scale.z = avg/(max.z-offset.z);
+
+                Serial.println(String("Max: x:") + max.x + ", y:" + max.y + ", z:" + max.z);
+                Serial.println(String("Min: x:") + min.x + ", y:" + min.y + ", z:" + min.z);
+                Serial.println(String("Max-offset: x:") + (max.x - offset.x) + ", y:" + (max.y - offset.y) + ", z:" + (max.z - offset.z));
+                Serial.println(String("Offset: x:") + offset.x + ", y:" + offset.y + ", z:" + offset.z);
+                Serial.println(String("Scale: x:") + scale.x + ", y:" + scale.y + ", z:" + scale.z + ", avg: " + avg);
+                Serial.println();*/
+
+
+                magVector = (magVector - _magOffset).compWiseMulti(_magScale);
+
+                //Correct state prediction
+                float dt = float(timestamp - _lastMagTimestamp)/1000000.0f;
+                _lastMagTimestamp = timestamp;
+
+                float gamma = 0.1f;
+
+                //X-Axis correction
+                Vector xAxisIs(1,0,0);
+                Vector xAxisSet = (navigationData_.attitude*magVector*navigationData_.attitude.copy().conjugate()).toVector();
+                xAxisSet.z = 0;
+                xAxisSet.normalize();
+
+                Vector xAxisRotationAxis = Vector(0,0,1);
+                float xAxisRotationAngle = -atan2(xAxisSet.y, xAxisSet.x);
+
+                Quaternion xAxisCorrectionQuat = Quaternion(xAxisRotationAxis, xAxisRotationAngle*gamma*dt);
+
+
+                //Apply state correction and normalise attitude quaternion 
+                navigationData_.attitude = xAxisCorrectionQuat*navigationData_.attitude;
+                navigationData_.attitude.normalize(true);
+
+            } else if (_accelInitialized) {
+
+                //Magnetometer filter initialisation
+                _magInitialized = true;
+                _lastMagTimestamp = timestamp;
+
+                //Set heading
+                Vector xAxisIs(1,0,0);
+                Vector xAxisSet = (navigationData_.attitude*magVector*navigationData_.attitude.copy().conjugate()).toVector();
+                xAxisSet.z = 0;
+                xAxisSet.normalize();
+
+                Vector xAxisRotationAxis = Vector(0,0,1);
+                float xAxisRotationAngle = -atan2(xAxisSet.y, xAxisSet.x);
+
+                Quaternion xAxisCorrectionQuat = Quaternion(xAxisRotationAxis, xAxisRotationAngle);
+
+                //Apply state correction and normalise attitude quaternion 
+                navigationData_.attitude = xAxisCorrectionQuat*navigationData_.attitude;
+                navigationData_.attitude.normalize(true);
+
             }
-            if (magVector.x < min.x) {
-                min.x = magVector.x;
-            }
-            if (magVector.y > max.y) {
-                max.y = magVector.y;
-            }
-            if (magVector.y < min.y) {
-                min.y = magVector.y;
-            }
-            if (magVector.z > max.z) {
-                max.z = magVector.z;
-            }
-            if (magVector.z < min.z) {
-                min.z = magVector.z;
-            }
-
-            offset = (min + max)/2;
-            float avg = (max.x-offset.x + max.y-offset.y + max.z-offset.z)/3;
-            scale.x = avg/(max.x-offset.x);
-            scale.y = avg/(max.y-offset.y);
-            scale.z = avg/(max.z-offset.z);
-
-            Serial.println(String("Max: x:") + max.x + ", y:" + max.y + ", z:" + max.z);
-            Serial.println(String("Min: x:") + min.x + ", y:" + min.y + ", z:" + min.z);
-            Serial.println(String("Max-offset: x:") + (max.x - offset.x) + ", y:" + (max.y - offset.y) + ", z:" + (max.z - offset.z));
-            Serial.println(String("Offset: x:") + offset.x + ", y:" + offset.y + ", z:" + offset.z);
-            Serial.println(String("Scale: x:") + scale.x + ", y:" + scale.y + ", z:" + scale.z + ", avg: " + avg);
-            Serial.println();*/
-
-
-            magVector = (magVector - _magOffset).compWiseMulti(_magScale);
-
-            //Correct state prediction
-            float dt = float(timestamp - _lastMagTimestamp)/1000000.0f;
-            _lastMagTimestamp = timestamp;
-
-            float gamma = 0.1f;
-
-            //X-Axis correction
-            Vector xAxisIs(1,0,0);
-            Vector xAxisSet = (navigationData_.attitude*magVector*navigationData_.attitude.copy().conjugate()).toVector();
-            xAxisSet.z = 0;
-            xAxisSet.normalize();
-
-            Vector xAxisRotationAxis = Vector(0,0,1);
-            float xAxisRotationAngle = -atan2(xAxisSet.y, xAxisSet.x);
-
-            Quaternion xAxisCorrectionQuat = Quaternion(xAxisRotationAxis, xAxisRotationAngle*gamma*dt);
-
-
-            //Apply state correction and normalise attitude quaternion 
-            navigationData_.attitude = xAxisCorrectionQuat*navigationData_.attitude;
-            navigationData_.attitude.normalize(true);
-
-        } else if (_accelInitialized) {
-
-            //Magnetometer filter initialisation
-            _magInitialized = true;
-            _lastMagTimestamp = timestamp;
-
-            //Set heading
-            Vector xAxisIs(1,0,0);
-            Vector xAxisSet = (navigationData_.attitude*magVector*navigationData_.attitude.copy().conjugate()).toVector();
-            xAxisSet.z = 0;
-            xAxisSet.normalize();
-
-            Vector xAxisRotationAxis = Vector(0,0,1);
-            float xAxisRotationAngle = -atan2(xAxisSet.y, xAxisSet.x);
-
-            Quaternion xAxisCorrectionQuat = Quaternion(xAxisRotationAxis, xAxisRotationAngle);
-
-            //Apply state correction and normalise attitude quaternion 
-            navigationData_.attitude = xAxisCorrectionQuat*navigationData_.attitude;
-            navigationData_.attitude.normalize(true);
 
         }
 
     }
 
 
-    if (baro_->pressureAvailable()) {
+    //Make sure baro module is valid before using.
+    if (baro_ != nullptr) {
 
-        //Get IMU data
-        float pressure;
-        uint32_t timestamp;
-        baro_->getPressure(&pressure, &timestamp);
+        while (baro_->pressureAvailable()) {
 
-        //Check if accelerometer initialised
-        if (_baroInitialized) {
-            
-            //Correct state prediction
-            float dt = float(timestamp - _lastBaroTimestamp)/1000000.0f;
-            _lastBaroTimestamp = timestamp;
+            //Get IMU data
+            float pressure;
+            uint32_t timestamp;
+            baro_->getPressure(&pressure, &timestamp);
 
-            float beta = 0.06f;
+            //Check if accelerometer initialised
+            if (_baroInitialized) {
+                
+                //Correct state prediction
+                float dt = float(timestamp - _lastBaroTimestamp)/1000000.0f;
+                _lastBaroTimestamp = timestamp;
 
-            //calculate height from new pressure value
-            float heightAbsolute = _getHeightFromPressure(pressure, 100e3f);
-            //float heightRelative = heightAbsolute - navigationData_.absolutePosition.height;
-            //calculate z velocity from new height value
-            float zVelocity = (heightAbsolute - _lastHeightValue)/dt;
+                float beta = 0.06f;
 
-            //correct dead reckoning values with new ones.
-            float heightError = (heightAbsolute - navigationData_.absolutePosition.height);
-            navigationData_.absolutePosition.height += heightError*beta;
-            navigationData_.velocity.z += (zVelocity - navigationData_.velocity.z)*beta*2;
+                //calculate height from new pressure value
+                float heightAbsolute = _getHeightFromPressure(pressure, 100e3f);
+                //float heightRelative = heightAbsolute - navigationData_.absolutePosition.height;
+                //calculate z velocity from new height value
+                float zVelocity = (heightAbsolute - _lastHeightValue)/dt;
 
-            //Update relative position
-            navigationData_.position.z = navigationData_.absolutePosition.height - navigationData_.homePosition.height;
+                //correct dead reckoning values with new ones.
+                float heightError = (heightAbsolute - navigationData_.absolutePosition.height);
+                navigationData_.absolutePosition.height += heightError*beta;
+                navigationData_.velocity.z += (zVelocity - navigationData_.velocity.z)*beta*2;
 
-            //Update last Height value
-            _lastHeightValue = heightAbsolute;
+                //Update relative position
+                navigationData_.position.z = navigationData_.absolutePosition.height - navigationData_.homePosition.height;
+
+                //Update last Height value
+                _lastHeightValue = heightAbsolute;
 
 
-        } else {
-            
-            //Set flag to true
-            _baroInitialized = true;
-            
-            //Barometer filter initialisation
-            _lastBaroTimestamp = timestamp;
-            _lastHeightValue = _getHeightFromPressure(pressure, 100e3f);
+            } else {
+                
+                //Set flag to true
+                _baroInitialized = true;
+                
+                //Barometer filter initialisation
+                _lastBaroTimestamp = timestamp;
+                _lastHeightValue = _getHeightFromPressure(pressure, 100e3f);
 
-            //Set current calculated height as start value.
-            navigationData_.absolutePosition.height = _lastHeightValue;
+                //Set current calculated height as start value.
+                navigationData_.absolutePosition.height = _lastHeightValue;
+
+            }
 
         }
 
     }
 
+    
+    
+    if (gnss_ != nullptr) {
 
-    navigationData_.velocity = navigationData_.velocity + navigationData_.linearAcceleration*dTime;
-    navigationData_.position.x += navigationData_.velocity.x*dTime;
-    navigationData_.position.y += navigationData_.velocity.y*dTime;
+        while (gnss_->positionAvailable()) {
 
-    navigationData_.absolutePosition.height = navigationData_.absolutePosition.height + navigationData_.velocity.z*dTime;
+            WorldPosition positionAbsolute; uint32_t time;
+            if (gnss_->getPosition(&positionAbsolute, &time)) {
 
-    navigationData_.position.z = navigationData_.absolutePosition.height - navigationData_.homePosition.height;
+                float beta = 0.1;
+
+                navigationData_.absolutePosition = positionAbsolute;
+
+                Vector positionBuf = positionAbsolute.getPositionVectorFrom(navigationData_.homePosition);
+
+                navigationData_.position += (positionBuf - navigationData_.position)*beta;
+
+            }
+
+            Vector velocityBuf;
+            if (gnss_->getVelocity(&velocityBuf, &time)) {
+
+                float beta = 0.1;
+
+                navigationData_.velocity += (velocityBuf - navigationData_.velocity)*beta;
+
+            }
+
+        }
+
+    }
+
 
     navigationData_.timestamp = micros();
 

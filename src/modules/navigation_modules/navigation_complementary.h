@@ -25,6 +25,7 @@
 #include "modules/sensor_modules/accelerometer_modules/accelerometer_interface.h"
 #include "modules/sensor_modules/magnetometer_modules/magnetometer_interface.h"
 #include "modules/sensor_modules/barometer_modules/barometer_interface.h"
+#include "modules/sensor_modules/gnss_modules/gnss_interface.h"
 
 #include "utils/high_pass_filter.h"
 #include "utils/low_pass_filter.h"
@@ -113,13 +114,16 @@ public:
 private:
 
     //Gyro that will be used by Navigation module
-    Gyroscope_Interface* gyro_;
+    Gyroscope_Interface* gyro_ = nullptr;
     //Accelerometer that will be used by Navigation module
-    Accelerometer_Interface* accel_;
+    Accelerometer_Interface* accel_ = nullptr;
     //Magnetometer that will be used by Navigation module
-    Magnetometer_Interface* mag_;
+    Magnetometer_Interface* mag_ = nullptr;
     //Barometer that will be used by Navigation module
-    Barometer_Interface* baro_;
+    Barometer_Interface* baro_ = nullptr;
+    //GNSS module to use
+    GNSS_Interface* gnss_ = nullptr;
+    
 
     //Storage container for navigationData
     NavigationData navigationData_;

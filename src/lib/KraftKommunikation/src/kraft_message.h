@@ -171,7 +171,7 @@ public:
 
     bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
 
-        setString((char*)(dataBytes+startByte));
+        setString((char*)(dataBytes)+startByte);
 
         return true;
 

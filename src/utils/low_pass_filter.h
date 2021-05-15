@@ -58,7 +58,7 @@ public:
      * @param values input value
      * @return filtered value.
      */
-    T update(T input) {
+    T update(const T &input) {
         
         if (_sampleRate == -1) {
             float dt = (micros() - _lastRun)/1000000.0;
@@ -81,7 +81,7 @@ public:
      * @param values input value and timestamp in microseconds
      * @return filtered value.
      */
-    T update(T input, uint32_t timestampUS) {
+    T update(const T &input, const uint32_t &timestampUS) {
         
         float dt = (timestampUS - _lastRun)/1000000.0;
         _lastRun = timestampUS;
@@ -120,7 +120,7 @@ public:
 
 private:
 
-    uint32_t _sampleRate;
+    int32_t _sampleRate;
     float _cutOffFreq;
     float _RC;
 

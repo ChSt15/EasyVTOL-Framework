@@ -7,6 +7,15 @@
 
 
 
+namespace {
+
+    const double c_earthRadius = 6371.0e3;
+    const double c_earthMass = 5.9722e24;
+    
+}
+
+
+
 /**
  * This enum is for the navigation attitude solution
  */
@@ -53,6 +62,32 @@ struct WorldPosition {
     double longitude;
     //In meters above MSL
     float height;
+
+    /**
+     * This is fairly computational due to usage of double values.
+     * 
+     * This calculates the position in reference to the given reference point. 
+     * X is distance towards north from reference. 
+     * Y is distance towards West from reference. 
+     * Z is height above reference. 
+     * 
+     * @param WorldPosition Reference point for position
+     * @returns position vector
+     */
+    Vector getPositionVectorFrom(const WorldPosition &referencePoint) {
+
+        float heightRef = height - referencePoint.height;
+
+        double radius = c_earthRadius + height;
+        float cosLat = cosf(referencePoint.latitude); 
+
+        float north = (latitude - referencePoint.latitude)*radius;
+        float west = (longitude - referencePoint.longitude)*radius*cosLat;
+
+        return Vector(north, west, heightRef);
+
+    }
+
 };
 
 

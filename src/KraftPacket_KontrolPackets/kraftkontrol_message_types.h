@@ -91,7 +91,7 @@ public:
 
     bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
 
-        if (dataByteSize < sizeof(Vector)) return false;
+        if (dataByteSize < getDataSize()) return false;
 
         memcpy(dataBytes, &position_, sizeof(Vector));
         memcpy(dataBytes + sizeof(Vector), &timestamp_, sizeof(uint32_t));
@@ -102,7 +102,7 @@ public:
 
     bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
 
-        if (dataByteSize < sizeof(Vector)) return false;
+        if (dataByteSize < getDataSize()) return false;
 
         memcpy(&position_, dataBytes, sizeof(Vector));
         memcpy(&timestamp_, dataBytes + sizeof(Vector), sizeof(uint32_t));

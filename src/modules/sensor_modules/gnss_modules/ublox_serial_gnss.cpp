@@ -25,8 +25,9 @@ void UbloxSerialGNSS::_getData() {
     velocityFifo_.push_front(velocity);
     velocityTimestampFifo_.push_front(time);
 
-    positionDeviation_ = gnss_.getHorizontalAccuracy();
-    altitudeDeviation_ = gnss_.getVerticalAccuracy();
+    //positionDeviation_ = gnss_.getHorizontalAccuracy(0);
+    //altitudeDeviation_ = gnss_.getVerticalAccuracy(0);
+
 
     positionCounter_++;
     velocityCounter_++;
@@ -107,9 +108,9 @@ void UbloxSerialGNSS::init() {
         gnss_.setSerialRate(115200);
         serialPort_->begin(115200);
 
-        gnss_.setUART1Output(COM_TYPE_UBX);
+        //gnss_.setUART1Output(COM_TYPE_UBX & COM_TYPE_NMEA & COM_TYPE_RTCM3);
         gnss_.setNavigationFrequency(10);
-        //gnss_.setAutoPVT(true);
+        gnss_.setAutoPVT(true);
         gnss_.assumeAutoPVT(true, true);
         gnss_.setDynamicModel(DYN_MODEL_AIRBORNE4g);
 

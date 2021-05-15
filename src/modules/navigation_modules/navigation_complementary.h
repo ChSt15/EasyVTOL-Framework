@@ -25,6 +25,7 @@
 #include "modules/sensor_modules/accelerometer_modules/accelerometer_interface.h"
 #include "modules/sensor_modules/magnetometer_modules/magnetometer_interface.h"
 #include "modules/sensor_modules/barometer_modules/barometer_interface.h"
+#include "modules/sensor_modules/gnss_modules/gnss_interface.h"
 
 #include "utils/high_pass_filter.h"
 #include "utils/low_pass_filter.h"
@@ -43,12 +44,14 @@ public:
      * @param accel module to use.
      * @param mag module to use.
      * @param baro module to use.
+     * @param gnss module to use.
      */
-    NavigationComplementaryFilter(Gyroscope_Interface* gyro, Accelerometer_Interface* accel, Magnetometer_Interface* mag, Barometer_Interface* baro) : Task_Abstract(8000, eTaskPriority_t::eTaskPriority_VeryHigh, true) {
+    NavigationComplementaryFilter(Gyroscope_Interface* gyro, Accelerometer_Interface* accel, Magnetometer_Interface* mag = nullptr, Barometer_Interface* baro = nullptr, GNSS_Interface* gnss = nullptr) : Task_Abstract(8000, eTaskPriority_t::eTaskPriority_VeryHigh, true) {
         gyro_ = gyro;
         accel_ = accel;
         mag_ = mag;
         baro_ = baro;
+        gnss_ = gnss;
     }
 
     /**
@@ -113,21 +116,26 @@ public:
 private:
 
     //Gyro that will be used by Navigation module
-    Gyroscope_Interface* gyro_;
+    Gyroscope_Interface* gyro_ = nullptr;
     //Accelerometer that will be used by Navigation module
-    Accelerometer_Interface* accel_;
+    Accelerometer_Interface* accel_ = nullptr;
     //Magnetometer that will be used by Navigation module
-    Magnetometer_Interface* mag_;
+    Magnetometer_Interface* mag_ = nullptr;
     //Barometer that will be used by Navigation module
-    Barometer_Interface* baro_;
+    Barometer_Interface* baro_ = nullptr;
+    //GNSS module that will be used by Navigation module.
+    GNSS_Interface* gnss_ = nullptr;
+    
 
     //Storage container for navigationData
     NavigationData navigationData_;
 
     //Filter data
-    HighPassFilter<Vector> _gyroHPF = HighPassFilter<Vector>(0.001);
+    LowPassFilter<Vector> gyroLPF_ = LowPassFilter<Vector>(0.01);
 
-    LowPassFilter<Vector> accelLPF_ = LowPassFilter<Vector>(0.2);
+    LowPassFilter<Vector> accelBiasLPF_ = LowPassFilter<Vector>(0.2);
+
+    LowPassFilter<Vector> accelLPF_ = LowPassFilter<Vector>(3000);
 
     uint32_t _lastGyroTimestamp = 0;
     uint32_t _lastAccelTimestamp = 0;

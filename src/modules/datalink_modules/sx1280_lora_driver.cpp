@@ -67,16 +67,18 @@ void SX1280Driver::internalLoop() {
 
             if (packetL != 0) { // make sure packet is okay
 
+                receivedDataRSSI_ = radio_.readPacketRSSI();
+                receivedDataSNR_ = radio_.readPacketSNR();
+
                 radio_.startReadSXBuffer(0);
 
                 int i;
                 for (i = 0; i < packetL && i < SX1280_DATA_BUFFER_SIZE; i++) receivedData_[i] = radio_.readUint8();
+                //radio_.readBuffer(receivedData_);
 
                 radio_.endReadSXBuffer();
 
-                receivedDataRSSI_ = radio_.readPacketRSSI();
-                receivedDataSNR_ = radio_.readPacketSNR();
-
+                
                 receivedDataSize_ = packetL;
 
                 #ifdef SX1280_DEBUG
@@ -124,7 +126,8 @@ void SX1280Driver::internalLoop() {
 
         radio_.clearIrqStatus(IRQ_RADIO_ALL); 
 
-        radio_.receive(receivedData_, SX1280_DATA_BUFFER_SIZE, 0, NO_WAIT);
+        //radio_.receive(receivedData_, SX1280_DATA_BUFFER_SIZE, 0, NO_WAIT);
+        radio_.receiveSXBuffer(0, 0, NO_WAIT);
 
     }
 

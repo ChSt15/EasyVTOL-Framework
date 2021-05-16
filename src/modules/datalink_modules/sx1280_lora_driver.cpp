@@ -130,7 +130,7 @@ void SX1280Driver::internalLoop() {
 
 
     
-    if (toSendDataSize_ > 0 && !isBusySending_) { 
+    if (toSendDataSize_ > 0 && !isBusySending_ && !digitalRead(busyPin_)) { 
 
         isBusySending_ = true;
 
@@ -181,7 +181,7 @@ void SX1280Driver::init() {
 
 
 
-bool SX1280Driver::busy() {return isBusySending_;}
+bool SX1280Driver::busy() {return isBusySending_ || toSendDataSize_ > 0;}
 
 
 

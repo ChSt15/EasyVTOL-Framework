@@ -124,7 +124,8 @@ void SX1280Driver::internalLoop() {
 
         radio_.clearIrqStatus(IRQ_RADIO_ALL); 
 
-        radio_.receive(receivedData_, SX1280_DATA_BUFFER_SIZE, 0, NO_WAIT);
+        //radio_.receive(receivedData_, SX1280_DATA_BUFFER_SIZE, 0, NO_WAIT);
+        radio_.receiveSXBuffer(0, 0, NO_WAIT);
 
     }
 
@@ -135,6 +136,11 @@ void SX1280Driver::internalLoop() {
         isBusySending_ = true;
 
         radio_.transmit(toSendData_, toSendDataSize_, 0, SX1280_POWER_dB, NO_WAIT);
+        /*radio_.startWriteSXBuffer(0);
+        radio_.writeBuffer(toSendData_, toSendDataSize_);
+        radio_.endWriteSXBuffer();
+
+        radio_.transmitSXBuffer(0, toSendDataSize_, 0, SX1280_POWER_dB, NO_WAIT);*/
 
         #ifdef SX1280_DEBUG
             Serial.println("Sending data packet!");

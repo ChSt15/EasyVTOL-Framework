@@ -58,7 +58,7 @@ public:
      * @param values input value
      * @return filtered value.
      */
-    T update(const T &input) {
+    T update(T input) {
         
         if (_sampleRate == -1) {
             float dt = (micros() - _lastRun)/1000000.0;

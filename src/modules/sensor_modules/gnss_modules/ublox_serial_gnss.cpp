@@ -99,7 +99,7 @@ void UbloxSerialGNSS::init() {
     }
 
     if (moduleStatus_ == eModuleStatus_t::eModuleStatus_NotStarted) serialPort_->begin(115200);
-    else serialPort_->begin(9600*max(serialBaudMulti_,1));
+    else serialPort_->begin(9600*max(serialBaudMulti_,uint32_t(1)));
 
     if (gnss_.begin(*serialPort_)) {
 

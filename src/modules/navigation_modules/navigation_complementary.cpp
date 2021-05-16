@@ -320,11 +320,13 @@ void NavigationComplementaryFilter::thread() {
 
                 float beta = 0.1;
 
-                navigationData_.absolutePosition = positionAbsolute;
+                navigationData_.absolutePosition.latitude = positionAbsolute.latitude;
+                navigationData_.absolutePosition.longitude = positionAbsolute.longitude;
 
                 Vector positionBuf = positionAbsolute.getPositionVectorFrom(navigationData_.homePosition);
 
-                navigationData_.position += (positionBuf - navigationData_.position)*beta;
+                navigationData_.position.x += (positionBuf.x - navigationData_.position.x)*beta;
+                navigationData_.position.y += (positionBuf.y - navigationData_.position.y)*beta;
 
             }
 

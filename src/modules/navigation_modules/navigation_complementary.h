@@ -92,6 +92,7 @@ public:
     virtual void setHome(WorldPosition homePosition) {
 
         navigationData_.homePosition = homePosition;
+        navigationData_.position = Vector(0);
 
     }
 

@@ -18,9 +18,13 @@ A flight controller framework using the Arduino Framework (Current development i
 - [ ] Improve comments in code.
 - [ ] Create documentation.
 - [ ] Idk, you tell me...
-## TRL: 3
 ## Installation Commands:
 To initialise submodules used: 
 ```
 git submodule update --init --recursive
 ```
+## ToDo:
+- [ ] Add new data containers.
+- [ ] Migrate to single universal time system. E.g. NOW() and returns runtime int64_t in nanoseconds. Should also solve problem with overflow. This can then be used to simulate later.
+- [ ] Add error calculation system for measurements and sensor fusion. This should make error calculation automatic.
+

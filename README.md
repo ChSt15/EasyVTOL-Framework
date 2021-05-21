@@ -8,7 +8,7 @@ A flight controller framework using the Arduino Framework (Current development i
 - [ ] Add position/velocity and acceleration to Sensorfusion using accelerometer and GPS.
 - [ ] Test and tune GNSS position correction for complementary sensorfustion
 - [ ] Prepare for first alpha version to be released.
-- [ ] Release first alpha version. Yay!
+- [ ] Released first alpha version. Yay!
 - [ ] Improve sensorfusion algorithm and auto-adjustment algorithm for filter factors.
 - [ ] Implement Starship vehicle and test.
 - [ ] Implement standard modules for common vehicle types. (E.g. Quadcopter, Plane)
@@ -25,6 +25,7 @@ git submodule update --init --recursive
 ```
 ## ToDo:
 - [ ] Add new data containers.
+- [ ] Add HMC5883 magnetometer sensor driver.
 - [ ] Migrate to single universal time system. E.g. NOW() and returns runtime int64_t in nanoseconds. Should also solve problem with overflow. This can later be used to simulate modules.
 - [ ] Add buffer with queue, stack, sorting, median, average, deviation calculations.
 - [ ] Add error calculation system for measurements and sensor fusion. This should make error calculation automatic.

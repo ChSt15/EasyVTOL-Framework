@@ -24,7 +24,7 @@ To initialise submodules used:
 git submodule update --init --recursive
 ```
 ## ToDo:
-- [ ] Add new data containers.
+- [x] Add new data containers.
 - [ ] Add HMC5883 magnetometer sensor driver.
 - [ ] Migrate to single universal time system. E.g. NOW() and returns runtime int64_t in nanoseconds. Should also solve problem with overflow. This can later be used to simulate modules.
 - [ ] Add buffer with queue, stack, sorting, median, average, deviation calculations.

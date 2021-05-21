@@ -1,5 +1,5 @@
-#ifndef eControlMode_DATA_H
-#define eControlMode_DATA_H
+#ifndef CONTROL_DATA_H
+#define CONTROL_DATA_H
 
 
 

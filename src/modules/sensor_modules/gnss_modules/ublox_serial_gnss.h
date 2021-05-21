@@ -183,6 +183,13 @@ public:
      */
     uint8_t getNumSatellites() {return numSats_;}
 
+    /**
+     * @returns true if GNSS lock is valid and safe.
+     */
+    bool getGNSSLockValid() {
+        return lockValid_;
+    }
+
 
 private:
 
@@ -200,7 +207,14 @@ private:
 
     uint8_t numSats_ = 0;
 
+    //Values used to determine true fix
+    uint8_t minNumSats_ = 6;
+    float maxError_ = 600;
+
+    bool lockValid_ = false;
+
     IntervalControl rateCalcInterval_ = IntervalControl(1); 
+    uint32_t lastMeasurement_ = 0;
 
     HardwareSerial* serialPort_;
     uint32_t serialBaudMulti_ = 1;

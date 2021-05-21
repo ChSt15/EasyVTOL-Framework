@@ -4,20 +4,20 @@
 
 
 #include "lib/Math-Helper/src/3d_math.h"
+#include "data_container_base.h"
 
 
 
 /**
  * Dynamic data is usually in local coordinate system!.
  */
-struct DynamicData {
+class DynamicData: public DataContainerTimestamped_Base {
+public:
 
     //Force in Newtons.
     Vector force;
     //Torqe in Nm.
     Vector torqe;
-    //Data timestamp in microseconds
-    uint32_t timestamp = 0;
     
 };
 

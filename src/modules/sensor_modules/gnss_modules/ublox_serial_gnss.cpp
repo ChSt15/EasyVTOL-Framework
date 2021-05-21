@@ -8,6 +8,15 @@ void UbloxSerialGNSS::_getData() {
 
     numSats_ = gnss_.getSIV();
 
+    positionDeviation_ = (float)gnss_.getHorizontalAccEst()/1000.0f;
+    altitudeDeviation_ = (float)gnss_.getVerticalAccEst()/1000.0f;
+
+    //gnss_.getSurveyInMeanAccuracy();
+
+    //gnss_.getPositionAccuracy();
+
+    //if ()
+
     WorldPosition position;
     position.latitude = (double)gnss_.getLatitude()*10e7;
     position.longitude = (double)gnss_.getLongitude()*10e7;
@@ -31,6 +40,12 @@ void UbloxSerialGNSS::_getData() {
 
     positionCounter_++;
     velocityCounter_++;
+
+    if (numSats_ >= minNumSats_) {
+        lockValid_ = true;
+    } else {
+        lockValid_ = false;
+    }
 
 }
 
@@ -57,6 +72,13 @@ void UbloxSerialGNSS::thread() {
         if (gnss_.getPVT()) { //If high then data is ready in the gps FIFO
 
             _getData();
+            lastMeasurement_ = micros();
+
+        } else if (micros() - lastMeasurement_ >= 500000) {
+
+            /*gnss_.factoryDefault(100);
+            init();*/
+            lastMeasurement_ = micros();
 
         }
 
@@ -105,11 +127,17 @@ void UbloxSerialGNSS::init() {
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Running;
 
+        //gnss_.factoryDefault();
+
+        //delay(100);
+
         gnss_.setSerialRate(115200);
         serialPort_->begin(115200);
 
         //gnss_.setUART1Output(COM_TYPE_UBX & COM_TYPE_NMEA & COM_TYPE_RTCM3);
         gnss_.setNavigationFrequency(10);
+        //gnss_.setMeasurementRate(10);
+        //gnss_.setNavigationRate(10);
         gnss_.setAutoPVT(true);
         gnss_.assumeAutoPVT(true, true);
         gnss_.setDynamicModel(DYN_MODEL_AIRBORNE4g);

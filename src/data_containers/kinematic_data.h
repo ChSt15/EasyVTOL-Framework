@@ -4,32 +4,52 @@
 
 
 #include "lib/Math-Helper/src/3d_math.h"
+#include "data_container_base.h"
 
 
 
 /**
- * Kinetic data is usually in world coordinate system!.
+ * Container for attitude kinematic data.
  */
-struct KinematicData {
+class AttitudeData: virtual public DataContainerTimestamped_Base {
+public:
 
-    //Position in meters.
-    Vector position;
-    //Velocity in m/s.
-    Vector velocity;
-    //Acceleration in m/s/s.
-    Vector acceleration;
-    //Acceleration without gravity.
-    Vector linearAcceleration;
-
-    //Attitude is without units as it is a quaternion. No idea what unit it should have ¯\_(ツ)_/¯
-    Quaternion attitude = Quaternion(1,0,0,0);
-    //Angular rate in radians/s.
-    Vector angularRate;
-    //Angular acceleration in radians/s/s.
     Vector angularAcceleration;
+    Vector angularRate;
+    Quaternion attitude;
 
-    //Data timestamp in microseconds
-    uint32_t timestamp = 0;
+};
+
+
+/**
+ * Container for position kinematic data.
+ */
+class PositionData: virtual public DataContainerTimestamped_Base {
+public:
+
+    Vector acceleration;
+    //Acceleration with gravity removed
+    Vector linearAcceleration;
+    Vector velocity;
+    Vector position;
+
+};
+
+
+
+/**
+ * Container for attitude and position kinematic data.
+ */
+class KinematicData: public PositionData, public AttitudeData {
+public:
+
+    /**
+     * Uses data to predict next state after dTime
+     * @param dTime Amount of time to predict in micros
+     */
+    KinematicData getStatePrediction(const uint32_t &dTime) {
+        return *this;
+    }
     
 };
 

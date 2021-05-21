@@ -19,7 +19,7 @@ namespace {
 /**
  * This enum is for the navigation attitude solution
  */
-enum eNavAttitudeMode_t {
+enum eNavAttitudeMode_t: uint8_t {
     //No attitude solution.
     eNavAttitudeMode_None,
     //Only angular rate can be measured.
@@ -33,7 +33,7 @@ enum eNavAttitudeMode_t {
 /**
  * This enum is for the navigation position solution
  */
-enum eNavPositionMode_t {
+enum eNavPositionMode_t: uint8_t {
     //No position solution.
     eNavPositionMode_None,
     //Solution using only barometer data. No position available. Height accuracy is medium.

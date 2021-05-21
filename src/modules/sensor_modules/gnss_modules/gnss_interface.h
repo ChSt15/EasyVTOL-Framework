@@ -108,6 +108,10 @@ public:
      */
     virtual uint8_t getNumSatellites() = 0;
 
+    /**
+     * @returns true if GNSS lock is valid and safe.
+     */
+    virtual bool getGNSSLockValid() = 0;
     
 };
 

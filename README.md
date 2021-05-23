@@ -25,7 +25,8 @@ git submodule update --init --recursive
 ```
 ## ToDo:
 - [x] Add new data containers.
-- [ ] Add buffer with queue, stack, sorting, median, average, deviation calculations.
+- [x] Add buffer with queue, stack, sorting, median, average, deviation calculations.
+- [ ] Migrate to new buffer class.
 - [ ] Migrate to single universal time system. E.g. NOW() and returns runtime int64_t in nanoseconds. Should also solve problem with overflow. This can later be used to simulate modules.
 - [ ] Add HMC5883 magnetometer sensor driver.
 - [ ] Add error calculation system for measurements and sensor fusion. This should make error calculation automatic.

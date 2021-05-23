@@ -13,7 +13,7 @@
 #include "modules/module_abstract.h"
 
 #include "lib/SparkFun_u-blox_GNSS/src/SparkFun_u-blox_GNSS_Arduino_Library.h"
-#include "utils/circular_buffer.h"
+#include "utils/buffer.h"
 
 
 
@@ -75,10 +75,10 @@ public:
      */
     bool getPosition(WorldPosition* position, uint32_t* positionTimestamp) {
 
-        if (!positionFifo_.available()) return false;
+        if (positionFifo_.available() == 0) return false;
 
-        *position = positionFifo_.pop_back();
-        *positionTimestamp = positionTimestampFifo_.pop_back();
+        positionFifo_.takeBack(position);
+        positionTimestampFifo_.takeBack(positionTimestamp);
 
         return true;
 
@@ -93,10 +93,10 @@ public:
      */
     bool peekPosition(WorldPosition* position, uint32_t* positionTimestamp) {
 
-        if (!positionFifo_.available()) return false;
+        if (positionFifo_.available() == 0) return false;
 
-        *position = *positionFifo_.peek_back();
-        *positionTimestamp = *positionTimestampFifo_.peek_back();
+        positionFifo_.peekBack(position);
+        positionTimestampFifo_.peekBack(positionTimestamp);
 
         return true;
 
@@ -143,10 +143,10 @@ public:
      */
     bool getVelocity(Vector* velocity, uint32_t* velocityTimestamp) {
 
-        if (!velocityFifo_.available()) return false;
+        if (velocityFifo_.available() == 0) return false;
 
-        *velocity = velocityFifo_.pop_back();
-        *velocityTimestamp = velocityTimestampFifo_.pop_back();
+        velocityFifo_.takeBack(velocity);
+        velocityTimestampFifo_.takeBack(velocityTimestamp);
 
         return true;
 
@@ -161,10 +161,10 @@ public:
      */
     bool peekVelocity(Vector* velocity, uint32_t* velocityTimestamp) {
 
-        if (!velocityFifo_.available()) return false;
+        if (velocityFifo_.available() == 0) return false;
 
-        *velocity = *velocityFifo_.peek_back();
-        *velocityTimestamp = *velocityTimestampFifo_.peek_back();
+        velocityFifo_.peekBack(velocity);
+        velocityTimestampFifo_.peekBack(velocityTimestamp);
 
         return true;
 
@@ -196,10 +196,10 @@ private:
     void _getData();
 
 
-    Circular_Buffer <WorldPosition, 10> positionFifo_;
-    Circular_Buffer <Vector, 10> velocityFifo_;
-    Circular_Buffer <uint32_t, 10> positionTimestampFifo_;
-    Circular_Buffer <uint32_t, 10> velocityTimestampFifo_;
+    Buffer <WorldPosition, 10> positionFifo_;
+    Buffer <Vector, 10> velocityFifo_;
+    Buffer <uint32_t, 10> positionTimestampFifo_;
+    Buffer <uint32_t, 10> velocityTimestampFifo_;
 
     float positionDeviation_ = -1;
     float altitudeDeviation_ = -1;

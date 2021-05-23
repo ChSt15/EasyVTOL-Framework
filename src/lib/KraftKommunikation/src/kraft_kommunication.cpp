@@ -104,8 +104,8 @@ bool KraftKommunication::sendMessage(KraftMessage_Interface* kraftMessage, const
 
     }
 
-    if (requiresAck) sendPacketsACK_.push_front(packetData);
-    else sendPackets_.push_front(packetData);
+    if (requiresAck) sendPacketsACK_.placeFront(packetData);
+    else sendPackets_.placeFront(packetData);
 
     return true;
 
@@ -117,8 +117,8 @@ bool KraftKommunication::getMessage(KraftMessage_Interface* kraftMessage, const 
 
     ReceivedPayloadData payloadData;
     
-    if (!peek) payloadData = receivedPackets_.pop_back();
-    else payloadData = *receivedPackets_.peek_back();
+    if (!peek) receivedPackets_.takeBack(&payloadData);
+    else receivedPackets_.peekBack(&payloadData);
 
     return kraftMessage->setRawData(payloadData.dataBuffer, payloadData.messageData.payloadSize);
 
@@ -133,12 +133,13 @@ void KraftKommunication::loop() {
 
         if (sendPackets_.available()) {
 
-            SendPacketData packet = sendPackets_.pop_back();
+            SendPacketData packet;
+            sendPackets_.takeBack(&packet);
             dataLink_->sendBuffer(packet.dataBuffer, packet.bufferSize);
             
         } else if (sendPacketsACK_.available()) {
 
-            SendPacketData* packet = sendPacketsACK_.peek_back();
+            SendPacketData* packet = &sendPacketsACK_[0];
 
             if (nodeData_[packet->receivingNodeID].waitingOnPacket == nullptr) { 
 
@@ -155,7 +156,7 @@ void KraftKommunication::loop() {
                     
                     if (packet->sendAttempts == 0) {
 
-                        sendPacketsACK_.pop_back();
+                        sendPacketsACK_.removeBack();
                         nodeData_[packet->receivingNodeID].waitingOnPacket = nullptr;
 
                     } else {
@@ -202,7 +203,7 @@ void KraftKommunication::loop() {
                     switch (message.messageData.payloadID) {
                     case eKraftMessageType_t::eKraftMessageType_Ack_ID:
                         
-                        sendPacketsACK_.pop_back();
+                        sendPacketsACK_.removeBack();
                         nodeData_[message.messageData.transmitterID].waitingOnPacket = nullptr; 
 
                         //Serial.println("Packet was an ACK");
@@ -224,7 +225,7 @@ void KraftKommunication::loop() {
                     default:
 
                         //Serial.println("Packet was of an unkown type: " + String(message.messageData.payloadID) + ". Placing in buffer.");
-                        receivedPackets_.push_front(message);
+                        receivedPackets_.placeFront(message);
                         
                         break;
 

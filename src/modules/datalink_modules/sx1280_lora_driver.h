@@ -13,8 +13,6 @@
 
 #include "modules/module_abstract.h"
 
-#include "utils/circular_buffer.h"
-
 
 
 //Lora radio settings.

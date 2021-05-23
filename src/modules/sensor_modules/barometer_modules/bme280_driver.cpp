@@ -11,24 +11,24 @@ void BME280Driver::_getData() {
 
     float bufMeasurement = measurements.pressure;
     if (bufMeasurement > 100) {
-        _pressureFifo.push_front(bufMeasurement);
-        _pressureTimestampFifo.push_front(_newDataTimestamp);
+        _pressureFifo.placeFront(bufMeasurement, true);
+        _pressureTimestampFifo.placeFront(_newDataTimestamp, true);
         _lastPressure = bufMeasurement;
         _pressureCounter++;
     }
 
     bufMeasurement = measurements.temperature;
     if (true) {
-        _temperatureFifo.push_front(bufMeasurement);
-        _temperatureTimestampFifo.push_front(_newDataTimestamp);
+        _temperatureFifo.placeFront(bufMeasurement, true);
+        _temperatureTimestampFifo.placeFront(_newDataTimestamp, true);
         _lastTemperature = bufMeasurement;
         _temperatureCounter++;
     }
 
     bufMeasurement = measurements.humidity;
     if (true) {
-        _humidityFifo.push_front(bufMeasurement);
-        _humidityTimestampFifo.push_front(_newDataTimestamp);
+        _humidityFifo.placeFront(bufMeasurement, true);
+        _humidityTimestampFifo.placeFront(_newDataTimestamp, true);
         _lastHumidity = bufMeasurement;
         _humidityCounter++;
     }

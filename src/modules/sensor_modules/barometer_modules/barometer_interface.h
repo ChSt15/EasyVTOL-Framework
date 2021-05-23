@@ -22,7 +22,7 @@ public:
      *
      * @return bool.
      */
-    virtual bool pressureAvailable() = 0;
+    virtual uint32_t pressureAvailable() = 0;
 
     /**
      * Returns rate (in Hz) of new sensor data

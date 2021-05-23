@@ -24,7 +24,7 @@ public:
      * @param values none.
      * @return bool.
      */
-    virtual bool accelAvailable() = 0;
+    virtual uint32_t accelAvailable() = 0;
 
     /**
      * Returns rate (in Hz) of the new sensor data

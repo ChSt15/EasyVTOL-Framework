@@ -10,8 +10,8 @@ void ADS1115Driver::_getData() {
 
     //adc_.readADC(currentPin_);
 
-    voltageTimestampFifo_[currentPin_].push_front(micros());
-    voltageFifo_[currentPin_].push_front(adc_.toVoltage(adc_.getValue()));
+    voltageTimestampFifo_[currentPin_].placeFront(micros(), true);
+    voltageFifo_[currentPin_].placeFront(adc_.toVoltage(adc_.getValue()), true);
 
     currentPin_++;
     if (currentPin_ >= 4) currentPin_ = 0;

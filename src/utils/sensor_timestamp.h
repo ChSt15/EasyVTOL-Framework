@@ -4,7 +4,7 @@
 
 
 template<typename T>
-struct SensorTimestamp {
+struct SensorTimestamp{
 
     SensorTimestamp(T sensorData, uint32_t sensorTimestamp) {
         this->sensorData = sensorData;

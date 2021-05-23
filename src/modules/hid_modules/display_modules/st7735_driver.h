@@ -15,8 +15,6 @@
 
 #include "TFT_eSPI.h"
 
-#include "utils/circular_buffer.h"
-
 
 
 class ST7735Driver: public Display_Interface, public Module_Abstract, public Task_Abstract {

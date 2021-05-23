@@ -24,7 +24,7 @@ public:
      * @param channel which channel to check if data available
      * @return bool.
      */
-    virtual bool voltageAvailable(uint8_t channel = 0) = 0;
+    virtual uint32_t voltageAvailable(uint8_t channel = 0) = 0;
 
     /**
      * Returns rate (in Hz) of new sensor data

@@ -11,7 +11,7 @@
 
 #include "data_containers/kinematic_data.h"
 
-#include "utils/circular_buffer.h"
+#include "utils/buffer.h"
 
 
 
@@ -67,7 +67,7 @@ public:
 
 private:
 
-    Circular_Buffer<KinematicData, 100> _path;
+    Buffer<KinematicData, 100> _path;
 
     ControlData vehicleControlSettings_;
 

@@ -13,7 +13,7 @@
 
 #include "lib/SparkFun_BME280/src/SparkFunBME280.h"
 
-#include "utils/circular_buffer.h"
+#include "utils/buffer.h"
 
 
 
@@ -62,7 +62,7 @@ public:
      * @param values none.
      * @return bool.
      */
-    bool pressureAvailable() {return _pressureFifo.available();};
+    uint32_t pressureAvailable() {return _pressureFifo.available();};
 
     /**
      * Returns rate (in Hz) of the new sensor data
@@ -82,10 +82,10 @@ public:
      */
     bool getPressure(float* pressureData, uint32_t* pressureTimestamp) {
 
-        if (!_pressureFifo.available()) return false;
+        if (_pressureFifo.available() == 0) return false;
 
-        *pressureData = _pressureFifo.pop_back();
-        *pressureTimestamp = _pressureTimestampFifo.pop_back();
+        _pressureFifo.takeBack(pressureData);
+        _pressureTimestampFifo.takeBack(pressureTimestamp);
 
         return true;
 
@@ -101,10 +101,10 @@ public:
      */
     bool peekPressure(float* pressureData, uint32_t* pressureTimestamp) {
 
-        if (!_pressureFifo.available()) return false;
+        if (_pressureFifo.available() == 0) return false;
 
-        *pressureData = *_pressureFifo.peek_back();
-        *pressureTimestamp = *_pressureTimestampFifo.peek_back();
+        _pressureFifo.peekBack(pressureData);
+        _pressureTimestampFifo.peekBack(pressureTimestamp);
 
         return true;
 
@@ -127,7 +127,7 @@ public:
      * @param values none.
      * @return bool.
      */
-    bool temperatureAvailable() {return _temperatureFifo.available();};
+    uint32_t temperatureAvailable() {return _temperatureFifo.available();};
 
     /**
      * Returns rate (in Hz) of the new sensor data
@@ -147,10 +147,10 @@ public:
      */
     bool getTemperature(float* temperatureData, uint32_t* temperatureTimestamp) {
 
-        if (!_temperatureFifo.available()) return false;
+        if (_temperatureFifo.available() == 0) return false;
 
-        *temperatureData = _temperatureFifo.pop_back();
-        *temperatureTimestamp = _temperatureTimestampFifo.pop_back();
+        _temperatureFifo.takeBack(temperatureData);
+        _temperatureTimestampFifo.takeBack(temperatureTimestamp);
 
         return true;
 
@@ -166,10 +166,10 @@ public:
      */
     bool peekTemperature(float* temperatureData, uint32_t* temperatureTimestamp) {
 
-        if (!_temperatureFifo.available()) return false;
+        if (_temperatureFifo.available() == 0) return false;
 
-        *temperatureData = *_temperatureFifo.peek_back();
-        *temperatureTimestamp = *_temperatureTimestampFifo.peek_back();
+        _temperatureFifo.peekBack(temperatureData);
+        _temperatureTimestampFifo.peekBack(temperatureTimestamp);
 
         return true;
 
@@ -192,7 +192,7 @@ public:
      * @param values none.
      * @return bool.
      */
-    bool humidityAvailable() {return _humidityFifo.available();};
+    uint32_t humidityAvailable() {return _humidityFifo.available();};
 
     /**
      * Returns rate (in Hz) of the new sensor data
@@ -212,10 +212,10 @@ public:
      */
     bool getHumidity(float* humidityData, uint32_t* humidityTimestamp) {
 
-        if (!_humidityFifo.available()) return false;
+        if (_humidityFifo.available() == 0) return false;
 
-        *humidityData = _humidityFifo.pop_back();
-        *humidityTimestamp = _humidityTimestampFifo.pop_back();
+        _humidityFifo.takeBack(humidityData);
+        _humidityTimestampFifo.takeBack(humidityTimestamp);
 
         return true;
 
@@ -231,10 +231,10 @@ public:
      */
     bool peekHumidity(float* humidityData, uint32_t* humidityTimestamp) {
 
-        if (!_humidityFifo.available()) return false;
+        if (_humidityFifo.available() == 0) return false;
 
-        *humidityData = *_humidityFifo.peek_back();
-        *humidityTimestamp = *_humidityTimestampFifo.peek_back();
+        _humidityFifo.peekBack(humidityData);
+        _humidityTimestampFifo.peekBack(humidityTimestamp);
 
         return true;
 
@@ -257,12 +257,12 @@ private:
     void _getData();
 
 
-    Circular_Buffer <float, 100> _pressureFifo;
-    Circular_Buffer <float, 100> _humidityFifo;
-    Circular_Buffer <float, 100> _temperatureFifo;
-    Circular_Buffer <uint32_t, 100> _pressureTimestampFifo;
-    Circular_Buffer <uint32_t, 100> _humidityTimestampFifo;
-    Circular_Buffer <uint32_t, 100> _temperatureTimestampFifo;
+    Buffer <float, 100> _pressureFifo;
+    Buffer <float, 100> _humidityFifo;
+    Buffer <float, 100> _temperatureFifo;
+    Buffer <uint32_t, 100> _pressureTimestampFifo;
+    Buffer <uint32_t, 100> _humidityTimestampFifo;
+    Buffer <uint32_t, 100> _temperatureTimestampFifo;
 
     float _lastPressure;
     float _lastHumidity;

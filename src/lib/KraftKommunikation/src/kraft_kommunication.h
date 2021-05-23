@@ -7,7 +7,7 @@
 
 #include "stdint.h"
 
-#include "circular_buffer.h"
+#include "buffer.h"
 
 #include "kraft_link.h"
 #include "kraft_message.h"
@@ -108,7 +108,7 @@ public:
      * @see networkAckBusy() for ack buffer
      * @returns Whether the buffer is full
      */
-    bool networkBusy() {return (sendPackets_.capacity() - sendPackets_.available()) == 0;}
+    bool networkBusy() {return sendPackets_.availableSpace() == 0;}
 
     /**
      * Checks if transmitter buffers are full. Sending a packet when buffers are full will fail or erase oldest message in buffer waiting to be sent.
@@ -116,7 +116,7 @@ public:
      * @see networkBusy() for nona ack buffer
      * @returns Whether the buffer is full
      */
-    bool networkAckBusy() {return (sendPacketsACK_.capacity() - sendPacketsACK_.available()) == 0;}
+    bool networkAckBusy() {return sendPacketsACK_.availableSpace() == 0;}
 
     /**
      * Checks if node is online.
@@ -132,8 +132,8 @@ public:
      * @returns MessageData struct.
      */
     MessageData getMessageInformation() {
-        ReceivedPayloadData buf = receivedPackets_.pop_back();
-        receivedPackets_.push_back(buf);
+        ReceivedPayloadData buf;
+        receivedPackets_.peekBack(&buf);
         return buf.messageData;
     };
 
@@ -153,7 +153,7 @@ public:
      * @param peek is a bool. If set to true then the message will not be removed from queue. Default value if false.
      * @returns true if message valid.
      */
-    void removeMessage() {if (messageAvailable()) receivedPackets_.pop_back();}
+    void removeMessage() {receivedPackets_.removeBack();}
 
     /**
      * Gets the nodes ID it uses when communicating with other transceivers
@@ -231,11 +231,11 @@ private:
     KraftLink_Interface* dataLink_; //Link used for sending receiving packets
 
     //Queue containing all received packets.
-    Circular_Buffer<ReceivedPayloadData, 10> receivedPackets_;
+    Buffer<ReceivedPayloadData, 10> receivedPackets_;
     //Queue containing all packets to send.
-    Circular_Buffer<SendPacketData, 10> sendPackets_;
+    Buffer<SendPacketData, 10> sendPackets_;
     //Queue containing all packets to send that require an ACK. These must wait until the one before it is finished
-    Circular_Buffer<SendPacketData, 10> sendPacketsACK_;
+    Buffer<SendPacketData, 10> sendPacketsACK_;
 
     NodeData nodeData_[255];
 

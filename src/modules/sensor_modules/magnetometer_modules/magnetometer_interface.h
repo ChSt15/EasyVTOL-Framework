@@ -24,7 +24,7 @@ public:
      * @param values none.
      * @return bool.
      */
-    virtual bool magAvailable() = 0;
+    virtual uint32_t magAvailable() = 0;
 
     /**
      * Returns rate (in Hz) of the new sensor data

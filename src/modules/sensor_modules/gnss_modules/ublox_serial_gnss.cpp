@@ -22,8 +22,8 @@ void UbloxSerialGNSS::_getData() {
     position.longitude = (double)gnss_.getLongitude()*10e7;
     position.longitude = (float)gnss_.getAltitudeMSL()/1000;
 
-    positionFifo_.push_front(position);
-    positionTimestampFifo_.push_front(time);
+    positionFifo_.placeFront(position, true);
+    positionTimestampFifo_.placeFront(time, true);
 
 
     Vector velocity;
@@ -31,8 +31,8 @@ void UbloxSerialGNSS::_getData() {
     velocity.y = -(float)gnss_.getNedEastVel()/1000;
     velocity.z = -(float)gnss_.getNedDownVel()/1000;
 
-    velocityFifo_.push_front(velocity);
-    velocityTimestampFifo_.push_front(time);
+    velocityFifo_.placeFront(velocity, true);
+    velocityTimestampFifo_.placeFront(time, true);
 
     //positionDeviation_ = gnss_.getHorizontalAccuracy(0);
     //altitudeDeviation_ = gnss_.getVerticalAccuracy(0);

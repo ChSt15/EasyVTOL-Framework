@@ -15,7 +15,7 @@
 
 #include "lib/MPU9250_Lib/src/mpu9250.h"
 
-#include "utils/circular_buffer.h"
+#include "utils/buffer.h"
 
 
 
@@ -56,7 +56,7 @@ public:
      * @param values none.
      * @return bool.
      */
-    bool gyroAvailable() {return _gyroFifo.available();};
+    uint32_t gyroAvailable() {return _gyroFifo.available();};
 
     /**
      * Returns rate (in Hz) of the new sensor data
@@ -76,10 +76,10 @@ public:
      */
     bool getGyro(Vector* gyroData, uint32_t* gyroTimestamp) {
 
-        if (!_gyroFifo.available()) return false;
+        if (_gyroFifo.available() == 0) return false;
 
-        *gyroData = _gyroFifo.pop_back();
-        *gyroTimestamp = _gyroTimestampFifo.pop_back();
+        _gyroFifo.takeBack(gyroData);
+        _gyroTimestampFifo.takeBack(gyroTimestamp);
 
         return true;
 
@@ -95,10 +95,10 @@ public:
      */
     bool peekGyro(Vector* gyroData, uint32_t* gyroTimestamp) {
 
-        if (!_gyroFifo.available()) return false;
+        if (_gyroFifo.available() == 0) return false;
 
-        *gyroData = *_gyroFifo.peek_back();
-        *gyroTimestamp = *_gyroTimestampFifo.peek_back();
+        _gyroFifo.peekBack(gyroData);
+        _gyroTimestampFifo.peekBack(gyroTimestamp);
 
         return true;
 
@@ -121,7 +121,7 @@ public:
      * @param values none.
      * @return bool.
      */
-    bool accelAvailable() {return _accelFifo.available();};
+    uint32_t accelAvailable() {return _accelFifo.available();};
 
     /**
      * Returns rate (in Hz) of the new sensor data
@@ -141,10 +141,10 @@ public:
      */
     bool getAccel(Vector* accelData, uint32_t* accelTimestamp) {
 
-        if (!_accelFifo.available()) return false;
+        if (_accelFifo.available() == 0) return false;
 
-        *accelData = _accelFifo.pop_back();
-        *accelTimestamp = _accelTimestampFifo.pop_back();
+        _accelFifo.takeBack(accelData);
+        _accelTimestampFifo.takeBack(accelTimestamp);
 
         return true;
 
@@ -160,10 +160,10 @@ public:
      */
     bool peekAccel(Vector* accelData, uint32_t* accelTimestamp) {
 
-        if (!_accelFifo.available()) return false;
+        if (_accelFifo.available() == 0) return false;
 
-        *accelData = *_accelFifo.peek_back();
-        *accelTimestamp = *_accelTimestampFifo.peek_back();
+        _accelFifo.peekBack(accelData);
+        _accelTimestampFifo.peekBack(accelTimestamp);
 
         return true;
 
@@ -186,7 +186,7 @@ public:
      * @param values none.
      * @return bool.
      */
-    bool magAvailable() {return _magFifo.available();};
+    uint32_t magAvailable() {return _magFifo.available();};
 
     /**
      * Returns rate (in Hz) of the new sensor data
@@ -206,10 +206,10 @@ public:
      */
     bool getMag(Vector* magData, uint32_t* magTimestamp) {
 
-        if (!_magFifo.available()) return false;
+        if (_magFifo.available() == 0) return false;
 
-        *magData = _magFifo.pop_back();
-        *magTimestamp = _magTimestampFifo.pop_back();
+        _magFifo.takeBack(magData);
+        _magTimestampFifo.takeBack(magTimestamp);
 
         return true;
 
@@ -225,10 +225,10 @@ public:
      */
     bool peekMag(Vector* magData, uint32_t* magTimestamp) {
 
-        if (!_magFifo.available()) return false;
+        if (_magFifo.available() == 0) return false;
 
-        *magData = *_magFifo.peek_back();
-        *magTimestamp = *_magTimestampFifo.peek_back();
+        _magFifo.peekBack(magData);
+        _magTimestampFifo.peekBack(magTimestamp);
 
         return true;
 
@@ -253,12 +253,12 @@ private:
     void _getData();
 
 
-    Circular_Buffer <Vector, 100> _gyroFifo;
-    Circular_Buffer <Vector, 100> _accelFifo;
-    Circular_Buffer <Vector, 100> _magFifo;
-    Circular_Buffer <uint32_t, 100> _gyroTimestampFifo;
-    Circular_Buffer <uint32_t, 100> _accelTimestampFifo;
-    Circular_Buffer <uint32_t, 100> _magTimestampFifo;
+    Buffer <Vector, 100> _gyroFifo;
+    Buffer <Vector, 100> _accelFifo;
+    Buffer <Vector, 100> _magFifo;
+    Buffer <uint32_t, 100> _gyroTimestampFifo;
+    Buffer <uint32_t, 100> _accelTimestampFifo;
+    Buffer <uint32_t, 100> _magTimestampFifo;
 
     Vector _lastGyro;
     Vector _lastAccel;

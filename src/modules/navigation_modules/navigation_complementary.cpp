@@ -25,9 +25,8 @@ void NavigationComplementaryFilter::thread() {
     navigationData_.position.z = navigationData_.absolutePosition.height - navigationData_.homePosition.height;
 
 
-
     //Correct with sensor values
-    while (gyro_->gyroAvailable()) {
+    while (gyro_->gyroAvailable() > 0) {
         
         //Get IMU data
         Vector rotationVector;
@@ -76,7 +75,7 @@ void NavigationComplementaryFilter::thread() {
     }
 
 
-    while (accel_->accelAvailable()) {
+    while (accel_->accelAvailable() > 0) {
 
         //static Vector lastValue = 0;
 
@@ -155,7 +154,7 @@ void NavigationComplementaryFilter::thread() {
 
     if (mag_ != nullptr) {
 
-        while (mag_->magAvailable()) {
+        while (mag_->magAvailable() > 0) {
 
             /*static Vector max = -1000;
             static Vector min = 1000;
@@ -257,7 +256,7 @@ void NavigationComplementaryFilter::thread() {
     //Make sure baro module is valid before using.
     if (baro_ != nullptr) {
 
-        while (baro_->pressureAvailable()) {
+        while (baro_->pressureAvailable() > 0) {
 
             //Get IMU data
             float pressure;
@@ -313,7 +312,7 @@ void NavigationComplementaryFilter::thread() {
     
     if (gnss_ != nullptr) {
 
-        while (gnss_->positionAvailable()) {
+        while (gnss_->positionAvailable() > 0) {
 
             WorldPosition positionAbsolute; uint32_t time;
             if (gnss_->getPosition(&positionAbsolute, &time)) {

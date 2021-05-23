@@ -13,7 +13,7 @@
 
 #include "lib/ADS1X15-master/ADS1X15.h"
 
-#include "utils/circular_buffer.h"
+#include "utils/buffer.h"
 
 
 
@@ -54,7 +54,7 @@ public:
      * @param channel which channel to check if data available
      * @return bool.
      */
-    virtual bool voltageAvailable(uint8_t channel = 0) {return voltageFifo_[min(channel, (uint8_t)4)].available();}
+    virtual uint32_t voltageAvailable(uint8_t channel = 0) {return voltageFifo_[min(channel, (uint8_t)4)].available();}
 
     /**
      * Returns rate (in Hz) of new sensor data
@@ -79,8 +79,8 @@ public:
 
         if (!voltageFifo_[channel].available()) return false;
 
-        *voltageData = voltageFifo_[channel].pop_back();
-        *voltageTimestamp = voltageTimestampFifo_[channel].pop_back();
+        voltageFifo_[channel].takeBack(voltageData);
+        voltageTimestampFifo_[channel].takeBack(voltageTimestamp);
 
         return true;
 
@@ -99,10 +99,10 @@ public:
 
         channel = min(channel, (uint8_t)4); 
 
-        if (!voltageFifo_[channel].available()) return false;
+        if (voltageFifo_[channel].available() == 0) return false;
 
-        *voltageData = *voltageFifo_[channel].peek_back();
-        *voltageTimestamp = *voltageTimestampFifo_[channel].peek_back();
+        voltageFifo_[channel].peekBack(voltageData);
+        voltageTimestampFifo_[channel].peekBack(voltageTimestamp);
 
         return true;
 
@@ -125,8 +125,8 @@ private:
     void _getData();
 
 
-    Circular_Buffer <float, 10> voltageFifo_[4];
-    Circular_Buffer <uint32_t, 10> voltageTimestampFifo_[4];
+    Buffer <float, 10> voltageFifo_[4];
+    Buffer <uint32_t, 10> voltageTimestampFifo_[4];
 
     IntervalControl _rateCalcInterval = IntervalControl(1); 
 

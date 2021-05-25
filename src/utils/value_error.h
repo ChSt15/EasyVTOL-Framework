@@ -13,15 +13,23 @@ public:
     }
 
     /**
-     * Give sampleRate to improve performance
-     *
+     * Error is defaulted to 0
+     * @param value Best value
+     * @return none.
+     */
+    ValueError(T valueIn) {
+        value = valueIn;
+        error = 0;
+    }
+
+    /**
      * @param value Best value
      * @param error Error of value
      * @return none.
      */
-    ValueError(T value, T error = 0) {
-        value = value;
-        error = error;
+    ValueError(T valueIn, T errorIn) {
+        value = valueIn;
+        error = errorIn;
     }
 
     //Values
@@ -37,11 +45,11 @@ public:
      */
     ValueError weightedAverage(const ValueError &valueB) {
 
-        if (error == 0 && valueB.error == 0) {
+        if (error == 0.0 && valueB.error == 0.0) {
             return ValueError((value + valueB.value)/2, 0);
-        } else if(error == 0) {
+        } else if(error == 0.0) {
             return *this;
-        } else if (valueB.error == 0) {
+        } else if (valueB.error == 0.0) {
             return valueB;
         }
 
@@ -56,6 +64,16 @@ public:
     ValueError& operator = (const ValueError &valueB) {
         value = valueB.value;
         error = valueB.error;
+        return *this;
+    }
+
+    ValueError& operator += (const ValueError &valueB) {
+        *this = *this + valueB;
+        return *this;
+    }
+
+    ValueError& operator -= (const ValueError &valueB) {
+        *this = *this - valueB;
         return *this;
     }
 
@@ -93,8 +111,32 @@ public:
         return ValueError(value/valueB, error/valueB);
     }
 
+    bool operator < (const T &valueB) {
+        return value < valueB.value;
+    }
+
+    bool operator > (const T &valueB) {
+        return value > valueB.value;
+    }
+
+    bool operator <= (const T &valueB) {
+        return value <= valueB.value;
+    }
+
+    bool operator >= (const T &valueB) {
+        return value >= valueB.value;
+    }
+
+    bool operator == (const T &valueB) {
+        return value == valueB.value;
+    }
+
 };
 
+
+
+template<typename T = float>
+extern ValueError<T> sqrt(const ValueError<T> &value);
 
 
 #endif

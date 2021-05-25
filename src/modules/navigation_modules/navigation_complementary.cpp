@@ -10,18 +10,28 @@ void NavigationComplementaryFilter::thread() {
 
     }
 
+    //if (navigationData_.absolutePosition)
+
     //Calculate time delta from last run
     float dTime = (float)(micros() - _lastLoopTimestamp)/1000000.0f;
     _lastLoopTimestamp = micros();
     	
     //Predict current state
-    //NavigationData prediction = navigationData_;
-    navigationData_.velocity = navigationData_.velocity + navigationData_.linearAcceleration*dTime;
-    navigationData_.position.x += navigationData_.velocity.x*dTime;
-    navigationData_.position.y += navigationData_.velocity.y*dTime;
+    velocityDeadReckoning_.x += accelDeadReckoning_.x*dTime;
+    velocityDeadReckoning_.y += accelDeadReckoning_.y*dTime;
+    velocityDeadReckoning_.z += accelDeadReckoning_.z*dTime;
 
-    navigationData_.absolutePosition.height = navigationData_.absolutePosition.height + navigationData_.velocity.z*dTime;
+    positionDeadReckoning_.x += velocityDeadReckoning_.x*dTime;
+    positionDeadReckoning_.y += velocityDeadReckoning_.y*dTime;
+    positionDeadReckoning_.z += velocityDeadReckoning_.z*dTime;
 
+    //Serial.println(String("pos: ") + positionDeadReckoning_.z.value + ", err: " + positionDeadReckoning_.z.error + ", vel: " + velocityDeadReckoning_.z.value + ", err: " + velocityDeadReckoning_.z.error);
+
+    navigationData_.velocity = Vector<float>(velocityDeadReckoning_.x.value, velocityDeadReckoning_.y.value, velocityDeadReckoning_.z.value);
+    navigationData_.position.x = positionDeadReckoning_.x.value;
+    navigationData_.position.y = positionDeadReckoning_.y.value;
+
+    navigationData_.absolutePosition.height = positionDeadReckoning_.z.value;
     navigationData_.position.z = navigationData_.absolutePosition.height - navigationData_.homePosition.height;
 
 
@@ -37,6 +47,11 @@ void NavigationComplementaryFilter::thread() {
             gyroLPF_.update(rotationVector);
         }
         rotationVector = rotationVector - gyroLPF_.getValue();
+
+        gyroXBuffer_.placeFront(rotationVector.x, true);
+        gyroYBuffer_.placeFront(rotationVector.y, true);
+        gyroZBuffer_.placeFront(rotationVector.z, true);
+        rotationVector = Vector<>(gyroXBuffer_.getMedian(), gyroYBuffer_.getMedian(), gyroZBuffer_.getMedian());
 
         //Calulate time delta
         float dt = float(timestamp - _lastGyroTimestamp)/1000000.0f;
@@ -88,6 +103,11 @@ void NavigationComplementaryFilter::thread() {
 
         accelVector = accelLPF_.update(accelVector);
 
+        accelXBuffer_.placeFront(accelVector.x, true);
+        accelYBuffer_.placeFront(accelVector.y, true);
+        accelZBuffer_.placeFront(accelVector.z, true);
+        accelVector = Vector<>(accelXBuffer_.getMedian(), accelYBuffer_.getMedian(), accelZBuffer_.getMedian());
+
         //accelVector = lastValue = lastValue*0.9999 + accelVector*0.0001;
 
         //Serial.println("Accel: x: " + String(accelVector.x,4) + ", y: " + String(accelVector.y,4) + ", z: " + String(accelVector.z,4));
@@ -120,6 +140,11 @@ void NavigationComplementaryFilter::thread() {
             navigationData_.acceleration = (navigationData_.attitude*accelVector*navigationData_.attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
             Vector<> filtered = accelBiasLPF_.update(navigationData_.acceleration - Vector<>(0,0,9.81));
             navigationData_.linearAcceleration = navigationData_.acceleration - Vector<>(0,0,9.81) - filtered;//accelHPF_.update(navigationData_.acceleration/* - Vector<>(0,0,9.81)*/);
+
+            //Update linear acceleration
+            accelDeadReckoning_.x = ValueError<float>(navigationData_.linearAcceleration.x, accelXBuffer_.getStandardError());
+            accelDeadReckoning_.y = ValueError<float>(navigationData_.linearAcceleration.y, accelYBuffer_.getStandardError());
+            accelDeadReckoning_.z = ValueError<float>(navigationData_.linearAcceleration.z, accelZBuffer_.getStandardError());
 
             //Serial.println(String("Accel: x: ") + navigationData_.linearAcceleration.x + ", y: " + navigationData_.linearAcceleration.y + ", z: " + navigationData_.linearAcceleration.z);
             
@@ -277,17 +302,26 @@ void NavigationComplementaryFilter::thread() {
                 //float heightRelative = heightAbsolute - navigationData_.absolutePosition.height;
                 //calculate z velocity from new height value
                 float zVelocity = (heightAbsolute - _lastHeightValue)/dt;
+                _lastHeightValue = heightAbsolute;
+
+                //Update buffers
+                baroHeightBuffer_.placeFront(heightAbsolute, true);
+                baroVelBuffer_.placeFront(zVelocity, true);
+
+                float heightMedian = baroHeightBuffer_.getMedian();
+                float heightError = baroHeightBuffer_.getStandardError();
+
+                float velMedian = baroVelBuffer_.getMedian();
+                float velError = baroVelBuffer_.getStandardError();
 
                 //correct dead reckoning values with new ones.
-                float heightError = (heightAbsolute - navigationData_.absolutePosition.height);
-                navigationData_.absolutePosition.height += heightError*0.03;
-                navigationData_.velocity.z += (zVelocity - navigationData_.velocity.z)*0.02;
+                velocityDeadReckoning_.z = velocityDeadReckoning_.z.weightedAverage(ValueError<float>(velMedian, velError));
+                positionDeadReckoning_.z = positionDeadReckoning_.z.weightedAverage(ValueError<float>(heightMedian, heightError));
 
-                //Update relative position
+                //Update output values
+                navigationData_.velocity.z = velocityDeadReckoning_.z.value;
+                navigationData_.absolutePosition.height = positionDeadReckoning_.z.value;
                 navigationData_.position.z = navigationData_.absolutePosition.height - navigationData_.homePosition.height;
-
-                //Update last Height value
-                _lastHeightValue = heightAbsolute;
 
 
             } else {
@@ -298,6 +332,9 @@ void NavigationComplementaryFilter::thread() {
                 //Barometer filter initialisation
                 _lastBaroTimestamp = timestamp;
                 _lastHeightValue = _getHeightFromPressure(pressure, 100e3f);
+
+                baroHeightBuffer_.placeFront(_lastHeightValue, true);
+                baroVelBuffer_.placeFront(0, true);
 
                 //Set current calculated height as start value.
                 navigationData_.absolutePosition.height = _lastHeightValue;

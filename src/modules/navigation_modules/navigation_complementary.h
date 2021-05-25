@@ -29,6 +29,8 @@
 
 #include "utils/high_pass_filter.h"
 #include "utils/low_pass_filter.h"
+#include "utils/buffer.h"
+#include "utils/value_error.h"
 
 #include "data_containers/kinematic_data.h"
 
@@ -135,6 +137,22 @@ private:
     LowPassFilter<Vector<>> gyroLPF_ = LowPassFilter<Vector<>>(0.01);
     LowPassFilter<Vector<>> accelBiasLPF_ = LowPassFilter<Vector<>>(0.2);
     LowPassFilter<Vector<>> accelLPF_ = LowPassFilter<Vector<>>(3000);
+
+    Buffer<float, 10> gyroXBuffer_;
+    Buffer<float, 10> gyroYBuffer_;
+    Buffer<float, 10> gyroZBuffer_;
+
+    Buffer<float, 10> accelXBuffer_;
+    Buffer<float, 10> accelYBuffer_;
+    Buffer<float, 10> accelZBuffer_;
+
+    Buffer<float, 10> baroHeightBuffer_;
+    Buffer<float, 10> baroVelBuffer_;
+
+    //Deadreckoning values
+    Vector<ValueError<float>> accelDeadReckoning_;
+    Vector<ValueError<float>> velocityDeadReckoning_;
+    Vector<ValueError<float>> positionDeadReckoning_;
 
     uint32_t _lastGyroTimestamp = 0;
     uint32_t _lastAccelTimestamp = 0;

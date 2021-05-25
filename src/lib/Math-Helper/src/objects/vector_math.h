@@ -59,7 +59,7 @@ class Vector {
 
             T m = x*x + y*y + z*z;
 
-            m = sqrtf(m);
+            m = sqrt(m);
             
             if (m == m) { // NAN check
                 return m;
@@ -240,6 +240,20 @@ class Vector {
         }
 
         /**
+         * @return bool.
+         */
+        inline bool operator < (const Vector<T> &b) const {
+            return this->magnitude() < b.magnitude();
+        }
+
+        /**
+         * @return bool.
+         */
+        inline bool operator > (const Vector<T> &b) const {
+            return this->magnitude() > b.magnitude();
+        }
+
+        /**
          * Computes cross multiplication of 2 vectors.
          * 
          *
@@ -310,7 +324,7 @@ class Vector {
 #define GRAVITY_VECTOR Vector<>(0,0,-9.81)
 
 template <typename T = float>
-inline extern Vector<T> sqrt(const Vector<T> &a);
+extern Vector<T> sqrt(Vector<T> a);
 
 
 #endif

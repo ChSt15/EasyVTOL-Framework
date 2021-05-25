@@ -1,11 +1,7 @@
-//#include "vector_math.h"
-//#include "quaternion_math.h"
+#include "vector_math.h"
 
 
-/*Vector::Vector(const Quaternion &quaternion) {
-    
-    x = quaternion.x;
-    y = quaternion.y;
-    z = quaternion.z;
 
-}*/
+Vector sqrt(Vector a) {
+    return Vector(sqrt(a.x), sqrt(a.y), sqrt(a.z));
+}

@@ -1,13 +1,6 @@
-//#include "quaternion_math.h"
-//#include "vector_math.h"
+#include "quaternion_math.h"
 
 
-
-/*Quaternion::Quaternion(const Vector &vector) {
-    
-    w = 0;
-    x = vector.x;
-    y = vector.y;
-    z = vector.z;
-
-}*/
+Quaternion sqrt(const Quaternion &a) {
+    return Quaternion(sqrtf(a.w), sqrtf(a.x), sqrtf(a.y), sqrtf(a.z));
+}

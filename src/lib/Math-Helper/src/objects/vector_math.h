@@ -4,7 +4,10 @@
 
 #include "math.h"
 
+
+#ifdef Arduino_h
 #include "WString.h"
+#endif
 
 
 #ifndef PI
@@ -16,15 +19,13 @@
 #endif
 
 
-
+//template <typename T>
 class Vector {
     public:
     
         float x;
         float y;
         float z;
-
-        bool valid = true;
 
         Vector() {
             x = 0.0f;
@@ -64,7 +65,6 @@ class Vector {
             if (m == m) { // NAN check
                 return m;
             }
-            valid = false;
             return 0.0f;
         }
 
@@ -200,6 +200,16 @@ class Vector {
         }
 
         /**
+         * Vector component wise multiplication.
+         *
+         * @param values none.
+         * @return multiplication result in float.
+         */
+        Vector operator * (Vector b) {
+            return Vector(x*b.x, y*b.y, z*b.z);
+        }
+
+        /**
          * Vector multiplication.
          * 
          * x1*x2 + y1*y2 + z1*z2
@@ -207,7 +217,7 @@ class Vector {
          * @param values none.
          * @return multiplication result in float.
          */
-        float operator * (Vector b) {
+        float operator ^ (Vector b) {
             return x*b.x + y*b.y + z*b.z;
         }
 
@@ -257,7 +267,7 @@ class Vector {
          */
         float getAngleTo(Vector b) {
             
-            float ca = (*this)*b/(magnitude()*b.magnitude());
+            float ca = (*this)^b/(magnitude()*b.magnitude());
 
             return acos(ca);
 
@@ -279,7 +289,7 @@ class Vector {
 
         }
 
-
+        #ifdef Arduino_h
         /**
          * Returns a String containing components.
          * Form:
@@ -294,6 +304,7 @@ class Vector {
         String toString(uint8_t digits = 2) {
             return "x: " + String(x, digits) + ", y: " + String(y, digits) + ", z: " + String(z, digits);  
         }
+        #endif
 
 
 };
@@ -303,9 +314,7 @@ class Vector {
 #define GRAVITY_VECTOR Vector(0,0,-9.81)
 
 
-/*Vector sqrt(Vector a) {
-    return Vector(sqrt(a.x), sqrt(a.y), sqrt(a.z));
-}*/
+extern Vector sqrt(Vector a);
 
 
 #endif

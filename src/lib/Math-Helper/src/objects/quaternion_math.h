@@ -4,7 +4,9 @@
 
 #include "math.h"
 
+#ifdef Arduino_h
 #include "WString.h"
+#endif
 
 #include "vector_math.h"
 
@@ -202,6 +204,7 @@ class Quaternion {
             return (*this*vectorToRotate*(copy().conjugate())).toVector();
         }
 
+        #ifdef Arduino_h
         /**
          * Returns a String containing components.
          * Form:
@@ -216,6 +219,7 @@ class Quaternion {
         String toString(const uint8_t &digits = 2) {
             return "w: " + String(w, digits) + ", x: " + String(x, digits) + ", y: " + String(y, digits) + ", z: " + String(z, digits);  
         }
+        #endif
 
         Quaternion operator + (const Quaternion &b) {
             return Quaternion(w + b.w, x + b.x, y + b.y, z + b.z);
@@ -262,9 +266,7 @@ class Quaternion {
 };
 
 
-/*Quaternion sqrt(Quaternion a) {
-    return Quaternion(sqrtf(a.w), sqrtf(a.x), sqrtf(a.y), sqrtf(a.z));
-}*/
+extern Quaternion sqrt(const Quaternion &a);
 
 
 #endif

@@ -209,7 +209,7 @@ private:
 template<typename T, uint32_t size_> 
 inline T Buffer<T, size_>::getStandardError() const {
     if (numElements_ < 2) return T();
-    return getStandardDeviation()/sqrtf(numElements_);
+    return getStandardDeviation()/sqrt(numElements_);
 }
 
 
@@ -230,7 +230,7 @@ inline T Buffer<T, size_>::getStandardDeviation() const {
 
     }
 
-    standardDev = sqrtf(standardDev/(numElements_-1));
+    standardDev = sqrt(standardDev/(numElements_-1));
 
     return standardDev;
     

@@ -26,7 +26,7 @@ void UbloxSerialGNSS::_getData() {
     positionTimestampFifo_.placeFront(time, true);
 
 
-    Vector velocity;
+    Vector<> velocity;
     velocity.x = (float)gnss_.getNedNorthVel()/1000;
     velocity.y = -(float)gnss_.getNedEastVel()/1000;
     velocity.z = -(float)gnss_.getNedDownVel()/1000;

@@ -42,7 +42,7 @@ public:
      * @param values Vector and uint32_t.
      * @return bool.
      */
-    virtual bool getMag(Vector* magData, uint32_t* magTimestamp) = 0;
+    virtual bool getMag(Vector<>* magData, uint32_t* magTimestamp) = 0;
 
     /**
      * Returns true if Magnetometer data valid.
@@ -52,7 +52,7 @@ public:
      * @param values Vector and uint32_t.
      * @return bool.
      */
-    virtual bool peekMag(Vector* magData, uint32_t* magTimestamp) = 0;
+    virtual bool peekMag(Vector<>* magData, uint32_t* magTimestamp) = 0;
 
     /**
      * Removes all elements from queue.

@@ -2,6 +2,7 @@
 
 
 
-Vector sqrt(Vector a) {
-    return Vector(sqrt(a.x), sqrt(a.y), sqrt(a.z));
+template <typename T = float>
+Vector<T> sqrt(const Vector<T> &a) {
+    return Vector<T>(sqrt(a.x), sqrt(a.y), sqrt(a.z));
 }

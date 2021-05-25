@@ -74,7 +74,7 @@ public:
      * @param values Vector and uint32_t.
      * @return bool.
      */
-    bool getGyro(Vector* gyroData, uint32_t* gyroTimestamp) {
+    bool getGyro(Vector<>* gyroData, uint32_t* gyroTimestamp) {
 
         if (_gyroFifo.available() == 0) return false;
 
@@ -93,7 +93,7 @@ public:
      * @param values Vector and uint32_t.
      * @return bool.
      */
-    bool peekGyro(Vector* gyroData, uint32_t* gyroTimestamp) {
+    bool peekGyro(Vector<>* gyroData, uint32_t* gyroTimestamp) {
 
         if (_gyroFifo.available() == 0) return false;
 
@@ -139,7 +139,7 @@ public:
      * @param values Vector and uint32_t.
      * @return bool.
      */
-    bool getAccel(Vector* accelData, uint32_t* accelTimestamp) {
+    bool getAccel(Vector<>* accelData, uint32_t* accelTimestamp) {
 
         if (_accelFifo.available() == 0) return false;
 
@@ -158,7 +158,7 @@ public:
      * @param values Vector and uint32_t.
      * @return bool.
      */
-    bool peekAccel(Vector* accelData, uint32_t* accelTimestamp) {
+    bool peekAccel(Vector<>* accelData, uint32_t* accelTimestamp) {
 
         if (_accelFifo.available() == 0) return false;
 
@@ -204,7 +204,7 @@ public:
      * @param values Vector and uint32_t.
      * @return bool.
      */
-    bool getMag(Vector* magData, uint32_t* magTimestamp) {
+    bool getMag(Vector<>* magData, uint32_t* magTimestamp) {
 
         if (_magFifo.available() == 0) return false;
 
@@ -223,7 +223,7 @@ public:
      * @param values Vector and uint32_t.
      * @return bool.
      */
-    bool peekMag(Vector* magData, uint32_t* magTimestamp) {
+    bool peekMag(Vector<>* magData, uint32_t* magTimestamp) {
 
         if (_magFifo.available() == 0) return false;
 
@@ -253,16 +253,16 @@ private:
     void _getData();
 
 
-    Buffer <Vector, 100> _gyroFifo;
-    Buffer <Vector, 100> _accelFifo;
-    Buffer <Vector, 100> _magFifo;
+    Buffer <Vector<>, 100> _gyroFifo;
+    Buffer <Vector<>, 100> _accelFifo;
+    Buffer <Vector<>, 100> _magFifo;
     Buffer <uint32_t, 100> _gyroTimestampFifo;
     Buffer <uint32_t, 100> _accelTimestampFifo;
     Buffer <uint32_t, 100> _magTimestampFifo;
 
-    Vector _lastGyro;
-    Vector _lastAccel;
-    Vector _lastMag;
+    Vector<> _lastGyro;
+    Vector<> _lastAccel;
+    Vector<> _lastMag;
 
     IntervalControl _rateCalcInterval = IntervalControl(1); 
 

@@ -74,7 +74,7 @@ struct WorldPosition {
      * @param WorldPosition Reference point for position
      * @returns position vector
      */
-    Vector getPositionVectorFrom(const WorldPosition &referencePoint) {
+    Vector<> getPositionVectorFrom(const WorldPosition &referencePoint) {
 
         float heightRef = height - referencePoint.height;
 
@@ -84,7 +84,7 @@ struct WorldPosition {
         float north = (latitude - referencePoint.latitude)*radius;
         float west = (longitude - referencePoint.longitude)*radius*cosLat;
 
-        return Vector(north, west, heightRef);
+        return Vector<>(north, west, heightRef);
 
     }
 

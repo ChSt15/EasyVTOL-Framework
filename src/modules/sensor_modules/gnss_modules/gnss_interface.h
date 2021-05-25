@@ -87,7 +87,7 @@ public:
      * @param velocity is the velocity.
      * @returns true if position data valid.
      */
-    virtual bool getVelocity(Vector* velocity, uint32_t* velocityTimestamp) = 0;
+    virtual bool getVelocity(Vector<>* velocity, uint32_t* velocityTimestamp) = 0;
 
     /**
      * Variables given as parameters will be overridden.
@@ -96,7 +96,7 @@ public:
      * @param velocity is the velocity.
      * @returns true if position data valid.
      */
-    virtual bool peekVelocity(Vector* velocity, uint32_t* velocityTimestamp) = 0;
+    virtual bool peekVelocity(Vector<>* velocity, uint32_t* velocityTimestamp) = 0;
 
     /**
      * Removes all elements from queue.

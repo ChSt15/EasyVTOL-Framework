@@ -31,23 +31,23 @@ public:
 
     KraftMessageAttitude() {}
 
-    KraftMessageAttitude(const Quaternion &attitude) {
+    KraftMessageAttitude(const Quaternion<> &attitude) {
         attitude_ = attitude;
     }
 
     uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_Attitude;}
 
-    uint32_t getDataSize() {return sizeof(Quaternion);}
+    uint32_t getDataSize() {return sizeof(Quaternion<>);}
 
-    Quaternion getAttitude() {return attitude_;}
+    Quaternion<> getAttitude() {return attitude_;}
 
-    void setAttitude(Quaternion attitude) {attitude_ = attitude;}
+    void setAttitude(Quaternion<> attitude) {attitude_ = attitude;}
 
     bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
 
-        if (dataByteSize < sizeof(Quaternion)) return false;
+        if (dataByteSize < sizeof(Quaternion<>)) return false;
 
-        memcpy(dataBytes, &attitude_, sizeof(Quaternion));
+        memcpy(dataBytes, &attitude_, sizeof(Quaternion<>));
 
         return true;
 
@@ -55,9 +55,9 @@ public:
 
     bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
 
-        if (dataByteSize < sizeof(Quaternion)) return false;
+        if (dataByteSize < sizeof(Quaternion<>)) return false;
 
-        memcpy(&attitude_, dataBytes, sizeof(Quaternion));
+        memcpy(&attitude_, dataBytes, sizeof(Quaternion<>));
 
         return true;
 
@@ -66,7 +66,7 @@ public:
 
 private:
 
-    Quaternion attitude_;
+    Quaternion<> attitude_;
 
 };
 
@@ -77,24 +77,24 @@ public:
 
     KraftMessagePosition() {}
 
-    KraftMessagePosition(const Vector &position, const uint32_t &timestamp) {
+    KraftMessagePosition(const Vector<> &position, const uint32_t &timestamp) {
         position_ = position;
         timestamp_ = timestamp;
     }
 
     uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_Position;}
 
-    uint32_t getDataSize() {return sizeof(Vector) + sizeof(timestamp_);}
+    uint32_t getDataSize() {return sizeof(Vector<>) + sizeof(timestamp_);}
 
-    Vector getPosition() {return position_;}
+    Vector<> getPosition() {return position_;}
     uint32_t getTimestamp() {return timestamp_;}
 
     bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
 
         if (dataByteSize < getDataSize()) return false;
 
-        memcpy(dataBytes, &position_, sizeof(Vector));
-        memcpy(dataBytes + sizeof(Vector), &timestamp_, sizeof(uint32_t));
+        memcpy(dataBytes, &position_, sizeof(Vector<>));
+        memcpy(dataBytes + sizeof(Vector<>), &timestamp_, sizeof(uint32_t));
 
         return true;
 
@@ -104,8 +104,8 @@ public:
 
         if (dataByteSize < getDataSize()) return false;
 
-        memcpy(&position_, dataBytes, sizeof(Vector));
-        memcpy(&timestamp_, dataBytes + sizeof(Vector), sizeof(uint32_t));
+        memcpy(&position_, dataBytes, sizeof(Vector<>));
+        memcpy(&timestamp_, dataBytes + sizeof(Vector<>), sizeof(uint32_t));
 
         return true;
 
@@ -114,7 +114,7 @@ public:
 
 private:
 
-    Vector position_;
+    Vector<> position_;
     uint32_t timestamp_;
 
 };

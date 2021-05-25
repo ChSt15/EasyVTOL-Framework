@@ -29,7 +29,7 @@ void NavigationComplementaryFilter::thread() {
     while (gyro_->gyroAvailable() > 0) {
         
         //Get IMU data
-        Vector rotationVector;
+        Vector<> rotationVector;
         uint32_t timestamp;
         gyro_->getGyro(&rotationVector, &timestamp);
 
@@ -53,7 +53,7 @@ void NavigationComplementaryFilter::thread() {
             //Predict system state
             if (!rotationVector.isZeroVector()) {
 
-                Quaternion rotationQuat = Quaternion(rotationVector, rotationVector.magnitude()*dt);
+                Quaternion<> rotationQuat(rotationVector, rotationVector.magnitude()*dt);
 
                 navigationData_.attitude = navigationData_.attitude*rotationQuat;
 
@@ -65,7 +65,7 @@ void NavigationComplementaryFilter::thread() {
         } else {
 
             //Gyro filter initialisation
-            if (rotationVector.magnitude() < 0.05) {
+            if (rotationVector.magnitude() < 0.01) {
                 gyroLPF_.setValue(rotationVector);
                 _gyroInitialized = true;
             }
@@ -80,7 +80,7 @@ void NavigationComplementaryFilter::thread() {
         //static Vector lastValue = 0;
 
         //Get IMU data
-        Vector accelVector;
+        Vector<> accelVector;
         uint32_t timestamp;
         accel_->getAccel(&accelVector, &timestamp);
 
@@ -102,13 +102,13 @@ void NavigationComplementaryFilter::thread() {
             float beta = 0.1f;
 
             //Z-Axis correction
-            Vector zAxisIs = Vector(0,0,1);
-            Vector zAxisSet = (navigationData_.attitude*accelVector*navigationData_.attitude.copy().conjugate()).toVector();
+            Vector<> zAxisIs = Vector<>(0,0,1);
+            Vector<> zAxisSet = (navigationData_.attitude*accelVector*navigationData_.attitude.copy().conjugate()).toVector();
 
-            Vector zAxisRotationAxis = zAxisSet.cross(zAxisIs);
+            Vector<> zAxisRotationAxis = zAxisSet.cross(zAxisIs);
             float zAxisRotationAngle = zAxisSet.getAngleTo(zAxisIs);
 
-            Quaternion zAxisCorrectionQuat = Quaternion(zAxisRotationAxis, zAxisRotationAngle*beta*dt);
+            Quaternion<> zAxisCorrectionQuat = Quaternion<>(zAxisRotationAxis, zAxisRotationAngle*beta*dt);
 
 
             //Apply state correction and normalise attitude quaternion 
@@ -118,8 +118,8 @@ void NavigationComplementaryFilter::thread() {
 
             //Update acceleration
             navigationData_.acceleration = (navigationData_.attitude*accelVector*navigationData_.attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
-            Vector filtered = accelBiasLPF_.update(navigationData_.acceleration - Vector(0,0,9.81));
-            navigationData_.linearAcceleration = navigationData_.acceleration - Vector(0,0,9.81) - filtered;//accelHPF_.update(navigationData_.acceleration/* - Vector(0,0,9.81)*/);
+            Vector<> filtered = accelBiasLPF_.update(navigationData_.acceleration - Vector<>(0,0,9.81));
+            navigationData_.linearAcceleration = navigationData_.acceleration - Vector<>(0,0,9.81) - filtered;//accelHPF_.update(navigationData_.acceleration/* - Vector<>(0,0,9.81)*/);
 
             //Serial.println(String("Accel: x: ") + navigationData_.linearAcceleration.x + ", y: " + navigationData_.linearAcceleration.y + ", z: " + navigationData_.linearAcceleration.z);
             
@@ -132,20 +132,20 @@ void NavigationComplementaryFilter::thread() {
             _lastAccelTimestamp = timestamp;
 
             //Set Attitude
-            Vector zAxisIs = Vector(0,0,1);
-            Vector zAxisSet = (navigationData_.attitude*accelVector*navigationData_.attitude.copy().conjugate()).toVector();
+            Vector<> zAxisIs = Vector<>(0,0,1);
+            Vector<> zAxisSet = (navigationData_.attitude*accelVector*navigationData_.attitude.copy().conjugate()).toVector();
 
-            Vector zAxisRotationAxis = zAxisSet.cross(zAxisIs);
+            Vector<> zAxisRotationAxis = zAxisSet.cross(zAxisIs);
             float zAxisRotationAngle = zAxisSet.getAngleTo(zAxisIs);
 
-            Quaternion zAxisCorrectionQuat = Quaternion(zAxisRotationAxis, zAxisRotationAngle);
+            Quaternion<> zAxisCorrectionQuat = Quaternion<>(zAxisRotationAxis, zAxisRotationAngle);
 
             //Apply state correction and normalise attitude quaternion 
             navigationData_.attitude = zAxisCorrectionQuat*navigationData_.attitude;
             navigationData_.attitude.normalize(true);
             //navigationData_.attitude = Quaternion(0,0,1,0);
 
-            accelBiasLPF_.setValue(navigationData_.acceleration - Vector(0,0,9.81));
+            accelBiasLPF_.setValue(navigationData_.acceleration - Vector<>(0,0,9.81));
 
         }
 
@@ -162,7 +162,7 @@ void NavigationComplementaryFilter::thread() {
             static Vector scale = 1;*/
 
             //Get IMU data
-            Vector magVector;
+            Vector<> magVector;
             uint32_t timestamp;
             mag_->getMag(&magVector, &timestamp);
 
@@ -210,15 +210,15 @@ void NavigationComplementaryFilter::thread() {
                 float gamma = 0.1f;
 
                 //X-Axis correction
-                Vector xAxisIs(1,0,0);
-                Vector xAxisSet = (navigationData_.attitude*magVector*navigationData_.attitude.copy().conjugate()).toVector();
+                Vector<> xAxisIs(1,0,0);
+                Vector<> xAxisSet = (navigationData_.attitude*magVector*navigationData_.attitude.copy().conjugate()).toVector();
                 xAxisSet.z = 0;
                 xAxisSet.normalize();
 
-                Vector xAxisRotationAxis = Vector(0,0,1);
+                Vector<> xAxisRotationAxis = Vector<>(0,0,1);
                 float xAxisRotationAngle = -atan2(xAxisSet.y, xAxisSet.x);
 
-                Quaternion xAxisCorrectionQuat = Quaternion(xAxisRotationAxis, xAxisRotationAngle*gamma*dt);
+                Quaternion<> xAxisCorrectionQuat = Quaternion<>(xAxisRotationAxis, xAxisRotationAngle*gamma*dt);
 
 
                 //Apply state correction and normalise attitude quaternion 
@@ -232,15 +232,15 @@ void NavigationComplementaryFilter::thread() {
                 _lastMagTimestamp = timestamp;
 
                 //Set heading
-                Vector xAxisIs(1,0,0);
-                Vector xAxisSet = (navigationData_.attitude*magVector*navigationData_.attitude.copy().conjugate()).toVector();
+                Vector<> xAxisIs(1,0,0);
+                Vector<> xAxisSet = (navigationData_.attitude*magVector*navigationData_.attitude.copy().conjugate()).toVector();
                 xAxisSet.z = 0;
                 xAxisSet.normalize();
 
-                Vector xAxisRotationAxis = Vector(0,0,1);
+                Vector<> xAxisRotationAxis = Vector<>(0,0,1);
                 float xAxisRotationAngle = -atan2(xAxisSet.y, xAxisSet.x);
 
-                Quaternion xAxisCorrectionQuat = Quaternion(xAxisRotationAxis, xAxisRotationAngle);
+                Quaternion<> xAxisCorrectionQuat = Quaternion<>(xAxisRotationAxis, xAxisRotationAngle);
 
                 //Apply state correction and normalise attitude quaternion 
                 navigationData_.attitude = xAxisCorrectionQuat*navigationData_.attitude;
@@ -322,14 +322,14 @@ void NavigationComplementaryFilter::thread() {
                 navigationData_.absolutePosition.latitude = positionAbsolute.latitude;
                 navigationData_.absolutePosition.longitude = positionAbsolute.longitude;
 
-                Vector positionBuf = positionAbsolute.getPositionVectorFrom(navigationData_.homePosition);
+                Vector<> positionBuf = positionAbsolute.getPositionVectorFrom(navigationData_.homePosition);
 
                 navigationData_.position.x += (positionBuf.x - navigationData_.position.x)*beta;
                 navigationData_.position.y += (positionBuf.y - navigationData_.position.y)*beta;
 
             }
 
-            Vector velocityBuf;
+            Vector<> velocityBuf;
             if (gnss_->getVelocity(&velocityBuf, &time)) {
 
                 float beta = 0.1;

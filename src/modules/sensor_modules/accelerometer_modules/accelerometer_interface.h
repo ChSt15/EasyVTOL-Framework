@@ -42,7 +42,7 @@ public:
      * @param values Vector and uint32_t.
      * @return bool.
      */
-    virtual bool getAccel(Vector* accelData, uint32_t* accelTimestamp) = 0;
+    virtual bool getAccel(Vector<>* accelData, uint32_t* accelTimestamp) = 0;
 
     /**
      * Returns true if accel data valid.
@@ -52,7 +52,7 @@ public:
      * @param values Vector and uint32_t.
      * @return bool.
      */
-    virtual bool peekAccel(Vector* accelData, uint32_t* accelTimestamp) = 0;
+    virtual bool peekAccel(Vector<>* accelData, uint32_t* accelTimestamp) = 0;
 
     /**
      * Removes all elements from queue.

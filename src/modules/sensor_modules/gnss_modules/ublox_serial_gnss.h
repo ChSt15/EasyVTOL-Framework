@@ -141,7 +141,7 @@ public:
      * @param velocity is the velocity.
      * @returns true if position data valid.
      */
-    bool getVelocity(Vector* velocity, uint32_t* velocityTimestamp) {
+    bool getVelocity(Vector<>* velocity, uint32_t* velocityTimestamp) {
 
         if (velocityFifo_.available() == 0) return false;
 
@@ -159,7 +159,7 @@ public:
      * @param velocity is the velocity.
      * @returns true if position data valid.
      */
-    bool peekVelocity(Vector* velocity, uint32_t* velocityTimestamp) {
+    bool peekVelocity(Vector<>* velocity, uint32_t* velocityTimestamp) {
 
         if (velocityFifo_.available() == 0) return false;
 
@@ -197,7 +197,7 @@ private:
 
 
     Buffer <WorldPosition, 10> positionFifo_;
-    Buffer <Vector, 10> velocityFifo_;
+    Buffer <Vector<>, 10> velocityFifo_;
     Buffer <uint32_t, 10> positionTimestampFifo_;
     Buffer <uint32_t, 10> velocityTimestampFifo_;
 

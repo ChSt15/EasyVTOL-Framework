@@ -15,9 +15,9 @@ class DynamicData: public DataContainerTimestamped_Base {
 public:
 
     //Force in Newtons.
-    Vector force;
+    Vector<> force;
     //Torqe in Nm.
-    Vector torqe;
+    Vector<> torqe;
     
 };
 

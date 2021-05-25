@@ -42,7 +42,7 @@ public:
      * @param values Vector and uint32_t.
      * @return bool.
      */
-    virtual bool getGyro(Vector* gyroData, uint32_t* gyroTimestamp) = 0;
+    virtual bool getGyro(Vector<>* gyroData, uint32_t* gyroTimestamp) = 0;
 
     /**
      * Returns true if gyro data valid.
@@ -52,7 +52,7 @@ public:
      * @param values Vector and uint32_t.
      * @return bool.
      */
-    virtual bool peekGyro(Vector* gyroData, uint32_t* gyroTimestamp) = 0;
+    virtual bool peekGyro(Vector<>* gyroData, uint32_t* gyroTimestamp) = 0;
 
     /**
      * Removes all elements from queue.

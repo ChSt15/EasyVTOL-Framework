@@ -19,15 +19,15 @@
 #endif
 
 
-//template <typename T>
+template <typename T = float>
 class Vector {
     public:
     
-        float x;
-        float y;
-        float z;
+        T x;
+        T y;
+        T z;
 
-        Vector() {
+        Vector<T>() {
             x = 0.0f;
             y = 0.0f;
             z = 0.0f;
@@ -36,29 +36,28 @@ class Vector {
         /**
          * This constructor sets all components to n.
          */
-        Vector(const float &n) {
+        Vector<T>(const T &n) {
             x = n;
             y = n;
             z = n;
         }
 
-        Vector(const float &nx, const float &ny, const float &nz) {
+        Vector<T>(const T &nx, const T &ny, const T &nz) {
             x = nx;
             y = ny;
             z = nz;
         }
 
-        //Vector(const Quaternion &quaternion);
+        //Vector<T>(const Quaternion &quaternion);
 
         /**
          * Calculates the magnitude of the vector.
          *
-         * @param values none.
          * @return magnitude of the vector.
          */
-        float magnitude() {
+        inline T magnitude() const {
 
-            float m = x*x + y*y + z*z;
+            T m = x*x + y*y + z*z;
 
             m = sqrtf(m);
             
@@ -71,22 +70,20 @@ class Vector {
         /**
          * Copies the vector.
          *
-         * @param values none.
          * @return copy of the vector.
          */
-        Vector copy() {
-            return Vector(x, y, z);
+        inline Vector<T> copy() const {
+            return Vector<T>(x, y, z);
         }
 
         /**
          * Normalizes the Vector.
          *
-         * @param values none.
          * @return copy of the normalized vector.
          */
-        Vector& normalize() {
+        inline Vector<T>& normalize() {
 
-            float mag = magnitude();
+            T mag = magnitude();
 
             if (mag != 0.0f) {
                 x /= mag;
@@ -103,12 +100,11 @@ class Vector {
         }
 
         /**
-         * Checks if vector is zero vector.
+         * Checks if vector<T> is zero vector.
          *
-         * @param values none.
          * @return true if vecter is zero vector.
          */
-        bool isZeroVector() {
+        inline bool isZeroVector() const {
 
             return magnitude() == 0.0f;
 
@@ -116,13 +112,13 @@ class Vector {
 
         /**
          * Multiplies the vectors components to this scheme:
-         * Vector(x*x, y*y, z*z)
+         * Vector<T>(x*x, y*y, z*z)
          *
-         * @param values none.
+         * @param vec vector<T> to multiply with
          * @return vector.
          */
-        Vector compWiseMulti(const Vector &vec) {
-            return Vector(x*vec.x, y*vec.y, z*vec.z);
+        inline Vector<T> compWiseMulti(const Vector<T> &vec) const {
+            return Vector<T>(x*vec.x, y*vec.y, z*vec.z);
         }
 
         /**
@@ -131,8 +127,8 @@ class Vector {
          * @param values none.
          * @return copy of the vector.
          */
-        Vector operator + (Vector b) {
-            return Vector(x + b.x, y + b.y, z + b.z);
+        inline Vector<T> operator + (const Vector<T> &b) const {
+            return Vector<T>(x + b.x, y + b.y, z + b.z);
         }
 
         /**
@@ -141,8 +137,8 @@ class Vector {
          * @param values none.
          * @return copy of the vector.
          */
-        Vector operator - (Vector b) {
-            return Vector(x - b.x, y - b.y, z - b.z);
+        inline Vector<T> operator - (const Vector<T> &b) const {
+            return Vector<T>(x - b.x, y - b.y, z - b.z);
         }
 
         /**
@@ -151,8 +147,8 @@ class Vector {
          * @param values none.
          * @return copy of the vector.
          */
-        Vector operator - (void) {
-            return Vector(-x, -y, -z);
+        inline Vector<T> operator - (void) const {
+            return Vector<T>(-x, -y, -z);
         }
 
         /**
@@ -161,8 +157,8 @@ class Vector {
          * @param values none.
          * @return copy of the vector.
          */
-        Vector operator * (float c) {
-            return Vector(x*c, y*c, z*c);
+        inline Vector<T> operator * (const T &c) const {
+            return Vector<T>(x*c, y*c, z*c);
         }
 
         /**
@@ -171,8 +167,8 @@ class Vector {
          * @param values none.
          * @return copy of the vector.
          */
-        Vector operator / (float c) {
-            return Vector(x/c, y/c, z/c);
+        inline Vector<T> operator / (const T &c) const {
+            return Vector<T>(x/c, y/c, z/c);
         }
 
         /**
@@ -181,7 +177,7 @@ class Vector {
          * @param values none.
          * @return nothing.
          */
-        void operator *= (float c) {
+        inline void operator *= (const T &c) {
             x *= c;
             y *= c;
             z *= c;
@@ -193,53 +189,53 @@ class Vector {
          * @param values none.
          * @return nothing.
          */
-        void operator += (Vector b) {
+        inline void operator += (const Vector<T> &b) {
             x += b.x;
             y += b.y;
             z += b.z;
         }
 
         /**
-         * Vector component wise multiplication.
+         * Vector<T> component wise multiplication.
          *
          * @param values none.
-         * @return multiplication result in float.
+         * @return multiplication result in T.
          */
-        Vector operator * (Vector b) {
-            return Vector(x*b.x, y*b.y, z*b.z);
+        inline Vector<T> operator * (const Vector<T> &b) const {
+            return Vector<T>(x*b.x, y*b.y, z*b.z);
         }
 
         /**
-         * Vector multiplication.
+         * Vector<T> multiplication.
          * 
          * x1*x2 + y1*y2 + z1*z2
          *
          * @param values none.
-         * @return multiplication result in float.
+         * @return multiplication result in T.
          */
-        float operator ^ (Vector b) {
+        inline T operator ^ (const Vector<T> &b) const {
             return x*b.x + y*b.y + z*b.z;
         }
 
         /**
-         * Vector equals.
+         * Vector<T> equals.
          * True is all components are equal
          *
          * @param values none.
          * @return bool.
          */
-        bool operator == (Vector b) {
+        inline bool operator == (const Vector<T> &b) const {
             return x==b.x && y==b.y && z==b.z;
         }
 
         /**
-         * Vector not equals.
+         * Vector<T> not equals.
          * true if any component not equal
          *
          * @param values none.
          * @return bool.
          */
-        bool operator != (Vector b) {
+        inline bool operator != (const Vector<T> &b) const {
             return !(x==b.x && y==b.y && z==b.z);
         }
 
@@ -250,8 +246,8 @@ class Vector {
          * @param values none.
          * @return Vector.
          */
-        Vector cross(Vector b) {
-            return Vector(
+        inline Vector<T> cross(const Vector<T> &b) const {
+            return Vector<T>(
                 y*b.z-z*b.y,
                 z*b.x-x*b.z,
                 x*b.y-y*b.x
@@ -263,11 +259,11 @@ class Vector {
          * 
          *
          * @param values none.
-         * @return angle(float) in radians.
+         * @return angle(T) in radians.
          */
-        float getAngleTo(Vector b) {
+        inline T getAngleTo(const Vector<T> &b) const {
             
-            float ca = (*this)^b/(magnitude()*b.magnitude());
+            T ca = (*this)^b/(magnitude()*b.magnitude());
 
             return acos(ca);
 
@@ -281,7 +277,7 @@ class Vector {
          * @param values none.
          * @return Vector.
          */
-        Vector getProjectionOn(Vector b) {
+        inline Vector<T> getProjectionOn(const Vector<T> &b) const {
 
             b.normalize();
 
@@ -301,7 +297,7 @@ class Vector {
          * @param values digits.
          * @return String.
          */
-        String toString(uint8_t digits = 2) {
+        inline String toString(const uint8_t &digits = 2) const {
             return "x: " + String(x, digits) + ", y: " + String(y, digits) + ", z: " + String(z, digits);  
         }
         #endif
@@ -310,11 +306,11 @@ class Vector {
 };
 
 
-//Is a vector with a z component of -9.81.
-#define GRAVITY_VECTOR Vector(0,0,-9.81)
+//Is a vector<T> with a z component of -9.81.
+#define GRAVITY_VECTOR Vector<>(0,0,-9.81)
 
-
-extern Vector sqrt(Vector a);
+template <typename T = float>
+inline extern Vector<T> sqrt(const Vector<T> &a);
 
 
 #endif

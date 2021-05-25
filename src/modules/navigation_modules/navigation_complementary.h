@@ -92,7 +92,7 @@ public:
     virtual void setHome(WorldPosition homePosition) {
 
         navigationData_.homePosition = homePosition;
-        navigationData_.position = Vector(0);
+        navigationData_.position = Vector<>(0);
 
     }
 
@@ -132,30 +132,26 @@ private:
     NavigationData navigationData_;
 
     //Filter data
-    LowPassFilter<Vector> gyroLPF_ = LowPassFilter<Vector>(0.01);
-
-    LowPassFilter<Vector> accelBiasLPF_ = LowPassFilter<Vector>(0.2);
-
-    LowPassFilter<Vector> accelLPF_ = LowPassFilter<Vector>(3000);
+    LowPassFilter<Vector<>> gyroLPF_ = LowPassFilter<Vector<>>(0.01);
+    LowPassFilter<Vector<>> accelBiasLPF_ = LowPassFilter<Vector<>>(0.2);
+    LowPassFilter<Vector<>> accelLPF_ = LowPassFilter<Vector<>>(3000);
 
     uint32_t _lastGyroTimestamp = 0;
     uint32_t _lastAccelTimestamp = 0;
     uint32_t _lastMagTimestamp = 0;
-
     uint32_t _lastBaroTimestamp = 0;
 
     uint32_t _lastLoopTimestamp = 0;
 
-    Vector _lastGyroValue = 0;
-
+    Vector<> _lastGyroValue = 0;
     float _lastHeightValue = 0;
-    //Vector _gyroOffset = 0;
+    //Vector<> _gyroOffset = 0;
 
-    Vector _magOffset = Vector(-40.24, 56.43, -42.97);
-    Vector _magScale = Vector(1.01, 1.03, 0.96);
+    Vector<> _magOffset = Vector<>(-40.24, 56.43, -42.97);
+    Vector<> _magScale = Vector<>(1.01, 1.03, 0.96);
 
-    Vector _accelBias = 0;//Vector(-0.085,-0.07,0.105);
-    Vector _accelScale = 1;//Vector(0,0,1.00765f);
+    Vector<> _accelBias = 0;//Vector<>(-0.085,-0.07,0.105);
+    Vector<> _accelScale = 1;//Vector<>(0,0,1.00765f);
 
     //System information flagges
     bool _angularRateValid = false;

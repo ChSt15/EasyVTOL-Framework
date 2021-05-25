@@ -21,18 +21,16 @@
 #endif
 
 
-
+template <typename T = float>
 class Quaternion {
     public:
     
-        float w;
-        float x;
-        float y;
-        float z;
-
-        bool valid = true;
+        T w;
+        T x;
+        T y;
+        T z;
         
-        Quaternion() {
+        Quaternion<T>() {
             w = 0.0f;
             x = 0.0f;
             y = 0.0f;
@@ -40,37 +38,36 @@ class Quaternion {
         }
 
         /**
-         * Creates a Quaternion where the rotational axis
-         * is around the given Vector (Does not need to be a unit vector)
+         * Creates a Quaternion<T> where the rotational axis
+         * is around the given Vector<T> (Does not need to be a unit vector)
          * and the rotation of "angle" [Rad].
          *
          * @param values axis[Vector] and angle[Rad]
          * @return none.
          */
-        Quaternion(Vector axis, float angle) {
+        Quaternion<T>(const Vector<T> &axis, const T &angle) {
 
             if (axis.isZeroVector()) {
 
-                *this = Quaternion(1,0,0,0);
+                *this = Quaternion<T>(1,0,0,0);
 
             } else {
 
-                axis.normalize();
+                Vector<T> axisNorm = axis.copy().normalize();
 
-                angle /= 2.0f;
-                float sa = sinf(angle);
+                T sa = sinf(angle/2);
                 
-                w = cosf(angle);
-                x = axis.x*sa;
-                y = axis.y*sa;
-                z = axis.z*sa;
+                w = cosf(angle/2);
+                x = axisNorm.x*sa;
+                y = axisNorm.y*sa;
+                z = axisNorm.z*sa;
 
             }
 
         }
 
 
-        Quaternion(const Vector &vector) {
+        Quaternion<T>(const Vector<T> &vector) {
     
             w = 0;
             x = vector.x;
@@ -80,12 +77,12 @@ class Quaternion {
         }
         
 
-        Vector toVector() {
-            return Vector(x,y,z);
+        inline Vector<T> toVector() const {
+            return Vector<T>(x,y,z);
         }
 
         
-        Quaternion(const float &nw, const float &nx, const float &ny, const float &nz) {
+        Quaternion<T>(const T &nw, const T &nx, const T &ny, const T &nz) {
             this->w = nw;
             this->x = nx;
             this->y = ny;
@@ -93,14 +90,14 @@ class Quaternion {
         }
 
         /**
-         * Simpler version of Quaternion(float nw, float nx, float ny, float nz)
+         * Simpler version of Quaternion<T>(T nw, T nx, T ny, T nz)
          * but w is set to 0.
          *
          * @param values x, y and z
          * @return none.
          */
 
-        Quaternion(const float &nx, const float &ny, const float &nz) {
+        Quaternion<T>(const T &nx, const T &ny, const T &nz) {
             this->w = 0.0f;
             this->x = nx;
             this->y = ny;
@@ -115,7 +112,7 @@ class Quaternion {
          * @param values none
          * @return copy of conjugated Quaternion.
          */
-        Quaternion& conjugate() {
+        inline Quaternion& conjugate() {
             x = -x;
             y = -y;
             z = -z;
@@ -129,19 +126,19 @@ class Quaternion {
          * @param values none
          * @return Magnitude.
          */
-        float getMagnitude() {
+        inline T getMagnitude() const {
 
-            return sqrtf(w*w + x*x + y*y + z*z);
+            return sqrt(w*w + x*x + y*y + z*z);
 
         }
 
         /**
          * Computes the axis[Unit Vector] of rotation and angle[Rad].
          *
-         * @param values pointer to axis Vector and angle float
+         * @param values pointer to axis Vector<T> and angle T
          * @return none.
          */
-        void getAxisAngle(Vector &axis, float &angle) {
+        inline void getAxisAngle(Vector<T> &axis, T &angle) const {
 
             axis.x = this->x;
             axis.y = this->y;
@@ -154,16 +151,16 @@ class Quaternion {
         }
 
         /**
-         * Normalises the Quaternion (Gives length of 1).
+         * Normalises the Quaternion<T> (Gives length of 1).
          * If sign is true then w will be positive
          * (Makes calculations sometimes more reliable)
          *
          * @param values sign
          * @return normalized Quaternion.
          */
-        Quaternion& normalize(const bool &sign = false) {
+        inline Quaternion& normalize(const bool &sign = false) {
 
-            float m = getMagnitude();
+            T m = getMagnitude();
 
             if (true) {
 
@@ -190,8 +187,8 @@ class Quaternion {
          * @param values none
          * @return copy of Quaternion.
          */
-        Quaternion copy() {
-            return Quaternion(w,x,y,z);
+        inline Quaternion<T> copy() const {
+            return Quaternion<T>(w,x,y,z);
         }
 
         /**
@@ -200,7 +197,7 @@ class Quaternion {
          * @param values none
          * @return copy of Quaternion.
          */
-        Vector rotateVector(const Vector &vectorToRotate) {
+        inline Vector<T> rotateVector(const Vector<T> &vectorToRotate) const {
             return (*this*vectorToRotate*(copy().conjugate())).toVector();
         }
 
@@ -216,47 +213,47 @@ class Quaternion {
          * @param values digits.
          * @return String.
          */
-        String toString(const uint8_t &digits = 2) {
+        inline String toString(const uint8_t &digits = 2) const {
             return "w: " + String(w, digits) + ", x: " + String(x, digits) + ", y: " + String(y, digits) + ", z: " + String(z, digits);  
         }
         #endif
 
-        Quaternion operator + (const Quaternion &b) {
-            return Quaternion(w + b.w, x + b.x, y + b.y, z + b.z);
+        inline Quaternion<T> operator + (const Quaternion<T> &b) const {
+            return Quaternion<T>(w + b.w, x + b.x, y + b.y, z + b.z);
         }
 
-        Quaternion operator - (const Quaternion &b) {
-            return Quaternion(w - b.w, x - b.x, y - b.y, z - b.z);
+        inline Quaternion<T> operator - (const Quaternion<T> &b) const {
+            return Quaternion<T>(w - b.w, x - b.x, y - b.y, z - b.z);
         }
 
-        Quaternion operator - (void) {
-            return Quaternion(-w, -x, -y, -z);
+        inline Quaternion<T> operator - (void) const {
+            return Quaternion<T>(-w, -x, -y, -z);
         }
 
-        Quaternion operator * (const float &c) {
-            return Quaternion(w*c, x*c, y*c, z*c);
+        inline Quaternion<T> operator * (const T &c) const {
+            return Quaternion<T>(w*c, x*c, y*c, z*c);
         }
 
-        Quaternion operator / (const float &c) {
-            return Quaternion(w/c, x/c, y/c, z/c);
+        inline Quaternion<T> operator / (const T &c) const {
+            return Quaternion<T>(w/c, x/c, y/c, z/c);
         }
 
-        void operator *= (const float &c) {
+        inline void operator *= (const T &c) {
             w *= c;
             x *= c;
             y *= c;
             z *= c;
         }
 
-        void operator += (const Quaternion &b) {
+        inline void operator += (const Quaternion<T> &b) {
             w += b.w;
             x += b.x;
             y += b.y;
             z += b.z;
         }
 
-        Quaternion operator * (const Quaternion &q) {
-            return Quaternion(
+        inline Quaternion<T> operator * (const Quaternion<T> &q) const {
+            return Quaternion<T>(
                 w*q.w - x*q.x - y*q.y - z*q.z,  // new w
                 w*q.x + x*q.w + y*q.z - z*q.y,  // new x
                 w*q.y - x*q.z + y*q.w + z*q.x,  // new y
@@ -265,8 +262,8 @@ class Quaternion {
 
 };
 
-
-extern Quaternion sqrt(const Quaternion &a);
+template <typename T = float>
+inline extern Quaternion<T> sqrt(const Quaternion<T> &a);
 
 
 #endif

@@ -35,7 +35,7 @@ public:
      * @param values rate.
      * @return none.
      */
-    void setAngularRate(const Vector &rate) {
+    void setAngularRate(const Vector<> &rate) {
         vehicleControlSettings_.angularRate = rate;
     }
 
@@ -45,7 +45,7 @@ public:
      * @param values attitude.
      * @return none.
      */
-    void setAttitude(const Quaternion &attitude) {
+    void setAttitude(const Quaternion<> &attitude) {
         vehicleControlSettings_.attitude = attitude;
     }
 
@@ -55,7 +55,7 @@ public:
      * @param values velocity.
      * @return none.
      */
-    void setVelocity(const Vector &velocity) {
+    void setVelocity(const Vector<> &velocity) {
         vehicleControlSettings_.velocity = velocity;
     }
 
@@ -65,7 +65,7 @@ public:
      * @param values position.
      * @return none.
      */
-    void setPosition(const Vector &position) {
+    void setPosition(const Vector<> &position) {
         vehicleControlSettings_.position = position;
     }
 

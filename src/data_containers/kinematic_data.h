@@ -14,9 +14,9 @@
 class AttitudeData: virtual public DataContainerTimestamped_Base {
 public:
 
-    Vector angularAcceleration;
-    Vector angularRate;
-    Quaternion attitude = Quaternion(1,0,0,0);
+    Vector<> angularAcceleration;
+    Vector<> angularRate;
+    Quaternion<> attitude = Quaternion<>(1,0,0,0);
 
 };
 
@@ -27,11 +27,11 @@ public:
 class PositionData: virtual public DataContainerTimestamped_Base {
 public:
 
-    Vector acceleration;
+    Vector<> acceleration;
     //Acceleration with gravity removed
-    Vector linearAcceleration;
-    Vector velocity;
-    Vector position;
+    Vector<> linearAcceleration;
+    Vector<> velocity;
+    Vector<> position;
 
 };
 

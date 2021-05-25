@@ -1,6 +1,7 @@
 #include "quaternion_math.h"
 
 
-Quaternion sqrt(const Quaternion &a) {
-    return Quaternion(sqrtf(a.w), sqrtf(a.x), sqrtf(a.y), sqrtf(a.z));
+template <typename T = float>
+Quaternion<T> sqrt(const Quaternion<T> &a) {
+    return Quaternion<T>(sqrtf(a.w), sqrtf(a.x), sqrtf(a.y), sqrtf(a.z));
 }

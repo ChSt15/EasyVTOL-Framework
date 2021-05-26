@@ -21,7 +21,7 @@
 #define SX1280_BANDWIDTH        LORA_BW_1600
 #define SX1280_CODINGRATE       LORA_CR_4_5
 
-//Keep at 10mW to stay legal. 100mW is allowed in europe of spread spectrum ist implemented. (It currently isnt so dont)
+//Keep at 10mW to stay legal. 100mW is allowed in europe only if spread spectrum is implemented. (It currently isnt so dont)
 #define SX1280_POWER_dB         10       
 
 //This id the size of the buffer used to store data that was recieved and to be sent.

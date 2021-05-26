@@ -157,7 +157,7 @@ class Vector {
          * @param c Value to scale with.
          * @return copy of scaled vector.
          */
-        inline Vector<T> operator * (const auto &c) const {
+        inline Vector<T> operator * (const float &c) const {
             return Vector<T>(x*c, y*c, z*c);
         }
 
@@ -167,7 +167,7 @@ class Vector {
          * @param values none.
          * @return copy of the vector.
          */
-        inline Vector<T> operator / (const auto &c) const {
+        inline Vector<T> operator / (const float &c) const {
             return Vector<T>(x/c, y/c, z/c);
         }
 
@@ -177,7 +177,7 @@ class Vector {
          * @param values none.
          * @return nothing.
          */
-        inline void operator *= (const auto &c) {
+        inline void operator *= (const float &c) {
             x *= c;
             y *= c;
             z *= c;

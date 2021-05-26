@@ -173,10 +173,19 @@ public:
     T& operator[] (const uint32_t &index);
 
     /**
+     * Used to access buffer like an array.
+     * Indexes outside of buffer will wrap around
+     * buffer.
+     * Starts from back of buffer("oldest" element or first that was placed inside).
+     * @returns copy of element from index.
+     */
+    T operator[] (const uint32_t &index) const;
+
+    /**
      * Needs to be overloaded to also copy the data to instance.
      * Not doing this will cause 2 buffers to share the exact same elements.
      */
-    Buffer operator = (const Buffer &toBeCopied) const;
+    Buffer operator = (const Buffer &toBeCopied);
 
     /**
      * Removes all items from buffer. Not computationaly intensive.
@@ -409,7 +418,13 @@ T& Buffer<T, size_>::operator[] (const uint32_t &index) {
 
 
 template<typename T, uint32_t size_> 
-Buffer<T, size_> Buffer<T, size_>::operator = (const Buffer &toBeCopied) const {
+T Buffer<T, size_>::operator[] (const uint32_t &index) const {
+    return bufferArray_[(back_ + index)%numElements_];
+}
+
+
+template<typename T, uint32_t size_> 
+Buffer<T, size_> Buffer<T, size_>::operator = (const Buffer &toBeCopied) {
 
     uint32_t sizeToBeCopied = toBeCopied.available();
 

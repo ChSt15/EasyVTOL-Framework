@@ -82,7 +82,7 @@ class Quaternion {
         }
 
         
-        Quaternion<T>(const auto &nw, const auto &nx, const auto &ny, const auto &nz) {
+        Quaternion<T>(const T &nw, const T &nx, const T &ny, const T &nz) {
             this->w = nw;
             this->x = nx;
             this->y = ny;
@@ -138,7 +138,7 @@ class Quaternion {
          * @param values pointer to axis Vector<T> and angle T
          * @return none.
          */
-        inline void getAxisAngle(Vector<T> &axis, auto &angle) const {
+        inline void getAxisAngle(Vector<T> &axis, float &angle) const {
 
             axis.x = this->x;
             axis.y = this->y;
@@ -238,7 +238,7 @@ class Quaternion {
             return Quaternion<T>(w/c, x/c, y/c, z/c);
         }
 
-        inline void operator *= (const auto &c) {
+        inline void operator *= (const float &c) {
             w *= c;
             x *= c;
             y *= c;

@@ -66,10 +66,12 @@ protected:
      */
     bool bufferWrite(void* data, const uint32_t numberBytes) {
 
-        if (bufferWritePointer == nullptr || bufferIndex + numberBytes >= bufferMaxIndex) return;
+        if (bufferWritePointer == nullptr || bufferIndex + numberBytes >= bufferMaxIndex) return false;
 
         memcpy(bufferWritePointer + bufferIndex, data, numberBytes);
         bufferIndex += numberBytes;
+
+        return true;
 
     }
 
@@ -95,10 +97,12 @@ protected:
      */
     bool bufferRead(void* data, const uint32_t numberBytes) {
 
-        if (bufferReadPointer == nullptr || bufferIndex + numberBytes >= bufferMaxIndex) return;
+        if (bufferReadPointer == nullptr || bufferIndex + numberBytes >= bufferMaxIndex) return false;
 
         memcpy(data, bufferReadPointer + bufferIndex, numberBytes);
         bufferIndex += numberBytes;
+
+        return true;
 
     }
 

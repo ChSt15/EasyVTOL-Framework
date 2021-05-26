@@ -118,11 +118,11 @@ public:
     uint32_t getDataSize() {return 0;};
 
     bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
-        return false;
+        return true;
     }
 
     bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
-        return false;
+        return true;
     }
 
 };
@@ -137,57 +137,12 @@ public:
     uint32_t getDataSize() {return 0;};
 
     bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
-        return false;
+        return true;
     }
 
     bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
-        return false;
-    }
-
-};
-
-
-
-/**
- * Not recommended. Please create a class that inherets from KraftMessagePacket_Abstract
- */
-template<typename T>
-class KraftMessageTemplate final: public KraftMessage_Interface {
-public:
-
-    KraftMessageTemplate(const T &data, eKraftMessageType_t messageID) {
-        data_ = data;
-        messageID_ = messageID_;
-    }
-
-    uint32_t getDataTypeID() {return messageID_;}
-
-    uint32_t getDataSize() {return sizeof(T);};
-
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
-
-        if (dataByteSize < (sizeof(data_) + startByte)) return false;
-        
-        for (uint32_t i = 0; i < (dataByteSize-startByte) && i < sizeof(T); i++) ((uint8_t*)dataBytes)[i+startByte] = ((uint8_t*)data_)[i];
-
         return true;
-
     }
-
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
-
-        if (dataByteSize < (sizeof(data_)+startByte)) return false;
-        
-        for (uint32_t i = 0; i < (dataByteSize-startByte) && i < sizeof(T); i++) ((uint8_t*)data_)[i] = ((uint8_t*)dataByteSize)[i+startByte];
-
-        return true;
-
-    }
-
-private:
-
-    T data_;
-    uint32_t messageID_ = 0;
 
 };
 

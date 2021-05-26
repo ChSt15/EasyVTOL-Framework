@@ -87,24 +87,25 @@ public:
 
     KraftMessagePosition() {}
 
-    KraftMessagePosition(const Vector<> &position, const uint32_t &timestamp) {
+    KraftMessagePosition(const Vector<> &position) {
         position_ = position;
-        timestamp_ = timestamp;
     }
 
     uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_Position;}
 
-    uint32_t getDataSize() {return sizeof(Vector<>) + sizeof(timestamp_);}
+    uint32_t getDataSize() {return sizeof(Vector<>);}
 
     Vector<> getPosition() {return position_;}
-    uint32_t getTimestamp() {return timestamp_;}
 
     bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
 
         if (dataByteSize < getDataSize()) return false;
 
-        memcpy(dataBytes, &position_, sizeof(Vector<>));
-        memcpy(dataBytes + sizeof(Vector<>), &timestamp_, sizeof(uint32_t));
+        startBufferWrite(dataBytes);
+        bufferWrite(&position_.x, sizeof(position_.x));
+        bufferWrite(&position_.y, sizeof(position_.y));
+        bufferWrite(&position_.z, sizeof(position_.z));
+        endBufferWrite();
 
         return true;
 
@@ -114,8 +115,11 @@ public:
 
         if (dataByteSize < getDataSize()) return false;
 
-        memcpy(&position_, dataBytes, sizeof(Vector<>));
-        memcpy(&timestamp_, dataBytes + sizeof(Vector<>), sizeof(uint32_t));
+        startBufferRead(dataBytes);
+        bufferRead(&position_.x, sizeof(position_.x));
+        bufferRead(&position_.y, sizeof(position_.y));
+        bufferRead(&position_.z, sizeof(position_.z));
+        endBufferRead();
 
         return true;
 
@@ -125,7 +129,6 @@ public:
 private:
 
     Vector<> position_;
-    uint32_t timestamp_;
 
 };
 
@@ -193,7 +196,9 @@ public:
 
         if (dataByteSize < sizeof(eVehicleMode_t)) return false;
 
-        memcpy(dataBytes, &vehicleMode_, sizeof(eVehicleMode_t));
+        startBufferWrite(dataBytes);
+        bufferWrite(&vehicleMode_, sizeof(vehicleMode_));
+        endBufferWrite();
 
         return true;
 
@@ -203,7 +208,9 @@ public:
 
         if (dataByteSize < sizeof(eVehicleMode_t)) return false;
 
-        memcpy(&vehicleMode_, dataBytes, sizeof(eVehicleMode_t));
+        startBufferRead(dataBytes);
+        bufferRead(&vehicleMode_, sizeof(vehicleMode_));
+        endBufferRead();
 
         return true;
 
@@ -237,7 +244,9 @@ public:
 
         if (dataByteSize < sizeof(eVehicleMode_t)) return false;
 
-        memcpy(dataBytes, &vehicleMode_, sizeof(eVehicleMode_t));
+        startBufferWrite(dataBytes);
+        bufferWrite(&vehicleMode_, sizeof(vehicleMode_));
+        endBufferWrite();
 
         return true;
 
@@ -247,7 +256,9 @@ public:
 
         if (dataByteSize < sizeof(eVehicleMode_t)) return false;
 
-        memcpy(&vehicleMode_, dataBytes, sizeof(eVehicleMode_t));
+        startBufferRead(dataBytes);
+        bufferRead(&vehicleMode_, sizeof(vehicleMode_));
+        endBufferRead();
 
         return true;
 
@@ -281,7 +292,10 @@ public:
 
         if (dataByteSize < sizeof(VehicleData)) return false;
 
-        memcpy(dataBytes, &vehicleData_, sizeof(VehicleData));
+        startBufferWrite(dataBytes);
+        bufferWrite(&vehicleData_.vehicleMode, sizeof(vehicleData_.vehicleMode));
+        bufferWrite(&vehicleData_.vehicleReady, sizeof(vehicleData_.vehicleReady));
+        endBufferWrite();
 
         return true;
 
@@ -291,7 +305,10 @@ public:
 
         if (dataByteSize < sizeof(VehicleData)) return false;
 
-        memcpy(&vehicleData_, dataBytes, sizeof(VehicleData));
+        startBufferRead(dataBytes);
+        bufferRead(&vehicleData_.vehicleMode, sizeof(vehicleData_.vehicleMode));
+        bufferRead(&vehicleData_.vehicleReady, sizeof(vehicleData_.vehicleReady));
+        endBufferRead();
 
         return true;
 
@@ -324,17 +341,19 @@ public:
 
     uint32_t getDataSize() {return sizeof(channels_);}
 
-    float getChannel(const uint8_t &channel) {return channels_[constrain(channel, 0, 20)];}
+    float getChannel(const uint8_t &channel) {return channels_[constrain(channel, 0, c_maxChannels)];}
 
-    void getChannelAll(int16_t* channelArray, uint8_t numChannels = 15) {for (uint8_t i = 0; i < numChannels; i++) channelArray[i] = channels_[i];}
+    void getChannelAll(int16_t* channelArray, uint8_t numChannels = c_maxChannels) {for (uint8_t i = 0; i < numChannels; i++) channelArray[i] = channels_[i];}
 
-    void setChannel(const int16_t &value, const uint8_t &channel) {channels_[constrain(channel, 0, 20)] = value;}
+    void setChannel(const int16_t &value, const uint8_t &channel) {channels_[constrain(channel, 0, c_maxChannels)] = value;}
 
     bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
 
         if (dataByteSize < sizeof(channels_)) return false;
 
-        memcpy(dataBytes, channels_, sizeof(channels_));
+        startBufferWrite(dataBytes);
+        for (uint8_t i = 0; i < c_maxChannels; i++) bufferWrite(channels_, sizeof(channels_[0]));
+        endBufferWrite();
 
         return true;
 
@@ -344,7 +363,9 @@ public:
 
         if (dataByteSize < sizeof(channels_)) return false;
 
-        memcpy(channels_, dataBytes, sizeof(channels_));
+        startBufferRead(dataBytes);
+        for (uint8_t i = 0; i < c_maxChannels; i++) bufferRead(channels_, sizeof(channels_[0]));
+        endBufferRead();
 
         return true;
 
@@ -353,7 +374,9 @@ public:
 
 protected:
 
-    int16_t channels_[15];
+    static const uint8_t c_maxChannels = 15;
+
+    int16_t channels_[c_maxChannels];
 
 };
 
@@ -365,16 +388,15 @@ public:
     KraftMessageGNSSData() {}
 
     /**
-     * Constructor for array as input
-     * @param channels Pointer to a int16_t array.
-     * @param numChannels Number of channels to copy from channels.
+     * @param position Position data.
+     * @param sats Number of sats.
      */
     KraftMessageGNSSData(WorldPosition position, uint8_t sats) {
         position_ = position;
         sats_ = sats;
     }
 
-    virtual uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_GNSSData;}
+    uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_GNSSData;}
 
     uint32_t getDataSize() {return sizeof(position_) + sizeof(sats_);}
 
@@ -386,8 +408,12 @@ public:
 
         if (dataByteSize < getDataSize()) return false;
 
-        memcpy(dataBytes, &sats_, sizeof(sats_));
-        memcpy(dataBytes + sizeof(sats_), &position_, sizeof(position_));
+        startBufferWrite(dataBytes);
+        bufferWrite(&position_.latitude, sizeof(position_.latitude));
+        bufferWrite(&position_.longitude, sizeof(position_.longitude));
+        bufferWrite(&position_.height, sizeof(position_.height));
+        bufferWrite(&sats_, sizeof(sats_));
+        endBufferWrite();
 
         return true;
 
@@ -397,8 +423,12 @@ public:
 
         if (dataByteSize < getDataSize()) return false;
 
-        memcpy(&sats_, dataBytes, sizeof(sats_));
-        memcpy(&position_, dataBytes + sizeof(sats_), sizeof(position_));
+        startBufferRead(dataBytes);
+        bufferRead(&position_.latitude, sizeof(position_.latitude));
+        bufferRead(&position_.longitude, sizeof(position_.longitude));
+        bufferRead(&position_.height, sizeof(position_.height));
+        bufferRead(&sats_, sizeof(sats_));
+        endBufferWrite();
 
         return true;
 

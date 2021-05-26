@@ -36,6 +36,72 @@ public:
 
     virtual bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) = 0;
 
+protected:
+
+    uint32_t bufferIndex = 0;
+    uint32_t bufferMaxIndex;
+    void* bufferWritePointer = nullptr;
+    const void* bufferReadPointer = nullptr;
+
+
+    /**
+     * Call this before using bufferWrite(..). 
+     * @param pointerToBuffer Pointer to buffer where all following data will be written.
+     * @param startIndex Index of buffer to start reading from. Default 0.
+     * @param maxIndex Index of buffer to limit reading. Default max of uint32_t.
+     */
+    void startBufferWrite(void* pointerToBuffer, const uint32_t &startIndex = 0, const uint32_t &maxIndex = UINT32_MAX) {bufferIndex = startIndex; bufferMaxIndex = maxIndex; bufferWritePointer = pointerToBuffer;}
+
+    /**
+     * Call this after using bufferWrite(..). 
+     */
+    void endBufferWrite() {bufferIndex = 0; bufferWritePointer = nullptr;}
+
+    /**
+     * Used to make copy lots of data easier. 
+     * Call startBufferWrite(...) before copying and endBufferWrite() after copying all data.
+     * @param data Pointer to the data to be copied
+     * @param numberBytes Number of bytes to be copied. Simply use sizeof("data type to be copied").
+     * @returns true if copied, false if failure.
+     */
+    bool bufferWrite(void* data, const uint32_t numberBytes) {
+
+        if (bufferWritePointer == nullptr || bufferIndex + numberBytes >= bufferMaxIndex) return;
+
+        memcpy(bufferWritePointer + bufferIndex, data, numberBytes);
+        bufferIndex += numberBytes;
+
+    }
+
+    /**
+     * Call this before using bufferRead(..). 
+     * @param pointerToBuffer Pointer to buffer where all following data will be read.
+     * @param startIndex Index of buffer to start writting to. Default 0.
+     * @param maxIndex Index of buffer to limit writting. Default max of uint32_t.
+     */
+    void startBufferRead(const void* pointerToBuffer, const uint32_t &startIndex = 0, const uint32_t &maxIndex = UINT32_MAX) {bufferIndex = startIndex; bufferMaxIndex = maxIndex; bufferReadPointer = pointerToBuffer;}
+
+    /**
+     * Call this after using bufferWrite(..). 
+     */
+    void endBufferRead() {bufferIndex = 0; bufferReadPointer = nullptr; bufferIndex = 0; bufferMaxIndex = UINT32_MAX;}
+
+    /**
+     * Used to make copy lots of data easier. 
+     * Call startBufferWrite(...) before copying and endBufferWrite() after copying all data.
+     * @param data Pointer to the data to be copied
+     * @param numberBytes Number of bytes to be copied. Simply use sizeof("data type to be copied").
+     * @returns true if copied, false if failure.
+     */
+    bool bufferRead(void* data, const uint32_t numberBytes) {
+
+        if (bufferReadPointer == nullptr || bufferIndex + numberBytes >= bufferMaxIndex) return;
+
+        memcpy(data, bufferReadPointer + bufferIndex, numberBytes);
+        bufferIndex += numberBytes;
+
+    }
+
 };
 
 

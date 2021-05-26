@@ -292,7 +292,7 @@ void SX128XLT::checkBusy()
     uint32_t start = micros();
   while (digitalRead(_RFBUSY))
   {
-      delayMicroseconds(100);
+      //delayMicroseconds(250);
 
     if (micros() - start >= 5000)                     //wait 5mS for busy to complete
     {
@@ -383,7 +383,7 @@ void SX128XLT::writeRegisters(uint16_t address, uint8_t *buffer, uint16_t size)
 
   addr_l = address & 0xff;
   addr_h = address >> 8;
-  checkBusy();
+  //checkBusy();
 
 #ifdef USE_SPI_TRANSACTION     //to use SPI_TRANSACTION enable define at beginning of CPP file 
   SPI.beginTransaction(SPISettings(LTspeedMaximum, LTdataOrder, LTdataMode));
@@ -427,7 +427,7 @@ void SX128XLT::writeCommand(uint8_t Opcode, uint8_t *buffer, uint16_t size)
 #endif
 
   uint8_t index;
-  checkBusy();
+  //checkBusy();
 
 #ifdef USE_SPI_TRANSACTION     //to use SPI_TRANSACTION enable define at beginning of CPP file 
   SPI.beginTransaction(SPISettings(LTspeedMaximum, LTdataOrder, LTdataMode));
@@ -460,7 +460,7 @@ void SX128XLT::readCommand(uint8_t Opcode, uint8_t *buffer, uint16_t size)
 #endif
 
   uint8_t i;
-  checkBusy();
+  //checkBusy();
 
 
 #ifdef USE_SPI_TRANSACTION     //to use SPI_TRANSACTION enable define at beginning of CPP file 
@@ -1112,7 +1112,7 @@ void SX128XLT::printASCIIPacket(uint8_t *buffer, uint8_t size)
 }
 
 
-uint8_t SX128XLT::transmit(uint8_t *txbuffer, uint8_t size, uint16_t timeout, int8_t txpower, uint8_t wait)
+uint8_t SX128XLT::transmit(uint8_t *txbuffer, uint8_t size, uint16_t timeout, int8_t txpower, uint8_t wait) 
 {
 #ifdef SX128XDEBUG
   Serial.println(F("transmit()"));

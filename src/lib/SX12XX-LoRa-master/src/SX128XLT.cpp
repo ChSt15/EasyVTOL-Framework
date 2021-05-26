@@ -288,15 +288,13 @@ void SX128XLT::checkBusy()
   //Serial.println(F("checkBusy()"));
 #endif
 
-  uint8_t busy_timeout_cnt;
-  busy_timeout_cnt = 0;
 
+    uint32_t start = micros();
   while (digitalRead(_RFBUSY))
   {
-    delay(1);
-    busy_timeout_cnt++;
+      //delayMicroseconds(100);
 
-    if (busy_timeout_cnt > 10)                     //wait 5mS for busy to complete
+    if (micros() - start >= 5000)                     //wait 5mS for busy to complete
     {
       Serial.println(F("ERROR - Busy Timeout!"));
       resetDevice();

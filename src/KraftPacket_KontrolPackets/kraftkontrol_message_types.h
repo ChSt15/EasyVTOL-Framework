@@ -47,7 +47,12 @@ public:
 
         if (dataByteSize < sizeof(Quaternion<>)) return false;
 
-        memcpy(dataBytes, &attitude_, sizeof(Quaternion<>));
+        startBufferWrite(dataBytes);
+        bufferWrite(&attitude_.w, sizeof(attitude_.w));
+        bufferWrite(&attitude_.x, sizeof(attitude_.x));
+        bufferWrite(&attitude_.y, sizeof(attitude_.y));
+        bufferWrite(&attitude_.z, sizeof(attitude_.z));
+        endBufferWrite();
 
         return true;
 
@@ -57,7 +62,12 @@ public:
 
         if (dataByteSize < sizeof(Quaternion<>)) return false;
 
-        memcpy(&attitude_, dataBytes, sizeof(Quaternion<>));
+        startBufferRead(dataBytes);
+        bufferRead(&attitude_.w, sizeof(attitude_.w));
+        bufferRead(&attitude_.x, sizeof(attitude_.x));
+        bufferRead(&attitude_.y, sizeof(attitude_.y));
+        bufferRead(&attitude_.z, sizeof(attitude_.z));
+        endBufferRead();
 
         return true;
 

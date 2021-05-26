@@ -292,7 +292,7 @@ void SX128XLT::checkBusy()
     uint32_t start = micros();
   while (digitalRead(_RFBUSY))
   {
-      //delayMicroseconds(100);
+      delayMicroseconds(100);
 
     if (micros() - start >= 5000)                     //wait 5mS for busy to complete
     {

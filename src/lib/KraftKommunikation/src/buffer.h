@@ -556,7 +556,4 @@ bool Buffer<T, size_>::placeBack(const T &element, const bool overwrite) {
 
 
 
-
-
-
 #endif

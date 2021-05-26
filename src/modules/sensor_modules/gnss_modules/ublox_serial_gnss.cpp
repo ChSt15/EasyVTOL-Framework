@@ -18,9 +18,9 @@ void UbloxSerialGNSS::_getData() {
     //if ()
 
     WorldPosition position;
-    position.latitude = (double)gnss_.getLatitude()*10e7;
-    position.longitude = (double)gnss_.getLongitude()*10e7;
-    position.longitude = (float)gnss_.getAltitudeMSL()/1000;
+    position.latitude = (double)gnss_.getLatitude()/10e6;
+    position.longitude = (double)gnss_.getLongitude()/10e6;
+    position.height = (float)gnss_.getAltitudeMSL()/1000;
 
     positionFifo_.placeFront(position, true);
     positionTimestampFifo_.placeFront(time, true);
@@ -76,8 +76,9 @@ void UbloxSerialGNSS::thread() {
 
         } else if (micros() - lastMeasurement_ >= 500000) {
 
-            /*gnss_.factoryDefault(100);
-            init();*/
+            //gnss_.factoryDefault(100);
+            //init();
+            gnss_.flushPVT();
             lastMeasurement_ = micros();
 
         }

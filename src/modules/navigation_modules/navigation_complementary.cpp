@@ -17,22 +17,8 @@ void NavigationComplementaryFilter::thread() {
     _lastLoopTimestamp = micros();
     	
     //Predict current state
-    velocityDeadReckoning_.x += accelDeadReckoning_.x*dTime;
-    velocityDeadReckoning_.y += accelDeadReckoning_.y*dTime;
-    velocityDeadReckoning_.z += accelDeadReckoning_.z*dTime;
-
-    positionDeadReckoning_.x += velocityDeadReckoning_.x*dTime;
-    positionDeadReckoning_.y += velocityDeadReckoning_.y*dTime;
-    positionDeadReckoning_.z += velocityDeadReckoning_.z*dTime;
-
-    //Serial.println(String("pos: ") + positionDeadReckoning_.z.value + ", err: " + positionDeadReckoning_.z.error + ", vel: " + velocityDeadReckoning_.z.value + ", err: " + velocityDeadReckoning_.z.error);
-
-    navigationData_.velocity = Vector<float>(velocityDeadReckoning_.x.value, velocityDeadReckoning_.y.value, velocityDeadReckoning_.z.value);
-    navigationData_.position.x = positionDeadReckoning_.x.value;
-    navigationData_.position.y = positionDeadReckoning_.y.value;
-
-    navigationData_.absolutePosition.height = positionDeadReckoning_.z.value;
-    navigationData_.position.z = navigationData_.absolutePosition.height - navigationData_.homePosition.height;
+    velocityDeadReckoning_ += accelDeadReckoning_*dTime;
+    positionDeadReckoning_ += velocityDeadReckoning_*dTime;
 
 
     //Correct with sensor values
@@ -142,9 +128,17 @@ void NavigationComplementaryFilter::thread() {
             navigationData_.linearAcceleration = navigationData_.acceleration - Vector<>(0,0,9.81) - filtered;//accelHPF_.update(navigationData_.acceleration/* - Vector<>(0,0,9.81)*/);
 
             //Update linear acceleration
-            accelDeadReckoning_.x = ValueError<float>(navigationData_.linearAcceleration.x, accelXBuffer_.getStandardError());
-            accelDeadReckoning_.y = ValueError<float>(navigationData_.linearAcceleration.y, accelYBuffer_.getStandardError());
-            accelDeadReckoning_.z = ValueError<float>(navigationData_.linearAcceleration.z, accelZBuffer_.getStandardError());
+            ValueError<> buf = ValueError<>(navigationData_.linearAcceleration.x, accelXBuffer_.getStandardError());
+            accelDeadReckoning_.value.x = buf.value;
+            accelDeadReckoning_.error.x = buf.error;
+
+            buf = ValueError<>(navigationData_.linearAcceleration.y, accelXBuffer_.getStandardError());
+            accelDeadReckoning_.value.y = buf.value;
+            accelDeadReckoning_.error.y = buf.error;
+
+            buf = ValueError<>(navigationData_.linearAcceleration.z, accelXBuffer_.getStandardError());
+            accelDeadReckoning_.value.z = buf.value;
+            accelDeadReckoning_.error.z = buf.error;
 
             //Serial.println(String("Accel: x: ") + navigationData_.linearAcceleration.x + ", y: " + navigationData_.linearAcceleration.y + ", z: " + navigationData_.linearAcceleration.z);
             
@@ -315,12 +309,17 @@ void NavigationComplementaryFilter::thread() {
                 float velError = baroVelBuffer_.getStandardError();
 
                 //correct dead reckoning values with new ones.
-                velocityDeadReckoning_.z = velocityDeadReckoning_.z.weightedAverage(ValueError<float>(velMedian, velError));
-                positionDeadReckoning_.z = positionDeadReckoning_.z.weightedAverage(ValueError<float>(heightMedian, heightError));
+                ValueError<> heightVel = ValueError<>(velocityDeadReckoning_.value.z, velocityDeadReckoning_.error.z).weightedAverage(ValueError<>(velMedian, velError));
+                velocityDeadReckoning_.value.z = heightVel.value;
+                velocityDeadReckoning_.error.z = heightVel.error;
+
+                ValueError<> height = ValueError<>(positionDeadReckoning_.value.z, positionDeadReckoning_.error.z).weightedAverage(ValueError<>(heightMedian, heightError));
+                positionDeadReckoning_.value.z = height.value;
+                positionDeadReckoning_.error.z = height.error;
 
                 //Update output values
-                navigationData_.velocity.z = velocityDeadReckoning_.z.value;
-                navigationData_.absolutePosition.height = positionDeadReckoning_.z.value;
+                navigationData_.velocity.z = velocityDeadReckoning_.value.z;
+                navigationData_.absolutePosition.height = positionDeadReckoning_.value.z;
                 navigationData_.position.z = navigationData_.absolutePosition.height - navigationData_.homePosition.height;
 
 
@@ -361,17 +360,43 @@ void NavigationComplementaryFilter::thread() {
 
                 Vector<> positionBuf = positionAbsolute.getPositionVectorFrom(navigationData_.homePosition);
 
-                navigationData_.position.x += (positionBuf.x - navigationData_.position.x)*beta;
-                navigationData_.position.y += (positionBuf.y - navigationData_.position.y)*beta;
+                gnssPositionXBuffer_.placeFront(positionBuf.x, true);
+                gnssPositionYBuffer_.placeFront(positionBuf.y, true);
+                gnssPositionZBuffer_.placeFront(positionBuf.z, true);
+
+                if (gnssPositionXBuffer_.available() >= 2) {
+
+                    ValueError<Vector<>> position;
+                    position.value = Vector<>(gnssPositionXBuffer_.getMedian(), gnssPositionYBuffer_.getMedian(), gnssPositionZBuffer_.getMedian());
+                    position.error = Vector<>(gnssPositionXBuffer_.getStandardError(), gnssPositionYBuffer_.getStandardError(), gnssPositionZBuffer_.getStandardError());
+
+                    position = positionDeadReckoning_.weightedAverage(position);
+
+                    positionDeadReckoning_.value.x = position.value.x;
+                    positionDeadReckoning_.error.x = position.error.x;
+                    positionDeadReckoning_.value.y = position.value.y;
+                    positionDeadReckoning_.error.y = position.error.y;
+
+                }
 
             }
 
             Vector<> velocityBuf;
             if (gnss_->getVelocity(&velocityBuf, &time)) {
 
-                float beta = 0.1;
+                gnssVelocityXBuffer_.placeFront(velocityBuf.x, true);
+                gnssVelocityYBuffer_.placeFront(velocityBuf.y, true);
+                gnssVelocityZBuffer_.placeFront(velocityBuf.z, true);
 
-                navigationData_.velocity += (velocityBuf - navigationData_.velocity)*beta;
+                if (gnssVelocityXBuffer_.available() >= 2) {
+
+                    ValueError<Vector<>> velocity;
+                    velocity.value = Vector<>(gnssVelocityXBuffer_.getMedian(), gnssVelocityYBuffer_.getMedian(), gnssVelocityZBuffer_.getMedian());
+                    velocity.error = Vector<>(gnssVelocityXBuffer_.getStandardError(), gnssVelocityYBuffer_.getStandardError(), gnssVelocityZBuffer_.getStandardError());
+
+                    velocityDeadReckoning_ = velocityDeadReckoning_.weightedAverage(velocity);
+
+                }
 
             }
 
@@ -379,6 +404,18 @@ void NavigationComplementaryFilter::thread() {
 
     }
 
+
+
+    //Update output parameters
+    navigationData_.velocity = velocityDeadReckoning_.value;
+    navigationData_.velocityError = velocityDeadReckoning_.error;
+
+    navigationData_.position = positionDeadReckoning_.value;
+    navigationData_.position.z = navigationData_.absolutePosition.height - navigationData_.homePosition.height;
+
+    navigationData_.absolutePosition.height = positionDeadReckoning_.value.z;
+
+    navigationData_.positionError = positionDeadReckoning_.error;
 
     navigationData_.timestamp = micros();
 

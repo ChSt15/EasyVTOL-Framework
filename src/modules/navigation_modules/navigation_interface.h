@@ -47,22 +47,6 @@ public:
      */
     virtual void setHome(WorldPosition homePosition) = 0;
 
-    /**
-     * Returns the current position accuracy in meters.
-     * Returns -1.0 if unsupported.
-     * 
-     * @return float.
-     */
-    virtual float getPositionAccuracy() {return -1.0f;}
-
-    /**
-     * Returns the current attitude accuracy in radians.
-     * Returns -1.0 if unsupported.
-     * 
-     * @return float.
-     */
-    virtual float getAttitudeAccuracy() {return -1.0f;}
-
 };
 
 

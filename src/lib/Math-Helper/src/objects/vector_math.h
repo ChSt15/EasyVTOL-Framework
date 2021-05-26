@@ -154,10 +154,10 @@ class Vector {
         /**
          * Scales the vector.
          *
-         * @param values none.
-         * @return copy of the vector.
+         * @param c Value to scale with.
+         * @return copy of scaled vector.
          */
-        inline Vector<T> operator * (const T &c) const {
+        inline Vector<T> operator * (const auto &c) const {
             return Vector<T>(x*c, y*c, z*c);
         }
 
@@ -167,7 +167,7 @@ class Vector {
          * @param values none.
          * @return copy of the vector.
          */
-        inline Vector<T> operator / (const T &c) const {
+        inline Vector<T> operator / (const auto &c) const {
             return Vector<T>(x/c, y/c, z/c);
         }
 
@@ -177,7 +177,7 @@ class Vector {
          * @param values none.
          * @return nothing.
          */
-        inline void operator *= (const T &c) {
+        inline void operator *= (const auto &c) {
             x *= c;
             y *= c;
             z *= c;
@@ -203,6 +203,16 @@ class Vector {
          */
         inline Vector<T> operator * (const Vector<T> &b) const {
             return Vector<T>(x*b.x, y*b.y, z*b.z);
+        }
+
+        /**
+         * Vector<T> component wise multiplication.
+         *
+         * @param values none.
+         * @return multiplication result in T.
+         */
+        inline Vector<T> operator / (const Vector<T> &b) const {
+            return Vector<T>(x/b.x, y/b.y, z/b.z);
         }
 
         /**
@@ -324,7 +334,14 @@ class Vector {
 #define GRAVITY_VECTOR Vector<>(0,0,-9.81)
 
 template <typename T = float>
-extern Vector<T> sqrt(Vector<T> a);
+inline Vector<T> sqrt(Vector<T> a)  {
+    return Vector<T>(sqrt(a.x), sqrt(a.y), sqrt(a.z));
+}
+
+template <typename T = float>
+inline Vector<T> operator / (const float &a, const Vector<T> &b)  {
+    return Vector<T>(a/b.x, a/b.y, a/b.z);
+}
 
 
 #endif

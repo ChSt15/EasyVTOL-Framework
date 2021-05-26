@@ -3,6 +3,6 @@
 
 
 template<typename T = float>
-ValueError<T> sqrt(const ValueError<T> &value) {
-    return ValueError<T>(sqrt(value.value), 1/(2*sqrt(value.value)*value.error));
+extern ValueError<T> sqrt(const ValueError<T> &value) {
+    return ValueError<T>(sqrt(value.value), 1.0f/(2.0f*sqrt(value.value)*value.error));
 }

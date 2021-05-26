@@ -1,23 +1,26 @@
-#ifndef VALUEERRORH
-#define VALUEERRORH
+#ifndef VALUEERROR<T>H
+#define VALUEERROR<T>H
 
+
+
+#include "math.h"
 
 
 template<typename T = float>
 class ValueError {
 public:
 
-    ValueError() {
+    ValueError<T>() {
         value = 0;
         error = 0;
     }
 
     /**
-     * Error is defaulted to 0
+     * Error defualts to 0
      * @param value Best value
      * @return none.
      */
-    ValueError(T valueIn) {
+    ValueError<T>(T valueIn) {
         value = valueIn;
         error = 0;
     }
@@ -27,13 +30,14 @@ public:
      * @param error Error of value
      * @return none.
      */
-    ValueError(T valueIn, T errorIn) {
+    ValueError<T>(T valueIn, T errorIn) {
         value = valueIn;
         error = errorIn;
     }
 
-    //Values
+    //Best value
     T value;
+    //Error of value
     T error;
 
     //Methodes
@@ -41,12 +45,12 @@ public:
      * Calculates the resulting best value and error when combining.
      * 
      * @param secondValue Value to combine with.
-     * @returns ValueError with the most likely best value and its error.
+     * @returns ValueError<T> with the most likely best value and its error.
      */
-    ValueError weightedAverage(const ValueError &valueB) {
+    ValueError<T> weightedAverage(const ValueError<T> &valueB) {
 
         if (error == 0.0 && valueB.error == 0.0) {
-            return ValueError((value + valueB.value)/2, 0);
+            return ValueError<T>((value + valueB.value)/2, 0);
         } else if(error == 0.0) {
             return *this;
         } else if (valueB.error == 0.0) {
@@ -56,83 +60,82 @@ public:
         T w1 = 1/(error*error);
         T w2 = 1/(valueB.error*valueB.error);
 
-        return ValueError((value*w1 + valueB.value*w2)/(w1 + w2), 1/sqrt(w1 + w2));
+        return ValueError<T>((value*w1 + valueB.value*w2)/(w1 + w2), 1/sqrt(w1 + w2));
 
     }
 
     //Operators
-    ValueError& operator = (const ValueError &valueB) {
+    ValueError<T>& operator = (const ValueError<T> &valueB) {
         value = valueB.value;
         error = valueB.error;
         return *this;
     }
 
-    ValueError& operator += (const ValueError &valueB) {
+    ValueError<T>& operator += (const ValueError<T> &valueB) {
         *this = *this + valueB;
         return *this;
     }
 
-    ValueError& operator -= (const ValueError &valueB) {
+    ValueError<T>& operator -= (const ValueError<T> &valueB) {
         *this = *this - valueB;
         return *this;
     }
 
-    ValueError operator + (const ValueError &valueB) {
-        return ValueError(value + valueB.value, error + valueB.error);
+    ValueError<T> operator + (const ValueError<T> &valueB) {
+        return ValueError<T>(value + valueB.value, error + valueB.error);
     }
 
-    ValueError operator + (const T &valueB) {
-        return ValueError(value + valueB, error);
+    ValueError<T> operator + (const T &valueB) {
+        return ValueError<T>(value + valueB, error);
     }
 
-    ValueError operator - (const ValueError &valueB) {
-        return ValueError(value - valueB.value, error + valueB.error);
+    ValueError<T> operator - (const ValueError<T> &valueB) {
+        return ValueError<T>(value - valueB.value, error + valueB.error);
     }
 
-    ValueError operator - (const T &valueB) {
-        return ValueError(value - valueB, error);
+    ValueError<T> operator - (const T &valueB) {
+        return ValueError<T>(value - valueB, error);
     }
 
-    ValueError operator * (const ValueError &valueB) {
+    ValueError<T> operator * (const ValueError<T> &valueB) {
         T bestValue = value*valueB.value;
-        return ValueError(bestValue, bestValue*(error/value + valueB.error/valueB.value));
+        return ValueError<T>(bestValue, bestValue*sqrt(error/value + valueB.error/valueB.value));
     }
 
-    ValueError operator * (const T &valueB) {
-        return ValueError(value*valueB, error*valueB);
+    ValueError<T> operator * (const T &valueB) {
+        return ValueError<T>(value*valueB, error*valueB);
     }
 
-    ValueError operator / (const ValueError &valueB) {
+    ValueError<T> operator / (const ValueError<T> &valueB) {
         T bestValue = value/valueB.value;
-        return ValueError(bestValue, bestValue*(error/value + valueB.error/valueB.value));
+        return ValueError<T>(bestValue, bestValue*(error/value + valueB.error/valueB.value));
     }
 
-    ValueError operator / (const T &valueB) {
-        return ValueError(value/valueB, error/valueB);
+    ValueError<T> operator / (const T &valueB) {
+        return ValueError<T>(value/valueB, error/valueB);
     }
 
-    bool operator < (const T &valueB) {
+    bool operator < (const ValueError<T> &valueB) {
         return value < valueB.value;
     }
 
-    bool operator > (const T &valueB) {
+    bool operator > (const ValueError<T> &valueB) {
         return value > valueB.value;
     }
 
-    bool operator <= (const T &valueB) {
+    bool operator <= (const ValueError<T> &valueB) {
         return value <= valueB.value;
     }
 
-    bool operator >= (const T &valueB) {
+    bool operator >= (const ValueError<T> &valueB) {
         return value >= valueB.value;
     }
 
-    bool operator == (const T &valueB) {
+    bool operator == (const ValueError<T> &valueB) {
         return value == valueB.value;
     }
 
 };
-
 
 
 template<typename T = float>

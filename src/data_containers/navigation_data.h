@@ -102,6 +102,11 @@ struct NavigationData: public KinematicData {
     //Current absolute position
     WorldPosition absolutePosition;
 
+    //Error of velocity estimate
+    Vector<> velocityError;
+    //Error of position estimate
+    Vector<> positionError;
+
     //Current attitude solution state.
     eNavAttitudeMode_t attitudeMode = eNavAttitudeMode_t::eNavAttitudeMode_None;
     //Current position solution state.

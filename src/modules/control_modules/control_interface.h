@@ -18,13 +18,13 @@ public:
      * Sets the control modules guidance module.
      * @param guidanceModule Pointer to module to use.
      */
-    inline virtual void setGuidanceModule(Guidance_Interface* guidanceModule) = 0;
+    virtual void setGuidanceModule(Guidance_Interface* guidanceModule) = 0;
 
     /**
      * Sets the control modules navigation module.
      * @param navigationModule Pointer to module to use.
      */
-    inline virtual void setGuidanceModule(Navigation_Interface* navigationModule) = 0;
+    virtual void setGuidanceModule(Navigation_Interface* navigationModule) = 0;
 
     /**
      * Returns the kinematics the system needs to achieve the desired
@@ -32,7 +32,7 @@ public:
      *
      * @return dynamicSetpoint.
      */
-    inline virtual DynamicData getDynamicsOutput() = 0;
+    virtual DynamicData getDynamicsOutput() = 0;
 
     /**
      * Returns the a pointer to a struct with the kinematics the system 
@@ -40,7 +40,7 @@ public:
      *
      * @return dynamicSetpoint pointer.
      */
-    inline virtual DynamicData* getDynamicsOutputPointer() = 0;
+    virtual DynamicData* getDynamicsOutputPointer() = 0;
 
     
 };

@@ -99,23 +99,6 @@ public:
     }
 
 
-    /**
-     * Returns the current position accuracy in meters.
-     * Returns -1.0 if unsupported.
-     * 
-     * @return float.
-     */
-    //virtual float getPositionAccuracy() {return -1.0f;}
-
-    /**
-     * Returns the current attitude accuracy in radians.
-     * Returns -1.0 if unsupported.
-     * 
-     * @return float.
-     */
-    //virtual float getAttitudeAccuracy() {return -1.0f;}
-
-
 private:
 
     //Gyro that will be used by Navigation module
@@ -146,13 +129,21 @@ private:
     Buffer<float, 10> accelYBuffer_;
     Buffer<float, 10> accelZBuffer_;
 
+    Buffer<float, 5> gnssPositionXBuffer_;
+    Buffer<float, 5> gnssPositionYBuffer_;
+    Buffer<float, 5> gnssPositionZBuffer_;
+
+    Buffer<float, 5> gnssVelocityXBuffer_;
+    Buffer<float, 5> gnssVelocityYBuffer_;
+    Buffer<float, 5> gnssVelocityZBuffer_;
+
     Buffer<float, 10> baroHeightBuffer_;
     Buffer<float, 10> baroVelBuffer_;
 
     //Deadreckoning values
-    Vector<ValueError<float>> accelDeadReckoning_;
-    Vector<ValueError<float>> velocityDeadReckoning_;
-    Vector<ValueError<float>> positionDeadReckoning_;
+    ValueError<Vector<>> accelDeadReckoning_;
+    ValueError<Vector<>> velocityDeadReckoning_;
+    ValueError<Vector<>> positionDeadReckoning_;
 
     uint32_t _lastGyroTimestamp = 0;
     uint32_t _lastAccelTimestamp = 0;

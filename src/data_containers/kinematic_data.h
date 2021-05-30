@@ -15,8 +15,13 @@ class AttitudeData: virtual public DataContainerTimestamped_Base {
 public:
 
     Vector<> angularAcceleration;
+    Vector<> angularAccelerationError = 0;
+
     Vector<> angularRate;
+    Vector<> angularRateError = 0;
+
     Quaternion<> attitude = Quaternion<>(1,0,0,0);
+    Quaternion<> attitudeError = 0;
 
 };
 
@@ -27,11 +32,17 @@ public:
 class PositionData: virtual public DataContainerTimestamped_Base {
 public:
 
+    //Total acceleration
     Vector<> acceleration;
-    //Acceleration with gravity removed
+    Vector<> accelerationError = 0;
+    //Acceleration with gravity removed. Error is the same as accelerationError
     Vector<> linearAcceleration;
+
     Vector<> velocity;
+    Vector<> velocityError = 0;
+
     Vector<> position;
+    Vector<> positionError = 0;
 
 };
 

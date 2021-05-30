@@ -64,7 +64,7 @@ protected:
      * @param numberBytes Number of bytes to be copied. Simply use sizeof("data type to be copied").
      * @returns true if copied, false if failure.
      */
-    bool bufferWrite(void* data, const uint32_t numberBytes) {
+    bool bufferWrite(void* data, const uint32_t &numberBytes) {
 
         if (bufferWritePointer == nullptr || bufferIndex + numberBytes >= bufferMaxIndex) return false;
 
@@ -95,7 +95,7 @@ protected:
      * @param numberBytes Number of bytes to be copied. Simply use sizeof("data type to be copied").
      * @returns true if copied, false if failure.
      */
-    bool bufferRead(void* data, const uint32_t numberBytes) {
+    bool bufferRead(void* data, const uint32_t &numberBytes) {
 
         if (bufferReadPointer == nullptr || bufferIndex + numberBytes >= bufferMaxIndex) return false;
 

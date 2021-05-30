@@ -14,7 +14,8 @@
 
 
 enum eKraftMessageType_KraftKontrol_t : uint8_t {
-    eKraftMessageType_KraftKontrol_Attitude = eKraftMessageType_t::eKraftMessageType_StandardEnd_ID, //Set first to ID of free not reserved IDs.
+    eKraftMessageType_KraftKontrol_AttitudeSet = eKraftMessageType_t::eKraftMessageType_StandardEnd_ID, //Set first to ID of free not reserved IDs.
+    eKraftMessageType_KraftKontrol_AttitudeIs,
     eKraftMessageType_KraftKontrol_Position,
     eKraftMessageType_KraftKontrol_FullKinematics,
     eKraftMessageType_KraftKontrol_VehicleModeSet,
@@ -26,16 +27,72 @@ enum eKraftMessageType_KraftKontrol_t : uint8_t {
 
 
 
-class KraftMessageAttitude: public KraftMessage_Interface {
+class KraftMessageAttitudeIs: public KraftMessage_Interface {
 public:
 
-    KraftMessageAttitude() {}
+    KraftMessageAttitudeIs() {}
 
-    KraftMessageAttitude(const Quaternion<> &attitude) {
+    KraftMessageAttitudeIs(const Quaternion<> &attitude) {
         attitude_ = attitude;
     }
 
-    uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_Attitude;}
+    uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_AttitudeIs;}
+
+    uint32_t getDataSize() {return sizeof(Quaternion<>);}
+
+    Quaternion<> getAttitude() {return attitude_;}
+
+    void setAttitude(Quaternion<> attitude) {attitude_ = attitude;}
+
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+
+        if (dataByteSize < sizeof(Quaternion<>)) return false;
+
+        startBufferWrite(dataBytes);
+        bufferWrite(&attitude_.w, sizeof(attitude_.w));
+        bufferWrite(&attitude_.x, sizeof(attitude_.x));
+        bufferWrite(&attitude_.y, sizeof(attitude_.y));
+        bufferWrite(&attitude_.z, sizeof(attitude_.z));
+        endBufferWrite();
+
+        return true;
+
+    }
+
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
+
+        if (dataByteSize < sizeof(Quaternion<>)) return false;
+
+        startBufferRead(dataBytes);
+        bufferRead(&attitude_.w, sizeof(attitude_.w));
+        bufferRead(&attitude_.x, sizeof(attitude_.x));
+        bufferRead(&attitude_.y, sizeof(attitude_.y));
+        bufferRead(&attitude_.z, sizeof(attitude_.z));
+        endBufferRead();
+
+        return true;
+
+    }
+
+
+private:
+
+    Quaternion<> attitude_;
+
+};
+
+
+
+class KraftMessageAttitudeSet: public KraftMessage_Interface {
+public:
+
+    KraftMessageAttitudeSet() {}
+
+    KraftMessageAttitudeSet(const Quaternion<> &attitude) {
+        attitude_ = attitude;
+    }
+
+    uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_AttitudeSet;}
 
     uint32_t getDataSize() {return sizeof(Quaternion<>);}
 
@@ -334,7 +391,7 @@ public:
      * @param numChannels Number of channels to copy from channels.
      */
     KraftMessageRCChannels(int16_t* channels, const uint8_t &numChannels) {
-        for (uint8_t i = 0; i < numChannels && i < sizeof(channels_)/sizeof(channels_[0]); i++) channels_[i] = channels[i];
+        for (uint8_t i = 0; i < numChannels && i < c_maxChannels; i++) channels_[i] = channels[i];
     }
 
     virtual uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_RCChannels;}

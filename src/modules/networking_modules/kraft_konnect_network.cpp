@@ -16,6 +16,7 @@ void KraftKonnectNetwork::thread() {
 
         commsPort_->loop();
 
+        //Send heartbeat
         if (!commsPort_->networkBusy() && heartbeatInterval_.isTimeToRun()) {
 
             KraftMessageHeartbeat message;
@@ -23,10 +24,28 @@ void KraftKonnectNetwork::thread() {
 
         }
 
+        //Check if last message from a node was so long ago that there must be no more connection
+        for (uint8_t i = 0; i < 255; i++) {
+
+            if (nodeConnected_[i] && micros() - nodeTimestamp_[i] >= heartbeatInterval_.getIntervalMicros()*3) {
+                nodeConnected_[i] = false;
+
+                //Call event handler for timeout
+                if (timeoutEventHandlers_[i] != nullptr) timeoutEventHandlers_[i]();
+
+            }
+
+        }
+
         if (commsPort_->messageAvailable()) {
 
             MessageData messageData = commsPort_->getMessageInformation();
 
+            //Update timestamp
+            nodeTimestamp_[messageData.transmitterID] = micros();
+            nodeConnected_[messageData.transmitterID] = true;
+
+            //Run event handler if given
             if (eventHandlers_[messageData.payloadID] != nullptr) eventHandlers_[messageData.payloadID]();
 
             if (commsPort_->messageAvailable()) { //Check if the message has been removed. If not then remove. This is to keep unknown messages from blokcing the queue.
@@ -72,6 +91,12 @@ void KraftKonnectNetwork::thread() {
 void KraftKonnectNetwork::init() {
 
     for (uint16_t i = 0; i < sizeof(eventHandlers_)/sizeof(eventHandlers_[0]); i++) eventHandlers_[i] = nullptr;
+
+    for (uint16_t i = 0; i < sizeof(timeoutEventHandlers_)/sizeof(timeoutEventHandlers_[0]); i++) timeoutEventHandlers_[i] = nullptr;
+
+    for (uint16_t i = 0; i < sizeof(nodeTimestamp_)/sizeof(nodeTimestamp_[0]); i++) nodeTimestamp_[i] = 0;
+
+    for (uint16_t i = 0; i < sizeof(nodeConnected_)/sizeof(nodeConnected_[0]); i++) nodeConnected_[i] = false;
 
     moduleStatus_ = eModuleStatus_t::eModuleStatus_Running;
 

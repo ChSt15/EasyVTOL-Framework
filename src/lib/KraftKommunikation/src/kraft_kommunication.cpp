@@ -212,13 +212,15 @@ void KraftKommunication::loop() {
 
                     case eKraftMessageType_t::eKraftMessageType_Heartbeat_ID:
 
-                       // Serial.println("Packet was a heartbeat");
+                        // Serial.println("Packet was a heartbeat");
+                        receivedPackets_.placeFront(message);
 
                         break;
 
                     case eKraftMessageType_t::eKraftMessageType_RadioSettings_ID:
 
                         //Serial.println("Packet was for radiosettings");
+                        receivedPackets_.placeFront(message);
 
                         break;
 

@@ -51,11 +51,26 @@ public:
      */
     void setEventHandler(void (*eventHandler)(void), uint8_t eventMessageType) {eventHandlers_[constrain(eventMessageType, 0, 255)] = eventHandler;}
 
+    /**
+     * Given function will be called when message is received.
+     * 
+     * @param eventHandler Pointer to the function to be called.
+     * @param eventMessageType What message to trigger event. Should be a message type
+     */
+    void setNodeTimeoutHandler(void (*eventHandler)(void), uint8_t nodeID) {timeoutEventHandlers_[constrain(nodeID, 0, 255)] = eventHandler;}
+
 
 private:
 
     //Receive handlers. These are called when a certain message type was received.
     void (*eventHandlers_[255])(void);
+    //Timeout handlers. These are called when communication with a node was lost. (no more heartbeats received)
+    void (*timeoutEventHandlers_[255])(void);
+
+    //Timestamps for last received messages from a node
+    uint32_t nodeTimestamp_[255];
+    bool nodeConnected_[255];
+
 
     KraftKommunication* commsPort_ = nullptr;
 

@@ -42,6 +42,11 @@ public:
      */
     virtual DynamicData* getDynamicsOutputPointer() = 0;
 
+    /**
+     * Resets control module. Things like PID I values are set to 0.
+     */
+    virtual void reset() = 0;
+
     
 };
 

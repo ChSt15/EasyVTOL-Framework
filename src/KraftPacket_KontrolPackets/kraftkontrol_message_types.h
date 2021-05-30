@@ -334,14 +334,14 @@ public:
      * @param numChannels Number of channels to copy from channels.
      */
     KraftMessageRCChannels(int16_t* channels, const uint8_t &numChannels) {
-        for (uint8_t i = 0; i < numChannels && i < sizeof(channels_)/sizeof(int16_t); i++) channels_[i] = channels[i];
+        for (uint8_t i = 0; i < numChannels && i < sizeof(channels_)/sizeof(channels_[0]); i++) channels_[i] = channels[i];
     }
 
     virtual uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_RCChannels;}
 
     uint32_t getDataSize() {return sizeof(channels_);}
 
-    float getChannel(const uint8_t &channel) {return channels_[constrain(channel, 0, c_maxChannels)];}
+    int16_t getChannel(const uint8_t &channel) {return channels_[constrain(channel, 0, c_maxChannels)];}
 
     void getChannelAll(int16_t* channelArray, uint8_t numChannels = c_maxChannels) {for (uint8_t i = 0; i < numChannels; i++) channelArray[i] = channels_[i];}
 

@@ -37,6 +37,13 @@ class Quaternion {
             z = 0.0f;
         }
 
+        Quaternion<T>(const T &value) {
+            w = value;
+            x = value;
+            y = value;
+            z = value;
+        }
+
         /**
          * Creates a Quaternion<T> where the rotational axis
          * is around the given Vector<T> (Does not need to be a unit vector)

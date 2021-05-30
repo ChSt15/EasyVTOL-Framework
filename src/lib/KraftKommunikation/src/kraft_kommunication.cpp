@@ -195,6 +195,13 @@ void KraftKommunication::loop() {
 
             if (decodeMessageFromBuffer(&message, &ackRequested, packet, sizeof(packet))) {
 
+                if (ackRequested) {
+                    
+                    KraftMessageACK ack;
+                    sendMessage(&ack, message.messageData.transmitterID);
+
+                }
+
                 if (message.messageData.receiverID == selfID_ || message.messageData.receiverID == eKraftPacketNodeID_t::eKraftPacketNodeID_broadcast) { //Make sure packet is for us.
 
                     nodeData_[message.messageData.transmitterID].lastPacketTimestamp = millis();

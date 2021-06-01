@@ -241,8 +241,8 @@ public:
      * @return none.
      */
     void flushMag() {
-        _accelFifo.clear();
-        _accelTimestampFifo.clear();
+        _magFifo.clear();
+        _magTimestampFifo.clear();
     }
 
 

@@ -36,15 +36,15 @@ public:
         attitude_ = attitude;
     }
 
-    uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_AttitudeIs;}
+    uint32_t getDataTypeID() const {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_AttitudeIs;}
 
-    uint32_t getDataSize() {return sizeof(Quaternion<>);}
+    uint32_t getDataSize() const {return sizeof(Quaternion<>);}
 
-    Quaternion<> getAttitude() {return attitude_;}
+    Quaternion<> getAttitude() const {return attitude_;}
 
     void setAttitude(Quaternion<> attitude) {attitude_ = attitude;}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
 
         if (dataByteSize < sizeof(Quaternion<>)) return false;
 
@@ -59,7 +59,7 @@ public:
 
     }
 
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
 
         if (dataByteSize < sizeof(Quaternion<>)) return false;
 
@@ -92,15 +92,15 @@ public:
         attitude_ = attitude;
     }
 
-    uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_AttitudeSet;}
+    uint32_t getDataTypeID() const {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_AttitudeSet;}
 
-    uint32_t getDataSize() {return sizeof(Quaternion<>);}
+    uint32_t getDataSize() const {return sizeof(Quaternion<>);}
 
     Quaternion<> getAttitude() {return attitude_;}
 
     void setAttitude(Quaternion<> attitude) {attitude_ = attitude;}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
 
         if (dataByteSize < sizeof(Quaternion<>)) return false;
 
@@ -148,13 +148,13 @@ public:
         position_ = position;
     }
 
-    uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_Position;}
+    uint32_t getDataTypeID() const {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_Position;}
 
-    uint32_t getDataSize() {return sizeof(Vector<>);}
+    uint32_t getDataSize() const {return sizeof(Vector<>);}
 
     Vector<> getPosition() {return position_;}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -199,13 +199,13 @@ public:
         kinematics_ = kinematics;
     }
 
-    uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_FullKinematics;}
+    uint32_t getDataTypeID() const {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_FullKinematics;}
 
-    uint32_t getDataSize() {return sizeof(KinematicData);}
+    uint32_t getDataSize() const {return sizeof(KinematicData);}
 
     KinematicData getKinematics() {return kinematics_;}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
 
         if (dataByteSize < sizeof(KinematicData)) return false;
 
@@ -243,13 +243,13 @@ public:
         vehicleMode_ = vehicleMode;
     }
 
-    virtual uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_VehicleModeSet;}
+    virtual uint32_t getDataTypeID() const {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_VehicleModeSet;}
 
-    uint32_t getDataSize() {return sizeof(eVehicleMode_t);}
+    uint32_t getDataSize() const {return sizeof(eVehicleMode_t);}
 
     eVehicleMode_t getVehicleMode() {return vehicleMode_;}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
 
         if (dataByteSize < sizeof(eVehicleMode_t)) return false;
 
@@ -291,13 +291,13 @@ public:
         vehicleMode_ = vehicleMode;
     }
 
-    virtual uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_VehicleModeIs;}
+    virtual uint32_t getDataTypeID() const {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_VehicleModeIs;}
 
-    uint32_t getDataSize() {return sizeof(eVehicleMode_t);}
+    uint32_t getDataSize() const {return sizeof(eVehicleMode_t);}
 
     eVehicleMode_t getVehicleMode() {return vehicleMode_;}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
 
         if (dataByteSize < sizeof(eVehicleMode_t)) return false;
 
@@ -339,13 +339,13 @@ public:
         vehicleData_ = vehicleData;
     }
 
-    virtual uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_VehicleStatus;}
+    virtual uint32_t getDataTypeID() const {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_VehicleStatus;}
 
-    uint32_t getDataSize() {return sizeof(VehicleData);}
+    uint32_t getDataSize() const {return sizeof(VehicleData);}
 
     VehicleData getVehicleStatus() {return vehicleData_;}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
 
         if (dataByteSize < sizeof(VehicleData)) return false;
 
@@ -394,9 +394,9 @@ public:
         for (uint8_t i = 0; i < numChannels && i < c_maxChannels; i++) channels_[i] = channels[i];
     }
 
-    virtual uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_RCChannels;}
+    virtual uint32_t getDataTypeID() const {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_RCChannels;}
 
-    uint32_t getDataSize() {return sizeof(channels_);}
+    uint32_t getDataSize() const {return sizeof(channels_);}
 
     int16_t getChannel(const uint8_t &channel) {return channels_[constrain(channel, 0, c_maxChannels)];}
 
@@ -404,7 +404,7 @@ public:
 
     void setChannel(const int16_t &value, const uint8_t &channel) {channels_[constrain(channel, 0, c_maxChannels)] = value;}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
 
         if (dataByteSize < sizeof(channels_)) return false;
 
@@ -453,15 +453,15 @@ public:
         sats_ = sats;
     }
 
-    uint32_t getDataTypeID() {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_GNSSData;}
+    uint32_t getDataTypeID() const {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_GNSSData;}
 
-    uint32_t getDataSize() {return sizeof(position_) + sizeof(sats_);}
+    uint32_t getDataSize() const {return sizeof(position_) + sizeof(sats_);}
 
     WorldPosition getPosition() {return position_;}
 
     uint8_t getNumSats() {return sats_;}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
 
         if (dataByteSize < getDataSize()) return false;
 

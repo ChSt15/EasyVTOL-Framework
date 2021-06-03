@@ -28,19 +28,19 @@ enum eKraftMessageType_t : uint8_t {
 class KraftMessage_Interface {
 public:
 
-    virtual uint32_t getDataTypeID() = 0;
+    virtual uint32_t getDataTypeID() const = 0;
 
-    virtual uint32_t getDataSize() = 0;
+    virtual uint32_t getDataSize() const = 0;
 
-    virtual bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) = 0;
+    virtual bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const = 0;
 
     virtual bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) = 0;
 
 protected:
 
-    uint32_t bufferIndex = 0;
-    uint32_t bufferMaxIndex;
-    void* bufferWritePointer = nullptr;
+    mutable uint32_t bufferIndex = 0;
+    mutable uint32_t bufferMaxIndex;
+    mutable void* bufferWritePointer = nullptr;
     const void* bufferReadPointer = nullptr;
 
 
@@ -50,12 +50,12 @@ protected:
      * @param startIndex Index of buffer to start reading from. Default 0.
      * @param maxIndex Index of buffer to limit reading. Default max of uint32_t.
      */
-    void startBufferWrite(void* pointerToBuffer, const uint32_t &startIndex = 0, const uint32_t &maxIndex = UINT32_MAX) {bufferIndex = startIndex; bufferMaxIndex = maxIndex; bufferWritePointer = pointerToBuffer;}
+    void startBufferWrite(void* pointerToBuffer, const uint32_t &startIndex = 0, const uint32_t &maxIndex = UINT32_MAX) const {bufferIndex = startIndex; bufferMaxIndex = maxIndex; bufferWritePointer = pointerToBuffer;}
 
     /**
      * Call this after using bufferWrite(..). 
      */
-    void endBufferWrite() {bufferIndex = 0; bufferWritePointer = nullptr;}
+    void endBufferWrite() const {bufferIndex = 0; bufferWritePointer = nullptr;}
 
     /**
      * Used to make copy lots of data easier. 
@@ -64,7 +64,7 @@ protected:
      * @param numberBytes Number of bytes to be copied. Simply use sizeof("data type to be copied").
      * @returns true if copied, false if failure.
      */
-    bool bufferWrite(void* data, const uint32_t &numberBytes) {
+    bool bufferWrite(const void* data, const uint32_t &numberBytes) const {
 
         if (bufferWritePointer == nullptr || bufferIndex + numberBytes >= bufferMaxIndex) return false;
 
@@ -113,11 +113,11 @@ protected:
 class KraftMessageHeartbeat final: public KraftMessage_Interface {
 public:
 
-    uint32_t getDataTypeID() {return eKraftMessageType_t::eKraftMessageType_Heartbeat_ID;}
+    uint32_t getDataTypeID() const {return eKraftMessageType_t::eKraftMessageType_Heartbeat_ID;}
 
-    uint32_t getDataSize() {return 0;};
+    uint32_t getDataSize() const {return 0;};
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
         return true;
     }
 
@@ -132,11 +132,11 @@ public:
 class KraftMessageACK final: public KraftMessage_Interface {
 public:
 
-    uint32_t getDataTypeID() {return eKraftMessageType_t::eKraftMessageType_Ack_ID;}
+    uint32_t getDataTypeID() const {return eKraftMessageType_t::eKraftMessageType_Ack_ID;}
 
-    uint32_t getDataSize() {return 0;};
+    uint32_t getDataSize() const {return 0;};
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
         return true;
     }
 
@@ -161,13 +161,13 @@ public:
         delete[] stringPointer;
     }
 
-    uint32_t getDataTypeID() {return eKraftMessageType_t::eKraftMessageType_String_ID;}
+    uint32_t getDataTypeID() const {return eKraftMessageType_t::eKraftMessageType_String_ID;}
 
-    uint32_t getDataSize() {return sizeStringPointer;};
+    uint32_t getDataSize() const {return sizeStringPointer;};
 
-    uint32_t getStringLength() {return sizeStringPointer;}
+    uint32_t getStringLength() const {return sizeStringPointer;}
 
-    bool getString(char string[], const uint32_t &sizeStringDest) {
+    bool getString(char string[], const uint32_t &sizeStringDest) const {
 
         if (sizeStringDest < sizeStringPointer || stringPointer == nullptr) return false;
 
@@ -188,7 +188,7 @@ public:
 
     }
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
 
         return getString((char*)dataBytes+startByte, dataByteSize);
 

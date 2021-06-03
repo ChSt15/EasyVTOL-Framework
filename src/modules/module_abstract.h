@@ -6,6 +6,7 @@
 /**
  * This is a template that contains all the functions that all 
  * modules must have.
+ * Things like module status und EEPROM are inhereted from this.
 */
 
 
@@ -73,6 +74,8 @@ public:
 protected:
 
     eModuleStatus_t moduleStatus_ = eModuleStatus_t::eModuleStatus_NotStarted;
+
+
 
 
 };

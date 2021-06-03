@@ -217,7 +217,7 @@ private:
 
 template<typename T, uint32_t size_> 
 T Buffer<T, size_>::getStandardError() const {
-    if (numElements_ < 2) return T();
+    if (numElements_ <= 2) return T();
     return getStandardDeviation()/sqrt(numElements_);
 }
 

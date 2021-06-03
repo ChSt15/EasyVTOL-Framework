@@ -49,13 +49,17 @@ public:
      */
     ValueError<T> weightedAverage(const ValueError<T> &valueB) {
 
-        if (error == 0.0 && valueB.error == 0.0) {
+        if (error < 0.003 && valueB.error < 0.003) {
             return ValueError<T>((value + valueB.value)/2, 0);
-        } else if(error == 0.0) {
+        } else if(error < 0.003) {
             return *this;
-        } else if (valueB.error == 0.0) {
+        } else if (valueB.error < 0.003) {
             return valueB;
         }
+
+        if (!(value == value) && !(valueB.value == valueB.value)) return ValueError<T>(0,10000);
+        else if (!(value == value)) valueB;
+        else if (!(valueB.value == valueB.value)) *this;
 
         T w1 = 1/(error*error);
         T w2 = 1/(valueB.error*valueB.error);

@@ -1,11 +1,11 @@
-#include "eeprom_hal_teensy_4_0.h"
+#include "eeprom_hal_teensy.h"
 
 
-bool EEPROM_Teensy4_0::initialised_ = false;
+bool EEPROM_Teensy::initialised_ = false;
 
 
 
-void EEPROM_Teensy4_0::init() {
+void EEPROM_Teensy::init() {
 
     if (initialised_) return;
 
@@ -18,7 +18,7 @@ void EEPROM_Teensy4_0::init() {
 }
 
 
-bool EEPROM_Teensy4_0::commitChanges() {
+bool EEPROM_Teensy::commitChanges() {
 
     if (!initialised_) return false;
 
@@ -31,7 +31,7 @@ bool EEPROM_Teensy4_0::commitChanges() {
 }
 
 
-bool EEPROM_Teensy4_0::readBytes(const uint32_t &address, uint8_t* data, const uint32_t &numberBytes) {
+bool EEPROM_Teensy::readBytes(const uint32_t &address, uint8_t* data, const uint32_t &numberBytes) {
 
     if (!initialised_) return false;
 
@@ -42,7 +42,7 @@ bool EEPROM_Teensy4_0::readBytes(const uint32_t &address, uint8_t* data, const u
 }
 
 
-bool EEPROM_Teensy4_0::writeBytes(const uint32_t &address, const uint8_t* data, const uint32_t &numberBytes) {
+bool EEPROM_Teensy::writeBytes(const uint32_t &address, const uint8_t* data, const uint32_t &numberBytes) {
 
     if (!initialised_) return false;
 

@@ -1,5 +1,5 @@
-#ifndef EEPROM_HAL_TEENSY_4_0_H
-#define EEPROM_HAL_TEENSY_4_0_H
+#ifndef EEPROM_HAL_TEENSY_H
+#define EEPROM_HAL_TEENSY_H
 
 
 #include "Arduino.h"
@@ -8,10 +8,10 @@
 
 
 
-class EEPROM_Teensy4_0: public EEPROM_Interface {
+class EEPROM_Teensy: public EEPROM_Interface {
 public:
 
-    EEPROM_Teensy4_0(const uint32_t &version): EEPROM_Interface(version) {}
+    EEPROM_Teensy(const uint32_t &version): EEPROM_Interface(version) {}
 
     static void init();
 

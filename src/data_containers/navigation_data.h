@@ -94,18 +94,35 @@ struct WorldPosition {
 /**
  * Inherits from Kinematic but add ability to show what the current state of attitude and position solution.
  */
-struct NavigationData: public KinematicData {
+class NavigationData: public KinematicData {
+public:
+
+    NavigationData() {}
+
+    NavigationData(const KinematicData &kinematicData) {
+
+        angularAcceleration = kinematicData.angularAcceleration;
+        angularAccelerationError = kinematicData.angularAccelerationError;
+        angularRate = kinematicData.angularRate;
+        angularRateError = kinematicData.angularRateError;
+        attitude = kinematicData.attitude;
+        attitudeError = kinematicData.attitudeError;
+
+        acceleration = kinematicData.acceleration;
+        accelerationError = kinematicData.accelerationError;
+        linearAcceleration = kinematicData.linearAcceleration;
+        velocity = kinematicData.velocity;
+        velocityError = kinematicData.velocityError;
+        position = kinematicData.position;
+        positionError = kinematicData.positionError;
+
+    }
 
     //Current home position. Output is in reference to this position
     WorldPosition homePosition;
 
     //Current absolute position
     WorldPosition absolutePosition;
-
-    //Error of velocity estimate
-    Vector<> velocityError;
-    //Error of position estimate
-    Vector<> positionError;
 
     //Current attitude solution state.
     eNavAttitudeMode_t attitudeMode = eNavAttitudeMode_t::eNavAttitudeMode_None;

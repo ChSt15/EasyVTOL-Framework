@@ -7,6 +7,14 @@
 
 
 
+enum class eMagCalibStatus_t {
+    eMagCalibStatus_NotCalibrated,
+    eMagCalibStatus_Calibrating,
+    eMagCalibStatus_Calibrated
+};
+
+
+
 class Magnetometer_Interface {
 public:
 
@@ -61,6 +69,23 @@ public:
      * @return none.
      */
     virtual void flushMag() = 0;
+
+    /**
+     * @returns current calibration status
+     */
+    virtual eMagCalibStatus_t getCalibrationStatus() = 0;
+
+    /**
+     * Starts calibration.
+     */
+    virtual void startCalibration() = 0;
+
+    /**
+     * Stops calibration sequence.
+     */
+    virtual void stopCalibration() = 0;
+
+
 
 
 private:

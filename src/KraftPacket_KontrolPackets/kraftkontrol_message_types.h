@@ -16,7 +16,8 @@
 enum eKraftMessageType_KraftKontrol_t : uint8_t {
     eKraftMessageType_KraftKontrol_AttitudeSet = eKraftMessageType_t::eKraftMessageType_StandardEnd_ID, //Set first to ID of free not reserved IDs.
     eKraftMessageType_KraftKontrol_AttitudeIs,
-    eKraftMessageType_KraftKontrol_Position,
+    eKraftMessageType_KraftKontrol_PositionSet,
+    eKraftMessageType_KraftKontrol_PositionIs,
     eKraftMessageType_KraftKontrol_FullKinematics,
     eKraftMessageType_KraftKontrol_VehicleModeSet,
     eKraftMessageType_KraftKontrol_VehicleModeIs,
@@ -141,16 +142,67 @@ private:
 
 
 
-class KraftMessagePosition: public KraftMessage_Interface {
+class KraftMessagePositionIs: public KraftMessage_Interface {
 public:
 
-    KraftMessagePosition() {}
+    KraftMessagePositionIs() {}
 
-    KraftMessagePosition(const Vector<> &position) {
+    KraftMessagePositionIs(const Vector<> &position) {
         position_ = position;
     }
 
-    uint32_t getDataTypeID() const {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_Position;}
+    uint32_t getDataTypeID() const {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_PositionIs;}
+
+    uint32_t getDataSize() const {return sizeof(Vector<>);}
+
+    Vector<> getPosition() {return position_;}
+
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+
+        if (dataByteSize < getDataSize()) return false;
+
+        startBufferWrite(dataBytes);
+        bufferWrite(&position_.x, sizeof(position_.x));
+        bufferWrite(&position_.y, sizeof(position_.y));
+        bufferWrite(&position_.z, sizeof(position_.z));
+        endBufferWrite();
+
+        return true;
+
+    }
+
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
+
+        if (dataByteSize < getDataSize()) return false;
+
+        startBufferRead(dataBytes);
+        bufferRead(&position_.x, sizeof(position_.x));
+        bufferRead(&position_.y, sizeof(position_.y));
+        bufferRead(&position_.z, sizeof(position_.z));
+        endBufferRead();
+
+        return true;
+
+    }
+
+
+private:
+
+    Vector<> position_;
+
+};
+
+
+class KraftMessagePositionSet: public KraftMessage_Interface {
+public:
+
+    KraftMessagePositionSet() {}
+
+    KraftMessagePositionSet(const Vector<> &position) {
+        position_ = position;
+    }
+
+    uint32_t getDataTypeID() const {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_PositionSet;}
 
     uint32_t getDataSize() const {return sizeof(Vector<>);}
 

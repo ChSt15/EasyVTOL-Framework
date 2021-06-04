@@ -9,6 +9,9 @@
 
 #include "modules/bus_hal_modules/arduino_i2c_bus_hal.h"
 
+#include "modules/eeprom_hal_modules/eeprom_hal_interface.h"
+#include "KraftPacket_KontrolPackets/kraftkontrol_message_types.h"
+
 #include "modules/sensor_modules/magnetometer_modules/magnetometer_interface.h"
 
 #include "modules/module_abstract.h"
@@ -44,8 +47,16 @@ namespace QMC5883Registers {
 class QMC5883Driver: public Magnetometer_Interface, public Module_Abstract, public Task_Abstract, I2CBus_HAL {
 public:
 
-    QMC5883Driver(TwoWire* bus, uint8_t address = QMC5883Registers::QMC5883L_ADDR_DEFAULT) : Task_Abstract(250, eTaskPriority_t::eTaskPriority_Realtime, true), I2CBus_HAL(bus) {
+    /**
+     * This is where all calculations are done.
+     *
+     * @param bus Pointer to I2C bus to use.
+     * @param address Address of QMC5883L. Default 0x0D.
+     * @param eeprom Pointer to EEPROM module to use for calibration values.
+     */
+    QMC5883Driver(TwoWire* bus, uint8_t address = QMC5883Registers::QMC5883L_ADDR_DEFAULT, EEPROM_Interface* eeprom = nullptr) : Task_Abstract(250, eTaskPriority_t::eTaskPriority_Realtime, true), I2CBus_HAL(bus) {
         address_ = address;
+        eeprom_ = eeprom;
     }
     
     /**
@@ -137,6 +148,21 @@ public:
         magTimestampFifo_.clear();
     }
 
+    /**
+     * @returns current calibration status
+     */
+    eMagCalibStatus_t getCalibrationStatus() {return calibrationStatus_;}
+
+    /**
+     * Starts calibration sequence.
+     */
+    void startCalibration() {calibrate_ = true; calibrationStart_ = micros();}
+
+    /**
+     * Stops calibration sequence.
+     */
+    void stopCalibration() {calibrate_ = false;}
+
 
 private:
 
@@ -144,11 +170,16 @@ private:
 
     bool dataAvailable();
 
+    bool getEEPROMData();
+    bool setEEPROMData();
+
 
     Buffer <Vector<>, 10> magFifo_;
     Buffer <uint32_t, 10> magTimestampFifo_;
 
     Vector<> _lastMag;
+
+    EEPROM_Interface* eeprom_ = nullptr;
 
     IntervalControl _rateCalcInterval = IntervalControl(1); 
 
@@ -164,7 +195,15 @@ private:
 
     uint32_t _lastMeasurement = 0;
 
+    Vector<> magMin_ = -1;
+    Vector<> magMax_ = 1;
+
     bool _block = false;
+
+    bool calibrate_ = false;
+    uint32_t calibrationStart_ = 0;
+
+    eMagCalibStatus_t calibrationStatus_ = eMagCalibStatus_t::eMagCalibStatus_NotCalibrated;
 
     
 };

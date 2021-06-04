@@ -22,7 +22,9 @@ enum eKraftMessageType_KraftKontrol_t : uint8_t {
     eKraftMessageType_KraftKontrol_VehicleModeIs,
     eKraftMessageType_KraftKontrol_VehicleStatus,
     eKraftMessageType_KraftKontrol_RCChannels,
-    eKraftMessageType_KraftKontrol_GNSSData
+    eKraftMessageType_KraftKontrol_GNSSData,
+    eKraftMessageType_KraftKontrol_MagCalibIs,
+    eKraftMessageType_KraftKontrol_MagCalibSet
 };
 
 
@@ -398,11 +400,11 @@ public:
 
     uint32_t getDataSize() const {return sizeof(channels_);}
 
-    int16_t getChannel(const uint8_t &channel) {return channels_[constrain(channel, 0, c_maxChannels)];}
+    int16_t getChannel(const uint8_t &channel) {return channels_[channel];}
 
     void getChannelAll(int16_t* channelArray, uint8_t numChannels = c_maxChannels) {for (uint8_t i = 0; i < numChannels; i++) channelArray[i] = channels_[i];}
 
-    void setChannel(const int16_t &value, const uint8_t &channel) {channels_[constrain(channel, 0, c_maxChannels)] = value;}
+    void setChannel(const int16_t &value, const uint8_t &channel) {channels_[channel] = value;}
 
     bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
 
@@ -498,6 +500,133 @@ protected:
     uint8_t sats_ = 0;
 
 };
+
+
+
+class KraftMessageMagCalValuesIs: public KraftMessage_Interface {
+public:
+
+    KraftMessageMagCalValuesIs() {}
+
+    KraftMessageMagCalValuesIs(const Vector<> &magMax, const Vector<> &magMin) {
+        magMin_ = magMin;
+        magMax_ = magMax;
+    }
+
+    uint32_t getDataTypeID() const {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_MagCalibIs;}
+
+    uint32_t getDataSize() const {return sizeof(magMin_) + sizeof(magMax_);}
+
+    Vector<> getMinValue() const {return magMin_;}
+    Vector<> getMaxValue() const {return magMax_;}
+
+    void setMinMax(const Vector<> &magMax, const Vector<> &magMin) {magMin_ = magMin; magMax_ = magMax;}
+
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+
+        if (dataByteSize < getDataSize()) return false;
+
+        startBufferWrite(dataBytes);
+        bufferWrite(&magMin_.x, sizeof(magMin_.x));
+        bufferWrite(&magMin_.y, sizeof(magMin_.y));
+        bufferWrite(&magMin_.z, sizeof(magMin_.z));
+        bufferWrite(&magMax_.x, sizeof(magMax_.x));
+        bufferWrite(&magMax_.y, sizeof(magMax_.y));
+        bufferWrite(&magMax_.z, sizeof(magMax_.z));
+        endBufferWrite();
+
+        return true;
+
+    }
+
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+
+        if (dataByteSize < getDataSize()) return false;
+
+        startBufferRead(dataBytes);
+        bufferRead(&magMin_.x, sizeof(magMin_.x));
+        bufferRead(&magMin_.y, sizeof(magMin_.y));
+        bufferRead(&magMin_.z, sizeof(magMin_.z));
+        bufferRead(&magMax_.x, sizeof(magMax_.x));
+        bufferRead(&magMax_.y, sizeof(magMax_.y));
+        bufferRead(&magMax_.z, sizeof(magMax_.z));
+        endBufferRead();
+
+        return true;
+
+    }
+
+
+private:
+
+    Vector<> magMin_ = 90000000;
+    Vector<> magMax_ = -90000000;
+
+};
+
+
+
+class KraftMessageMagCalValuesSet: public KraftMessage_Interface {
+public:
+
+    KraftMessageMagCalValuesSet() {}
+
+    KraftMessageMagCalValuesSet(const Vector<> &magMax, const Vector<> &magMin) {
+        magMin_ = magMin;
+        magMax_ = magMax;
+    }
+
+    uint32_t getDataTypeID() const {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_MagCalibSet;}
+
+    uint32_t getDataSize() const {return sizeof(magMin_) + sizeof(magMax_);}
+
+    Vector<> getMinValue() const {return magMin_;}
+    Vector<> getMaxValue() const {return magMax_;}
+
+    void setMinMax(const Vector<> &magMax, const Vector<> &magMin) {magMin_ = magMin; magMax_ = magMax;}
+
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+
+        if (dataByteSize < getDataSize()) return false;
+
+        startBufferWrite(dataBytes);
+        bufferWrite(&magMin_.x, sizeof(magMin_.x));
+        bufferWrite(&magMin_.y, sizeof(magMin_.y));
+        bufferWrite(&magMin_.z, sizeof(magMin_.z));
+        bufferWrite(&magMax_.x, sizeof(magMax_.x));
+        bufferWrite(&magMax_.y, sizeof(magMax_.y));
+        bufferWrite(&magMax_.z, sizeof(magMax_.z));
+        endBufferWrite();
+
+        return true;
+
+    }
+
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+
+        if (dataByteSize < getDataSize()) return false;
+
+        startBufferRead(dataBytes);
+        bufferRead(&magMin_.x, sizeof(magMin_.x));
+        bufferRead(&magMin_.y, sizeof(magMin_.y));
+        bufferRead(&magMin_.z, sizeof(magMin_.z));
+        bufferRead(&magMax_.x, sizeof(magMax_.x));
+        bufferRead(&magMax_.y, sizeof(magMax_.y));
+        bufferRead(&magMax_.z, sizeof(magMax_.z));
+        endBufferRead();
+
+        return true;
+
+    }
+
+
+private:
+
+    Vector<> magMin_ = 90000000;
+    Vector<> magMax_ = -90000000;
+
+};
+
 
 
 #endif 

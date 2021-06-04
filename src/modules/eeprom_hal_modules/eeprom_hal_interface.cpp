@@ -46,14 +46,23 @@ bool EEPROM_Interface::writeMessage(const KraftMessage_Interface* message, const
 
     uint8_t id = message->getDataTypeID();
 
-    uint8_t buffer[size + 2];
+    uint8_t buffer[size];
 
-    buffer[0] = id;
-    buffer[1] = size;
+    //buffer[0] = id;
+    //buffer[1] = size;
 
-    if (!message->getRawData(buffer, size + 2, 2)) return false;
+    if (!message->getRawData(buffer, size)) {
+        //Serial.println("Message Get fail");
+        return false;
+    }
 
-    if (!writeBytes(address, buffer, size + 2)) return false;
+    writeBytes(address, &id, 1);
+    writeBytes(address+1, &size, 1);
+
+    if (!writeBytes(address+2, buffer, size)) {
+        //Serial.println("write bytes fail");
+        return false;
+    }
 
     return true;
 
@@ -66,17 +75,32 @@ bool EEPROM_Interface::readMessage(KraftMessage_Interface* message, const uint32
     uint8_t size = 0;
     uint8_t id = 0;
 
-    if (!readBytes(address, &size, 1)) return false;
+    if (!readBytes(address, &id, 1)) {
+        //Serial.println("read id failed");
+        return false;
+    }
 
-    if (!readBytes(address + 1, &id, 1)) return false;
+    if (!readBytes(address + 1, &size, 1)) {
+        //Serial.println("read size failed");
+        return false;
+    }
 
-    if (size != message->getDataSize() || id != message->getDataTypeID()) return false;
+    if (size != message->getDataSize() || id != message->getDataTypeID()) {
+        //Serial.println(String("message compare failed: id: ") + id + ", size: " + size);
+        return false;
+    }
 
     uint8_t buffer[size];
 
-    if (!readBytes(address + 2, buffer, size)) return false;
+    if (!readBytes(address + 2, buffer, size)) {
+        //Serial.println("read bytes failed");
+        return false;
+    }
 
-    message->setRawData(buffer, size);
+    if (!message->setRawData(buffer, size)) {
+        //Serial.println("message set failed");
+        return false;
+    }
 
     return true;
     

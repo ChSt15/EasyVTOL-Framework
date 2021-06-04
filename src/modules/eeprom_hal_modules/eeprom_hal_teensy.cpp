@@ -2,7 +2,7 @@
 
 
 bool EEPROM_Teensy::initialised_ = false;
-
+uint8_t EEPROM_Teensy::eepromState_[1000];
 
 
 void EEPROM_Teensy::init() {

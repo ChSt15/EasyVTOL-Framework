@@ -2,6 +2,9 @@
 #define EEPROM_HAL_TEENSY_H
 
 
+#ifdef ARDUINO_TEENSY40
+
+
 #include "Arduino.h"
 #include "eeprom_hal_interface.h"
 #include "EEPROM.h"
@@ -15,14 +18,16 @@ public:
 
     static void init();
 
-
-protected:
-
     bool commitChanges();
 
     bool readBytes(const uint32_t &address, uint8_t* data, const uint32_t &numberBytes);
 
     bool writeBytes(const uint32_t &address, const uint8_t* data, const uint32_t &numberBytes);
+
+
+protected:
+
+    
 
 private:
 
@@ -30,12 +35,12 @@ private:
 
     static uint8_t eepromState_[1000];
     
-    static const uint32_t eepromMax_ = 0;
+    static const uint32_t eepromMax_ = 1000;
     
 };
 
 
-
+#endif
 
 
 #endif

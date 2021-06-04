@@ -21,8 +21,8 @@ protected:
 
         if (speed != -1) bus_->setClock(speed);
 
-        if (scl != -1) bus_->setSCL(scl);
-        if (sda != -1) bus_->setSDA(sda);
+        //if (scl != -1) bus_->setSCL(scl);
+        //if (sda != -1) bus_->setSDA(sda);
 
     }
 

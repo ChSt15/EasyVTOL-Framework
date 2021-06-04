@@ -1,5 +1,7 @@
 #include "eeprom_hal_teensy.h"
 
+#ifdef ARDUINO_TEENSY40
+
 
 bool EEPROM_Teensy::initialised_ = false;
 uint8_t EEPROM_Teensy::eepromState_[1000];
@@ -51,3 +53,6 @@ bool EEPROM_Teensy::writeBytes(const uint32_t &address, const uint8_t* data, con
     return true;
 
 }
+
+
+#endif

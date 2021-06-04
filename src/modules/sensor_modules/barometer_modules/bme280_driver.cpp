@@ -45,7 +45,7 @@ void BME280Driver::thread() {
 
     if (moduleStatus_ == eModuleStatus_t::eModuleStatus_Running) {
 
-        if (/*!_bme.isMeasuring()*/true) {
+        if (!_bme.isMeasuring()) {
             
             _getData();
 
@@ -107,7 +107,7 @@ void BME280Driver::init() {
 
         _bme.setStandbyTime(6);
 
-        _bme.setMode(MODE_FORCED);
+        _bme.setMode(MODE_NORMAL);
 
         _lastMeasurement = micros();
         

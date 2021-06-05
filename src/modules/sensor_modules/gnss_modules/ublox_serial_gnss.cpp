@@ -18,8 +18,8 @@ void UbloxSerialGNSS::_getData() {
     //if ()
 
     WorldPosition position;
-    position.latitude = (double)gnss_.getLatitude()/10e6;
-    position.longitude = (double)gnss_.getLongitude()/10e6;
+    position.latitude = (double)gnss_.getLatitude()/10e6*DEGREES;
+    position.longitude = (double)gnss_.getLongitude()/10e6*DEGREES;
     position.height = (float)gnss_.getAltitudeMSL()/1000;
 
     positionFifo_.placeFront(position, true);

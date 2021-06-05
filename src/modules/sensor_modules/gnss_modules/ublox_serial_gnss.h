@@ -208,7 +208,7 @@ private:
     uint8_t numSats_ = 0;
 
     //Values used to determine true fix
-    uint8_t minNumSats_ = 6;
+    uint8_t minNumSats_ = 5;
     float maxError_ = 600;
 
     bool lockValid_ = false;

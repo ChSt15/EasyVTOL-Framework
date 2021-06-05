@@ -171,6 +171,10 @@ private:
     float _lastHeightValue = 0;
     //Vector<> _gyroOffset = 0;
 
+    float baroPressure_ = 0;
+    float sealevelPressure_ = 100e3;
+    bool seaLevelPressureCorrected_ = false;
+
 
     Vector<> magVec_ = 0;
 
@@ -194,11 +198,23 @@ private:
     /**
      * Calculates height from current pressure and pressure at sea level for reference.
      * 
-     * @param values pressure and refPressure.
-     * @return float.
+     * @param pressure Air pressure at current position.
+     * @param refPressure Air pressure at sea level.
+     * @returns altitude above reference pressure (sea level)
      */
-    float _getHeightFromPressure(const float &pressure, const float &refPressure = 1000) {
+    float getHeightFromPressure(const float &pressure, const float &refPressure) {
         return ((float)-44330.77)*(pow(((float)pressure/(float)refPressure), 0.190263) - (float)1);
+    }
+
+    /**
+     * Calculates height from current pressure and pressure at sea level for reference.
+     * 
+     * @param pressure Air pressure at current position.
+     * @param height Current height.
+     * @returns calclulated sealevel pressure.
+     */
+    float getSealevelPressureFromHeight(const float &pressure, const float &height) {
+        return pressure/pow(height/((float)-44330.77) + 1, 5.25588f);
     }
 
 

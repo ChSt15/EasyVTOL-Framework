@@ -40,7 +40,7 @@ void UbloxSerialGNSS::_getData() {
     positionCounter_++;
     velocityCounter_++;
 
-    if (numSats_ >= minNumSats_) {
+    if (numSats_ >= minNumSats_ && positionDeviation_ < 100 && altitudeDeviation_ < 100) {
         lockValid_ = true;
     } else {
         lockValid_ = false;

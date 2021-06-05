@@ -8,10 +8,11 @@
 
 
 class I2CBus_HAL {
-protected:
+public:
 
-    I2CBus_HAL(TwoWire* bus) {
+    I2CBus_HAL(TwoWire* bus, const uint8_t &address) {
         bus_ = bus;
+        address_ = address;
     }
 
     bool initBus(const int32_t &speed = -1, const int16_t &scl = -1, const int16_t &sda = -1, const int16_t &address = -1) {
@@ -28,17 +29,17 @@ protected:
 
     //Write functions
 
-    inline bool writeByte(const uint8_t &address, const uint8_t &reg, const uint8_t &data) {
-        return writeBytes(address, reg, &data, 1);
+    inline bool writeByte(const uint8_t &reg, const uint8_t &data) {
+        return writeBytes(reg, &data, 1);
     }
 
     /**
      * 
      * 
      */
-    inline bool writeBytes(const uint8_t &address, const uint8_t &reg, const void* data, const uint32_t numberBytes) {
+    inline bool writeBytes(const uint8_t &reg, const void* data, const uint32_t numberBytes) {
 
-        bus_->beginTransmission(address);
+        bus_->beginTransmission(address_);
 
         bus_->write(reg);
         bus_->write((uint8_t*)data, numberBytes);
@@ -50,19 +51,19 @@ protected:
 
     //Read functions
 
-    inline bool readByte(const uint8_t &address, const uint8_t &reg, void* data) {
-        return readBytes(address, reg, data, 1);
+    inline bool readByte(const uint8_t &reg, void* data) {
+        return readBytes(reg, data, 1);
     }
 
-    inline bool readBytes(const uint8_t &address, const uint8_t &reg, void* data, const uint32_t numberBytes) {
+    inline bool readBytes(const uint8_t &reg, void* data, const uint32_t numberBytes) {
 
-        bus_->beginTransmission(address);
+        bus_->beginTransmission(address_);
         bus_->write(reg);
         if (bus_->endTransmission(false) != 0) {
             return false;
         }
 
-        if (bus_->requestFrom(address, numberBytes) != numberBytes) {
+        if (bus_->requestFrom(address_, numberBytes) != numberBytes) {
             return false;
         }
 
@@ -76,6 +77,8 @@ protected:
 private:
 
     TwoWire* bus_;
+
+    uint8_t address_;
 
     
 };

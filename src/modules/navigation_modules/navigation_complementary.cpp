@@ -459,10 +459,8 @@ void NavigationComplementaryFilter::thread() {
 
         while (baro_->pressureAvailable() > 0) {
 
-            //Get IMU data
-            float pressure;
             uint32_t timestamp;
-            baro_->getPressure(&pressure, &timestamp);
+            baro_->getPressure(&baroPressure_, &timestamp);
 
             //Check if accelerometer initialised
             if (_baroInitialized) {
@@ -472,7 +470,7 @@ void NavigationComplementaryFilter::thread() {
                 lastBaroTimestamp_ = timestamp;
 
                 //calculate height from new pressure value
-                float heightAbsolute = _getHeightFromPressure(pressure, 100e3f);
+                float heightAbsolute = getHeightFromPressure(baroPressure_, sealevelPressure_);
                 //float heightRelative = heightAbsolute - navigationData_.absolutePosition.height;
                 //calculate z velocity from new height value
                 float zVelocity = (heightAbsolute - _lastHeightValue)/dt;
@@ -508,7 +506,7 @@ void NavigationComplementaryFilter::thread() {
                 
                 //Barometer filter initialisation
                 lastBaroTimestamp_ = timestamp;
-                _lastHeightValue = _getHeightFromPressure(pressure, 100e3f);
+                _lastHeightValue = getHeightFromPressure(baroPressure_, sealevelPressure_);
 
                 baroHeightBuffer_.placeFront(_lastHeightValue, true);
                 baroVelBuffer_.placeFront(0, true);
@@ -526,7 +524,7 @@ void NavigationComplementaryFilter::thread() {
     
     if (gnss_ != nullptr) {
 
-        while (gnss_->positionAvailable() > 0) {
+        while (gnss_->positionAvailable() > 0 && gnss_->getGNSSLockValid()) {
 
             WorldPosition positionAbsolute; uint32_t time;
             if (gnss_->getPosition(&positionAbsolute, &time)) {
@@ -547,12 +545,19 @@ void NavigationComplementaryFilter::thread() {
                     position.error = Vector<>(gnss_->getPositionAccuracy(), gnss_->getPositionAccuracy(), gnss_->getAltitudeAccuracy());
 
                     //Create corrcted prediction
-                    //position = ValueError<Vector<>>(Vector<>(navigationData_.position.x, navigationData_.position.y, navigationData_.absolutePosition.height), navigationData_.positionError).weightedAverage(position);
+                    position = ValueError<Vector<>>(Vector<>(navigationData_.position.x, navigationData_.position.y, navigationData_.absolutePosition.height), navigationData_.positionError).weightedAverage(position);
+
+                    if (!seaLevelPressureCorrected_ && baroPressure_ > 10) {
+                        seaLevelPressureCorrected_ = true;
+                        sealevelPressure_ = getSealevelPressureFromHeight(baroPressure_, positionAbsolute.height);
+                    } else if (seaLevelPressureCorrected_) {
+                        sealevelPressure_ = sealevelPressure_*0.999f + getSealevelPressureFromHeight(baroPressure_, positionAbsolute.height)*0.001f;
+                    }
 
                     //Update position values.
                     navigationData_.position.x = position.value.x;
                     navigationData_.position.y = position.value.y;
-                    navigationData_.position.z = position.value.z;
+                    navigationData_.position.z = position.value.z - navigationData_.homePosition.height;
 
                     navigationData_.positionError.x = position.error.x;
                     navigationData_.positionError.y = position.error.y;
@@ -573,16 +578,21 @@ void NavigationComplementaryFilter::thread() {
 
                     ValueError<Vector<>> velocity;
                     velocity.value = Vector<>(gnssVelocityXBuffer_.getMedian(), gnssVelocityYBuffer_.getMedian(), gnssVelocityZBuffer_.getMedian());
-                    velocity.error = Vector<>(gnssVelocityXBuffer_.getStandardError(), gnssVelocityYBuffer_.getStandardError(), gnssVelocityZBuffer_.getStandardError());
+                    velocity.error = Vector<>(gnssVelocityXBuffer_.getStandardError()+0.02, gnssVelocityYBuffer_.getStandardError()+0.02, gnssVelocityZBuffer_.getStandardError()+0.02);
                     
                     //Create corrcted prediction
-                    //velocity = ValueError<Vector<>>(navigationData_.velocity, navigationData_.velocityError).weightedAverage(velocity);
+                    velocity = ValueError<Vector<>>(navigationData_.velocity, navigationData_.velocityError).weightedAverage(velocity);
+
+                    //Serial.println(String("Vel: ") + velocity.value.toString() + ", error: " + velocity.error.toString());
 
                     //Update position values.
-                    navigationData_.velocity.x = velocity.value.x;
-                    navigationData_.velocity.y = velocity.value.y;
-                    navigationData_.velocityError.x = velocity.error.x;
-                    navigationData_.velocityError.y = velocity.error.y;
+                    //navigationData_.velocity.x = velocity.value.x;
+                    //navigationData_.velocity.y = velocity.value.y;
+                    //navigationData_.velocityError.x = velocity.error.x;
+                    //navigationData_.velocityError.y = velocity.error.y;
+
+                    navigationData_.velocity = velocity.value;
+                    navigationData_.velocityError = velocity.error;
 
                 }
 

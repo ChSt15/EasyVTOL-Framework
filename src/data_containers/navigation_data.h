@@ -9,7 +9,7 @@
 
 namespace {
 
-    const double c_earthRadius = 6371.0e3;
+    const double c_earthRadius = 6371.0*1000;
     const double c_earthMass = 5.9722e24;
     
 }
@@ -57,11 +57,11 @@ enum eNavPositionMode_t: uint8_t {
  */
 struct WorldPosition {
     //In radians
-    double latitude;
+    double latitude = 0;
     //In radians
-    double longitude;
+    double longitude = 0;
     //In meters above MSL
-    float height;
+    float height = 0;
 
     /**
      * This is fairly computational due to usage of double values.
@@ -76,15 +76,44 @@ struct WorldPosition {
      */
     Vector<> getPositionVectorFrom(const WorldPosition &referencePoint) {
 
-        float heightRef = height - referencePoint.height;
+        double heightRef = height - referencePoint.height;
 
         double radius = c_earthRadius + height;
-        float cosLat = cosf(referencePoint.latitude); 
+        double cosLat = cos(referencePoint.latitude); 
 
-        float north = (latitude - referencePoint.latitude)*radius;
-        float west = (longitude - referencePoint.longitude)*radius*cosLat;
+        double north = (latitude - referencePoint.latitude)*radius;
+        double east = (longitude - referencePoint.longitude)*radius*cosLat;
 
-        return Vector<>(north, west, heightRef);
+        return Vector<>(north, -east, heightRef);
+
+        /*
+        //Calculate helper variables
+        double radiusA = c_earthRadius + height;
+        double radiusB = c_earthRadius + referencePoint.height;
+
+        //Calculate ECEF xyz coodinates
+        float aX = radiusA*cos(latitude)*cos(longitude);
+        float aY = radiusA*cos(latitude)*sin(longitude);
+        float aZ = radiusA*sin(latitude);
+
+        float bX = radiusB*cos(referencePoint.latitude)*cos(referencePoint.longitude);
+        float bY = radiusB*cos(referencePoint.latitude)*sin(referencePoint.longitude);
+        float bZ = radiusB*sin(referencePoint.latitude);
+
+        Vector<> bToA = Vector<>(float(aX-bX), float(aY-bY), float(aZ-bZ));
+
+        //Rotate vector onto tangential plane on references coordinates
+        Quaternion<> rotation = Quaternion<>(Vector<>(0,0,1), referencePoint.longitude)*Quaternion<>(Vector<>(0,1,0), referencePoint.latitude);
+        bToA = rotation.rotateVector(bToA);
+
+        //Change to system coordinate system
+        Vector<> buf = bToA;
+
+        bToA.x = buf.z;
+        bToA.y = -buf.y;
+        bToA.z = buf.x;
+
+        return bToA;*/
 
     }
 

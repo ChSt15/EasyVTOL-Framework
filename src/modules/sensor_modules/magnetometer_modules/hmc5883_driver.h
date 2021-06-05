@@ -44,7 +44,7 @@ namespace QMC5883Registers {
 
 
 
-class QMC5883Driver: public Magnetometer_Interface, public Module_Abstract, public Task_Abstract, I2CBus_HAL {
+class QMC5883Driver: public Magnetometer_Interface, public Module_Abstract, public Task_Abstract {
 public:
 
     /**
@@ -54,8 +54,7 @@ public:
      * @param address Address of QMC5883L. Default 0x0D.
      * @param eeprom Pointer to EEPROM module to use for calibration values.
      */
-    QMC5883Driver(TwoWire* bus, uint8_t address = QMC5883Registers::QMC5883L_ADDR_DEFAULT, EEPROM_Interface* eeprom = nullptr) : Task_Abstract(250, eTaskPriority_t::eTaskPriority_Realtime, true), I2CBus_HAL(bus) {
-        address_ = address;
+    QMC5883Driver(TwoWire* bus, uint8_t address = QMC5883Registers::QMC5883L_ADDR_DEFAULT, EEPROM_Interface* eeprom = nullptr) : Task_Abstract(250, eTaskPriority_t::eTaskPriority_Realtime, true), bus_(bus, QMC5883Registers::QMC5883L_ADDR_DEFAULT) {
         eeprom_ = eeprom;
     }
     
@@ -183,7 +182,7 @@ private:
 
     IntervalControl _rateCalcInterval = IntervalControl(1); 
 
-    uint8_t address_ = 0;
+    I2CBus_HAL bus_;
 
     uint8_t _startAttempts = 0;
 

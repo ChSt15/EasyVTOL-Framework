@@ -309,6 +309,19 @@ class Vector {
 
         }
 
+        /**
+         * Computes the projection onto a plane.
+         * 
+         * @param planeNormal Planes normal vector. Gives plane its angles.
+         * @return Vector.
+         */
+        inline Vector<T> getProjectionOnPlane(const Vector<T> &planeNormal) const {
+
+            Vector<T> normalNorm = planeNormal.copy().normalize();
+
+            return *this-(*this^planeNormal)*normalNorm;
+        }
+
         #ifdef Arduino_h
         /**
          * Returns a String containing components.

@@ -19,10 +19,10 @@
 
 
 
-class MPU9250Driver: public Gyroscope_Interface, public Accelerometer_Interface, public Magnetometer_Interface, public Module_Abstract, public Task_Abstract {
+class MPU9250Driver: public Gyroscope_Interface, public Accelerometer_Interface, public Module_Abstract, public Task_Abstract {
 public:
 
-    MPU9250Driver(int interruptPin, int chipSelect, SPIClass* spiBus) : Task_Abstract(35000, eTaskPriority_t::eTaskPriority_Realtime, true), _imu(spiBus, chipSelect) {
+    MPU9250Driver(int interruptPin, int chipSelect, SPIClass* spiBus) : Task_Abstract(40000, eTaskPriority_t::eTaskPriority_Realtime, true), _imu(spiBus, chipSelect) {
         imuINTPin_ = interruptPin;
     }
     

@@ -91,6 +91,10 @@ void BME280Driver::init() {
 
     int startCode;
 
+    if (_startAttempts == 0) {
+        _bme.reset();
+    }
+
     if (useSPI_) startCode = _bme.beginSPI(chipSelectPin_);
     else {
         _bme.setI2CAddress(i2cAddress_);
@@ -103,9 +107,9 @@ void BME280Driver::init() {
         _bme.setPressureOverSample(4);
         _bme.setTempOverSample(1);
 
-        _bme.setFilter(3);
+        _bme.setFilter(2);
 
-        _bme.setStandbyTime(6);
+        _bme.setStandbyTime(0);
 
         _bme.setMode(MODE_NORMAL);
 

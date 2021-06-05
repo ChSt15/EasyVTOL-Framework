@@ -189,7 +189,7 @@ void SX1280Driver::init() {
 
 
 
-bool SX1280Driver::busy() {return isBusySending_ || toSendDataSize_ > 0;}
+bool SX1280Driver::busy() {return isBusySending_ || (toSendDataSize_ > 0);}
 
 
 

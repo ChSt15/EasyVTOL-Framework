@@ -31,6 +31,7 @@
 #include "utils/low_pass_filter.h"
 #include "utils/buffer.h"
 #include "utils/value_error.h"
+#include "utils/system_time.h"
 
 #include "data_containers/kinematic_data.h"
 
@@ -58,11 +59,13 @@ public:
 
     /**
      * This is where all calculations are done.
-     *
-     * @param values none.
-     * @return none.
      */
     void thread();
+
+    /**
+     * Initialisation of module.
+     */
+    void init();
 
     /**
      * Returns a struct containing all the vehicles
@@ -72,7 +75,7 @@ public:
      *
      * @return navigation paramenters.
      */
-    virtual NavigationData getNavigationData() {return navigationData_;};
+    NavigationData getNavigationData() {return navigationData_;};
 
     /**
      * Returns a pointer to a struct containing all 
@@ -83,7 +86,7 @@ public:
      *
      * @return kinematic parameter pointer.
      */
-    virtual NavigationData* getNavigationDataPointer() {return &navigationData_;};
+    NavigationData* getNavigationDataPointer() {return &navigationData_;};
 
     /**
      * Sets the home position.
@@ -91,7 +94,7 @@ public:
      *
      * @param homePosition Is the position to be used as home.
      */
-    virtual void setHome(WorldPosition homePosition) {
+    void setHome(WorldPosition homePosition) {
 
         navigationData_.homePosition = homePosition;
         navigationData_.position = Vector<>(0);
@@ -99,7 +102,21 @@ public:
     }
 
 
+    /**
+     * @returns magnetic vector
+     */
+    Vector<> getMag() {return magVec_;}
+
+
 private:
+
+    /**
+     * Predicts system state at given time.
+     * @param systemState Current system state to predict.
+     * @param time Absolute time of where system should be. In nanoseconds.
+     * @returns predicted state.
+     */
+    KinematicData predictState(const KinematicData &systemState, const int64_t &time);
 
     //Gyro that will be used by Navigation module
     Gyroscope_Interface* gyro_ = nullptr;
@@ -121,6 +138,7 @@ private:
     LowPassFilter<Vector<>> accelBiasLPF_ = LowPassFilter<Vector<>>(0.2);
     LowPassFilter<Vector<>> accelLPF_ = LowPassFilter<Vector<>>(3000);
 
+    //Buffers
     Buffer<float, 10> gyroXBuffer_;
     Buffer<float, 10> gyroYBuffer_;
     Buffer<float, 10> gyroZBuffer_;
@@ -140,27 +158,21 @@ private:
     Buffer<float, 10> baroHeightBuffer_;
     Buffer<float, 10> baroVelBuffer_;
 
-    //Deadreckoning values
-    ValueError<Vector<>> accelDeadReckoning_;
-    ValueError<Vector<>> velocityDeadReckoning_;
-    ValueError<Vector<>> positionDeadReckoning_;
+    //timestamps
+    uint32_t lastGyroTimestamp_ = 0;
+    uint32_t lastAccelTimestamp_ = 0;
+    uint32_t lastMagTimestamp_ = 0;
+    uint32_t lastBaroTimestamp_ = 0;
 
-    uint32_t _lastGyroTimestamp = 0;
-    uint32_t _lastAccelTimestamp = 0;
-    uint32_t _lastMagTimestamp = 0;
-    uint32_t _lastBaroTimestamp = 0;
+    uint32_t lastLoopTimestamp_ = 0;
 
-    uint32_t _lastLoopTimestamp = 0;
-
-    Vector<> _lastGyroValue = 0;
+    Vector<> lastGyroValue_ = 0;
+    ValueError<Vector<>> lastAngularRateValue_ = ValueError<Vector<>>(0, 0);
     float _lastHeightValue = 0;
     //Vector<> _gyroOffset = 0;
 
-    Vector<> _magOffset = Vector<>(-40.24, 56.43, -42.97);
-    Vector<> _magScale = Vector<>(1.01, 1.03, 0.96);
 
-    Vector<> _accelBias = 0;//Vector<>(-0.085,-0.07,0.105);
-    Vector<> _accelScale = 1;//Vector<>(0,0,1.00765f);
+    Vector<> magVec_ = 0;
 
     //System information flagges
     bool _angularRateValid = false;

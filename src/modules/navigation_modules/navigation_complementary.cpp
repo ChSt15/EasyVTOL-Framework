@@ -8,17 +8,197 @@ void NavigationComplementaryFilter::thread() {
 
         stopTaskThreading();
 
+        return;
+
     }
 
-    //if (navigationData_.absolutePosition)
+
+    //We will go through the history of sensor values to correct our model predictions.
+
+    /*while (navigationData_.timestamp < micros()) {
+
+        //Used to exit loop
+        bool newData = false;
+
+        //Used to determine oldest sensor value
+        int64_t smallestTime = micros();
+
+        //Gather valid sensor values
+        Vector<> angularRateRaw; uint32_t angularRateTime = 0;
+        if (gyro_->peekGyro(&angularRateRaw, &angularRateTime)) {
+            if (angularRateTime < smallestTime) smallestTime = angularRateTime;
+            newData = true;
+        }
+
+        Vector<> accelRaw; uint32_t accelTime = 0;
+        if (accel_->peekAccel(&accelRaw, &accelTime)) {
+            if (accelTime < smallestTime) smallestTime = accelTime;
+            newData = true;
+        }
+
+        Vector<> magRaw; uint32_t magTime = 0;
+        if ((mag_ != nullptr) ? mag_->peekMag(&magRaw, &magTime):false) {
+            if (magTime < smallestTime) smallestTime = magTime;
+            newData = true;
+        }
+
+        float baroRaw; uint32_t baroTime = 0;
+        if ((baro_ != nullptr) ? baro_->peekPressure(&baroRaw, &baroTime):false) {
+            if (baroTime < smallestTime) smallestTime = baroTime;
+            newData = true;
+        }
+
+        Vector<> gnssVelRaw; uint32_t gnssVelTime = 0;
+        if ((gnss_ != nullptr) ? gnss_->peekVelocity(&gnssVelRaw, &gnssVelTime):false) {
+            if (gnssVelTime < smallestTime) smallestTime = gnssVelTime;
+            newData = true;
+        }
+
+        Vector<> gnssPosRaw; uint32_t gnssPosTime = 0;
+        if ((gnss_ != nullptr) ? gnss_->peekVelocity(&gnssPosRaw, &gnssPosTime):false) {
+            if (gnssPosTime < smallestTime) smallestTime = gnssPosTime;
+            newData = true;
+        }
+
+
+        //Predict system state until oldest sensor timestamp
+        KinematicData statePrediction = predictState(navigationData_, smallestTime);
+
+
+        //Correct state prediction with gyro values.
+        if (angularRateTime != 0 && angularRateTime == smallestTime) {
+            
+            //Retreive gyro data
+            gyro_->getGyro(&angularRateRaw, &angularRateTime);
+
+            //Get delta time from last gyro data
+            float dTime = float(angularRateTime - lastGyroTimestamp_)/1000000.0f;
+            lastGyroTimestamp_ = angularRateTime;
+
+            //Update filters
+            if (angularRateRaw.magnitude() < 0.1f) angularRateRaw =- gyroLPF_.update(angularRateRaw);
+
+            //update buffers
+            gyroXBuffer_.placeFront(angularRateRaw.x, true);
+            gyroYBuffer_.placeFront(angularRateRaw.y, true);
+            gyroZBuffer_.placeFront(angularRateRaw.z, true);
+
+            if (gyroXBuffer_.available() >= 2) {
+
+                _gyroInitialized = true;
+
+                //Calulate measured values
+                ValueError<Vector<>> angularRate = ValueError<Vector<>>(Vector<>(gyroXBuffer_.getMedian(), gyroYBuffer_.getMedian(), gyroZBuffer_.getMedian()), Vector<>(gyroXBuffer_.getStandardError(), gyroYBuffer_.getStandardError(), gyroZBuffer_.getStandardError()));
+                ValueError<Vector<>> angularAccel = (angularRate - lastAngularRateValue_)/dTime;
+
+                //Calculate best prediction of current system
+                ValueError<Vector<>> angularAccelBest = angularAccel.weightedAverage(ValueError<Vector<>>(statePrediction.attitude.rotateVector(statePrediction.angularAcceleration), statePrediction.attitude.rotateVector(statePrediction.angularAccelerationError)));
+                ValueError<Vector<>> angularRateBest = angularRate.weightedAverage(ValueError<Vector<>>(statePrediction.attitude.rotateVector(statePrediction.angularRate), statePrediction.attitude.rotateVector(statePrediction.angularRateError)));
+
+                //Predict next system state with measured values
+                Vector<> angleChange = angularRate.value*dTime;//(navigationData_.angularAcceleration + angularAccelBest.value)*0.5*dTime*dTime + (navigationData_.angularRate + angularRateBest.value)*dTime;
+                Quaternion<> attitude = navigationData_.attitude*Quaternion<>(angleChange, angleChange.magnitude());
+
+                //Update state prediction
+                statePrediction.attitude = attitude; // Sadly no error for this yet.
+
+                statePrediction.angularRate = statePrediction.attitude.copy().conjugate().rotateVector(angularRateBest.value);
+                statePrediction.angularRateError = statePrediction.attitude.copy().conjugate().rotateVector(angularRate.error);
+
+                statePrediction.angularAcceleration = statePrediction.attitude.copy().conjugate().rotateVector(angularAccelBest.value);
+                statePrediction.angularAccelerationError = statePrediction.attitude.copy().conjugate().rotateVector(angularAccelBest.error);
+
+                //Update last values
+                lastAngularRateValue_ = angularRate;
+
+            }
+
+        }
+
+
+        //Correct state prediction with accel values
+        if (accelTime != 0 && accelTime == smallestTime) {
+            
+            //Retreive gyro data
+            accel_->getAccel(&accelRaw, &accelTime);
+
+            //Get delta time from last gyro data
+            float dTime = float(accelTime - lastAccelTimestamp_)/1000000.0f;
+            lastAccelTimestamp_ = accelTime;
+
+            //update buffers
+            accelXBuffer_.placeFront(accelRaw.x, true);
+            accelYBuffer_.placeFront(accelRaw.y, true);
+            accelZBuffer_.placeFront(accelRaw.z, true);
+
+            if (accelXBuffer_.available() >= 2) {
+
+                float beta = 0.1f;
+
+                //Z-Axis correction
+                Vector<> zAxisIs = Vector<>(0,0,1);
+                Vector<> zAxisSet = (statePrediction.attitude*accelRaw*statePrediction.attitude.copy().conjugate()).toVector();
+
+                Vector<> zAxisRotationAxis = zAxisSet.cross(zAxisIs);
+                float zAxisRotationAngle = zAxisSet.getAngleTo(zAxisIs);
+
+                Quaternion<> zAxisCorrectionQuat = Quaternion<>(zAxisRotationAxis, zAxisRotationAngle*beta*dTime);
+
+
+                //Apply state correction and normalise attitude quaternion 
+                statePrediction.attitude = zAxisCorrectionQuat*statePrediction.attitude;
+                statePrediction.attitude.normalize(true);
+
+
+                //Update acceleration
+                statePrediction.acceleration = (statePrediction.attitude*accelRaw*statePrediction.attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
+                Vector<> filtered = accelBiasLPF_.update(statePrediction.acceleration - Vector<>(0,0,9.81));
+                statePrediction.linearAcceleration = statePrediction.acceleration - Vector<>(0,0,9.81) - filtered;
+
+                //Update linear acceleration
+                ValueError<> buf = ValueError<>(navigationData_.linearAcceleration.x, accelXBuffer_.getStandardError());
+                navigationData_.acceleration.x = buf.value;
+                navigationData_.accelerationError.x = buf.error;
+
+                buf = ValueError<>(navigationData_.linearAcceleration.y, accelXBuffer_.getStandardError());
+                navigationData_.acceleration.y = buf.value;
+                navigationData_.accelerationError.y = buf.error;
+
+                buf = ValueError<>(navigationData_.linearAcceleration.z, accelXBuffer_.getStandardError());
+                navigationData_.acceleration.z = buf.value;
+                navigationData_.accelerationError.z = buf.error;
+
+                //Serial.println(String("Accel: x: ") + navigationData_.linearAcceleration.x + ", y: " + navigationData_.linearAcceleration.y + ", z: " + navigationData_.linearAcceleration.z);
+
+            }
+
+        }
+
+        //Serial.println(String("Time: ") + micros() + ", smallest: " + uint32_t(smallestTime));
+
+        //Update for next iteration
+        navigationData_ = statePrediction;
+        navigationData_.timestamp = smallestTime;
+
+        if (!newData) break;
+
+
+    }
+
+
+    return;*/
+
 
     //Calculate time delta from last run
-    float dTime = (float)(micros() - _lastLoopTimestamp)/1000000.0f;
-    _lastLoopTimestamp = micros();
-    	
-    //Predict current state
-    velocityDeadReckoning_ += accelDeadReckoning_*dTime;
-    positionDeadReckoning_ += velocityDeadReckoning_*dTime;
+    float dTime = (float)(micros() - lastLoopTimestamp_)/1000000.0f;
+    lastLoopTimestamp_ = micros();
+
+    //Predict current state and its error
+    navigationData_.velocity += navigationData_.linearAcceleration*dTime;
+    navigationData_.velocityError += navigationData_.accelerationError*dTime;
+
+    navigationData_.position += navigationData_.velocity*dTime;
+    navigationData_.positionError += navigationData_.velocityError*dTime;
 
 
     //Correct with sensor values
@@ -40,11 +220,11 @@ void NavigationComplementaryFilter::thread() {
         rotationVector = Vector<>(gyroXBuffer_.getMedian(), gyroYBuffer_.getMedian(), gyroZBuffer_.getMedian());
 
         //Calulate time delta
-        float dt = float(timestamp - _lastGyroTimestamp)/1000000.0f;
-        _lastGyroTimestamp = timestamp;
+        float dt = float(timestamp - lastGyroTimestamp_)/1000000.0f;
+        lastGyroTimestamp_ = timestamp;
 
         //Calulate derivitive of gyro for angular acceleration
-        navigationData_.angularAcceleration = (rotationVector - _lastGyroValue)/dt;
+        navigationData_.angularAcceleration = (rotationVector - lastGyroValue_)/dt;
 
         //Check if gyro initialised
         if (_gyroInitialized) {
@@ -85,8 +265,6 @@ void NavigationComplementaryFilter::thread() {
         uint32_t timestamp;
         accel_->getAccel(&accelVector, &timestamp);
 
-        accelVector = (accelVector - _accelBias).compWiseMulti(_accelScale);
-
         accelVector = accelLPF_.update(accelVector);
 
         accelXBuffer_.placeFront(accelVector.x, true);
@@ -102,8 +280,8 @@ void NavigationComplementaryFilter::thread() {
         if (_accelInitialized) {
             
             //Correct state prediction
-            float dt = float(timestamp - _lastAccelTimestamp)/1000000.0f;
-            _lastAccelTimestamp = timestamp;
+            float dt = float(timestamp - lastAccelTimestamp_)/1000000.0f;
+            lastAccelTimestamp_ = timestamp;
 
             float beta = 0.1f;
 
@@ -125,20 +303,17 @@ void NavigationComplementaryFilter::thread() {
             //Update acceleration
             navigationData_.acceleration = (navigationData_.attitude*accelVector*navigationData_.attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
             Vector<> filtered = accelBiasLPF_.update(navigationData_.acceleration - Vector<>(0,0,9.81));
-            navigationData_.linearAcceleration = navigationData_.acceleration - Vector<>(0,0,9.81) - filtered;//accelHPF_.update(navigationData_.acceleration/* - Vector<>(0,0,9.81)*/);
+            navigationData_.linearAcceleration = navigationData_.acceleration - Vector<>(0,0,9.81) - filtered;//accelHPF_.update(navigationData_.acceleration);
 
             //Update linear acceleration
-            ValueError<> buf = ValueError<>(navigationData_.linearAcceleration.x, accelXBuffer_.getStandardError());
-            accelDeadReckoning_.value.x = buf.value;
-            accelDeadReckoning_.error.x = buf.error;
+            navigationData_.acceleration.x = navigationData_.linearAcceleration.x;
+            navigationData_.accelerationError.x = accelXBuffer_.getStandardError();
 
-            buf = ValueError<>(navigationData_.linearAcceleration.y, accelXBuffer_.getStandardError());
-            accelDeadReckoning_.value.y = buf.value;
-            accelDeadReckoning_.error.y = buf.error;
+            navigationData_.acceleration.y = navigationData_.linearAcceleration.y;
+            navigationData_.accelerationError.y = accelYBuffer_.getStandardError();
 
-            buf = ValueError<>(navigationData_.linearAcceleration.z, accelXBuffer_.getStandardError());
-            accelDeadReckoning_.value.z = buf.value;
-            accelDeadReckoning_.error.z = buf.error;
+            navigationData_.acceleration.z = navigationData_.linearAcceleration.z;
+            navigationData_.accelerationError.z = accelZBuffer_.getStandardError();
 
             //Serial.println(String("Accel: x: ") + navigationData_.linearAcceleration.x + ", y: " + navigationData_.linearAcceleration.y + ", z: " + navigationData_.linearAcceleration.z);
             
@@ -148,7 +323,7 @@ void NavigationComplementaryFilter::thread() {
             
             //Accel filter initialisation
             _accelInitialized = true;
-            _lastAccelTimestamp = timestamp;
+            lastAccelTimestamp_ = timestamp;
 
             //Set Attitude
             Vector<> zAxisIs = Vector<>(0,0,1);
@@ -219,12 +394,19 @@ void NavigationComplementaryFilter::thread() {
                 Serial.println(String("Scale: x:") + scale.x + ", y:" + scale.y + ", z:" + scale.z + ", avg: " + avg);
                 Serial.println();*/
 
+                //Mounting orientation compensation
+                //magVector = Quaternion<>(Vector<>(0, -1, 0), 90*DEGREES).rotateVector(magVector);
 
-                magVector = (magVector - _magOffset).compWiseMulti(_magScale);
+                Vector<> magBuf = magVector;
+                magVector.x = -magBuf.z;
+                magVector.y = magBuf.x;
+                magVector.z = magBuf.y;
+
+                magVec_ = magVector;
 
                 //Correct state prediction
-                float dt = float(timestamp - _lastMagTimestamp)/1000000.0f;
-                _lastMagTimestamp = timestamp;
+                float dt = float(timestamp - lastMagTimestamp_)/1000000.0f;
+                lastMagTimestamp_ = timestamp;
 
                 float gamma = 0.1f;
 
@@ -248,7 +430,7 @@ void NavigationComplementaryFilter::thread() {
 
                 //Magnetometer filter initialisation
                 _magInitialized = true;
-                _lastMagTimestamp = timestamp;
+                lastMagTimestamp_ = timestamp;
 
                 //Set heading
                 Vector<> xAxisIs(1,0,0);
@@ -286,8 +468,8 @@ void NavigationComplementaryFilter::thread() {
             if (_baroInitialized) {
                 
                 //Correct state prediction
-                float dt = float(timestamp - _lastBaroTimestamp)/1000000.0f;
-                _lastBaroTimestamp = timestamp;
+                float dt = float(timestamp - lastBaroTimestamp_)/1000000.0f;
+                lastBaroTimestamp_ = timestamp;
 
                 float beta = 0.01f;
 
@@ -309,17 +491,15 @@ void NavigationComplementaryFilter::thread() {
                 float velError = baroVelBuffer_.getStandardError();
 
                 //correct dead reckoning values with new ones.
-                ValueError<> heightVel = ValueError<>(velocityDeadReckoning_.value.z, velocityDeadReckoning_.error.z).weightedAverage(ValueError<>(velMedian, velError));
-                velocityDeadReckoning_.value.z = heightVel.value;
-                velocityDeadReckoning_.error.z = heightVel.error;
+                ValueError<> heightVel = ValueError<>(navigationData_.velocity.z, navigationData_.velocityError.z).weightedAverage(ValueError<>(velMedian, velError));
+                navigationData_.velocity.z = heightVel.value;
+                navigationData_.velocityError.z = heightVel.error;
 
-                ValueError<> height = ValueError<>(positionDeadReckoning_.value.z, positionDeadReckoning_.error.z).weightedAverage(ValueError<>(heightMedian, heightError));
-                positionDeadReckoning_.value.z = height.value;
-                positionDeadReckoning_.error.z = height.error;
+                ValueError<> height = ValueError<>(navigationData_.absolutePosition.height, navigationData_.positionError.z).weightedAverage(ValueError<>(heightMedian, heightError));
+                navigationData_.absolutePosition.height = height.value;
+                navigationData_.positionError.z = height.error;
 
-                //Update output values
-                navigationData_.velocity.z = velocityDeadReckoning_.value.z;
-                navigationData_.absolutePosition.height = positionDeadReckoning_.value.z;
+                //Update position z
                 navigationData_.position.z = navigationData_.absolutePosition.height - navigationData_.homePosition.height;
 
 
@@ -329,7 +509,7 @@ void NavigationComplementaryFilter::thread() {
                 _baroInitialized = true;
                 
                 //Barometer filter initialisation
-                _lastBaroTimestamp = timestamp;
+                lastBaroTimestamp_ = timestamp;
                 _lastHeightValue = _getHeightFromPressure(pressure, 100e3f);
 
                 baroHeightBuffer_.placeFront(_lastHeightValue, true);
@@ -353,8 +533,6 @@ void NavigationComplementaryFilter::thread() {
             WorldPosition positionAbsolute; uint32_t time;
             if (gnss_->getPosition(&positionAbsolute, &time)) {
 
-                float beta = 0.1;
-
                 navigationData_.absolutePosition.latitude = positionAbsolute.latitude;
                 navigationData_.absolutePosition.longitude = positionAbsolute.longitude;
 
@@ -370,12 +548,17 @@ void NavigationComplementaryFilter::thread() {
                     position.value = Vector<>(gnssPositionXBuffer_.getMedian(), gnssPositionYBuffer_.getMedian(), gnssPositionZBuffer_.getMedian());
                     position.error = Vector<>(gnssPositionXBuffer_.getStandardError(), gnssPositionYBuffer_.getStandardError(), gnssPositionZBuffer_.getStandardError());
 
-                    position = positionDeadReckoning_.weightedAverage(position);
+                    //Create corrcted prediction
+                    //position = ValueError<Vector<>>(Vector<>(navigationData_.position.x, navigationData_.position.y, navigationData_.absolutePosition.height), navigationData_.positionError).weightedAverage(position);
 
-                    positionDeadReckoning_.value.x = position.value.x;
-                    positionDeadReckoning_.error.x = position.error.x;
-                    positionDeadReckoning_.value.y = position.value.y;
-                    positionDeadReckoning_.error.y = position.error.y;
+                    //Update position values.
+                    navigationData_.position.x = position.value.x;
+                    navigationData_.position.y = position.value.y;
+                    navigationData_.position.z = position.value.z;
+
+                    navigationData_.positionError.x = position.error.x;
+                    navigationData_.positionError.y = position.error.y;
+                    navigationData_.positionError.z = position.error.z;
 
                 }
 
@@ -393,8 +576,15 @@ void NavigationComplementaryFilter::thread() {
                     ValueError<Vector<>> velocity;
                     velocity.value = Vector<>(gnssVelocityXBuffer_.getMedian(), gnssVelocityYBuffer_.getMedian(), gnssVelocityZBuffer_.getMedian());
                     velocity.error = Vector<>(gnssVelocityXBuffer_.getStandardError(), gnssVelocityYBuffer_.getStandardError(), gnssVelocityZBuffer_.getStandardError());
+                    
+                    //Create corrcted prediction
+                    //velocity = ValueError<Vector<>>(navigationData_.velocity, navigationData_.velocityError).weightedAverage(velocity);
 
-                    velocityDeadReckoning_ = velocityDeadReckoning_.weightedAverage(velocity);
+                    //Update position values.
+                    navigationData_.velocity.x = velocity.value.x;
+                    navigationData_.velocity.y = velocity.value.y;
+                    navigationData_.velocityError.x = velocity.error.x;
+                    navigationData_.velocityError.y = velocity.error.y;
 
                 }
 
@@ -404,19 +594,54 @@ void NavigationComplementaryFilter::thread() {
 
     }
 
-
-
-    //Update output parameters
-    navigationData_.velocity = velocityDeadReckoning_.value;
-    navigationData_.velocityError = velocityDeadReckoning_.error;
-
-    navigationData_.position = positionDeadReckoning_.value;
-    navigationData_.position.z = navigationData_.absolutePosition.height - navigationData_.homePosition.height;
-
-    navigationData_.absolutePosition.height = positionDeadReckoning_.value.z;
-
-    navigationData_.positionError = positionDeadReckoning_.error;
-
     navigationData_.timestamp = micros();
+
+}
+
+
+
+void NavigationComplementaryFilter::init() {
+
+    navigationData_.angularAccelerationError = 10000;
+    navigationData_.angularRateError = 10000;
+    navigationData_.attitudeError = 10000;
+
+    navigationData_.accelerationError = 10000;
+    navigationData_.velocityError = 10000;
+    navigationData_.positionError = 10000;
+
+}
+
+
+
+KinematicData NavigationComplementaryFilter::predictState(const KinematicData &systemState, const int64_t &time) {
+
+    KinematicData statePrediction = systemState;
+
+    float dTime = float(time - systemState.timestamp)/1000000.0f;
+
+    float dTimePow2 = dTime*dTime;
+    float dTimeHalfPow2 = dTimePow2*0.5f;
+    float dTimeQuartPow4 = dTimePow2*dTimePow2*0.25f;
+
+
+    //Predict angular stuff
+    statePrediction.angularRate = systemState.angularAcceleration*dTime + systemState.angularRate; //Integrate angular accel to get new angular rate
+    statePrediction.angularRateError = sqrt(systemState.angularAccelerationError*systemState.angularAccelerationError*dTimePow2 + systemState.angularRateError*systemState.angularRateError); //Calculate new error
+
+    Vector<> angleChange = systemState.angularAcceleration*dTimeHalfPow2 + systemState.angularRate*dTime;
+    //statePrediction.attitude = Quaternion<>(angleChange, angleChange.magnitude()/2)*systemState.attitude;
+
+    //Predict positional stuff
+    statePrediction.velocity = systemState.velocity + systemState.linearAcceleration*dTime; //Integrate linear accel for velocity
+    statePrediction.velocityError = sqrt(systemState.accelerationError*systemState.accelerationError*dTimePow2 + systemState.velocityError*systemState.velocityError); //Calculate new error
+
+    statePrediction.position = systemState.position + systemState.velocity*dTime + systemState.linearAcceleration*dTimeHalfPow2; //Integrate linear accel for velocity
+    statePrediction.positionError = sqrt(systemState.accelerationError*systemState.accelerationError*dTimeQuartPow4 + systemState.velocityError*systemState.velocityError*dTimePow2 + systemState.positionError*systemState.positionError); //Calculate new error
+
+    //Update time
+    statePrediction.timestamp = time;
+
+    return statePrediction;
 
 }

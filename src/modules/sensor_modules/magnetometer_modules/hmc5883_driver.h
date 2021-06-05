@@ -54,7 +54,7 @@ public:
      * @param address Address of QMC5883L. Default 0x0D.
      * @param eeprom Pointer to EEPROM module to use for calibration values.
      */
-    QMC5883Driver(TwoWire* bus, uint8_t address = QMC5883Registers::QMC5883L_ADDR_DEFAULT, EEPROM_Interface* eeprom = nullptr) : Task_Abstract(250, eTaskPriority_t::eTaskPriority_Realtime, true), bus_(bus, QMC5883Registers::QMC5883L_ADDR_DEFAULT) {
+    QMC5883Driver(TwoWire* bus, uint8_t address = QMC5883Registers::QMC5883L_ADDR_DEFAULT, EEPROM_Interface* eeprom = nullptr) : Task_Abstract(250, eTaskPriority_t::eTaskPriority_VeryHigh, false), bus_(bus, QMC5883Registers::QMC5883L_ADDR_DEFAULT) {
         eeprom_ = eeprom;
     }
     

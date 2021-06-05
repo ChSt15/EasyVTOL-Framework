@@ -471,8 +471,6 @@ void NavigationComplementaryFilter::thread() {
                 float dt = float(timestamp - lastBaroTimestamp_)/1000000.0f;
                 lastBaroTimestamp_ = timestamp;
 
-                float beta = 0.01f;
-
                 //calculate height from new pressure value
                 float heightAbsolute = _getHeightFromPressure(pressure, 100e3f);
                 //float heightRelative = heightAbsolute - navigationData_.absolutePosition.height;
@@ -545,8 +543,8 @@ void NavigationComplementaryFilter::thread() {
                 if (gnssPositionXBuffer_.available() >= 2) {
 
                     ValueError<Vector<>> position;
-                    position.value = Vector<>(gnssPositionXBuffer_.getMedian(), gnssPositionYBuffer_.getMedian(), gnssPositionZBuffer_.getMedian());
-                    position.error = Vector<>(gnssPositionXBuffer_.getStandardError(), gnssPositionYBuffer_.getStandardError(), gnssPositionZBuffer_.getStandardError());
+                    position.value = positionBuf;//Vector<>(gnssPositionXBuffer_.getMedian(), gnssPositionYBuffer_.getMedian(), gnssPositionZBuffer_.getMedian());
+                    position.error = Vector<>(gnss_->getPositionAccuracy(), gnss_->getPositionAccuracy(), gnss_->getAltitudeAccuracy());
 
                     //Create corrcted prediction
                     //position = ValueError<Vector<>>(Vector<>(navigationData_.position.x, navigationData_.position.y, navigationData_.absolutePosition.height), navigationData_.positionError).weightedAverage(position);

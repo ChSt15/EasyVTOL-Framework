@@ -289,8 +289,6 @@ void NavigationComplementaryFilter::thread() {
                 float dt = float(timestamp - _lastBaroTimestamp)/1000000.0f;
                 _lastBaroTimestamp = timestamp;
 
-                float beta = 0.01f;
-
                 //calculate height from new pressure value
                 float heightAbsolute = _getHeightFromPressure(pressure, 100e3f);
                 //float heightRelative = heightAbsolute - navigationData_.absolutePosition.height;
@@ -353,8 +351,6 @@ void NavigationComplementaryFilter::thread() {
             WorldPosition positionAbsolute; uint32_t time;
             if (gnss_->getPosition(&positionAbsolute, &time)) {
 
-                float beta = 0.1;
-
                 navigationData_.absolutePosition.latitude = positionAbsolute.latitude;
                 navigationData_.absolutePosition.longitude = positionAbsolute.longitude;
 
@@ -367,8 +363,8 @@ void NavigationComplementaryFilter::thread() {
                 if (gnssPositionXBuffer_.available() >= 2) {
 
                     ValueError<Vector<>> position;
-                    position.value = Vector<>(gnssPositionXBuffer_.getMedian(), gnssPositionYBuffer_.getMedian(), gnssPositionZBuffer_.getMedian());
-                    position.error = Vector<>(gnssPositionXBuffer_.getStandardError(), gnssPositionYBuffer_.getStandardError(), gnssPositionZBuffer_.getStandardError());
+                    position.value = positionBuf;//Vector<>(gnssPositionXBuffer_.getMedian(), gnssPositionYBuffer_.getMedian(), gnssPositionZBuffer_.getMedian());
+                    position.error = Vector<>(gnss_->getPositionAccuracy(), gnss_->getPositionAccuracy(), gnss_->getAltitudeAccuracy());
 
                     position = positionDeadReckoning_.weightedAverage(position);
 

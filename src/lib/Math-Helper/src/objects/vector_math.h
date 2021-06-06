@@ -196,6 +196,18 @@ class Vector {
         }
 
         /**
+         * Compound addition.
+         *
+         * @param values none.
+         * @return nothing.
+         */
+        inline void operator -= (const Vector<T> &b) {
+            x -= b.x;
+            y -= b.y;
+            z -= b.z;
+        }
+
+        /**
          * Vector<T> component wise multiplication.
          *
          * @param values none.

@@ -2,7 +2,7 @@
 
 
 
-void BME280Driver::_getData() {
+void BME280Driver::getData() {
 
     BME280_SensorMeasurements measurements;
 
@@ -45,11 +45,16 @@ void BME280Driver::thread() {
 
     if (moduleStatus_ == eModuleStatus_t::eModuleStatus_Running) {
 
-        if (!_bme.isMeasuring()) {
-            
-            _getData();
+        /*bool measuring = _bme.isMeasuring();
 
-        }
+        if (!sensorMeasuring_ && measuring) {
+            sensorMeasuring_ = true;
+        } else if (sensorMeasuring_ && !measuring) {
+            sensorMeasuring_ = false;
+            getData();
+        }*/
+
+        getData();
 
     } else if (moduleStatus_ == eModuleStatus_t::eModuleStatus_NotStarted || moduleStatus_ == eModuleStatus_t::eModuleStatus_RestartAttempt) {
         
@@ -102,6 +107,10 @@ void BME280Driver::init() {
     }
 
     if (startCode > 0) {
+
+        _bme.setMode(MODE_SLEEP);
+
+        delay(10);
 
         _bme.setHumidityOverSample(1);
         _bme.setPressureOverSample(4);

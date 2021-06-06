@@ -20,13 +20,13 @@
 class BME280Driver: public Barometer_Interface, public Module_Abstract, public Task_Abstract {
 public:
 
-    BME280Driver(int chipSelectPin, SPIClass* spiBus) : Task_Abstract(100, eTaskPriority_t::eTaskPriority_Realtime, true) {
+    BME280Driver(int chipSelectPin, SPIClass* spiBus) : Task_Abstract(50, eTaskPriority_t::eTaskPriority_Realtime, true) {
         chipSelectPin_ = chipSelectPin;
         spiBus_ = spiBus;
         useSPI_ = true;
     }
 
-    BME280Driver(TwoWire* i2cBus, int address) : Task_Abstract(100, eTaskPriority_t::eTaskPriority_Realtime, true) {
+    BME280Driver(TwoWire* i2cBus, int address) : Task_Abstract(50, eTaskPriority_t::eTaskPriority_Realtime, true) {
         i2cBus_ = i2cBus;
         i2cAddress_ = address;
         useSPI_ = false;
@@ -254,7 +254,7 @@ public:
 
 private:
 
-    void _getData();
+    void getData();
 
 
     Buffer <float, 100> _pressureFifo;
@@ -274,6 +274,8 @@ private:
     int chipSelectPin_ = 0;
     SPIClass* spiBus_;
     bool useSPI_ = false;
+
+    bool sensorMeasuring_ = false;
 
     TwoWire* i2cBus_;
     int i2cAddress_;

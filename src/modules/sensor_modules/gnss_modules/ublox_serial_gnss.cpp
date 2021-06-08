@@ -137,6 +137,14 @@ void UbloxSerialGNSS::init() {
         gnss_.setUART1Output(COM_TYPE_UBX);
         gnss_.setNavigationFrequency(10);
         gnss_.setAutoPVT(true);
+        gnss_.setDynamicModel(DYN_MODEL_AIRBORNE2g);
+        gnss_.enableGNSS(true, sfe_ublox_gnss_ids_e::SFE_UBLOX_GNSS_ID_GPS);
+        gnss_.enableGNSS(true, sfe_ublox_gnss_ids_e::SFE_UBLOX_GNSS_ID_GALILEO);
+        gnss_.enableGNSS(true, sfe_ublox_gnss_ids_e::SFE_UBLOX_GNSS_ID_GLONASS);
+        gnss_.enableGNSS(false, sfe_ublox_gnss_ids_e::SFE_UBLOX_GNSS_ID_IMES);
+        gnss_.enableGNSS(false, sfe_ublox_gnss_ids_e::SFE_UBLOX_GNSS_ID_QZSS);
+        gnss_.enableGNSS(false, sfe_ublox_gnss_ids_e::SFE_UBLOX_GNSS_ID_SBAS);
+        gnss_.enableGNSS(false, sfe_ublox_gnss_ids_e::SFE_UBLOX_GNSS_ID_BEIDOU);
 
         gnss_.saveConfiguration();
 

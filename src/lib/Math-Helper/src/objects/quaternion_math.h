@@ -267,6 +267,14 @@ class Quaternion {
                 w*q.z + x*q.y - y*q.x + z*q.w); // new z
         }
 
+        inline Quaternion<T> operator ^ (const Quaternion<T> &q) const {
+            return Quaternion<T>(
+                w*q.w - x*q.x - y*q.y - z*q.z,  // new w
+                w*q.x + x*q.w + y*q.z - z*q.y,  // new x
+                w*q.y - x*q.z + y*q.w + z*q.x,  // new y
+                w*q.z + x*q.y - y*q.x + z*q.w); // new z
+        }
+
 };
 
 template <typename T = float>

@@ -143,20 +143,20 @@ private:
     Buffer<float, 10> gyroYBuffer_;
     Buffer<float, 10> gyroZBuffer_;
 
-    Buffer<float, 10> accelXBuffer_;
-    Buffer<float, 10> accelYBuffer_;
-    Buffer<float, 10> accelZBuffer_;
+    Buffer<float, 50> accelXBuffer_;
+    Buffer<float, 50> accelYBuffer_;
+    Buffer<float, 50> accelZBuffer_;
 
     Buffer<float, 5> gnssPositionXBuffer_;
     Buffer<float, 5> gnssPositionYBuffer_;
     Buffer<float, 5> gnssPositionZBuffer_;
 
-    Buffer<float, 5> gnssVelocityXBuffer_;
-    Buffer<float, 5> gnssVelocityYBuffer_;
-    Buffer<float, 5> gnssVelocityZBuffer_;
+    Buffer<float, 3> gnssVelocityXBuffer_;
+    Buffer<float, 3> gnssVelocityYBuffer_;
+    Buffer<float, 3> gnssVelocityZBuffer_;
 
-    Buffer<float, 10> baroHeightBuffer_;
-    Buffer<float, 10> baroVelBuffer_;
+    Buffer<float, 50> baroHeightBuffer_;
+    Buffer<float, 50> baroVelBuffer_;
 
     //timestamps
     uint32_t lastGyroTimestamp_ = 0;

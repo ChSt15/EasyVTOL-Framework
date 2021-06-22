@@ -25,7 +25,9 @@ enum eKraftMessageType_KraftKontrol_t : uint8_t {
     eKraftMessageType_KraftKontrol_RCChannels,
     eKraftMessageType_KraftKontrol_GNSSData,
     eKraftMessageType_KraftKontrol_MagCalibIs,
-    eKraftMessageType_KraftKontrol_MagCalibSet
+    eKraftMessageType_KraftKontrol_MagCalibSet,
+    eKraftMessageType_KraftKontrol_CountDown,
+    eKraftMessageType_KraftKontrol_ProgramStart
 };
 
 
@@ -355,7 +357,7 @@ public:
 
         if (dataByteSize < sizeof(eVehicleMode_t)) return false;
 
-        startBufferWrite(dataBytes);
+        startBufferWrite(dataBytes + startByte);
         bufferWrite(&vehicleMode_, sizeof(vehicleMode_));
         endBufferWrite();
 
@@ -367,7 +369,7 @@ public:
 
         if (dataByteSize < sizeof(eVehicleMode_t)) return false;
 
-        startBufferRead(dataBytes);
+        startBufferRead(dataBytes + startByte);
         bufferRead(&vehicleMode_, sizeof(vehicleMode_));
         endBufferRead();
 
@@ -676,6 +678,105 @@ private:
 
     Vector<> magMin_ = 90000000;
     Vector<> magMax_ = -90000000;
+
+};
+
+
+
+class KraftMessageCountDown: public KraftMessage_Interface {
+public:
+
+    KraftMessageCountDown() {}
+
+    KraftMessageCountDown(const uint32_t &time_ms) {
+        time_ms_ = time_ms;
+    }
+
+    uint32_t getDataTypeID() const {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_CountDown;}
+
+    uint32_t getDataSize() const {return sizeof(time_ms_);}
+
+    uint32_t getTime() const {return time_ms_;}
+
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+
+        if (dataByteSize < getDataSize()) return false;
+
+        startBufferWrite(dataBytes + startByte);
+        bufferWrite(&time_ms_, sizeof(time_ms_));
+        endBufferWrite();
+
+        return true;
+
+    }
+
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+
+        if (dataByteSize < getDataSize()) return false;
+
+        startBufferRead(dataBytes + startByte);
+        bufferRead(&time_ms_, sizeof(time_ms_));
+        endBufferRead();
+
+        return true;
+
+    }
+
+
+private:
+
+    uint32_t time_ms_ = 0;
+
+};
+
+
+
+class KraftMessageProgramSet: public KraftMessage_Interface {
+public:
+
+    KraftMessageProgramSet() {}
+
+    KraftMessageProgramSet(const uint8_t &programNumber) {
+        programNumber_ = programNumber;
+    }
+
+    uint32_t getDataTypeID() const {return eKraftMessageType_KraftKontrol_t::eKraftMessageType_KraftKontrol_ProgramStart;}
+    uint32_t getDataSize() const {return sizeof(programNumber_) + sizeof(countDown_ms_);}
+
+    uint8_t getProgramNumber() const {return programNumber_;}
+    uint32_t getCountDown() const {return countDown_ms_;}
+
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+
+        if (dataByteSize < getDataSize()) return false;
+
+        startBufferWrite(dataBytes + startByte);
+        bufferWrite(&programNumber_, sizeof(programNumber_));
+        bufferWrite(&countDown_ms_, sizeof(countDown_ms_));
+        endBufferWrite();
+
+        return true;
+
+    }
+
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+
+        if (dataByteSize < getDataSize()) return false;
+
+        startBufferRead(dataBytes + startByte);
+        bufferRead(&programNumber_, sizeof(programNumber_));
+        bufferRead(&countDown_ms_, sizeof(countDown_ms_));
+        endBufferRead();
+
+        return true;
+
+    }
+
+
+private:
+
+    uint8_t programNumber_ = 0;
+    uint32_t countDown_ms_ = 0;
 
 };
 

@@ -198,6 +198,7 @@ void NavigationComplementaryFilter::thread() {
     navigationData_.velocityError += navigationData_.accelerationError*dTime;
 
     navigationData_.position += navigationData_.velocity*dTime;
+    navigationData_.absolutePosition.height = navigationData_.position.z + navigationData_.homePosition.height;
     navigationData_.positionError += navigationData_.velocityError*dTime;
 
 
@@ -404,6 +405,8 @@ void NavigationComplementaryFilter::thread() {
 
                 magVec_ = magVector;
 
+                //Serial.println(String("Mag: ") + magVec_.toString());
+
                 //Correct state prediction
                 float dt = float(timestamp - lastMagTimestamp_)/1000000.0f;
                 lastMagTimestamp_ = timestamp;
@@ -414,7 +417,6 @@ void NavigationComplementaryFilter::thread() {
                 Vector<> xAxisIs(1,0,0);
                 Vector<> xAxisSet = (navigationData_.attitude*magVector*navigationData_.attitude.copy().conjugate()).toVector();
                 xAxisSet.z = 0;
-                xAxisSet.normalize();
 
                 Vector<> xAxisRotationAxis = Vector<>(0,0,1);
                 float xAxisRotationAngle = -atan2(xAxisSet.y, xAxisSet.x);
@@ -471,6 +473,7 @@ void NavigationComplementaryFilter::thread() {
 
                 //calculate height from new pressure value
                 float heightAbsolute = getHeightFromPressure(baroPressure_, sealevelPressure_);
+                //Serial.println(String("H: ") + heightAbsolute);
                 //float heightRelative = heightAbsolute - navigationData_.absolutePosition.height;
                 //calculate z velocity from new height value
                 float zVelocity = (heightAbsolute - _lastHeightValue)/dt;
@@ -480,11 +483,14 @@ void NavigationComplementaryFilter::thread() {
                 baroHeightBuffer_.placeFront(heightAbsolute, true);
                 baroVelBuffer_.placeFront(zVelocity, true);
 
-                float heightMedian = baroHeightBuffer_.getMedian();
-                float heightError = baroHeightBuffer_.getStandardError();
+                float heightMedian = heightAbsolute;
+                float heightError = baroHeightBuffer_.getStandardError()+0.20;
 
-                float velMedian = baroVelBuffer_.getMedian();
+                float velMedian = zVelocity;
                 float velError = baroVelBuffer_.getStandardError();
+
+                //Serial.println(String("Height: ") + heightMedian + " +- " + String(heightError,5) + ",\tvel: " + velMedian + "+-" + velError);
+                //Serial.println(String("") + (heightMedian - navigationData_.homePosition.height) + "  " + velMedian);
 
                 //correct dead reckoning values with new ones.
                 ValueError<> heightVel = ValueError<>(navigationData_.velocity.z, navigationData_.velocityError.z).weightedAverage(ValueError<>(velMedian, velError));
@@ -497,6 +503,8 @@ void NavigationComplementaryFilter::thread() {
 
                 //Update position z
                 navigationData_.position.z = navigationData_.absolutePosition.height - navigationData_.homePosition.height;
+
+                
 
 
             } else {
@@ -531,8 +539,11 @@ void NavigationComplementaryFilter::thread() {
 
                 navigationData_.absolutePosition.latitude = positionAbsolute.latitude;
                 navigationData_.absolutePosition.longitude = positionAbsolute.longitude;
+                //navigationData_.absolutePosition.height = positionAbsolute.height;
 
                 Vector<> positionBuf = positionAbsolute.getPositionVectorFrom(navigationData_.homePosition);
+
+                //Serial.println(navigationData_.homePosition.height);
 
                 gnssPositionXBuffer_.placeFront(positionBuf.x, true);
                 gnssPositionYBuffer_.placeFront(positionBuf.y, true);
@@ -551,17 +562,19 @@ void NavigationComplementaryFilter::thread() {
                         seaLevelPressureCorrected_ = true;
                         sealevelPressure_ = getSealevelPressureFromHeight(baroPressure_, positionAbsolute.height);
                     } else if (seaLevelPressureCorrected_) {
-                        sealevelPressure_ = sealevelPressure_*0.999f + getSealevelPressureFromHeight(baroPressure_, positionAbsolute.height)*0.001f;
+                        //sealevelPressure_ = sealevelPressure_*0.99f + getSealevelPressureFromHeight(baroPressure_, positionAbsolute.height)*0.01f;
                     }
 
                     //Update position values.
                     navigationData_.position.x = position.value.x;
                     navigationData_.position.y = position.value.y;
-                    navigationData_.position.z = position.value.z - navigationData_.homePosition.height;
+                    //navigationData_.position.z = position.value.z;// - navigationData_.homePosition.height;
+
+                    //navigationData_.absolutePosition.height = navigationData_.position.z + navigationData_.homePosition.height;
 
                     navigationData_.positionError.x = position.error.x;
                     navigationData_.positionError.y = position.error.y;
-                    navigationData_.positionError.z = position.error.z;
+                    //navigationData_.positionError.z = position.error.z;
 
                 }
 
@@ -578,7 +591,7 @@ void NavigationComplementaryFilter::thread() {
 
                     ValueError<Vector<>> velocity;
                     velocity.value = Vector<>(gnssVelocityXBuffer_.getMedian(), gnssVelocityYBuffer_.getMedian(), gnssVelocityZBuffer_.getMedian());
-                    velocity.error = Vector<>(gnssVelocityXBuffer_.getStandardError()+0.02, gnssVelocityYBuffer_.getStandardError()+0.02, gnssVelocityZBuffer_.getStandardError()+0.02);
+                    velocity.error = Vector<>(gnss_->getPositionAccuracy()/10+0.02, gnss_->getPositionAccuracy()/10+0.02, gnss_->getAltitudeAccuracy()/10+0.02);
                     
                     //Create corrcted prediction
                     velocity = ValueError<Vector<>>(navigationData_.velocity, navigationData_.velocityError).weightedAverage(velocity);
@@ -603,6 +616,8 @@ void NavigationComplementaryFilter::thread() {
     }
 
     navigationData_.timestamp = micros();
+
+    
 
 }
 

@@ -7,7 +7,7 @@
 
 #include "stdint.h"
 
-#include "buffer.h"
+#include "utils/buffer.h"
 
 #include "kraft_link.h"
 #include "kraft_message.h"

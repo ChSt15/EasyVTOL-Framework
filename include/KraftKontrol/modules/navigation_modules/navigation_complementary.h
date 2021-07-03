@@ -35,6 +35,8 @@
 
 #include "KraftKontrol/data_containers/kinematic_data.h"
 
+#include "KraftKontrol/utils/topic_subscribers.h"
+
 
 
 class NavigationComplementaryFilter: public Navigation_Interface, public Task_Abstract {
@@ -50,11 +52,11 @@ public:
      * @param gnss module to use.
      */
     NavigationComplementaryFilter(Gyroscope_Interface* gyro, Accelerometer_Interface* accel, Magnetometer_Interface* mag = nullptr, Barometer_Interface* baro = nullptr, GNSS_Interface* gnss = nullptr) : Task_Abstract(8000, eTaskPriority_t::eTaskPriority_VeryHigh, true) {
-        gyro_ = gyro;
-        accel_ = accel;
-        mag_ = mag;
-        baro_ = baro;
-        gnss_ = gnss;
+        gyroSub_.subscribe(&gyro->getGyroTopic());
+        accelSub_.subscribe(&accel->getAccelTopic());
+        if (mag != nullptr) magSub_.subscribe(&mag->getMagTopic());
+        if (baro != nullptr) baroSub_.subscribe(&baro->getBaroTopic());
+        if (gnss != nullptr) gnssSub_.subscribe(&gnss->getGNSSTopic());
     }
 
     /**
@@ -118,16 +120,16 @@ private:
      */
     KinematicData predictState(const KinematicData &systemState, const int64_t &time);
 
-    //Gyro that will be used by Navigation module
-    Gyroscope_Interface* gyro_ = nullptr;
-    //Accelerometer that will be used by Navigation module
-    Accelerometer_Interface* accel_ = nullptr;
-    //Magnetometer that will be used by Navigation module
-    Magnetometer_Interface* mag_ = nullptr;
-    //Barometer that will be used by Navigation module
-    Barometer_Interface* baro_ = nullptr;
-    //GNSS module that will be used by Navigation module.
-    GNSS_Interface* gnss_ = nullptr;
+    //Subscriber for gyro with fifo function
+    Buffer_Subscriber<SensorTimestamp<Vector<>>, 100> gyroSub_;
+    //Subscriber for accel with fifo function
+    Buffer_Subscriber<SensorTimestamp<Vector<>>, 100> accelSub_;
+    //Subscriber for mag with fifo function
+    Buffer_Subscriber<SensorTimestamp<Vector<>>, 20> magSub_;
+    //Subscriber for baro with fifo function
+    Buffer_Subscriber<SensorTimestamp<float>, 10> baroSub_;
+    //Subscriber for gnssdata with fifo function
+    Buffer_Subscriber<GNSSData, 10> gnssSub_;
     
 
     //Storage container for navigationData
@@ -159,12 +161,12 @@ private:
     Buffer<float, 50> baroVelBuffer_;
 
     //timestamps
-    uint32_t lastGyroTimestamp_ = 0;
-    uint32_t lastAccelTimestamp_ = 0;
-    uint32_t lastMagTimestamp_ = 0;
-    uint32_t lastBaroTimestamp_ = 0;
+    int64_t lastGyroTimestamp_ = 0;
+    int64_t lastAccelTimestamp_ = 0;
+    int64_t lastMagTimestamp_ = 0;
+    int64_t lastBaroTimestamp_ = 0;
 
-    uint32_t lastLoopTimestamp_ = 0;
+    int64_t lastLoopTimestamp_ = 0;
 
     Vector<> lastGyroValue_ = 0;
     ValueError<Vector<>> lastAngularRateValue_ = ValueError<Vector<>>(0, 0);

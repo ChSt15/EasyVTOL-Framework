@@ -17,6 +17,8 @@ class Subscriber_Interface {
 friend Topic<TYPE>;
 public: 
 
+    Subscriber_Interface() {}
+
     Subscriber_Interface(Topic<TYPE>* topic) {
         subscribe(topic);
     }
@@ -74,6 +76,8 @@ class Topic {
 friend Subscriber_Interface<TYPE>;
 public:
 
+    Topic(){}
+
     ~Topic();
 
     /**
@@ -86,6 +90,11 @@ public:
      * @param item Item to be sent.
      */
     void publish(TYPE& item);
+
+    /**
+     * @returns a copy of the last published item.
+     */
+    const TYPE& getLatestItem(); 
 
 
 private:
@@ -104,7 +113,16 @@ private:
     //List of subscribers
     List<Subscriber_Interface<TYPE>*> subscribers_;
 
+    TYPE latestItem;
+
 };
+
+
+
+template<typename TYPE> 
+const TYPE& Topic<TYPE>::getLatestItem() {
+    return latestItem;
+}
 
 
 
@@ -124,6 +142,7 @@ const List<Subscriber_Interface<TYPE>*>& Topic<TYPE>::getSubscriberList() const 
 
 template<typename TYPE> 
 void Topic<TYPE>::publish(TYPE& item) {
+    latestItem = item;
     for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) subscribers_[i]->receive(item);
 }
 

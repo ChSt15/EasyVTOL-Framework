@@ -23,6 +23,8 @@ template<typename TYPE>
 class Simple_Subscriber: public Subscriber_Interface<TYPE> {
 public:
 
+    Simple_Subscriber() {}
+
     /**
      * @param topic Topic to subscribe to.
      */
@@ -65,6 +67,8 @@ private:
 template<typename TYPE, uint32_t SIZE> 
 class Buffer_Subscriber: public Subscriber_Interface<TYPE>, public Buffer<TYPE, SIZE> {
 public:
+
+    Buffer_Subscriber(bool overwrite = false) {}
 
     /**
      * @param topic Topic to subscribe to.

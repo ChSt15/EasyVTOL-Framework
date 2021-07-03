@@ -6,14 +6,19 @@
 template<typename T>
 struct SensorTimestamp{
 
-    SensorTimestamp(T sensorData, uint32_t sensorTimestamp) {
+    SensorTimestamp() {
+        //this->sensorData = 0;
+        //this->sensorTimestamp = 0;
+    }
+
+    SensorTimestamp(T sensorData, int64_t sensorTimestamp) {
         this->sensorData = sensorData;
         this->sensorTimestamp = sensorTimestamp;
     }
 
     T sensorData;
 
-    uint32_t sensorTimestamp = 0;
+    int64_t sensorTimestamp = 0;
 
 };
 

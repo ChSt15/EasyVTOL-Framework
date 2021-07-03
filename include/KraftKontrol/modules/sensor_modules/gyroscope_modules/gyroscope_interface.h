@@ -5,6 +5,9 @@
 
 #include "lib/Math-Helper/src/3d_math.h"
 
+#include "KraftKontrol/utils/topic.h"
+#include "KraftKontrol/utils/sensor_timestamp.h"
+
 
 
 class Gyroscope_Interface {
@@ -19,14 +22,6 @@ public:
     virtual uint32_t loopRate() = 0;
 
     /**
-     * Returns true if gyro data available
-     *
-     * @param values none.
-     * @return bool.
-     */
-    virtual uint32_t gyroAvailable() = 0;
-
-    /**
      * Returns rate (in Hz) of the new sensor data
      *
      * @param values none.
@@ -35,33 +30,15 @@ public:
     virtual uint32_t gyroRate() = 0;
 
     /**
-     * Returns true if gyro data valid.
-     * Variables given as parameters will be overridden.
-     * This will remove sensor data from queue, peek will not.
-     *
-     * @param values Vector and uint32_t.
-     * @return bool.
+     * @returns reference to gyro data topic
      */
-    virtual bool getGyro(Vector<>* gyroData, uint32_t* gyroTimestamp) = 0;
+    Topic<SensorTimestamp<Vector<>>>& getGyroTopic() {return gyroTopic_;}
 
-    /**
-     * Returns true if gyro data valid.
-     * Variables given as parameters will be overridden.
-     * Will not remove data from queue, get will.
-     *
-     * @param values Vector and uint32_t.
-     * @return bool.
-     */
-    virtual bool peekGyro(Vector<>* gyroData, uint32_t* gyroTimestamp) = 0;
 
-    /**
-     * Removes all elements from queue.
-     *
-     * @param values none.
-     * @return none.
-     */
-    virtual void flushGyro() = 0;
+protected:
 
+    //Topic for distributing new measurements.
+    Topic<SensorTimestamp<Vector<>>> gyroTopic_;
     
 };
 

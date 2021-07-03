@@ -53,54 +53,11 @@ public:
     uint32_t loopRate() {return loopRate_;};
 
     /**
-     * This is only for horizontal position. Even if this is true then that does not mean height is available
-     *
-     * @returns true if horizontal position available.
-     */
-    uint16_t positionAvailable() {return positionFifo_.available();};
-
-     /**
      * Returns rate (in Hz) of new sensor data
      *
      * @return uint32_t.
      */
     uint32_t positionRate() {return positionRate_;}
-
-    /**
-     * Variables given as parameters will be overridden.
-     * This will remove sensor data from queue, peek will not.
-     *
-     * @param position Struct to be overritten with position data.
-     * @returns true if position data valid.
-     */
-    bool getPosition(WorldPosition* position, uint32_t* positionTimestamp) {
-
-        if (positionFifo_.available() == 0) return false;
-
-        positionFifo_.takeBack(position);
-        positionTimestampFifo_.takeBack(positionTimestamp);
-
-        return true;
-
-    };
-
-    /**
-     * Variables given as parameters will be overridden.
-     * This will remove sensor data from queue, peek will not.
-     *
-     * @param position Struct to be overritten with position data.
-     * @returns true if position data valid.
-     */
-    bool peekPosition(WorldPosition* position, uint32_t* positionTimestamp) {
-
-        if (positionFifo_.available() == 0) return false;
-
-        positionFifo_.peekBack(position);
-        positionTimestampFifo_.peekBack(positionTimestamp);
-
-        return true;
-
-    }
 
     /**
      * @returns the Position accuracy. If unsupported or altitude not available will return -1;
@@ -113,70 +70,11 @@ public:
     float getAltitudeAccuracy() {return altitudeDeviation_;}
 
     /**
-     * Removes all elements from queue.
-     */
-    void flushPosition() {
-        positionFifo_.clear();
-        positionTimestampFifo_.clear();
-    }
-
-    /**
-     * This is only for horizontal position. Even if this is true then that does not mean height is available
-     *
-     * @returns true if horizontal position available.
-     */
-    uint16_t velocityAvailable() {return velocityFifo_.available();}
-
-    /**
      * Returns rate (in Hz) of new sensor data
      *
      * @return uint32_t.
      */
     uint32_t velocityRate()  {return positionRate_;}
-
-    /**
-     * Variables given as parameters will be overridden.
-     * This will remove sensor data from queue, peek will not.
-     *
-     * @param velocity is the velocity.
-     * @returns true if position data valid.
-     */
-    bool getVelocity(Vector<>* velocity, uint32_t* velocityTimestamp) {
-
-        if (velocityFifo_.available() == 0) return false;
-
-        velocityFifo_.takeBack(velocity);
-        velocityTimestampFifo_.takeBack(velocityTimestamp);
-
-        return true;
-
-    };
-
-    /**
-     * Variables given as parameters will be overridden.
-     * This will remove sensor data from queue, peek will not.
-     *
-     * @param velocity is the velocity.
-     * @returns true if position data valid.
-     */
-    bool peekVelocity(Vector<>* velocity, uint32_t* velocityTimestamp) {
-
-        if (velocityFifo_.available() == 0) return false;
-
-        velocityFifo_.peekBack(velocity);
-        velocityTimestampFifo_.peekBack(velocityTimestamp);
-
-        return true;
-
-    }
-
-    /**
-     * Removes all elements from queue.
-     */
-    void flushVelocity() {
-        velocityFifo_.clear();
-        velocityTimestampFifo_.clear();
-    }
 
     /**
      * @returns the number of satellites used.
@@ -186,7 +84,7 @@ public:
     /**
      * @returns true if GNSS lock is valid and safe.
      */
-    bool getGNSSLockValid() {
+    bool getGNSSLockValid() override {
         return lockValid_;
     }
 
@@ -194,12 +92,6 @@ public:
 private:
 
     void _getData();
-
-
-    Buffer <WorldPosition, 10> positionFifo_;
-    Buffer <Vector<>, 10> velocityFifo_;
-    Buffer <uint32_t, 10> positionTimestampFifo_;
-    Buffer <uint32_t, 10> velocityTimestampFifo_;
 
     float positionDeviation_ = -1;
     float altitudeDeviation_ = -1;

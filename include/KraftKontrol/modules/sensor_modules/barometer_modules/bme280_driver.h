@@ -50,76 +50,17 @@ public:
 
     /**
      * Returns rate (in Hz) of the thread
-     *
-     * @param values none.
+
      * @return uint32_t.
      */
     uint32_t loopRate() {return _loopRate;};
 
     /**
-     * Returns true if pressure data available
-     *
-     * @param values none.
-     * @return bool.
-     */
-    uint32_t pressureAvailable() {return _pressureFifo.available();};
-
-    /**
      * Returns rate (in Hz) of the new sensor data
-     *
-     * @param values none.
+
      * @return uint32_t.
      */
     uint32_t pressureRate() {return _pressureRate;};
-
-    /**
-     * Returns true if pressure data valid.
-     * Variables given as parameters will be overridden.
-     * This will remove sensor data from queue, peek will not.
-     *
-     * @param values float and uint32_t.
-     * @return bool.
-     */
-    bool getPressure(float* pressureData, uint32_t* pressureTimestamp) {
-
-        if (_pressureFifo.available() == 0) return false;
-
-        _pressureFifo.takeBack(pressureData);
-        _pressureTimestampFifo.takeBack(pressureTimestamp);
-
-        return true;
-
-    };
-
-    /**
-     * Returns true if pressure data valid.
-     * Variables given as parameters will be overridden.
-     * Will not remove data from queue, get will.
-     *
-     * @param values float and uint32_t.
-     * @return bool.
-     */
-    bool peekPressure(float* pressureData, uint32_t* pressureTimestamp) {
-
-        if (_pressureFifo.available() == 0) return false;
-
-        _pressureFifo.peekBack(pressureData);
-        _pressureTimestampFifo.peekBack(pressureTimestamp);
-
-        return true;
-
-    }
-
-    /**
-     * Removes all elements from queue.
-     *
-     * @param values none.
-     * @return none.
-     */
-    void flushPressure() {
-        _pressureFifo.clear();
-        _pressureTimestampFifo.clear();
-    }
 
     /**
      * Returns true if temperature data available
@@ -257,10 +198,8 @@ private:
     void getData();
 
 
-    Buffer <float, 100> _pressureFifo;
     Buffer <float, 100> _humidityFifo;
     Buffer <float, 100> _temperatureFifo;
-    Buffer <uint32_t, 100> _pressureTimestampFifo;
     Buffer <uint32_t, 100> _humidityTimestampFifo;
     Buffer <uint32_t, 100> _temperatureTimestampFifo;
 

@@ -17,10 +17,10 @@
 
 
 
-class ADS1115Driver: public ADC_Interface, public Module_Abstract, public Task_Abstract {
+class ADS1115Driver: public ADCChannel_Interface, public Module_Abstract, public Task_Abstract {
 public:
 
-    ADS1115Driver(TwoWire* i2cBus) : Task_Abstract(1000, eTaskPriority_t::eTaskPriority_Realtime, true), adc_(0x48) {
+    ADS1115Driver(TwoWire* i2cBus) : Task_Abstract(1000, eTaskPriority_t::eTaskPriority_High, true), adc_(0x48) {
         i2cBus_ = i2cBus;
     }
     

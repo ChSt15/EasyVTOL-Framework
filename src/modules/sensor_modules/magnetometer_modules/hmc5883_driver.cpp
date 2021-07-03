@@ -39,6 +39,8 @@ void QMC5883Driver::getData() {
 
     if (!bus_.readBytes(QMC5883Registers::QMC5883L_X_LSB, buffer, 6)) return;
 
+    int64_t time = NOW();
+
     int16_t x,y,z;
 
     x = static_cast<int16_t>(buffer[0]) | (static_cast<int16_t>(buffer[1])<<8);
@@ -78,7 +80,7 @@ void QMC5883Driver::getData() {
         }
 
         //timeout for calibration
-        if (micros() - calibrationStart_ >= 30*1000000) stopCalibration();
+        if (NOW() - calibrationStart_ >= 30*SECONDS) stopCalibration();
 
 
     } else {
@@ -92,8 +94,8 @@ void QMC5883Driver::getData() {
 
         mag = (mag - magMin_)/(magMax_ - magMin_)*2-1;
 
-        magFifo_.placeFront(mag, true);
-        magTimestampFifo_.placeFront(micros(), true);
+        SensorTimestamp<Vector<>> magTime(mag, time);
+        magTopic_.publish(magTime);
 
     }
 

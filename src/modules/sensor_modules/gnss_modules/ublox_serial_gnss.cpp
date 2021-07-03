@@ -4,7 +4,7 @@
 
 void UbloxSerialGNSS::_getData() {
 
-    uint32_t time = micros();
+    int64_t time = NOW();
 
     numSats_ = gnss_.getSIV();
 
@@ -22,17 +22,10 @@ void UbloxSerialGNSS::_getData() {
     position.longitude = (double)gnss_.getLongitude()/10e6*DEGREES;
     position.height = (float)gnss_.getAltitudeMSL()/1000;
 
-    positionFifo_.placeFront(position, true);
-    positionTimestampFifo_.placeFront(time, true);
-
-
     Vector<> velocity;
     velocity.x = (float)gnss_.getNedNorthVel()/1000;
     velocity.y = -(float)gnss_.getNedEastVel()/1000;
     velocity.z = -(float)gnss_.getNedDownVel()/1000;
-
-    velocityFifo_.placeFront(velocity, true);
-    velocityTimestampFifo_.placeFront(time, true);
 
     //positionDeviation_ = gnss_.getHorizontalAccuracy(0);
     //altitudeDeviation_ = gnss_.getVerticalAccuracy(0);
@@ -45,6 +38,16 @@ void UbloxSerialGNSS::_getData() {
     } else {
         lockValid_ = false;
     }
+
+    GNSSData data;
+    data.lockValid = lockValid_;
+    data.altitudeError = altitudeDeviation_;
+    data.positionError = positionDeviation_;
+    data.positionValueTimestamp.sensorData = position;
+    data.velocityValueTimestamp.sensorData = velocity;
+    data.positionValueTimestamp.sensorTimestamp = data.velocityValueTimestamp.sensorTimestamp = time;
+
+    gnssTopic_.publish(data);
 
 }
 

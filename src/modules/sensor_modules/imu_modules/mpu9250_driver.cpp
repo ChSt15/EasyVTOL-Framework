@@ -11,30 +11,27 @@ void MPU9250Driver::_getData() {
 
     _imu.Read();
 
-    Vector<> bufVec(-_imu.gyro_x_radps(), _imu.gyro_y_radps(), -_imu.gyro_z_radps());
-    if (_lastGyro != bufVec || true) {
+    SensorTimestamp<Vector<>> bufVec(Vector<>(-_imu.gyro_x_radps(), _imu.gyro_y_radps(), -_imu.gyro_z_radps()), _newDataTimestamp);
+    if (_lastGyro != bufVec.sensorData || true) {
         //Serial.println(String("Gyro: x:") + bufVec.x + ", y:" + bufVec.y + ", z:" + bufVec.z + ", Rate:" + _gyroRate);
-        _gyroFifo.placeFront(bufVec, true);
-        _gyroTimestampFifo.placeFront(_newDataTimestamp, true);
-        _lastGyro = bufVec;
+        gyroTopic_.publish(bufVec);
+        _lastGyro = bufVec.sensorData;
         _gyroCounter++;
     }
 
-    bufVec = Vector<>(-_imu.accel_x_mps2(), _imu.accel_y_mps2(), -_imu.accel_z_mps2());
-    if (_lastAccel != bufVec || true) {
-        _accelFifo.placeFront(bufVec, true);
-        _accelTimestampFifo.placeFront(_newDataTimestamp, true);
-        _lastAccel = bufVec;
+    bufVec = SensorTimestamp<Vector<>>(Vector<>(-_imu.accel_x_mps2(), _imu.accel_y_mps2(), -_imu.accel_z_mps2()), _newDataTimestamp);
+    if (_lastAccel != bufVec.sensorData || true) {
+        accelTopic_.publish(bufVec);
+        _lastAccel = bufVec.sensorData;
         _accelCounter++;
     }
 
     if (_imu.MagnetometerFailed()) return; //Do not get mag data if mag failed to start.
 
-    bufVec = Vector<>(-_imu.mag_x_ut(), _imu.mag_y_ut(), -_imu.mag_z_ut());
-    if (_lastMag != bufVec || true) {
-        _magFifo.placeFront(bufVec, true);
-        _magTimestampFifo.placeFront(_newDataTimestamp, true);
-        _lastMag = bufVec;
+    bufVec = SensorTimestamp<Vector<>>(Vector<>(-_imu.mag_x_ut(), _imu.mag_y_ut(), -_imu.mag_z_ut()), _newDataTimestamp);
+    if (_lastMag != bufVec.sensorData || true) {
+        //topic.publish(bufVec);
+        _lastMag = bufVec.sensorData;
         _magCounter++;
     }
 

@@ -83,69 +83,12 @@ public:
     uint32_t loopRate() {return _loopRate;};
 
     /**
-     * Returns true if Magnetometer data available
-     *
-     * @param values none.
-     * @return bool.
-     */
-    uint32_t magAvailable() {return magFifo_.available();};
-
-    /**
      * Returns rate (in Hz) of the new sensor data
      *
      * @param values none.
      * @return uint32_t.
      */
     uint32_t magRate() {return _magRate;};
-
-    /**
-     * Returns true if Magnetometer data valid.
-     * Variables given as parameters will be overridden.
-     * This will remove sensor data from queue, peek will not.
-     *
-     * @param values Vector and uint32_t.
-     * @return bool.
-     */
-    bool getMag(Vector<>* magData, uint32_t* magTimestamp) {
-
-        if (magFifo_.available() == 0) return false;
-
-        magFifo_.takeBack(magData);
-        magTimestampFifo_.takeBack(magTimestamp);
-
-        return true;
-
-    };
-
-    /**
-     * Returns true if Magnetometer data valid.
-     * Variables given as parameters will be overridden.
-     * Will not remove data from queue, get will.
-     *
-     * @param values Vector and uint32_t.
-     * @return bool.
-     */
-    bool peekMag(Vector<>* magData, uint32_t* magTimestamp) {
-
-        if (magFifo_.available() == 0) return false;
-
-        magFifo_.peekBack(magData);
-        magTimestampFifo_.peekBack(magTimestamp);
-
-        return true;
-
-    };
-
-    /**
-     * Removes all elements from queue.
-     *
-     * @param values none.
-     * @return none.
-     */
-    void flushMag() {
-        magFifo_.clear();
-        magTimestampFifo_.clear();
-    }
 
     /**
      * @returns current calibration status
@@ -171,10 +114,6 @@ private:
 
     bool getEEPROMData();
     bool setEEPROMData();
-
-
-    Buffer <Vector<>, 10> magFifo_;
-    Buffer <uint32_t, 10> magTimestampFifo_;
 
     Vector<> _lastMag;
 

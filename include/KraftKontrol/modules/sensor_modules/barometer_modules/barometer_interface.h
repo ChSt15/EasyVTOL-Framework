@@ -6,65 +6,34 @@
 #include "stdint.h"
 
 
+#include "KraftKontrol/utils/topic.h"
+#include "KraftKontrol/utils/sensor_timestamp.h"
+
+
 
 class Barometer_Interface {
 public:
 
     /**
-     * Returns rate (in Hz) of the thread
-     *
-     * @return uint32_t.
+     * @returns rate (in Hz) of the thread
      */
     virtual uint32_t loopRate() = 0;
 
     /**
-     * Returns true if pressure data available
-     *
-     * @return bool.
-     */
-    virtual uint32_t pressureAvailable() = 0;
-
-    /**
-     * Returns rate (in Hz) of new sensor data
-     *
-     * @return uint32_t.
+     * @returns rate (in Hz) of new sensor data
      */
     virtual uint32_t pressureRate() = 0;
 
     /**
-     * Returns true if pressure data valid.
-     * Variables given as parameters will be overridden.
-     * This will remove sensor data from queue, peek will not.
-     *
-     * @param pressureData float where the data will be writen into
-     * @param pressureTimestamp timestamp of when the measurement was taken
-     * @return bool.
+     * @returns reference to baro data topic
      */
-    virtual bool getPressure(float* pressureData, uint32_t* pressureTimestamp) = 0;
-
-    /**
-     * Returns true if pressure data valid.
-     * Variables given as parameters will be overridden.
-     * Will not remove data from queue, get will.
-     * 
-     * @see getPressure(...)
-     *
-     * @param pressureData float where the data will be writen into
-     * @param pressureTimestamp timestamp of when the measurement was taken
-     * @return bool.
-     */
-    virtual bool peekPressure(float* pressureData, uint32_t* pressureTimestamp) = 0;
-
-    /**
-     * Removes all elements from queue.
-     *
-     * @return none.
-     */
-    virtual void flushPressure() = 0;
-
-private:
+    Topic<SensorTimestamp<float>>& getBaroTopic() {return baroTopic_;}
 
 
+protected:
+
+    //Topic for distributing new measurements.
+    Topic<SensorTimestamp<float>> baroTopic_;
 
     
 };

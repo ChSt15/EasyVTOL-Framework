@@ -6,13 +6,13 @@ void BME280Driver::getData() {
 
     BME280_SensorMeasurements measurements;
 
-    uint32_t _newDataTimestamp = micros();
+    int64_t _newDataTimestamp = NOW();
     _bme.readAllMeasurements(&measurements);
 
     float bufMeasurement = measurements.pressure;
     if (bufMeasurement > 100) {
-        _pressureFifo.placeFront(bufMeasurement, true);
-        _pressureTimestampFifo.placeFront(_newDataTimestamp, true);
+        SensorTimestamp<float> value(bufMeasurement, _newDataTimestamp);
+        baroTopic_.publish(value);
         _lastPressure = bufMeasurement;
         _pressureCounter++;
     }

@@ -5,62 +5,34 @@
 
 #include "lib/Math-Helper/src/3d_math.h"
 
+#include "KraftKontrol/utils/topic.h"
+#include "KraftKontrol/utils/sensor_timestamp.h"
+
 
 
 class Accelerometer_Interface {
 public:
 
     /**
-     * Returns rate (in Hz) of the thread
-     *
-     * @param values none.
-     * @return uint32_t.
+     * @returns rate (in Hz) of the thread
      */
     virtual uint32_t loopRate() = 0;
 
     /**
-     * Returns true if accel data available
-     *
-     * @param values none.
-     * @return bool.
-     */
-    virtual uint32_t accelAvailable() = 0;
-
-    /**
-     * Returns rate (in Hz) of the new sensor data
-     *
-     * @param values none.
-     * @return uint32_t.
+     * @returns rate (in Hz) of the new sensor data
      */
     virtual uint32_t accelRate() = 0;
 
     /**
-     * Returns true if accel data valid.
-     * Variables given as parameters will be overridden.
-     * This will remove sensor data from queue, peek will not.
-     *
-     * @param values Vector and uint32_t.
-     * @return bool.
+     * @returns reference to accel data topic
      */
-    virtual bool getAccel(Vector<>* accelData, uint32_t* accelTimestamp) = 0;
+    Topic<SensorTimestamp<Vector<>>>& getAccelTopic() {return accelTopic_;}
 
-    /**
-     * Returns true if accel data valid.
-     * Variables given as parameters will be overridden.
-     * Will not remove data from queue, get will.
-     *
-     * @param values Vector and uint32_t.
-     * @return bool.
-     */
-    virtual bool peekAccel(Vector<>* accelData, uint32_t* accelTimestamp) = 0;
 
-    /**
-     * Removes all elements from queue.
-     *
-     * @param values none.
-     * @return none.
-     */
-    virtual void flushAccel() = 0;
+protected:
+
+    //Topic for distributing new measurements.
+    Topic<SensorTimestamp<Vector<>>> accelTopic_;
     
     
 };

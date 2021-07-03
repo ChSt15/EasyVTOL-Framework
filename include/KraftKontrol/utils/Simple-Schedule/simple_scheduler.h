@@ -150,23 +150,12 @@ public:
      * e.g. attachTask(FunctionToBeCalled, 1000, eTaskPriority_t::eTaskPriority_realtime);
      *
      * @param function Pointer to Thread task to be ran.
-     * @param rate_Hz Rate in Hz to try to run task at.
+     * @param rate_Hz Rate in Hz to run task at.
      * @param priority Priority to run task at.
+     * @param startTime_ns Time when to start runnin thread
+     * @param time_ns Time length to run task for
      */
-    void attachTask(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority);
-
-    /**
-     * This adds a function to the scheduler. 
-     * Will run a function for a given amount of time (in nanoseconds)
-     * 
-     * e.g. attachTask(FunctionToBeCalled, 1000, eTaskPriority_t::eTaskPriority_realtime);
-     *
-     * @param function Pointer to Thread task to be ran.
-     * @param rate_Hz Rate in Hz to try to run task at.
-     * @param priority Priority to run task at.
-     * @param time_ns Time lenght to run task for in nanoseconds. e.g. 5*SECONDS will run for 5 seconds.
-     */
-    void attachTaskForTime(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority, int64_t time_ns);
+    void attachTask(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority, int64_t startTime_ns = 0, int64_t time_ns = 0);
 
     /**
      * This adds a function to the scheduler. 
@@ -178,8 +167,9 @@ public:
      * @param rate_Hz Rate in Hz to try to run task at.
      * @param priority Priority to run task at.
      * @param numberLoops Number of times to run task.
+     * @param startTime_ns Time when to start runnin thread
      */
-    void attachTaskForNumberLoops(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority, uint32_t numberLoops);
+    void attachTaskForNumberLoops(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority, uint32_t numberLoops, int64_t startTime_ns = 0);
 
     /**
      * This removes a function from the scheduler.
@@ -214,8 +204,9 @@ private:
         bool initWasCalled = false;
 
         //If not -1 then this task will be removed once it reached its removal threshold.
-        int64_t removeThreshold_ns = 0;
-        int64_t creationTimestamp_ns = 0;
+        int64_t timeLength_ns = 0;
+        int64_t startTime_ns = 0;
+        bool timeLimited = false;
 
         //If set to 0 then no limit. Should be decremented every run.
         uint32_t numberRunsLeft = 0;

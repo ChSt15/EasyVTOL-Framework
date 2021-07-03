@@ -35,12 +35,13 @@ bool Scheduler::runPrioGroup(ChainObject<Task>* startOfGroup) {
         ChainObject<Task>* nextTask = currentTask->nextObject; // Must be selected before it is removed
         //currentRunningTask_ = &(currentTask->item);
         //if (!currentTask->item.isSuspended) {
+        if (NOW() >= currentTask->item.startTime_ns) {
             if (!currentTask->item.initWasCalled) {
                 currentTask->item.thread->init();
                 currentTask->item.initWasCalled = true;
             }
-            if (currentTask->item.removeThreshold_ns > 0) {
-                if (NOW() - currentTask->item.creationTimestamp_ns >= currentTask->item.removeThreshold_ns) {
+            if (currentTask->item.timeLimited) {
+                if (NOW() - currentTask->item.startTime_ns >= currentTask->item.timeLength_ns) {
                     currentTask->item.thread->removal(); //Run removal function before removing.
                     detachTask(currentTask->item.thread);
                 }
@@ -55,6 +56,7 @@ bool Scheduler::runPrioGroup(ChainObject<Task>* startOfGroup) {
                     }
                 }
             }
+        }
         //}
         currentTask = nextTask;
 
@@ -89,11 +91,13 @@ void Scheduler::initializeTasks() {
 
 
 
-void Scheduler::attachTask(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority) {
+void Scheduler::attachTask(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority, int64_t startTime_ns, int64_t time_ns) {
 
     Task task;
     task.thread = function;
     task.interval = IntervalControl(rate_Hz);
+    task.startTime_ns = startTime_ns;
+    task.timeLength_ns = time_ns;
     //task.interval.setLimit(false);
 
     switch (priority) {
@@ -131,56 +135,14 @@ void Scheduler::attachTask(Thread_Interface* function, uint32_t rate_Hz, eTaskPr
 
 
 
-void Scheduler::attachTaskForTime(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority, int64_t time_ns) {
+void Scheduler::attachTaskForNumberLoops(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority, uint32_t numberLoops, int64_t startTime_ns) {
 
     Task task;
     task.thread = function;
     task.interval = IntervalControl(rate_Hz);
-    //task.interval.setLimit(false);
-    task.creationTimestamp_ns = NOW();
-    task.removeThreshold_ns = time_ns;
-
-    switch (priority) {
-
-    case eTaskPriority_t::eTaskPriority_Realtime:
-        tasks_[0].addItem(task);
-        break;
-
-    case eTaskPriority_t::eTaskPriority_VeryHigh :
-        tasks_[1].addItem(task);
-        break;
-
-    case eTaskPriority_t::eTaskPriority_High :
-        tasks_[2].addItem(task);
-        break;
-
-    case eTaskPriority_t::eTaskPriority_Middle :
-        tasks_[3].addItem(task);
-        break;
-
-    case eTaskPriority_t::eTaskPriority_Low :
-        tasks_[4].addItem(task);
-        break;
-
-    case eTaskPriority_t::eTaskPriority_VeryLow :
-        tasks_[5].addItem(task);
-        break;
-    
-    default:
-        tasks_[6].addItem(task);
-        break;
-    }
-
-}
-
-
-
-void Scheduler::attachTaskForNumberLoops(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority, uint32_t numberLoops) {
-
-    Task task;
-    task.thread = function;
-    task.interval = IntervalControl(rate_Hz);
+    task.startTime_ns = startTime_ns;
     task.numberRunsLeft = numberLoops;
+    task.timeLimited = true;
 
     switch (priority) {
 

@@ -27,7 +27,7 @@ void KraftKonnectNetwork::thread() {
         //Check if last message from a node was so long ago that there must be no more connection
         for (uint8_t i = 0; i < 255; i++) {
 
-            if (nodeConnected_[i] && micros() - nodeTimestamp_[i] >= heartbeatInterval_.getIntervalMicros()*3) {
+            if (nodeConnected_[i] && NOW() - nodeTimestamp_[i] >= heartbeatInterval_.getInterval()*3) {
                 nodeConnected_[i] = false;
 
                 //Call event handler for timeout
@@ -42,7 +42,7 @@ void KraftKonnectNetwork::thread() {
             MessageData messageData = commsPort_->getMessageInformation();
 
             //Update timestamp
-            nodeTimestamp_[messageData.transmitterID] = micros();
+            nodeTimestamp_[messageData.transmitterID] = NOW();
             nodeConnected_[messageData.transmitterID] = true;
 
             //Run event handler if given

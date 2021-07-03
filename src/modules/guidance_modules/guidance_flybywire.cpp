@@ -6,8 +6,8 @@ void GuidanceFlyByWire::thread() {
 
     if (!initialised) init();
 
-    float dT = ((float) micros() - _lastRunTimestamp)/1000000.0f; //Get time delta in seconds
-    _lastRunTimestamp = micros(); //Save current run timestamp for next run.
+    float dT = float(NOW() - _lastRunTimestamp)/SECONDS; //Get time delta in seconds
+    _lastRunTimestamp = NOW(); //Save current run timestamp for next run.
 
     //Integrate speed, position and attitude
     vehicleControlSettings_.velocity += vehicleControlSettings_.linearAcceleration*dT;

@@ -14,6 +14,8 @@
 #include "KraftKontrol/modules/control_modules/control_interface.h"
 #include "KraftKontrol/modules/navigation_modules/navigation_interface.h"
 
+#include "KraftKontrol.h"
+
 
 class HoverController: public Control_Interface, public Module_Abstract, public Task_Abstract {
 public:

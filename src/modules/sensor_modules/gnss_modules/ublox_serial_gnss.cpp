@@ -1,4 +1,4 @@
-#include "ublox_serial_gnss.h"
+#include "KraftKontrol/modules/sensor_modules/gnss_modules/ublox_serial_gnss.h"
 
 
 

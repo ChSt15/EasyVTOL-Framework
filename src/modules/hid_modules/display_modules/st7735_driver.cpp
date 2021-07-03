@@ -1,5 +1,5 @@
 #ifdef ESP32
-#include "st7735_driver.h"
+#include "KraftKontrol/modules/hid_modules/display_modules/st7735_driver.h"
 
 
 

@@ -1,4 +1,4 @@
-#include "ads1115_driver.h"
+#include "KraftKontrol/modules/sensor_modules/adc_modules/ads1115_driver.h"
 
 
 

@@ -1,4 +1,4 @@
-#include "mpu9250_driver.h"
+#include "KraftKontrol/modules/sensor_modules/imu_modules/mpu9250_driver.h"
 
 
 

@@ -1,4 +1,4 @@
-#include "eeprom_hal_interface.h"
+#include "KraftKontrol/modules/eeprom_hal_modules/eeprom_hal_interface.h"
 
 
 

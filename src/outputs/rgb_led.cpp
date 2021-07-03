@@ -1,4 +1,4 @@
-#include "rgb_led.h"
+#include "KraftKontrol/outputs/rgb_led.h"
 
 /*
 namespace RGBLED {

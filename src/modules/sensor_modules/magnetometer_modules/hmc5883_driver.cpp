@@ -1,4 +1,4 @@
-#include "hmc5883_driver.h"
+#include "KraftKontrol/modules/sensor_modules/magnetometer_modules/hmc5883_driver.h"
 
 
 

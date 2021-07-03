@@ -1,4 +1,4 @@
-#include "eeprom_hal_teensy.h"
+#include "KraftKontrol/modules/eeprom_hal_modules/eeprom_hal_teensy.h"
 
 #ifdef ARDUINO_TEENSY40
 

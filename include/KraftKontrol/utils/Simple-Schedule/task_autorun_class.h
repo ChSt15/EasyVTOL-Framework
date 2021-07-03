@@ -26,10 +26,10 @@ public:
      * @param startRunning will auto start threading if set to true. Default is true.
      * @param runs sets the number of times to run the thread function. Set to -1 for infinite. Default is -1.
      */
-    Task_Abstract(uint32_t rate, eTaskPriority_t priority, bool startRunning = false, int32_t runs = -1) {
+    Task_Abstract(uint32_t rate, eTaskPriority_t priority, bool startRunning = false) {
         rate_ = rate;
         priority_ = priority;
-        if (startRunning) startTaskThreading(runs);
+        if (startRunning) startTaskThreading();
     }
 
     /**
@@ -45,10 +45,11 @@ public:
      * @param numberRuns sets the number of times to run the thread function. Set to -1 for infinite. Default is -1.
      * @returns true if added or false if rate is set to 0 or scheduler failed to add task.
      */
-    bool startTaskThreading(const int32_t &numberRuns = -1) {
+    bool startTaskThreading() {
         if (rate_ == 0) return false;
         if (attached_) return true; //Keep from attaching itsself multiple times
-        return g_scheduler.attachTask(this, rate_, priority_, numberRuns);
+        g_scheduler.attachTask(this, rate_, priority_);
+        return true;
     }
 
     /**

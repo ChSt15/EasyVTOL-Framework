@@ -107,8 +107,6 @@ enum eTaskPriority_t {
 class Scheduler {
 public:
 
-    uint32_t counter = 0;
-
     /**
      * This is the loop for the scheduler.
      * It will check for functions that need to be ran and run them.
@@ -147,43 +145,49 @@ public:
     }*/
 
     /**
-     * This adds a function to the scheduler.
-     * 
-     * Functions cannot return.
-     * 
-     * Will return false if fails to add function to scheduler.
+     * This adds a function to the scheduler. 
      * 
      * e.g. attachTask(FunctionToBeCalled, 1000, eTaskPriority_t::eTaskPriority_realtime);
      *
-     * @param values function pointer, rate_Hz, priority
-     * @return bool.
+     * @param function Pointer to Thread task to be ran.
+     * @param rate_Hz Rate in Hz to try to run task at.
+     * @param priority Priority to run task at.
      */
-    bool attachTask(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority = eTaskPriority_t::eTaskPriority_Middle, int32_t numberRuns = -1);
+    void attachTask(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority);
 
     /**
-     * Will run a function for a given amount of time (in microseconds)
-     * 
-     * If continualRun is false then the function will only be ran 
-     * once at its removal.
-     * 
-     * Functions cannot return.
-     * 
-     * Will return false if fails to add function to scheduler.
+     * This adds a function to the scheduler. 
+     * Will run a function for a given amount of time (in nanoseconds)
      * 
      * e.g. attachTask(FunctionToBeCalled, 1000, eTaskPriority_t::eTaskPriority_realtime);
      *
-     * @param values function pointer, rate_Hz, priority
-     * @return bool.
+     * @param function Pointer to Thread task to be ran.
+     * @param rate_Hz Rate in Hz to try to run task at.
+     * @param priority Priority to run task at.
+     * @param time_ns Time lenght to run task for in nanoseconds. e.g. 5*SECONDS will run for 5 seconds.
      */
-    bool attachTask(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority, uint32_t time_us, int32_t numberRuns = -1);
+    void attachTaskForTime(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority, int64_t time_ns);
+
+    /**
+     * This adds a function to the scheduler. 
+     * Will run a function for a given number of loops
+     * 
+     * e.g. attachTask(FunctionToBeCalled, 1000, eTaskPriority_t::eTaskPriority_realtime);
+     *
+     * @param function Pointer to Thread task to be ran.
+     * @param rate_Hz Rate in Hz to try to run task at.
+     * @param priority Priority to run task at.
+     * @param numberLoops Number of times to run task.
+     */
+    void attachTaskForNumberLoops(Thread_Interface* function, uint32_t rate_Hz, eTaskPriority_t priority, uint32_t numberLoops);
 
     /**
      * This removes a function from the scheduler.
      * 
      * Returns false if function not found.
      *
-     * @param values none.
-     * @return none.
+     * @param function Pointer to task to remove.
+     * @returns true if task found and removed.
      */
     bool detachTask(Thread_Interface* function);
 
@@ -210,13 +214,11 @@ private:
         bool initWasCalled = false;
 
         //If not -1 then this task will be removed once it reached its removal threshold.
-        uint32_t removeThreshold_us = 0;
-        uint32_t creationTimestamp_us = 0;
+        int64_t removeThreshold_ns = 0;
+        int64_t creationTimestamp_ns = 0;
 
-        //If set to true then remove once remove timestamp is reached.
-        bool limited = false;
         //If set to 0 then no limit. Should be decremented every run.
-        int32_t numberRunsLeft = 0;
+        uint32_t numberRunsLeft = 0;
 
         //Operator must be overloaded for the Chainbuffer to find the correct Task. Only the function pointers must be the same.
         bool operator == (Task b) {
@@ -224,6 +226,13 @@ private:
         }
 
     };
+
+    /**
+     * Runs through chain of tasks.
+     * @param startOfGroup Pointer to starting task of chain.
+     * @returns true if al least one task ran.
+     */
+    bool runPrioGroup(ChainObject<Task>* startOfGroup);
 
     ChainBuffer<Task> tasks_[7]; //array size must be as big, as the number of priorities there are.
 

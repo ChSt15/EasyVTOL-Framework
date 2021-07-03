@@ -3,7 +3,7 @@
 
 
 
-#include "Arduino.h"
+#include "KraftKontrol/utils/system_time.h"
 
 
 
@@ -11,11 +11,11 @@ class IntervalControl {
 public:
 
     IntervalControl() {
-        _lastRun_us = 0;
+        lastRun_ns_ = 0;
     }
 
     IntervalControl(float rate) {
-        _lastRun_us = 0;
+        lastRun_ns_ = 0;
         if (rate != 0) setRate(rate);
     }
 
@@ -25,7 +25,7 @@ public:
      * @param values rate in Hz
      * @return none.
      */
-    inline void setRate(float rate_Hz) {_interval_us = (float)1000000L/rate_Hz;}
+    inline void setRate(float rate_Hz) {interval_ns_ = SECONDS/rate_Hz;}
 
     /**
      * Gets the rate in Hz
@@ -33,7 +33,7 @@ public:
      * @param values none.
      * @return uint32_t.
      */
-    inline uint32_t getRate() {return (float)1000000/_interval_us;}
+    inline uint32_t getRate() {return SECONDS/interval_ns_;}
 
     /**
      * Sets the interval in milliseconds
@@ -41,15 +41,7 @@ public:
      * @param values interval in milliseconds
      * @return none.
      */
-    inline void setIntervalMillis(uint32_t interval_ms) {_interval_us = interval_ms*1000L; _lastRun_us = micros() - _interval_us;}
-
-    /**
-     * Sets the interval in microseconds
-     *
-     * @param values interval in microseconds
-     * @return none.
-     */
-    inline void setIntervalMicros(uint32_t interval_us) {_interval_us = interval_us; _lastRun_us = micros() - _interval_us;}
+    inline void setInterval(uint32_t interval_ns) {interval_ns_ = interval_ns; lastRun_ns_ = NOW() - interval_ns_;}
 
     /**
      * Gets the interval in milliseconds
@@ -57,15 +49,7 @@ public:
      * @param values none.
      * @return interval in milliseconds.
      */
-    inline uint32_t getIntervalMillis() {return _interval_us/1000;}
-
-    /**
-     * Gets the interval in microseconds
-     *
-     * @param values none.
-     * @return interval in microseconds.
-     */
-    inline uint32_t getIntervalMicros() {return _interval_us;}
+    inline int64_t getInterval() {return interval_ns_;}
 
     /**
      * Returns the amount of time till the next run.
@@ -74,7 +58,7 @@ public:
      * @param values none
      * @return remaining time till next run.
      */
-    inline int32_t getTimeRemainMicros() {return (int32_t) -_interval_us + micros() + _lastRun_us;}
+    inline int64_t getTimeRemain() {return -interval_ns_ + NOW() + lastRun_ns_;}
 
     /**
      * Sets the way the system limits the runs.
@@ -89,7 +73,7 @@ public:
      * @param values limit
      * @return none.
      */
-    inline void setLimit(bool limit) {_limit = limit;}
+    inline void setLimit(bool limit) {limit_ = limit;}
 
     /**
      * This syncs the internal variables. This is usefull
@@ -103,7 +87,7 @@ public:
      * @param values none
      * @return none.
      */
-    inline void syncInternal() {_lastRun_us = micros();}
+    inline void syncInternal() {lastRun_ns_ = NOW();}
 
     /**
      * Waits till next Run.
@@ -114,10 +98,10 @@ public:
      */
     inline void waitTillNextRun() {
 
-        while(micros() - _lastRun_us < _interval_us || _block);
+        while(NOW() - lastRun_ns_ < interval_ns_ || block_);
         
-        if (_limit) _lastRun_us = micros();
-        else _lastRun_us += _interval_us;
+        if (limit_) lastRun_ns_ = NOW();
+        else lastRun_ns_ += interval_ns_;
 
     }
 
@@ -130,10 +114,10 @@ public:
      */
     inline void waitTillNextRun(void (*callMethod)(void)) {
 
-        while (micros() - _lastRun_us < _interval_us || _block) callMethod();
+        while (NOW() - lastRun_ns_ < interval_ns_ || block_) callMethod();
         
-        if (_limit) _lastRun_us = micros();
-        else _lastRun_us = micros() - (micros()%_interval_us);
+        if (limit_) lastRun_ns_ = NOW();
+        else lastRun_ns_ = NOW() - (NOW()%interval_ns_);
 
     }
 
@@ -155,11 +139,11 @@ public:
      */
     inline bool isTimeToRun(bool updateClock = true) {
 
-        if (_block) return false;
+        if (block_) return false;
         
-        if (micros() - _lastRun_us > _interval_us) {
-            if (!_limit && updateClock) _lastRun_us = micros() - (micros()%_interval_us);//{while(_lastRun_us + _interval_us < micros()) _lastRun_us += _interval_us;}
-            else if (updateClock) _lastRun_us = micros();
+        if (NOW() - lastRun_ns_ > interval_ns_) {
+            if (!limit_ && updateClock) lastRun_ns_ = NOW() - (NOW()%interval_ns_);//{while(lastRun_ns_ + interval_ns_ < NOW()) lastRun_ns_ += interval_ns_;}
+            else if (updateClock) lastRun_ns_ = NOW();
             return true;
         } else return false;
 
@@ -184,14 +168,14 @@ public:
      * @param values updateClock
      * @return none.
      */
-    inline bool isTimeToRun(uint32_t &timeDelta, bool updateClock = true) {
+    inline bool isTimeToRun(int64_t& timeDelta, bool updateClock = true) {
 
-        if (_block) return false;
+        if (block_) return false;
         
-        timeDelta = micros() - _lastRun_us;
-        if (timeDelta > _interval_us) {
-            if (!_limit && updateClock) _lastRun_us = micros() - (micros()%_interval_us);
-            else if (updateClock) _lastRun_us = micros();
+        timeDelta = NOW() - lastRun_ns_;
+        if (timeDelta > interval_ns_) {
+            if (!limit_ && updateClock) lastRun_ns_ = NOW() - (NOW()%interval_ns_);
+            else if (updateClock) lastRun_ns_ = NOW();
             return true;
         } else return false;
 
@@ -207,19 +191,19 @@ public:
      * @return none.
      */
     inline void block(bool block) {
-        _block = block;
+        block_ = block;
     }
 
 
 private:
 
-    uint32_t _lastRun_us = 0;
+    uint32_t lastRun_ns_ = 0;
 
-    uint32_t _interval_us = 0;
+    uint32_t interval_ns_ = 0;
 
-    bool _limit = true;
+    bool limit_ = true;
 
-    bool _block = false;
+    bool block_ = false;
 
 };
 

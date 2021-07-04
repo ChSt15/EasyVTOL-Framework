@@ -611,6 +611,8 @@ void NavigationComplementaryFilter::thread() {
 
     navigationData_.timestamp = micros();
 
+    navigationDataTopic_.publish(navigationData_);
+
 }
 
 
@@ -624,39 +626,5 @@ void NavigationComplementaryFilter::init() {
     navigationData_.accelerationError = 10000;
     navigationData_.velocityError = 10000;
     navigationData_.positionError = 10000;
-
-}
-
-
-
-KinematicData NavigationComplementaryFilter::predictState(const KinematicData &systemState, const int64_t &time) {
-
-    KinematicData statePrediction = systemState;
-
-    float dTime = float(time - systemState.timestamp)/1000000.0f;
-
-    float dTimePow2 = dTime*dTime;
-    float dTimeHalfPow2 = dTimePow2*0.5f;
-    float dTimeQuartPow4 = dTimePow2*dTimePow2*0.25f;
-
-
-    //Predict angular stuff
-    statePrediction.angularRate = systemState.angularAcceleration*dTime + systemState.angularRate; //Integrate angular accel to get new angular rate
-    statePrediction.angularRateError = sqrt(systemState.angularAccelerationError*systemState.angularAccelerationError*dTimePow2 + systemState.angularRateError*systemState.angularRateError); //Calculate new error
-
-    Vector<> angleChange = systemState.angularAcceleration*dTimeHalfPow2 + systemState.angularRate*dTime;
-    //statePrediction.attitude = Quaternion<>(angleChange, angleChange.magnitude()/2)*systemState.attitude;
-
-    //Predict positional stuff
-    statePrediction.velocity = systemState.velocity + systemState.linearAcceleration*dTime; //Integrate linear accel for velocity
-    statePrediction.velocityError = sqrt(systemState.accelerationError*systemState.accelerationError*dTimePow2 + systemState.velocityError*systemState.velocityError); //Calculate new error
-
-    statePrediction.position = systemState.position + systemState.velocity*dTime + systemState.linearAcceleration*dTimeHalfPow2; //Integrate linear accel for velocity
-    statePrediction.positionError = sqrt(systemState.accelerationError*systemState.accelerationError*dTimeQuartPow4 + systemState.velocityError*systemState.velocityError*dTimePow2 + systemState.positionError*systemState.positionError); //Calculate new error
-
-    //Update time
-    statePrediction.timestamp = time;
-
-    return statePrediction;
 
 }

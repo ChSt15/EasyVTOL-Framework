@@ -70,55 +70,12 @@ public:
     void init();
 
     /**
-     * Returns a struct containing all the vehicles
-     * current navigation parameters.
-     * If only the kinematic parameters are needed
-     * then use getKinematicData().
-     *
-     * @return navigation paramenters.
-     */
-    NavigationData getNavigationData() {return navigationData_;};
-
-    /**
-     * Returns a pointer to a struct containing all 
-     * the vehicles current kinematic parameters.
-     * 
-     * This is usefull for data linking instead of 
-     * always having to pass data manually.
-     *
-     * @return kinematic parameter pointer.
-     */
-    NavigationData* getNavigationDataPointer() {return &navigationData_;};
-
-    /**
-     * Sets the home position.
-     * All position data will be in refernce to this home position.
-     *
-     * @param homePosition Is the position to be used as home.
-     */
-    void setHome(WorldPosition homePosition) {
-
-        navigationData_.homePosition = homePosition;
-        navigationData_.position = Vector<>(0);
-
-    }
-
-
-    /**
      * @returns magnetic vector
      */
-    Vector<> getMag() {return magVec_;}
+    //Vector<> getMag() {return magVec_;}
 
 
 private:
-
-    /**
-     * Predicts system state at given time.
-     * @param systemState Current system state to predict.
-     * @param time Absolute time of where system should be. In nanoseconds.
-     * @returns predicted state.
-     */
-    KinematicData predictState(const KinematicData &systemState, const int64_t &time);
 
     //Subscriber for gyro with fifo function
     Buffer_Subscriber<SensorTimestamp<Vector<>>, 100> gyroSub_;
@@ -130,10 +87,6 @@ private:
     Buffer_Subscriber<SensorTimestamp<float>, 10> baroSub_;
     //Subscriber for gnssdata with fifo function
     Buffer_Subscriber<GNSSData, 10> gnssSub_;
-    
-
-    //Storage container for navigationData
-    NavigationData navigationData_;
 
     //Filter data
     LowPassFilter<Vector<>> gyroLPF_ = LowPassFilter<Vector<>>(0.01);

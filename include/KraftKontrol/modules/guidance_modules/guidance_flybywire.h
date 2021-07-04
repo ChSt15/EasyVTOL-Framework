@@ -122,14 +122,6 @@ public:
     eControlMode_t getPositionControlMode() {return vehicleControlSettings_.positionControlMode;};
 
     /**
-     * Returns a struct containing all the vehicles
-     * setpoint data that feeds to the controller.
-     *
-     * @return control parameters.
-     */
-    virtual ControlData getControlSetpoint() {return vehicleControlSettings_;}
-
-    /**
      * Returns a pointer to a struct containing all the 
      * vehicles setpoint data that feeds to the controller.
      * 

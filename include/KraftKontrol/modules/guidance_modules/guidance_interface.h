@@ -4,6 +4,7 @@
 
 
 #include "KraftKontrol/data_containers/control_data.h"
+#include "KraftKontrol/utils/topic.h"
 
 
 
@@ -14,24 +15,21 @@ public:
      * Returns a struct containing all the vehicles
      * setpoint data that feeds to the controller.
      *
-     * @return control parameters.
+     * @return control parameters container.
      */
-    virtual ControlData getControlSetpoint() = 0;
+    virtual ControlData& getControlSetpoint() {return controlSetpoint_;}
 
     /**
-     * Returns a pointer to a struct containing all the 
-     * vehicles setpoint data that feeds to the controller.
-     * 
-     * Using pointers allows for data linking instead of
-     * always passing data.
-     *
-     * @return control parameter pointer.
+     * @returns reference to guidance modules output topic
      */
-    virtual ControlData* getControlSetpointPointer() = 0;
+    Topic<ControlData>& getControlSetpointTopic() {return controlSetpointTopic_;}
 
 
 protected:
 
+    ControlData controlSetpoint_;
+
+    Topic<ControlData> controlSetpointTopic_;
     
 
 };

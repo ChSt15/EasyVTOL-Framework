@@ -38,18 +38,7 @@ public:
      *
      * @return DynamicData.
      */
-    virtual DynamicData getDynamicSetpoint() = 0;
-
-    /**
-     * Returns a pointer towards a struct containing the forces 
-     * the acuators need to produce in total on the vehicle in 
-     * order to achieve the kinematic setpoints. 
-     * 
-     * Using pointers allows for data linking.
-     *
-     * @return DynamicData pointer.
-     */
-    virtual DynamicData* getDynamicSetpointPointer() = 0;
+    virtual DynamicData& getDynamicSetpoint() = 0;
 
     /**
      * Tells dynamics module to test all actuators. 

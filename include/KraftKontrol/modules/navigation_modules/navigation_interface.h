@@ -14,6 +14,7 @@
 
 
 #include "KraftKontrol/data_containers/navigation_data.h"
+#include "KraftKontrol/utils/topic.h"
 
 
 
@@ -21,31 +22,46 @@ class Navigation_Interface {
 public:
 
     /**
-     * Returns a struct containing all the vehicles
-     * current navigation parameters.
-     *
-     * @return navigation paramenters.
-     */
-    virtual NavigationData getNavigationData() = 0;
-
-    /**
-     * Returns a pointer to a struct containing all 
-     * the vehicles current kinematic parameters.
-     * 
-     * This is usefull for data linking instead of 
-     * always having to pass data manually.
-     *
-     * @return kinematic parameter pointer.
-     */
-    virtual NavigationData* getNavigationDataPointer() = 0;
-
-    /**
      * Sets the home position.
      * All position data will be in refernce to this home position.
      *
      * @param homePosition Is the position to be used as home.
      */
-    virtual void setHome(WorldPosition homePosition) = 0;
+    virtual void setHome(const WorldPosition& homePosition) {
+        navigationData_.homePosition = homePosition;
+    };
+
+    /**
+     * Sets the navigation data to given parameter.
+     * This id to reset to a known position
+     * @param startPose
+     */
+    virtual void setStartKinematics(const KinematicData& startPose) {
+        navigationData_ = startPose;
+    }
+
+    /**
+     * Returns a struct containing all the vehicles
+     * current navigation parameters.
+     *
+     * @return navigation parameters.
+     */
+    virtual NavigationData& getNavigationData() {return navigationData_;}
+
+    /**
+     * @returns reference to nav modules output topic
+     */
+    Topic<NavigationData>& getNavigationDataTopic() {return navigationDataTopic_;}
+
+
+protected:
+
+    //Topic to distributing new navigation data.
+    Topic<NavigationData> navigationDataTopic_;
+
+    //Storage container for navigationData.
+    NavigationData navigationData_;
+
 
 };
 

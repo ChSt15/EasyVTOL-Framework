@@ -24,7 +24,7 @@ public:
      * Sets the control modules navigation module.
      * @param navigationModule Pointer to module to use.
      */
-    virtual void setGuidanceModule(Navigation_Interface* navigationModule) = 0;
+    virtual void setNavigationModule(Navigation_Interface* navigationModule) = 0;
 
     /**
      * Returns the kinematics the system needs to achieve the desired
@@ -32,20 +32,25 @@ public:
      *
      * @return dynamicSetpoint.
      */
-    virtual DynamicData getDynamicsOutput() = 0;
+    virtual DynamicData& getDynamicsOutput() {return controlOutput_;};
 
     /**
-     * Returns the a pointer to a struct with the kinematics the system 
-     * needs to achieve the desired guidance inputs.
-     *
-     * @return dynamicSetpoint pointer.
+     * @returns topic for control output.
      */
-    virtual DynamicData* getDynamicsOutputPointer() = 0;
+    virtual Topic<DynamicData>& getControlDataTopic() {return controlTopic_;};
 
     /**
      * Resets control module. Things like PID I values are set to 0.
      */
     virtual void reset() = 0;
+
+
+protected:
+
+
+    DynamicData controlOutput_;
+
+    Topic<DynamicData> controlTopic_;
 
     
 };

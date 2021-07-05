@@ -1,6 +1,8 @@
 # KraftFramework
-A flight controller framework using the Arduino Framework (Current development is only on the Teensy 4.0) thats designed to be highly modular and for use in highly experimental vehicles and complex system, without many compromises to efficiency or performance.
-## **This project is still under initial development and should not be used even for experimental systems as it will not work and has major bugs.**
+A flight controller framework using the Arduino Framework (Current development is only on the Teensy 4.0) thats designed to be highly modular and for use in highly experimental vehicles and complex systems, without many compromises to efficiency or performance.
+The philosophy behind the architecture is fault handling at runtime through automation of base classes, while keeping direct communication between modules. Meaning we use pointers between modules and if a module is somehow deleted all dependent modules will not cause a system crash (Accessing said deleted module).
+This is of great importance as testing of modules and switching between them during flight is possible with this modular design, and a failure during switching could easily cause a crash. 
+## **This project is still under initial development. Huge structure and architecture changes are very likely to happen resulting in many broken things.**
 ## Current goal roadmap:
 - [x] Create basic structure and test on hardware.
 - [x] Develop Communication protocols and packet handling for radio control and basestation control.
@@ -27,7 +29,7 @@ git submodule update --init --recursive
 - [x] Add new data containers.
 - [x] Add buffer with queue, stack, sorting, median, average, deviation calculations.
 - [x] Migrate to new buffer class.
-- [ ] Migrate to single universal time system. E.g. NOW() and returns runtime int64_t in nanoseconds. Should also solve problem with overflow. This can later be used to simulate modules.
-- [ ] Add HMC5883 magnetometer sensor driver.
+- [x] Migrate to single universal time system. E.g. NOW() and returns runtime int64_t in nanoseconds. Should also solve problem with overflow. This can later be used to simulate modules.
+- [x] Add HMC5883 magnetometer sensor driver.
 - [ ] Add error calculation system for measurements and sensor fusion. This should make error calculation automatic.
 

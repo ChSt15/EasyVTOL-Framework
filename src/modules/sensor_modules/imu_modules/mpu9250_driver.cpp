@@ -82,9 +82,9 @@ void MPU9250Driver::thread() {
     }
 
 
-    uint32_t dTime;
+    int64_t dTime;
     if (_rateCalcInterval.isTimeToRun(dTime)) {
-        float dTime_s = (float)dTime/1000000.0f;
+        float dTime_s = (float)dTime/SECONDS;
         _loopRate = _loopCounter/dTime_s;
         _gyroRate = _gyroCounter/dTime_s;
         _accelRate = _accelCounter/dTime_s;

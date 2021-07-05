@@ -8,7 +8,7 @@ void Scheduler::tick() {
 
     //Measure and calculate tickrate
     tickCounter_++;  
-    uint32_t dTime;
+    int64_t dTime;
     if (tickCounterResetInterval_.isTimeToRun(dTime)) {
         tickRate_ = (double)tickCounter_/dTime*SECONDS;
         tickCounter_ = 0;
@@ -61,6 +61,8 @@ bool Scheduler::runPrioGroup(ChainObject<Task>* startOfGroup) {
         currentTask = nextTask;
 
     }
+
+    return taskRan;
 
 }
 

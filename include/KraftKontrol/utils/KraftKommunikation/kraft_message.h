@@ -11,6 +11,8 @@
 
 //Indicates the type of packet. Use eKraftMessageType_StandardEnd_ID and up for custom Packets
 enum eKraftMessageType_t : uint8_t {
+    //Used for initialising and signify that it was never set.
+    eKraftMessageType_Invalid_ID,
     //Simply signals that connection is still there. Should be send at 1Hz rate.
     eKraftMessageType_Heartbeat_ID,
     //To be returned to signal succesfull receive when requiested.
@@ -105,6 +107,34 @@ protected:
         return true;
 
     }
+
+};
+
+
+
+class KraftMessageContainer {
+public:
+
+    KraftMessageContainer(const KraftMessage_Interface& message) {
+        dataType_ = static_cast<eKraftMessageType_t>(message.getDataTypeID());
+        dataSize_ = message.getDataSize();
+        data_ = new uint8_t[dataSize_];
+        message.getRawData(data_, dataSize_);
+    }
+
+    ~KraftMessageContainer() {delete[] data_;}
+
+    const eKraftMessageType_t& getMessageID() const {return dataType_;}
+
+    bool getMessage(KraftMessage_Interface& message) const {
+        return message.setRawData(data_, dataSize_);
+    }
+
+private:
+
+    uint8_t* data_ = nullptr;
+    eKraftMessageType_t dataType_ = eKraftMessageType_t::eKraftMessageType_Invalid_ID;
+    uint8_t dataSize_ = 0;
 
 };
 

@@ -1,4 +1,4 @@
-#include "kraft_kommunication.h"
+#include "KraftKontrol/utils/KraftKommunikation/kraft_kommunication.h"
 
 
 
@@ -26,7 +26,7 @@ bool KraftKommunication::decodeMessageFromBuffer(ReceivedPayloadData* payloadDat
 
     for (uint32_t i = 0; i < payloadData->messageData.payloadSize; i++) payloadData->dataBuffer[i] = buffer[8+i]; //Move data from buffer into output
 
-    uint8_t crc = buffer[8+payloadData->messageData.payloadSize];
+    //uint8_t crc = buffer[8+payloadData->messageData.payloadSize];
 
     if (buffer[9+payloadData->messageData.payloadSize] != c_kraftPacketEndMarker) return false;
 

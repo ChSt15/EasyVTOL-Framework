@@ -6,7 +6,7 @@
 #include "Arduino.h"
 #include "SPI.h"
 
-#include "lib/KraftKommunikation/src/kraft_link.h"
+#include "KraftKontrol/utils/KraftKommunikation/kraft_kommunication.h"
 #include "lib/SX12XX-LoRa-master/src/SX128XLT.h"
 
 #include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"

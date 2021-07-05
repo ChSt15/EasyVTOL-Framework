@@ -1,7 +1,7 @@
 # KraftFramework
-A flight controller framework using the Arduino Framework (Current development is only on the Teensy 4.0) thats designed to be highly modular and for use in highly experimental vehicles and complex systems, without many compromises to efficiency or performance.
-The philosophy behind the architecture is fault handling at runtime through automation of base classes, while keeping direct communication between modules. Meaning we use pointers between modules and if a module is somehow deleted all dependent modules will not cause a system crash (Accessing said deleted module).
-This is of great importance as testing of modules and switching between them during flight is possible with this modular design, and a failure during switching could easily cause a crash. 
+A flight controller framework using the Arduino Framework (Current development is only on the Teensy 4.0) thats designed to be highly modular and for use in highly experimental vehicles and complex systems, without many compromises to performance.
+The philosophy behind the architecture is fault handling at runtime through automation of base classes, while keeping direct communication between modules.
+This is of great importance as testing of modules and switching between them during flight is possible with this modular design and greatly simplifies programming, and a failure during switching could easily cause a crash. 
 ## **This project is still under initial development. Huge structure and architecture changes are very likely to happen resulting in many broken things.**
 ## Current goal roadmap:
 - [x] Create basic structure and test on hardware.

@@ -175,8 +175,7 @@ void QMC5883Driver::init() {
 
     bool failed = false;
 
-    uint8_t byte;
-
+    //uint8_t byte;
     //if (!readByte(address_, QMC5883Registers::QMC5883L_CHIP_ID, &byte)) failed = true;
 
     if (!bus_.writeByte(QMC5883Registers::QMC5883L_CONFIG2, 0b10000000)) failed = true;

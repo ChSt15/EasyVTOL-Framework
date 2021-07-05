@@ -357,7 +357,7 @@ public:
 
         if (dataByteSize < sizeof(eVehicleMode_t)) return false;
 
-        startBufferWrite(dataBytes + startByte);
+        startBufferWrite((uint8_t*)dataBytes + startByte);
         bufferWrite(&vehicleMode_, sizeof(vehicleMode_));
         endBufferWrite();
 
@@ -369,7 +369,7 @@ public:
 
         if (dataByteSize < sizeof(eVehicleMode_t)) return false;
 
-        startBufferRead(dataBytes + startByte);
+        startBufferRead((uint8_t*)dataBytes + startByte);
         bufferRead(&vehicleMode_, sizeof(vehicleMode_));
         endBufferRead();
 
@@ -702,7 +702,7 @@ public:
 
         if (dataByteSize < getDataSize()) return false;
 
-        startBufferWrite(dataBytes + startByte);
+        startBufferWrite((uint8_t*)dataBytes + startByte);
         bufferWrite(&time_ms_, sizeof(time_ms_));
         endBufferWrite();
 
@@ -714,7 +714,7 @@ public:
 
         if (dataByteSize < getDataSize()) return false;
 
-        startBufferRead(dataBytes + startByte);
+        startBufferRead((uint8_t*)dataBytes + startByte);
         bufferRead(&time_ms_, sizeof(time_ms_));
         endBufferRead();
 
@@ -750,7 +750,7 @@ public:
 
         if (dataByteSize < getDataSize()) return false;
 
-        startBufferWrite(dataBytes + startByte);
+        startBufferWrite((uint8_t*)dataBytes + startByte);
         bufferWrite(&programNumber_, sizeof(programNumber_));
         bufferWrite(&countDown_ms_, sizeof(countDown_ms_));
         endBufferWrite();
@@ -763,7 +763,7 @@ public:
 
         if (dataByteSize < getDataSize()) return false;
 
-        startBufferRead(dataBytes + startByte);
+        startBufferRead((uint8_t*)dataBytes + startByte);
         bufferRead(&programNumber_, sizeof(programNumber_));
         bufferRead(&countDown_ms_, sizeof(countDown_ms_));
         endBufferRead();

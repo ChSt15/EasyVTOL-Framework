@@ -25,6 +25,8 @@ public:
         //if (scl != -1) bus_->setSCL(scl);
         //if (sda != -1) bus_->setSDA(sda);
 
+        return true;
+
     }
 
     //Write functions

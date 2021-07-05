@@ -313,7 +313,7 @@ class Vector {
          * @param values none.
          * @return Vector.
          */
-        inline Vector<T> getProjectionOn(const Vector<T> &b) const {
+        inline Vector<T> getProjectionOn(Vector<T> b) const {
 
             b.normalize();
 

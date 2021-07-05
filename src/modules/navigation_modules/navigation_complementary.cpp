@@ -454,7 +454,7 @@ void NavigationComplementaryFilter::thread() {
         SensorTimestamp<float> sensorTime;
         baroSub_.takeBack(&sensorTime);
 
-        float& magVector = sensorTime.sensorData;
+        float& baroPressure_ = sensorTime.sensorData;
         int64_t& timestamp = sensorTime.sensorTimestamp;
 
         //Check if accelerometer initialised

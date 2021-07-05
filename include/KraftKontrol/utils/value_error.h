@@ -1,5 +1,5 @@
-#ifndef VALUEERROR<T>H
-#define VALUEERROR<T>H
+#ifndef VALUEERROR_H
+#define VALUEERROR_H
 
 
 
@@ -58,8 +58,8 @@ public:
         }
 
         if (!(value == value) && !(valueB.value == valueB.value)) return ValueError<T>(0,10000);
-        else if (!(value == value)) valueB;
-        else if (!(valueB.value == valueB.value)) *this;
+        else if (!(value == value)) return valueB;
+        else if (!(valueB.value == valueB.value)) return *this;
 
         T w1 = 1/(error*error);
         T w2 = 1/(valueB.error*valueB.error);

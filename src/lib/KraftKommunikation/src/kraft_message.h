@@ -68,7 +68,7 @@ protected:
 
         if (bufferWritePointer == nullptr || bufferIndex + numberBytes >= bufferMaxIndex) return false;
 
-        memcpy(bufferWritePointer + bufferIndex, data, numberBytes);
+        memcpy((uint8_t*)bufferWritePointer + bufferIndex, data, numberBytes);
         bufferIndex += numberBytes;
 
         return true;
@@ -99,7 +99,7 @@ protected:
 
         if (bufferReadPointer == nullptr || bufferIndex + numberBytes >= bufferMaxIndex) return false;
 
-        memcpy(data, bufferReadPointer + bufferIndex, numberBytes);
+        memcpy(data, (uint8_t*)bufferReadPointer + bufferIndex, numberBytes);
         bufferIndex += numberBytes;
 
         return true;

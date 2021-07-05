@@ -11,6 +11,11 @@
 
 
 
+#include "KraftKontrol/utils/topic.h"
+#include "KraftKontrol/utils/KraftKommunikation/kraft_message.h"
+
+
+
 enum eModuleStatus_t {
     eModuleStatus_NotStarted,
     eModuleStatus_Starting,
@@ -74,12 +79,19 @@ public:
      */
     virtual eModuleStatus_t getModuleStatus() {return moduleStatus_;}
 
+    /**
+     * @returns global topic for module communication
+     */
+    static Topic<KraftMessageContainer>& getGlobalMessageTopic() {return globalMessages_;}
+
 
 protected:
 
+    //This static topic is used for transfering global messages between modules like disarming, failsafe, startup etc.
+    static Topic<KraftMessageContainer> globalMessages_;
+
+    //Every module can use this to signify its current state.
     eModuleStatus_t moduleStatus_ = eModuleStatus_t::eModuleStatus_NotStarted;
-
-
 
 
 };

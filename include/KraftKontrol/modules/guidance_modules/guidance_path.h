@@ -20,7 +20,7 @@
  * of points (inlcuding all kinematic data like attitude).
  * This can be used to also hover and stay stationary.
  */
-class GuidancePath: public Guidance_Interface, Task_Abstract {
+class GuidancePath: public Guidance_Interface, public Task_Abstract {
 public:
 
     /**

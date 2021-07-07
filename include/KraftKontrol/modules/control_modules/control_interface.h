@@ -10,21 +10,24 @@
 #include "KraftKontrol/modules/guidance_modules/guidance_interface.h"
 #include "KraftKontrol/modules/navigation_modules/navigation_interface.h"
 
+#include "KraftKontrol/modules/module_abstract.h"
 
-class Control_Interface {
+
+
+class Control_Interface: public Module_Abstract {
 public:
 
     /**
      * Sets the control modules guidance module.
      * @param guidanceModule Pointer to module to use.
      */
-    virtual void setGuidanceModule(Guidance_Interface* guidanceModule) = 0;
+    virtual void setGuidanceModule(Guidance_Interface& guidanceModule) = 0;
 
     /**
      * Sets the control modules navigation module.
      * @param navigationModule Pointer to module to use.
      */
-    virtual void setNavigationModule(Navigation_Interface* navigationModule) = 0;
+    virtual void setNavigationModule(Navigation_Interface& navigationModule) = 0;
 
     /**
      * Returns the kinematics the system needs to achieve the desired
@@ -37,7 +40,7 @@ public:
     /**
      * @returns topic for control output.
      */
-    virtual Topic<DynamicData>& getControlDataTopic() {return controlTopic_;};
+    Topic<DynamicData>& getControlDataTopic() {return controlTopic_;};
 
     /**
      * Resets control module. Things like PID I values are set to 0.
@@ -47,12 +50,12 @@ public:
 
 protected:
 
-
+    //Newest output data.
     DynamicData controlOutput_;
 
+    //Topic for distributing new control data.
     Topic<DynamicData> controlTopic_;
 
-    
 };
 
 

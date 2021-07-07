@@ -16,9 +16,11 @@
 #include "KraftKontrol/data_containers/navigation_data.h"
 #include "KraftKontrol/utils/topic.h"
 
+#include "KraftKontrol/modules/module_abstract.h"
 
 
-class Navigation_Interface {
+
+class Navigation_Interface: public Module_Abstract {
 public:
 
     /**

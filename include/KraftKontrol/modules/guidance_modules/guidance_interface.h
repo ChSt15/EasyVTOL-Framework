@@ -6,9 +6,11 @@
 #include "KraftKontrol/data_containers/control_data.h"
 #include "KraftKontrol/utils/topic.h"
 
+#include "KraftKontrol/modules/module_abstract.h"
 
 
-class Guidance_Interface {
+
+class Guidance_Interface: public Module_Abstract {
 public:
 
     /**

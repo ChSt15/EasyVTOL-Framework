@@ -17,8 +17,6 @@
 
 #include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
 
-#include "KraftKontrol/modules/module_abstract.h"
-
 #include "navigation_interface.h"
 
 #include "KraftKontrol/modules/sensor_modules/gyroscope_modules/gyroscope_interface.h"
@@ -51,12 +49,12 @@ public:
      * @param baro module to use.
      * @param gnss module to use.
      */
-    NavigationComplementaryFilter(Gyroscope_Interface* gyro, Accelerometer_Interface* accel, Magnetometer_Interface* mag = nullptr, Barometer_Interface* baro = nullptr, GNSS_Interface* gnss = nullptr) : Task_Abstract(8000, eTaskPriority_t::eTaskPriority_VeryHigh, true) {
-        gyroSub_.subscribe(&gyro->getGyroTopic());
-        accelSub_.subscribe(&accel->getAccelTopic());
-        if (mag != nullptr) magSub_.subscribe(&mag->getMagTopic());
-        if (baro != nullptr) baroSub_.subscribe(&baro->getBaroTopic());
-        if (gnss != nullptr) gnssSub_.subscribe(&gnss->getGNSSTopic());
+    NavigationComplementaryFilter(Gyroscope_Interface& gyro, Accelerometer_Interface& accel, Magnetometer_Interface* mag = nullptr, Barometer_Interface* baro = nullptr, GNSS_Interface* gnss = nullptr) : Task_Abstract(8000, eTaskPriority_t::eTaskPriority_VeryHigh, true) {
+        gyroSub_.subscribe(gyro.getGyroTopic());
+        accelSub_.subscribe(accel.getAccelTopic());
+        if (mag != nullptr) magSub_.subscribe(mag->getMagTopic());
+        if (baro != nullptr) baroSub_.subscribe(baro->getBaroTopic());
+        if (gnss != nullptr) gnssSub_.subscribe(gnss->getGNSSTopic());
     }
 
     /**

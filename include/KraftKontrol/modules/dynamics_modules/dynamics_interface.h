@@ -6,6 +6,11 @@
 #include "KraftKontrol/data_containers/navigation_data.h"
 #include "KraftKontrol/data_containers/dynamic_data.h"
 
+#include "KraftKontrol/modules/control_modules/control_interface.h"
+#include "KraftKontrol/modules/navigation_modules/navigation_interface.h"
+
+#include "KraftKontrol/modules/module_abstract.h"
+
 
 /**
  * struct used to sent raw actuator commands to a dynamics module
@@ -29,16 +34,20 @@ enum eActuatorStatus_t {
 
 
 
-class Dynamics_Interface {
+class Dynamics_Interface: public Module_Abstract {
 public:
 
     /**
-     * Returns the forces the acuators need to produce in total
-     * on the vehicle in order to achieve the kinematic setpoints. 
-     *
-     * @return DynamicData.
+     * Sets the dynamics modules control module.
+     * @param controlModule Pointer to module to use.
      */
-    virtual DynamicData& getDynamicSetpoint() = 0;
+    virtual void setControlModule(Control_Interface& controlModule) = 0;
+
+    /**
+     * Sets the control modules navigation module.
+     * @param navigationModule Pointer to module to use.
+     */
+    virtual void setNavigationModule(Navigation_Interface& navigationModule) = 0;
 
     /**
      * Tells dynamics module to test all actuators. 

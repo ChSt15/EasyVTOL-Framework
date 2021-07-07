@@ -19,7 +19,7 @@ public:
 
     Subscriber_Interface() {}
 
-    Subscriber_Interface(Topic<TYPE>* topic) {
+    Subscriber_Interface(Topic<TYPE>& topic) {
         subscribe(topic);
     }
 
@@ -38,9 +38,9 @@ public:
      * Subscribes to given topic. Will remove old subscription.
      * @param topic Topic to subscribe to.
      */
-    void subscribe(Topic<TYPE>* topic) {
+    void subscribe(Topic<TYPE>& topic) {
         unsubcribe();
-        topic_ = topic;
+        topic_ = &topic;
         topic_->addSubscriber(this);
     }
 

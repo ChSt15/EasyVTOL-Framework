@@ -33,7 +33,12 @@ public:
     /**
      * @returns True if new data was received
      */
-    inline bool isDataNew() const {return itemIsNew;}
+    inline const bool& isDataNew() const {return itemIsNew;}
+
+    /**
+     * @returns true if internal data storage has been updated.
+     */
+    inline const bool& isValid() const {return itemIsValid;}
     
     /**
      * @returns reference to item.
@@ -52,6 +57,7 @@ private:
     }
 
     bool itemIsNew = false;
+    bool itemIsValid = false;
 
     TYPE receivedItem;
 

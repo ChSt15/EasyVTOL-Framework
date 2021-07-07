@@ -8,6 +8,8 @@
 #include "stdint.h"
 
 #include "KraftKontrol/utils/buffer.h"
+#include "KraftKontrol/modules/module_abstract.h"
+#include "KraftKontrol/utils/system_time.h"
 
 #include "kraft_link.h"
 #include "kraft_message.h"
@@ -19,20 +21,21 @@
  * - First byte 0 and 1 are the Kraftpacket startbyte markers. These must be first checked to make sure the Packet is actually a kraftpacket and correct version
  * - byte 2 is the transmitterID
  * - byte 3 is the receiverID. A packet not adressed to a receiver should be ignored.
- * - byte 4 indicates what type of kraftmessage.
- * - byte 5 is a flag for if an ACK packet must be returned.
- * - byte 6 is the packet incrementer. This is incremented for every new byte addressed to a specific reciever. Used for counting lost packets.
- * - byte 7 is the size of the packets payload (n ist this number).
- * - byte 8 to (7+n)th byte is the raw data
- * - (8+n)th byte is the crc byte to check if data is valid
- * - (9+n) is the endbyte marker
+ * - byte 4 indicates what the message type is.
+ * - byte 5 indicates what the data type is.
+ * - byte 6 is a flag for if an ACK packet must be returned.
+ * - byte 7 is the packet incrementer. This is incremented for every new byte addressed to a specific reciever. Used for counting lost packets.
+ * - byte 8 is the size of the packets payload (n ist this number).
+ * - byte 9 to (8+n)th byte is the raw data
+ * - (9+n)th byte is the crc byte to check if data is valid
+ * - (10+n) is the endbyte marker
  */
 
 
 
 namespace {
 
-    const uint16_t c_kraftPacketStartMarker = 0xBD5E;
+    const uint16_t c_kraftPacketStartMarker = 0xBD6E;
     const uint8_t c_kraftPacketEndMarker = 0xDE;
 
     const uint16_t c_kraftPacketVersion = 0; //Should be changed when something in the protocoll was changed.
@@ -44,26 +47,138 @@ namespace {
     //Default power to send packets at.
     const uint8_t c_sendPowerDefault = 10;
 
+    enum eDataLinkDataType_t: uint8_t {
+        eDataLinkDataType_Heartbeat = 0,
+        eDataLinkDataType_ACK
+    };
+
 }  
 
 
 
 
 //Is the ID of a devide like Vehicle or basestation. Broadcast means the data is meant for all devices to receive. Also used for Transmitting device ID.
-enum eKraftPacketNodeID_t : uint8_t {
-    eKraftPacketNodeID_vehicle = 1,                //Vehicle ID
-    eKraftPacketNodeID_controller = 2,             //Controllers ID. Controller is for manual control
-    eKraftPacketNodeID_basestation = 3,            //Basestation ID. 
-    eKraftPacketNodeID_broadcast = 255             //General packet that everything can receive. Basically a broadcast.
+enum eKraftMessageNodeID_t : uint8_t {
+    eKraftMessageNodeID_vehicle = 1,                //Vehicle ID
+    eKraftMessageNodeID_controller = 2,             //Controllers ID. Controller is for manual control
+    eKraftMessageNodeID_basestation = 3,            //Basestation ID. 
+    eKraftMessageNodeID_broadcast = 255             //General packet that everything can receive. Basically a broadcast.
 };
+
+
+
+class KraftMessageHeartbeat: public KraftMessage_Interface {
+public:
+
+    uint32_t getMessageType() const {return eKraftMessageType_t::eKraftMessageType_DataLink_ID;}
+
+    uint32_t getDataType() const {{return eDataLinkDataType_t::eDataLinkDataType_Heartbeat;}
+
+    uint32_t getDataSize() const {return 0;};
+
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+        return true;
+    }
+
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+        return true;
+    }
+
+};
+
+
+
+class KraftMessageACK: public KraftMessage_Interface {
+public:
+
+    uint32_t getMessageType() const {return eKraftMessageType_t::eKraftMessageType_DataLink_ID;}
+
+    uint32_t getDataTypeID() const {return eDataLinkDataType_t::eDataLinkDataType_ACK;}
+
+    uint32_t getDataSize() const {return 0;};
+
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+        return true;
+    }
+
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+        return true;
+    }
+
+};
+
+
+/*
+class KraftMessageStringPacket final: public KraftMessage_Interface {
+public:
+
+    KraftMessageStringPacket() {}
+
+    KraftMessageStringPacket(const char string[]) {
+        setString(string);
+    }
+
+    ~KraftMessageStringPacket() {
+        delete[] stringPointer;
+    }
+
+    uint32_t getDataTypeID() const {return eKraftMessageType_t::eKraftMessageType_String_ID;}
+
+    uint32_t getDataSize() const {return sizeStringPointer;};
+
+    uint32_t getStringLength() const {return sizeStringPointer;}
+
+    bool getString(char string[], const uint32_t &sizeStringDest) const {
+
+        if (sizeStringDest < sizeStringPointer || stringPointer == nullptr) return false;
+
+        memcpy(string, stringPointer, sizeStringPointer);
+
+        return true;
+
+    }
+
+    void setString(const char string[]) {
+        
+        if (stringPointer != nullptr) delete[] stringPointer;
+
+        sizeStringPointer = strlen(string)+1;
+        stringPointer = new char[sizeStringPointer];
+
+        memcpy(stringPointer, string, sizeStringPointer);
+
+    }
+
+    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+
+        return getString((char*)dataBytes+startByte, dataByteSize);
+
+    }
+
+    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+
+        setString((char*)(dataBytes)+startByte);
+
+        return true;
+
+    }
+
+
+private:
+
+    char* stringPointer = nullptr;
+    uint32_t sizeStringPointer = 0;
+
+};*/
 
 
 
 struct MessageData {
 
-    eKraftPacketNodeID_t transmitterID;
-    eKraftPacketNodeID_t receiverID;
-    uint8_t payloadID = 0;
+    eKraftMessageNodeID_t transmitterID;
+    eKraftMessageNodeID_t receiverID;
+    uint8_t messageTypeID = 0;
+    uint8_t dataTypeID = 0;
     uint8_t payloadSize = 0;
     uint8_t messageCounter = 0;
 
@@ -74,7 +189,7 @@ struct MessageData {
 
 
 
-class KraftKommunication {
+class KraftKommunication: public Module_Abstract {
 public:
 
     /**
@@ -82,7 +197,7 @@ public:
      * 
      * @param dataLink is a radio class that inherets from KraftLink_Interface that will be used to send and receive packets 
      */
-    KraftKommunication(KraftLink_Interface* dataLink, eKraftPacketNodeID_t selfID) {
+    KraftKommunication(KraftLink_Interface* dataLink, eKraftMessageNodeID_t selfID) {
         dataLink_ = dataLink;
         selfID_ = selfID;
     }
@@ -93,7 +208,7 @@ public:
      * @param kraftMessage is a KraftMessage_Interface class containing the data to be sent.
      * @returns false if queue is full. loop() needs to be ran to give link time to send data and make room.
      */
-    bool sendMessage(KraftMessage_Interface* kraftMessage, const eKraftPacketNodeID_t &receiveNodeID, const bool &requiresAck = false);
+    bool sendMessage(KraftMessage_Interface& kraftMessage, const eKraftMessageNodeID_t &receiveNodeID, const bool &requiresAck = false);
 
     /**
      * Checks if a message is available.
@@ -124,7 +239,7 @@ public:
      * @param node Node to check.
      * @returns node status
      */
-    bool getNodeStatus(eKraftPacketNodeID_t node) {return nodeData_[constrain(node, 0, 255)].online;}
+    bool getNodeStatus(eKraftMessageNodeID_t node) {return nodeData_[constrain(node, 0, 255)].online;}
 
     /**
      * Returns latest received message data. Use this to find out what KraftMessage_Interface class needs to be given.
@@ -144,7 +259,7 @@ public:
      * @param peek is a bool. If set to true then the message will not be removed from queue. Default value if false.
      * @returns true if message valid.
      */
-    bool getMessage(KraftMessage_Interface* kraftMessage, const bool &peek = false);
+    bool getMessage(KraftMessage_Interface& kraftMessage, const bool &peek = false);
 
     /**
      * Returns latest received message data. Use this to find out what KraftMessage_Interface class needs to be given.
@@ -189,7 +304,7 @@ private:
 
         bool waitforAck = false;
 
-        eKraftPacketNodeID_t receivingNodeID = eKraftPacketNodeID_t::eKraftPacketNodeID_broadcast;
+        eKraftMessageNodeID_t receivingNodeID = eKraftMessageNodeID_t::eKraftMessageNodeID_broadcast;
 
         uint32_t sendTimestamp = 0;
         uint8_t sendAttempts = 0;
@@ -219,10 +334,10 @@ private:
     };
 
     //returns true when successfull. Ackrequested bool is an output and is true if an ack was requested by sender.
-    bool decodeMessageFromBuffer(ReceivedPayloadData* payloadData, bool* ackRequested, uint8_t* buffer, uint32_t bufferSize);
+    bool decodeMessageFromBuffer(ReceivedPayloadData& payloadData, bool& ackRequested, uint8_t* buffer, uint32_t bufferSize);
 
     //Returns number of bytes written into buffer
-    uint32_t encodeMessageToBuffer(KraftMessage_Interface* messagePointer, const uint8_t &receiveNode, const bool &requestAck, uint8_t* buffer, const uint32_t &bufferSize);
+    uint32_t encodeMessageToBuffer(KraftMessage_Interface& message, const uint8_t &receiveNode, const bool &requestAck, uint8_t* buffer, const uint32_t &bufferSize);
 
     //Calculate CRC of packet.
     uint8_t calculateCRC(uint8_t* buffer, const uint32_t &stopByte);
@@ -242,7 +357,7 @@ private:
     //Index corresponds to node that should receive packet.
     uint32_t sentPacketsCounter_[255];
 
-    eKraftPacketNodeID_t selfID_;
+    eKraftMessageNodeID_t selfID_;
 
 
 };

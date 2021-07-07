@@ -84,14 +84,34 @@ public:
      */
     static Topic<KraftMessageContainer>& getGlobalMessageTopic() {return globalMessages_;}
 
+    /**
+     * @returns module specific topic for module communication
+     */
+    Topic<KraftMessageContainer>& getModuleMessageTopic() {return moduleMessages_;}
+
+    /**
+     * @returns a reference to a list of pointers to all currently existing modules
+     */
+    const List<Module_Abstract*>& getListExistingModules() {return existingModules_;}
+
 
 protected:
+
+    Module_Abstract() {existingModules_.append(this);}
+    ~Module_Abstract() {existingModules_.removeAllEqual(this);}
 
     //This static topic is used for transfering global messages between modules like disarming, failsafe, startup etc.
     static Topic<KraftMessageContainer> globalMessages_;
 
+    //This topic is used for modules to receive messages from specifically this module.
+    Topic<KraftMessageContainer> moduleMessages_;
+
     //Every module can use this to signify its current state.
     eModuleStatus_t moduleStatus_ = eModuleStatus_t::eModuleStatus_NotStarted;
+
+private:
+
+    static List<Module_Abstract*> existingModules_;
 
 
 };

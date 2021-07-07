@@ -18,7 +18,7 @@
  * flybywire system. Its a very simple way of
  * transfering manual control to to vehicle.
  */
-class GuidanceFlyByWire: public Guidance_Interface, Task_Abstract {
+class GuidanceFlyByWire: public Guidance_Interface, public Task_Abstract {
 public:
 
     /**

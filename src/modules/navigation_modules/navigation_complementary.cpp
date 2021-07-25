@@ -181,8 +181,8 @@ void NavigationComplementaryFilter::thread() {
 
 
     //Calculate time delta from last run
-    float dTime = (float)(micros() - lastLoopTimestamp_)/1000000.0f;
-    lastLoopTimestamp_ = micros();
+    float dTime = (float)(NOW() - lastLoopTimestamp_)/SECONDS;
+    lastLoopTimestamp_ = NOW();
 
     //Predict current state and its error
     navigationData_.velocity += navigationData_.linearAcceleration*dTime;
@@ -200,8 +200,8 @@ void NavigationComplementaryFilter::thread() {
         SensorTimestamp<Vector<>> sensorTime;
         gyroSub_.takeBack(&sensorTime);
 
-        Vector<>& rotationVector = sensorTime.sensorData;
-        int64_t& timestamp = sensorTime.sensorTimestamp;
+        Vector<> rotationVector = sensorTime.sensorData;
+        int64_t timestamp = sensorTime.sensorTimestamp;
 
         if (rotationVector.magnitude() < 0.1) {
             gyroLPF_.update(rotationVector);
@@ -211,7 +211,7 @@ void NavigationComplementaryFilter::thread() {
         gyroXBuffer_.placeFront(rotationVector.x, true);
         gyroYBuffer_.placeFront(rotationVector.y, true);
         gyroZBuffer_.placeFront(rotationVector.z, true);
-        rotationVector = Vector<>(gyroXBuffer_.getMedian(), gyroYBuffer_.getMedian(), gyroZBuffer_.getMedian());
+        //rotationVector = Vector<>(gyroXBuffer_.getMedian(), gyroYBuffer_.getMedian(), gyroZBuffer_.getMedian());
 
         //Calulate time delta
         float dt = float(timestamp - lastGyroTimestamp_)/SECONDS;
@@ -219,6 +219,7 @@ void NavigationComplementaryFilter::thread() {
 
         //Calulate derivitive of gyro for angular acceleration
         navigationData_.angularAcceleration = (rotationVector - lastGyroValue_)/dt;
+        lastGyroValue_ = rotationVector;
 
         //Check if gyro initialised
         if (_gyroInitialized) {
@@ -258,15 +259,19 @@ void NavigationComplementaryFilter::thread() {
         SensorTimestamp<Vector<>> sensorTime;
         accelSub_.takeBack(&sensorTime);
 
-        Vector<>& accelVector = sensorTime.sensorData;
-        int64_t& timestamp = sensorTime.sensorTimestamp;
+        Vector<> accelVector = sensorTime.sensorData;
+        int64_t timestamp = sensorTime.sensorTimestamp;
 
-        accelVector = accelLPF_.update(accelVector);
+        //Serial.println(String("Accel: ") + accelVector.toString());
+
+        //accelVector = accelLPF_.update(accelVector);
 
         accelXBuffer_.placeFront(accelVector.x, true);
         accelYBuffer_.placeFront(accelVector.y, true);
         accelZBuffer_.placeFront(accelVector.z, true);
-        accelVector = Vector<>(accelXBuffer_.getMedian(), accelYBuffer_.getMedian(), accelZBuffer_.getMedian());
+        accelVector = Vector<>(accelXBuffer_.getAverage(), accelYBuffer_.getAverage(), accelZBuffer_.getAverage());
+
+        //Serial.println(String("Accel: ") + accelVector.toString());
 
         //accelVector = lastValue = lastValue*0.9999 + accelVector*0.0001;
 
@@ -609,7 +614,7 @@ void NavigationComplementaryFilter::thread() {
 
     }
 
-    navigationData_.timestamp = micros();
+    navigationData_.timestamp = NOW();
 
     navigationDataTopic_.publish(navigationData_);
 

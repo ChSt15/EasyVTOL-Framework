@@ -18,11 +18,45 @@ public:
     //This is ran once before first run of thread()
     virtual void init() = 0;
 
-    //This is ran at rate set in scheduler.
-    virtual void thread() = 0;
-
     //This is ran only when the Task is removed from scheduler.
     virtual void removal() = 0;
+
+    //Is called by scheduler
+    void run() {
+
+        runCounter_++;
+
+        if (NOW() - lastCounterTimestamp_ >= 1*SECONDS) {
+            rate_ = (int64_t)runCounter_;//*SECONDS/(NOW() - lastCounterTimestamp_);
+            runCounter_ = 0;
+            lastCounterTimestamp_ = NOW();
+        }
+
+        thread();
+
+    }
+
+    /**
+     * @returns the rate at which the task is being called at.
+     */
+    uint32_t getLoopRate() {return rate_;}
+
+
+private:
+
+    //This should be overloaded by task class
+    virtual void thread() = 0;
+
+    //Counter for number of runs
+    uint32_t runCounter_ = 0;
+
+    //Timestamp for last run counter reset
+    int64_t lastCounterTimestamp_ = 0;
+
+    //Rate at which runs is being called
+    uint32_t rate_ = 0;
+
+
 
 };
 
@@ -31,7 +65,7 @@ public:
 /**
  * This is a class that can be used to attach simple functions to a scheduler. 
  */
-class Thread: public Thread_Interface {
+class GlobalThread final: public Thread_Interface {
 public:
 
     /**
@@ -41,26 +75,27 @@ public:
      * @param functionToRunOnThread is a pointer to a function that will be run on thread.
      * @param functionToRunOnRemoval is a function that is only ran once on tast removal. Default value is null and will then be ignored.
      */
-    Thread(void (*functionToRunOnInit)(void), void (*functionToRunOnThread)(void), void (*functionToRunOnRemoval)(void) = nullptr) {
+    GlobalThread(void (*functionToRunOnInit)(void), void (*functionToRunOnThread)(void), void (*functionToRunOnRemoval)(void) = nullptr) {
         functionToRunOnInit_ = functionToRunOnInit;
         functionToRunOnThread_ = functionToRunOnThread;
         functionToRunOnRemoval_ = functionToRunOnRemoval;
     }
 
     //This is ran once before thread first run
-    virtual void init() {
+    void init() override {
         if (functionToRunOnInit_ != nullptr) functionToRunOnInit_();
     }
 
     //This is ran at rate set in scheduler.
-    virtual void thread() {
+    void thread() override {
         if (functionToRunOnThread_ != nullptr) functionToRunOnThread_();
     }
 
     //This is ran only when the Task is removed from scheduler.
-    virtual void removal() {
+    void removal() override {
         if (functionToRunOnRemoval_ != nullptr) functionToRunOnRemoval_();
     }
+
 
 private:
     

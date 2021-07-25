@@ -12,8 +12,6 @@
 
 
 
-class GNSS_Interface;
-
 
 struct GNSSData {
 
@@ -32,25 +30,6 @@ struct GNSSData {
 
 class GNSS_Interface {
 public:
-
-    /**
-     * Returns rate (in Hz) of the thread
-     *
-     * @return uint32_t.
-     */
-    virtual uint32_t loopRate() = 0;
-
-    /**
-     * Returns rate (in Hz) of new sensor data
-     *
-     * @return uint32_t.
-     */
-    virtual uint32_t positionRate() = 0;
-
-    /**
-     * @returns true if lock is valid
-     */
-    virtual bool getGNSSLockValid() = 0;
 
     /**
      * @returns reference to gnss data topic

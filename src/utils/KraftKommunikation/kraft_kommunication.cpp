@@ -8,10 +8,10 @@ bool KraftKommunication::decodeMessageFromBuffer(ReceivedPayloadData& payloadDat
     if (buffer[1] != (uint8_t)((c_kraftPacketStartMarker + c_kraftPacketVersion)<<8)) return false;
 
 
-    payloadData.messageData.transmitterID = static_cast<eKraftPacketNodeID_t>(buffer[2]);
-    payloadData.messageData.receiverID = static_cast<eKraftPacketNodeID_t>(buffer[3]);
+    payloadData.messageData.transmitterID = static_cast<eKraftMessageNodeID_t>(buffer[2]);
+    payloadData.messageData.receiverID = static_cast<eKraftMessageNodeID_t>(buffer[3]);
 
-    if (payloadData.messageData.transmitterID == eKraftPacketNodeID_t::eKraftPacketNodeID_broadcast) return false; //That would be pretty wierd if the sender was a broadcast id
+    if (payloadData.messageData.transmitterID == eKraftMessageNodeID_t::eKraftMessageNodeID_broadcast) return false; //That would be pretty wierd if the sender was a broadcast id
 
     payloadData.messageData.messageTypeID = buffer[4];
     payloadData.messageData.dataTypeID = buffer[5];
@@ -87,7 +87,7 @@ uint8_t KraftKommunication::calculateCRC(uint8_t* buffer, const uint32_t &stopBy
 
 
 
-bool KraftKommunication::sendMessage(KraftMessage_Interface& kraftMessage, const eKraftPacketNodeID_t &receiveNodeID, const bool &requiresAck) {
+bool KraftKommunication::sendMessage(KraftMessage_Interface& kraftMessage, const eKraftMessageNodeID_t &receiveNodeID, const bool &requiresAck) {
 
     SendPacketData packetData;
 
@@ -128,16 +128,35 @@ bool KraftKommunication::getMessage(KraftMessage_Interface& kraftMessage, const 
 
 
 
-void KraftKommunication::loop() {
+void KraftKommunication::thread() {
+
+    //Check node status and if a packet needs to be sent.
+    for (uint32_t i = 0; i < c_maxNumberNodes; i++) {
+        if (nodeData_[i].online && NOW() - nodeData_[i].lastPacketTimestamp > (int64_t)SECONDS*3/c_heartbeatRate) {
+            nodeData_[i].online = false;
+            KraftMessageContainer message = KraftMessageContainer(DataMessageNodeStatus(false, i));
+            globalMessages_.publish(message);
+        }
+    }
+    if (heartbeatTimer_.isTimeToRun()) {
+
+        KraftMessageHeartbeat message;
+        sendMessage(message, eKraftMessageNodeID_t::eKraftMessageNodeID_broadcast);
+
+    }
 
 
+    //Send packets waiting to be sent
     if (!dataLink_->busy()) {
 
         if (sendPackets_.available()) {
 
             SendPacketData packet;
             sendPackets_.takeBack(&packet);
-            dataLink_->sendBuffer(packet.dataBuffer, packet.bufferSize);
+            DataMessageBuffer message;
+            message.setBuffer(packet.dataBuffer, packet.bufferSize);
+            heartbeatTimer_.syncInternal();
+            dataLink_->getToSendDataTopic().publish(message);
             
         } else if (sendPacketsACK_.available()) {
 
@@ -145,7 +164,10 @@ void KraftKommunication::loop() {
 
             if (nodeData_[packet->receivingNodeID].waitingOnPacket == nullptr) { 
 
-                dataLink_->sendBuffer(packet->dataBuffer, packet->bufferSize);
+                DataMessageBuffer message;
+                message.setBuffer(packet->dataBuffer, packet->bufferSize);
+                heartbeatTimer_.syncInternal();
+                dataLink_->getToSendDataTopic().publish(message);
 
                 if (packet->sendAttempts > 0) packet->sendAttempts--;
                 packet->sendTimestamp = NOW();
@@ -166,7 +188,10 @@ void KraftKommunication::loop() {
                         packet->sendAttempts--;
                         packet->sendTimestamp = NOW();
 
-                        dataLink_->sendBuffer(packet->dataBuffer, packet->bufferSize);
+                        DataMessageBuffer message;
+                        message.setBuffer(packet->dataBuffer, packet->bufferSize);
+                        heartbeatTimer_.syncInternal();
+                        dataLink_->getToSendDataTopic().publish(message);
 
                     }
                     
@@ -179,14 +204,18 @@ void KraftKommunication::loop() {
     }
 
 
-
-    if (dataLink_->available()) {
+    //Receive any packets received by data link
+    if (receivedPacketSub_.available() > 0) {
 
         //Serial.println("Kraftkomm sees packet is available!");
 
-        uint8_t packet[dataLink_->available()];
+        DataMessageBuffer message;
+        receivedPacketSub_.takeBack(&message);
 
-        uint32_t bytes = dataLink_->receiveBuffer(packet, sizeof(packet));
+        uint32_t bytes = message.getBufferSize();
+        uint8_t packet[bytes];
+
+        for (uint32_t i = 0; i < bytes; i++) packet[i] = message.getBuffer()[i];
 
         //Serial.println("Kraft komm sees packet is " + String(bytes) + " bytes long!");
 
@@ -199,53 +228,51 @@ void KraftKommunication::loop() {
 
                 if (ackRequested) {
                     
-                    KraftMessageACK ack;
-                    sendMessage(&ack, message.messageData.transmitterID);
+                    KraftMessageACK messageAck;
+                    sendMessage(messageAck, message.messageData.transmitterID);
 
                 }
 
-                if (message.messageData.receiverID == selfID_ || message.messageData.receiverID == eKraftPacketNodeID_t::eKraftPacketNodeID_broadcast) { //Make sure packet is for us.
+                if (message.messageData.receiverID == selfID_ || message.messageData.receiverID == eKraftMessageNodeID_t::eKraftMessageNodeID_broadcast) { //Make sure packet is for us.
 
                     nodeData_[message.messageData.transmitterID].lastPacketTimestamp = millis();
                     nodeData_[message.messageData.transmitterID].online = true;
 
-                    KraftMessageContainer messageContained(message.dataBuffer, message.messageData.payloadSize, static_cast<eKraftMessageType_t>(message.messageData.payloadID));
+                    KraftMessageContainer messageContained(message.dataBuffer, message.messageData.payloadSize, message.messageData.messageTypeID, message.messageData.dataTypeID);
 
-                    switch (message.messageData.payloadID) {
-                    case eKraftMessageType_t::eKraftMessageType_Ack_ID:
+                    if (message.messageData.messageTypeID == eKraftMessageType_t::eKraftMessageType_Datalink_ID) {
+
+                        switch (message.messageData.dataTypeID) {
+                        case eDataLinkDataType_t::eDataLinkDataType_ACK:
+                            sendPacketsACK_.removeBack();
+                            nodeData_[message.messageData.transmitterID].waitingOnPacket = nullptr; 
+                            break;
+
+                        case eDataLinkDataType_t::eDataLinkDataType_Heartbeat:
+                            //NEEDS IMPLEMENTATION. Should reset timer for checking if a device is connected.
+                            break;
                         
-                        sendPacketsACK_.removeBack();
-                        nodeData_[message.messageData.transmitterID].waitingOnPacket = nullptr; 
+                        default:
+                            break;
 
-                        //Serial.println("Packet was an ACK");
+                        }
 
-                        break;
+                    } else if (message.messageData.messageTypeID == eKraftMessageType_t::eKraftMessageType_Telemetry_ID) {
 
-                    case eKraftMessageType_t::eKraftMessageType_Heartbeat_ID:
+                        receivedPackets_.placeFront(message);
+                        telemetryMessages_.publish(messageContained);
 
-                        // Serial.println("Packet was a heartbeat");
+                    } else if (message.messageData.messageTypeID == eKraftMessageType_t::eKraftMessageType_Command_ID) {
+
                         receivedPackets_.placeFront(message);
                         globalMessages_.publish(messageContained);
 
-                        break;
+                    } else if (message.messageData.messageTypeID == eKraftMessageType_t::eKraftMessageType_Data_ID) {
 
-                    case eKraftMessageType_t::eKraftMessageType_RadioSettings_ID:
+                        //receivedPackets_.placeFront(message);
+                        //globalMessages_.publish(messageContained);
 
-                        //Serial.println("Packet was for radiosettings");
-                        receivedPackets_.placeFront(message);
-                        globalMessages_.publish(messageContained);
-
-                        break;
-
-                    default:
-
-                        //Serial.println("Packet was of an unkown type: " + String(message.messageData.payloadID) + ". Placing in buffer.");
-                        receivedPackets_.placeFront(message);
-                        globalMessages_.publish(messageContained);
-                        
-                        break;
-
-                    } 
+                    }
 
                 } else {
 

@@ -14,16 +14,6 @@ class Accelerometer_Interface {
 public:
 
     /**
-     * @returns rate (in Hz) of the thread
-     */
-    virtual uint32_t loopRate() = 0;
-
-    /**
-     * @returns rate (in Hz) of the new sensor data
-     */
-    virtual uint32_t accelRate() = 0;
-
-    /**
      * @returns reference to accel data topic
      */
     Topic<SensorTimestamp<Vector<>>>& getAccelTopic() {return accelTopic_;}

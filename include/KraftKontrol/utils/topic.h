@@ -61,7 +61,6 @@ protected:
      */
     virtual void receive(TYPE& item) = 0;
 
-
 private:
 
     //Pointer to subscribed topic

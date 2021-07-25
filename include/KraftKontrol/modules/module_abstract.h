@@ -66,7 +66,7 @@ inline String deviceStatusToString(eModuleStatus_t status) {
 
 
 /**
- * Although not here declared, void thread() must be defined in the derived class and will be automatically ran by scheduler.
+ * Modules inhereting from this class automatically support module status and module topics for communication.
  */
 class Module_Abstract {
 public:
@@ -77,7 +77,7 @@ public:
      * @param values none.
      * @return MODULE_STATUS.
      */
-    virtual eModuleStatus_t getModuleStatus() {return moduleStatus_;}
+    eModuleStatus_t getModuleStatus() {return moduleStatus_;}
 
     /**
      * @returns global topic for module communication
@@ -102,6 +102,10 @@ protected:
 
     //This static topic is used for transfering global messages between modules like disarming, failsafe, startup etc.
     static Topic<KraftMessageContainer> globalMessages_;
+    //This static topic is used for distributing received telemetry messages
+    static Topic<KraftMessageContainer> telemetryMessages_;
+    //This static topic is used for sending 
+    //static Topic<KraftMessageContainer> commandMessages_; 
 
     //This topic is used for modules to receive messages from specifically this module.
     Topic<KraftMessageContainer> moduleMessages_;

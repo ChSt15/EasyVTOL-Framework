@@ -70,41 +70,11 @@ public:
      * @return uint32_t.
      */
     uint32_t loopRate() {return loopRate_;};
-    
 
     /**
-     * Checks if radio is busy or can send a new data packet.
-     * 
-     * @returns true if radio is busy.
+     * @returns true if the internal buffer is full and adding a new message will result in data loss.
      */
-    bool busy();
-
-
-    /**
-     * Gives radio data to send.
-     * 
-     * @param buffer is a pointer to a uint8_t* array containing all data to be sent.
-     * @param size is a uint8_t integer giving the amount of data to send from the buffer pointer.
-     * @returns number of bytes sent. Will be 0 if failed.
-     */
-    uint8_t sendBuffer(uint8_t* buffer, uint8_t size);
-
-
-    /**
-     * Checks if data is available for reading
-     * 
-     * @returns number of bytes received ready for reading. Will be 0 if none available
-     */
-    uint8_t available();
-
-    /**
-     * Places received data into buffer and returns number of bytes placed into buffer
-     * 
-     * @param buffer is a pointer to a uint8_t* array where all the data is to be placed.
-     * @param size is the max size of buffer.
-     * @returns number of bytes placed into buffer.
-     */
-    uint8_t receiveBuffer(uint8_t* buffer, uint8_t size);
+    virtual bool busy() const override {return toSendBufferSub_.availableSpace() == 0;}
 
     /**
      * Get the last received data SNR. Used for signal strength. Better than RSSI
@@ -120,8 +90,6 @@ public:
      * @returns last received datas RSSI
      */
     int8_t getRSSI() {return receivedDataRSSI_;}
-
-
 
 
 private:
@@ -141,6 +109,8 @@ private:
     bool isBusySending_ = false;
 
     IntervalControl rateCalcInterval_ = IntervalControl(1); 
+
+    Buffer_Subscriber<DataMessageBuffer, 10> toSendBufferSub_ = Buffer_Subscriber<DataMessageBuffer, 10>(toSendDataTopic_);
 
     int nssPin_;
     int busyPin_;

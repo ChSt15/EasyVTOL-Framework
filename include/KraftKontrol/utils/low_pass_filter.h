@@ -61,8 +61,8 @@ public:
     T update(T input) {
         
         if (_sampleRate == -1) {
-            float dt = (micros() - _lastRun)/1000000.0;
-            _lastRun = micros();
+            float dt = (NOW() - _lastRun)/SECONDS;
+            _lastRun = NOW();
             _alpha = dt/(_RC+dt);
         }
 
@@ -81,9 +81,9 @@ public:
      * @param values input value and timestamp in microseconds
      * @return filtered value.
      */
-    T update(const T &input, const uint32_t &timestampUS) {
+    T update(const T &input, int64_t timestampUS) {
         
-        float dt = (timestampUS - _lastRun)/1000000.0;
+        float dt = (timestampUS - _lastRun)/SECONDS;
         _lastRun = timestampUS;
         _alpha = dt/(_RC+dt);
 
@@ -127,7 +127,7 @@ private:
     float _alpha;
 
     T _lastValue;
-    uint32_t _lastRun = 0;
+    int64_t _lastRun = 0;
 
 
 };

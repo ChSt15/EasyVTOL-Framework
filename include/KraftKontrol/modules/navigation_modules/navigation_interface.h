@@ -48,7 +48,7 @@ public:
      *
      * @return navigation parameters.
      */
-    virtual NavigationData& getNavigationData() {return navigationData_;}
+    const NavigationData& getNavigationData() {return navigationData_;}
 
     /**
      * @returns reference to nav modules output topic

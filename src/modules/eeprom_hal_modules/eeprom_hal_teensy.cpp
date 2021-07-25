@@ -20,7 +20,7 @@ void EEPROM_Teensy::init() {
 }
 
 
-bool EEPROM_Teensy::commitChanges() {
+bool EEPROM_Teensy::saveChanges() {
 
     if (!initialised_) return false;
 
@@ -33,22 +33,22 @@ bool EEPROM_Teensy::commitChanges() {
 }
 
 
-bool EEPROM_Teensy::readBytes(const uint32_t &address, uint8_t* data, const uint32_t &numberBytes) {
+bool EEPROM_Teensy::readBytes(const uint32_t &address, void* data, const uint32_t &numberBytes) {
 
     if (!initialised_) return false;
 
-    for (uint32_t i = 0; i < numberBytes; i++) data[i] = eepromState_[address + i];
+    for (uint32_t i = 0; i < numberBytes; i++) ((uint8_t*)data)[i] = eepromState_[address + i];
 
     return true;
 
 }
 
 
-bool EEPROM_Teensy::writeBytes(const uint32_t &address, const uint8_t* data, const uint32_t &numberBytes) {
+bool EEPROM_Teensy::writeBytes(const uint32_t &address, const void* data, const uint32_t &numberBytes) {
 
     if (!initialised_) return false;
 
-    for (uint32_t i = 0; i < numberBytes; i++) eepromState_[address + i] =  data[i]; 
+    for (uint32_t i = 0; i < numberBytes; i++) eepromState_[address + i] =  ((uint8_t*)data)[i]; 
 
     return true;
 

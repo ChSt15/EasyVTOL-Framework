@@ -106,7 +106,7 @@ class Vector {
          */
         inline bool isZeroVector() const {
 
-            return magnitude() == 0.0f;
+            return magnitude() < 0.0001f;
 
         }
 

@@ -10,6 +10,7 @@
 #include "KraftKontrol/utils/buffer.h"
 #include "KraftKontrol/modules/module_abstract.h"
 #include "KraftKontrol/utils/system_time.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
 
 #include "kraft_link.h"
 #include "kraft_message.h"
@@ -47,6 +48,12 @@ namespace {
     //Default power to send packets at.
     const uint8_t c_sendPowerDefault = 10;
 
+    //Maximum number of nodes on network
+    const uint32_t c_maxNumberNodes = 255;
+
+    //Rate at which heartbeat messages should be sent
+    const uint32_t c_heartbeatRate = 4;
+
     enum eDataLinkDataType_t: uint8_t {
         eDataLinkDataType_Heartbeat = 0,
         eDataLinkDataType_ACK
@@ -70,11 +77,11 @@ enum eKraftMessageNodeID_t : uint8_t {
 class KraftMessageHeartbeat: public KraftMessage_Interface {
 public:
 
-    uint32_t getMessageType() const {return eKraftMessageType_t::eKraftMessageType_DataLink_ID;}
+    uint32_t getMessageType() const {return eKraftMessageType_t::eKraftMessageType_Datalink_ID;}
 
-    uint32_t getDataType() const {{return eDataLinkDataType_t::eDataLinkDataType_Heartbeat;}
+    uint32_t getDataType() const {return eDataLinkDataType_t::eDataLinkDataType_Heartbeat;}
 
-    uint32_t getDataSize() const {return 0;};
+    uint32_t getDataSize() const {return 0;}
 
     bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
         return true;
@@ -91,9 +98,9 @@ public:
 class KraftMessageACK: public KraftMessage_Interface {
 public:
 
-    uint32_t getMessageType() const {return eKraftMessageType_t::eKraftMessageType_DataLink_ID;}
+    uint32_t getMessageType() const {return eKraftMessageType_t::eKraftMessageType_Datalink_ID;}
 
-    uint32_t getDataTypeID() const {return eDataLinkDataType_t::eDataLinkDataType_ACK;}
+    uint32_t getDataType() const {return eDataLinkDataType_t::eDataLinkDataType_ACK;}
 
     uint32_t getDataSize() const {return 0;};
 
@@ -122,7 +129,7 @@ public:
         delete[] stringPointer;
     }
 
-    uint32_t getDataTypeID() const {return eKraftMessageType_t::eKraftMessageType_String_ID;}
+    uint32_t getDataType() const {return eKraftMessageType_t::eKraftMessageType_String_ID;}
 
     uint32_t getDataSize() const {return sizeStringPointer;};
 
@@ -189,7 +196,7 @@ struct MessageData {
 
 
 
-class KraftKommunication: public Module_Abstract {
+class KraftKommunication: public Module_Abstract, public Task_Abstract {
 public:
 
     /**
@@ -197,9 +204,10 @@ public:
      * 
      * @param dataLink is a radio class that inherets from KraftLink_Interface that will be used to send and receive packets 
      */
-    KraftKommunication(KraftLink_Interface* dataLink, eKraftMessageNodeID_t selfID) {
+    KraftKommunication(KraftLink_Interface* dataLink, eKraftMessageNodeID_t selfID): Task_Abstract(500, eTaskPriority_t::eTaskPriority_Middle, true) {
         dataLink_ = dataLink;
         selfID_ = selfID;
+        receivedPacketSub_.subscribe(dataLink->getReceivedDataTopic());
     }
 
     /**
@@ -208,7 +216,7 @@ public:
      * @param kraftMessage is a KraftMessage_Interface class containing the data to be sent.
      * @returns false if queue is full. loop() needs to be ran to give link time to send data and make room.
      */
-    bool sendMessage(KraftMessage_Interface& kraftMessage, const eKraftMessageNodeID_t &receiveNodeID, const bool &requiresAck = false);
+    bool sendMessage(KraftMessage_Interface& kraftMessage, const eKraftMessageNodeID_t& receiveNodeID, const bool &requiresAck = false);
 
     /**
      * Checks if a message is available.
@@ -280,7 +288,7 @@ public:
     /**
      * Gives system time to do things.
      */
-    void loop();
+    void thread();
 
 
 private:
@@ -317,7 +325,7 @@ private:
     struct NodeData {
 
         //Stores the last time a packet was received. Used to see if still connected.
-        uint32_t lastPacketTimestamp = 0;
+        int64_t lastPacketTimestamp = 0;
 
         //Whether the node is online. 
         bool online = false;
@@ -345,6 +353,8 @@ private:
 
     KraftLink_Interface* dataLink_; //Link used for sending receiving packets
 
+    Buffer_Subscriber<DataMessageBuffer, 10> receivedPacketSub_;
+
     //Queue containing all received packets.
     Buffer<ReceivedPayloadData, 10> receivedPackets_;
     //Queue containing all packets to send.
@@ -352,12 +362,15 @@ private:
     //Queue containing all packets to send that require an ACK. These must wait until the one before it is finished
     Buffer<SendPacketData, 10> sendPacketsACK_;
 
-    NodeData nodeData_[255];
+    NodeData nodeData_[c_maxNumberNodes];
 
     //Index corresponds to node that should receive packet.
-    uint32_t sentPacketsCounter_[255];
+    uint32_t sentPacketsCounter_[c_maxNumberNodes];
 
     eKraftMessageNodeID_t selfID_;
+
+    //Timer to keep track of sending heatbeat messages
+    IntervalControl heartbeatTimer_ = IntervalControl(c_heartbeatRate);
 
 
 };

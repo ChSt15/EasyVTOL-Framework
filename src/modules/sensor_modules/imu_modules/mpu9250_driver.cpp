@@ -2,7 +2,7 @@
 
 
 
-uint32_t MPU9250Driver::_newDataTimestamp = 0;
+int64_t MPU9250Driver::_newDataTimestamp = 0;
 bool MPU9250Driver::_newDataInterrupt = false;
 
 
@@ -101,7 +101,7 @@ void MPU9250Driver::thread() {
 
 void MPU9250Driver::_interruptRoutine() {
     _newDataInterrupt = true;
-    _newDataTimestamp = micros();
+    _newDataTimestamp =  NOW();
 }
 
 
@@ -124,10 +124,7 @@ void MPU9250Driver::init() {
         _imu.ConfigSrd(0);
         _imu.ConfigDlpf(Mpu9250::DlpfBandwidth::DLPF_BANDWIDTH_250HZ_4kHz);
 
-
-        attachInterrupt(imuINTPin_, _interruptRoutine, RISING);
-
-        _lastMeasurement = micros();
+        _lastMeasurement = NOW();
         
 
         //imuStatus = DeviceStatus::DEVICE_CALIBRATING;
@@ -135,7 +132,7 @@ void MPU9250Driver::init() {
 
     } else {
         moduleStatus_ = eModuleStatus_t::eModuleStatus_RestartAttempt; 
-        Serial.println("NEW! IMU Start Fail. Code: " + String(startCode));
+        Serial.println("IMU Start Fail. Code: " + String(startCode));
     }
 
     _startAttempts++;

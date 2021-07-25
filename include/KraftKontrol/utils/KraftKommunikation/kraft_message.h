@@ -9,6 +9,15 @@
 
 
 
+namespace KraftMessage {
+
+    //Setting for max size of message container
+    const uint32_t c_messageContainerArraySize_ = 1000;
+
+}
+
+
+
 /**
  * Indicates the type of message. 
  * This is to differentiate between telemetry, telecommands, general data etc.
@@ -22,7 +31,7 @@ enum eKraftMessageType_t: uint32_t {
     //Telemetry data.
     eKraftMessageType_Telemetry_ID,
     //Telecommand data.
-    eKraftMessageType_Telecommand_ID,
+    eKraftMessageType_Command_ID,
     //Datalink information e.g. ack, radio setting changes etc.
     eKraftMessageType_Datalink_ID,
     //This is to extend the enum
@@ -85,12 +94,12 @@ protected:
      * @param startIndex Index of buffer to start reading from. Default 0.
      * @param maxIndex Index of buffer to limit reading. Default max of uint32_t.
      */
-    void startBufferWrite(void* pointerToBuffer, const uint32_t &startIndex = 0, const uint32_t &maxIndex = UINT32_MAX) const {bufferIndex = startIndex; bufferMaxIndex = maxIndex; bufferWritePointer = pointerToBuffer;}
+    inline void startBufferWrite(void* pointerToBuffer, const uint32_t &startIndex = 0, const uint32_t &maxIndex = UINT32_MAX) const {bufferIndex = startIndex; bufferMaxIndex = maxIndex; bufferWritePointer = pointerToBuffer;}
 
     /**
      * Call this after using bufferWrite(..). 
      */
-    void endBufferWrite() const {bufferIndex = 0; bufferWritePointer = nullptr;}
+    inline void endBufferWrite() const {bufferIndex = 0; bufferWritePointer = nullptr;}
 
     /**
      * Used to make copy lots of data easier. 
@@ -99,7 +108,7 @@ protected:
      * @param numberBytes Number of bytes to be copied. Simply use sizeof("data type to be copied").
      * @returns true if copied, false if failure.
      */
-    bool bufferWrite(const void* data, const uint32_t &numberBytes) const {
+    inline bool bufferWrite(const void* data, const uint32_t &numberBytes) const {
 
         if (bufferWritePointer == nullptr || bufferIndex + numberBytes >= bufferMaxIndex) return false;
 
@@ -116,12 +125,12 @@ protected:
      * @param startIndex Index of buffer to start writting to. Default 0.
      * @param maxIndex Index of buffer to limit writting. Default max of uint32_t.
      */
-    void startBufferRead(const void* pointerToBuffer, const uint32_t &startIndex = 0, const uint32_t &maxIndex = UINT32_MAX) {bufferIndex = startIndex; bufferMaxIndex = maxIndex; bufferReadPointer = pointerToBuffer;}
+    inline void startBufferRead(const void* pointerToBuffer, const uint32_t &startIndex = 0, const uint32_t &maxIndex = UINT32_MAX) {bufferIndex = startIndex; bufferMaxIndex = maxIndex; bufferReadPointer = pointerToBuffer;}
 
     /**
      * Call this after using bufferWrite(..). 
      */
-    void endBufferRead() {bufferIndex = 0; bufferReadPointer = nullptr; bufferIndex = 0; bufferMaxIndex = UINT32_MAX;}
+    inline void endBufferRead() {bufferIndex = 0; bufferReadPointer = nullptr; bufferIndex = 0; bufferMaxIndex = UINT32_MAX;}
 
     /**
      * Used to make copy lots of data easier. 
@@ -130,7 +139,7 @@ protected:
      * @param numberBytes Number of bytes to be copied. Simply use sizeof("data type to be copied").
      * @returns true if copied, false if failure.
      */
-    bool bufferRead(void* data, const uint32_t &numberBytes) {
+    inline bool bufferRead(void* data, const uint32_t &numberBytes) {
 
         if (bufferReadPointer == nullptr || bufferIndex + numberBytes >= bufferMaxIndex) return false;
 
@@ -154,7 +163,7 @@ public:
      * Message type is to differentiate between telemetry, telecommands, and general data.
      * @returns the type of message. Not the type of data its holding.
      */
-    virtual uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Data_ID;}
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Data_ID;}
 
 };
 
@@ -167,20 +176,20 @@ public:
      * Message type is to differentiate between telemetry, telecommands, and general data.
      * @returns the type of message. Not the type of data its holding.
      */
-    virtual uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Telemetry_ID;}
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Telemetry_ID;}
 
 };
 
 
 
-class KraftMessageTelecommand_Abstract: public KraftMessage_Interface {
+class KraftMessageCommand_Abstract: public KraftMessage_Interface {
 public:
 
     /**
      * Message type is to differentiate between telemetry, telecommands, and general data.
      * @returns the type of message. Not the type of data its holding.
      */
-    virtual uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Telecommand_ID;}
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Command_ID;}
 
 };
 
@@ -193,7 +202,7 @@ public:
      * Message type is to differentiate between telemetry, telecommands, and general data.
      * @returns the type of message. Not the type of data its holding.
      */
-    virtual uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Datalink_ID;}
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Datalink_ID;}
 
 };
 
@@ -201,6 +210,8 @@ public:
 
 /**
  * This can be used to copy any type of KraftMessage and store it.
+ * Max size is c_messageContainerArraySize_ bytes. Anything over will result in a failure.
+ * @see c_messageContainerArraySize_
  */
 class KraftMessageContainer {
 public:
@@ -215,6 +226,13 @@ public:
     }
 
     /**
+     * @param message Reference to message.
+     */
+    KraftMessageContainer(const KraftMessage_Interface&& message) {
+        setMessage(message);
+    }
+
+    /**
      * Used to store the data directly even if its an unknown data type.
      * @param dataBytes Pointer to buffer containing data.
      * @param numberBytes Exact number of raw bytes to contain.
@@ -225,18 +243,17 @@ public:
         setMessage(dataBytes, numberBytes, dataTypeID, messageTypeID);
     }
 
-    ~KraftMessageContainer() {delete[] data_;}
+    ~KraftMessageContainer() {}
 
     /**
      * @param message Reference to message.
      * @returns true if successfull.
      */
     inline bool setMessage(const KraftMessage_Interface& message) {
-        delete[] data_;
         dataType_ = message.getDataType();
         dataSize_ = message.getDataSize();
+        if (dataSize_ > KraftMessage::c_messageContainerArraySize_) return false;
         messageType_ = message.getMessageType();
-        data_ = new uint8_t[dataSize_];
         if (message.getRawData(data_, dataSize_)) {
             isValid_ = true;
             return true;
@@ -255,11 +272,10 @@ public:
      * @returns true if successfull.
      */
     inline bool setMessage(const uint8_t* dataBytes, const uint32_t& numberBytes, const uint32_t& dataTypeID, const uint32_t& messageTypeID) {
-        delete[] data_;
         dataType_ = dataTypeID;
         dataSize_ = numberBytes;
+        if (dataSize_ > KraftMessage::c_messageContainerArraySize_) return false;
         messageType_ = messageTypeID;
-        data_ = new uint8_t[dataSize_];
         for (uint32_t i = 0; i < dataSize_;i++) data_[i] = dataBytes[i];
         isValid_ = true;
         return true;
@@ -276,14 +292,9 @@ public:
         return message.setRawData(data_, dataSize_);
     }
 
-    inline KraftMessageContainer& operator= (const KraftMessageContainer& a) {
-        setMessage(a.data_, a.dataSize_, a.dataType_, a.messageType_);
-        return *this;
-    }
-
 private:
 
-    uint8_t* data_ = nullptr;
+    uint8_t data_[KraftMessage::c_messageContainerArraySize_];
     uint32_t dataType_ = 0;
     uint32_t messageType_ = eKraftMessageType_t::eKraftMessageType_Invalid_ID;
     uint8_t dataSize_ = 0;

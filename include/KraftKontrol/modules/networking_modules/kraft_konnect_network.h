@@ -1,5 +1,5 @@
-#ifndef KRAFTKONNECT_NETWORK_DRIVER_H
-#define KRAFTKONNECT_NETWORK_DRIVER_H
+#ifndef KRAFTKONNECT_NETWORK_H
+#define KRAFTKONNECT_NETWORK_H
 
 
 
@@ -11,18 +11,12 @@
 
 #include "KraftKontrol/modules/module_abstract.h"
 
-#include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_message_types.h"
-
-
-
-
-
 
 
 class KraftKonnectNetwork: public Module_Abstract, public Task_Abstract {
 public:
 
-    KraftKonnectNetwork(KraftKommunication* communicationPort) : Task_Abstract(1000, eTaskPriority_t::eTaskPriority_Middle, true) {
+    KraftKonnectNetwork(KraftKommunication* communicationPort): Task_Abstract(1000, eTaskPriority_t::eTaskPriority_Middle, true) {
         commsPort_ = communicationPort;
     }
     

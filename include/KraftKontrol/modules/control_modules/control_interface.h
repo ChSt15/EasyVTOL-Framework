@@ -35,7 +35,7 @@ public:
      *
      * @return dynamicSetpoint.
      */
-    virtual DynamicData& getDynamicsOutput() {return controlOutput_;};
+    DynamicData& getDynamicsOutput() {return controlOutput_;};
 
     /**
      * @returns topic for control output.
@@ -49,6 +49,8 @@ public:
 
 
 protected:
+
+    Control_Interface() {}
 
     //Newest output data.
     DynamicData controlOutput_;

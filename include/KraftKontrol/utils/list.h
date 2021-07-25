@@ -5,17 +5,20 @@
 #include "stdint.h"
 
 
-/*
+/**
  * This is a class to create a dynamic buffer.
  * Its size can be changed during runtime.
+ * @param TYPE type of data to store in List
  */
-
-
 template<typename TYPE> 
 class List {
 public:
 
-    List() {
+    /**
+     * @param sizeControl if set to true then the list will automatically reduce the internal size to save space. Setting this to false will reduce heap fragmentation. Defaults to false.
+     */
+    List(bool sizeControl = false) {
+        sizeControl_ = sizeControl;
         array_ = new TYPE;
         maxSize_ = 1;
     }
@@ -84,6 +87,11 @@ public:
      */
     List& operator = (const List& list);
 
+    /**
+     * This will cut down the size of the array if it is less than half full.
+     */
+    void reduceSize();
+
 
 private:
 
@@ -96,6 +104,9 @@ private:
     //Pointer to start of array.
     TYPE* array_ = nullptr;
 
+    //Wether to reduce array size automatically.
+    bool sizeControl_ = false;
+
     /**
      * Changes size to given parameter.
      * Copies items to new array.
@@ -104,6 +115,21 @@ private:
     void changeSizeTo(const uint32_t& size);
 
 };
+
+
+
+template<typename TYPE> 
+void List<TYPE>::reduceSize() {
+
+    if (size_ >= maxSize_/2) return;
+
+    uint32_t newSize = size_;
+
+    while (size_ < maxSize_/2) newSize /= 2;
+
+    changeSizeTo(newSize);
+
+}
 
 
 
@@ -174,7 +200,7 @@ bool List<TYPE>::removeAtIndex(const uint32_t& index) {
 
     size_--;
 
-    if (size_ <= maxSize_/2) changeSizeTo(maxSize_/2);
+    if (sizeControl_ && size_ <= maxSize_/2) changeSizeTo(maxSize_/2);
 
     return true;
     
@@ -230,7 +256,8 @@ bool List<TYPE>::removeAllEqual(const TYPE& item) {
 template<typename TYPE> 
 void List<TYPE>::clear() {
 
-    changeSizeTo(0);
+    if (sizeControl_) changeSizeTo(0);
+    else size_ = 0;
 
 }
 

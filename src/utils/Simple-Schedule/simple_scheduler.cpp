@@ -45,8 +45,9 @@ bool Scheduler::runPrioGroup(ChainObject<Task>* startOfGroup) {
                     currentTask->item.thread->removal(); //Run removal function before removing.
                     detachTask(currentTask->item.thread);
                 }
-            } else if (currentTask->item.interval.isTimeToRun()) {
-                currentTask->item.thread->thread();
+            } 
+            if (currentTask->item.interval.isTimeToRun()) {
+                currentTask->item.thread->run();
                 taskRan = true;
                 if (currentTask->item.numberRunsLeft > 0) {
                     currentTask->item.numberRunsLeft--;

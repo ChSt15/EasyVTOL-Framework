@@ -18,11 +18,11 @@ public:
 
     static void init();
 
-    bool commitChanges();
+    bool saveChanges();
 
-    bool readBytes(const uint32_t &address, uint8_t* data, const uint32_t &numberBytes);
+    bool readBytes(const uint32_t &address, void* data, const uint32_t &numberBytes);
 
-    bool writeBytes(const uint32_t &address, const uint8_t* data, const uint32_t &numberBytes);
+    bool writeBytes(const uint32_t &address, const void* data, const uint32_t &numberBytes);
 
 
 protected:

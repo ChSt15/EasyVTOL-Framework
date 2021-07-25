@@ -17,13 +17,15 @@
 
 #include "KraftKontrol/utils/buffer.h"
 
+#include "KraftKontrol/platforms/platform_hal.h"
+
 
 
 class MPU9250Driver: public Gyroscope_Interface, public Accelerometer_Interface, public Module_Abstract, public Task_Abstract {
 public:
 
-    MPU9250Driver(int interruptPin, int chipSelect, SPIClass* spiBus) : Task_Abstract(40000, eTaskPriority_t::eTaskPriority_Realtime, true), _imu(spiBus, chipSelect) {
-        imuINTPin_ = interruptPin;
+    MPU9250Driver(int interruptPin, int chipSelect, SPIClass* spiBus) : Task_Abstract(40000, eTaskPriority_t::eTaskPriority_Realtime, true), _imu(spiBus, chipSelect), pinInterrupt_(interruptPin, _interruptRoutine, true, false) {
+        
     }
     
     /**
@@ -87,7 +89,7 @@ private:
 
     IntervalControl _rateCalcInterval = IntervalControl(1); 
 
-    int imuINTPin_ = 0;
+    PinInterrupt_HAL pinInterrupt_;
 
     Mpu9250 _imu;
 
@@ -105,11 +107,11 @@ private:
     uint32_t _magRate = 0;
     uint32_t _magCounter = 0;
 
-    uint32_t _lastMeasurement = 0;
+    int64_t _lastMeasurement = 0;
 
     bool _block = false;
 
-    static uint32_t _newDataTimestamp;
+    static int64_t _newDataTimestamp;
     static bool _newDataInterrupt;
 
 

@@ -49,12 +49,18 @@ public:
      * @param baro module to use.
      * @param gnss module to use.
      */
-    NavigationComplementaryFilter(Gyroscope_Interface& gyro, Accelerometer_Interface& accel, Magnetometer_Interface* mag = nullptr, Barometer_Interface* baro = nullptr, GNSS_Interface* gnss = nullptr) : Task_Abstract(8000, eTaskPriority_t::eTaskPriority_VeryHigh, true) {
-        gyroSub_.subscribe(gyro.getGyroTopic());
-        accelSub_.subscribe(accel.getAccelTopic());
-        if (mag != nullptr) magSub_.subscribe(mag->getMagTopic());
-        if (baro != nullptr) baroSub_.subscribe(baro->getBaroTopic());
-        if (gnss != nullptr) gnssSub_.subscribe(gnss->getGNSSTopic());
+    NavigationComplementaryFilter(Gyroscope_Interface* gyro = nullptr, Accelerometer_Interface* accel = nullptr, Magnetometer_Interface* mag = nullptr, Barometer_Interface* baro = nullptr, GNSS_Interface* gnss = nullptr) : Task_Abstract(8000, eTaskPriority_t::eTaskPriority_VeryHigh, true) {
+        if (gyro != nullptr) {
+            gyroSub_.subscribe(gyro->getGyroTopic()); 
+            gyroSub_.setOverwrite(true);
+        }
+        if (accel != nullptr) {
+            accelSub_.subscribe(accel->getAccelTopic()); 
+            accelSub_.setOverwrite(true);
+        }
+        if (mag != nullptr) {magSub_.subscribe(mag->getMagTopic()); }
+        if (baro != nullptr) {baroSub_.subscribe(baro->getBaroTopic()); }
+        if (gnss != nullptr) {gnssSub_.subscribe(gnss->getGNSSTopic()); }
     }
 
     /**
@@ -96,9 +102,9 @@ private:
     Buffer<float, 10> gyroYBuffer_;
     Buffer<float, 10> gyroZBuffer_;
 
-    Buffer<float, 50> accelXBuffer_;
-    Buffer<float, 50> accelYBuffer_;
-    Buffer<float, 50> accelZBuffer_;
+    Buffer<float, 20> accelXBuffer_;
+    Buffer<float, 20> accelYBuffer_;
+    Buffer<float, 20> accelZBuffer_;
 
     Buffer<float, 5> gnssPositionXBuffer_;
     Buffer<float, 5> gnssPositionYBuffer_;

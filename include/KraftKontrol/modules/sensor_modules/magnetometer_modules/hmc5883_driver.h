@@ -7,16 +7,17 @@
 
 #include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
 
-#include "KraftKontrol/modules/bus_hal_modules/arduino_i2c_bus_hal.h"
-
 #include "KraftKontrol/modules/eeprom_hal_modules/eeprom_hal_interface.h"
-#include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_message_types.h"
+#include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_data_messages.h"
+#include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_command_messages.h"
 
 #include "KraftKontrol/modules/sensor_modules/magnetometer_modules/magnetometer_interface.h"
 
 #include "KraftKontrol/modules/module_abstract.h"
 
 #include "KraftKontrol/utils/buffer.h"
+
+#include "KraftKontrol/hal/bus_device.h"
 
 
 
@@ -51,10 +52,10 @@ public:
      * This is where all calculations are done.
      *
      * @param bus Pointer to I2C bus to use.
-     * @param address Address of QMC5883L. Default 0x0D.
-     * @param eeprom Pointer to EEPROM module to use for calibration values.
+     * @param selector For I2C this is the address. For SPI this is the chip select pin.
+     * @param eeprom Reference to EEPROM module to use for calibration values.
      */
-    QMC5883Driver(TwoWire* bus, uint8_t address = QMC5883Registers::QMC5883L_ADDR_DEFAULT, EEPROM_Interface* eeprom = nullptr) : Task_Abstract(250, eTaskPriority_t::eTaskPriority_VeryHigh, true), bus_(bus, QMC5883Registers::QMC5883L_ADDR_DEFAULT) {
+    QMC5883Driver(Bus_HAL_Abstract& bus, uint32_t selector, EEPROM_Interface* eeprom = nullptr) : Task_Abstract(250, eTaskPriority_t::eTaskPriority_VeryHigh, true), bus_(selector, bus) {
         eeprom_ = eeprom;
     }
     
@@ -121,7 +122,7 @@ private:
 
     IntervalControl _rateCalcInterval = IntervalControl(1); 
 
-    I2CBus_HAL bus_;
+    BusDevice bus_;
 
     uint8_t _startAttempts = 0;
 

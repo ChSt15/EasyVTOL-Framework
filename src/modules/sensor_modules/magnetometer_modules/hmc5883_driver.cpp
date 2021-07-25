@@ -6,7 +6,7 @@ bool QMC5883Driver::getEEPROMData() {
 
     if (eeprom_ == nullptr) return false;
 
-    KraftMessageMagCalValuesIs magValues;
+    CommandMessageMagCalValues magValues;
 
     if (!eeprom_->readMessage(&magValues, 500)) return false;
 
@@ -22,11 +22,12 @@ bool QMC5883Driver::setEEPROMData() {
 
     if (eeprom_ == nullptr) return false;
 
-    KraftMessageMagCalValuesIs magValues = KraftMessageMagCalValuesIs(magMax_, magMin_);
+    //KraftMessageMagCalValuesIs magValues = KraftMessageMagCalValuesIs(magMax_, magMin_);
+    CommandMessageMagCalValues magValues(magMax_, magMin_);
 
     if (!eeprom_->writeMessage(&magValues, 500)) return false;
 
-    eeprom_->commitChanges();
+    eeprom_->saveChanges();
 
     return true;
 
@@ -122,7 +123,7 @@ bool QMC5883Driver::dataAvailable() {
 
     uint8_t byte = 0;
 
-    if (!bus_.readByte(QMC5883Registers::QMC5883L_STATUS, &byte)) return false;
+    if (!bus_.readByte(QMC5883Registers::QMC5883L_STATUS, byte)) return false;
 
     return (byte&0x01) == 0x01;
 

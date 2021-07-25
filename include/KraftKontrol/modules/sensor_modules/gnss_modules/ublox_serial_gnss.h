@@ -84,7 +84,7 @@ public:
     /**
      * @returns true if GNSS lock is valid and safe.
      */
-    bool getGNSSLockValid() override {
+    bool getGNSSLockValid() {
         return lockValid_;
     }
 

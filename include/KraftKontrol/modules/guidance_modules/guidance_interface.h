@@ -19,7 +19,7 @@ public:
      *
      * @return control parameters container.
      */
-    virtual ControlData& getControlSetpoint() {return controlSetpoint_;}
+    ControlData& getControlSetpoint() {return controlSetpoint_;}
 
     /**
      * @returns reference to guidance modules output topic

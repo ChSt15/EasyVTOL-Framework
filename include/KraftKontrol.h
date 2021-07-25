@@ -2,6 +2,7 @@
 #define KRAFT_KONTROL_H
 
 
+#include "KraftKontrol/platforms/platform_hal.h"
 
 #include "KraftKontrol/utils/constrainers.h"
 
@@ -47,7 +48,10 @@
     #include "KraftKontrol/modules/hid_modules/display_modules/st7735_driver.h"
 #endif
 
-#include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_message_types.h"
+#include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_messagetype_abstracts.h"
+#include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_data_messages.h"
+#include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_telemetry_messages.h"
+#include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_command_messages.h"
 
 #include "KraftKontrol/modules/networking_modules/kraft_konnect_network.h"
 

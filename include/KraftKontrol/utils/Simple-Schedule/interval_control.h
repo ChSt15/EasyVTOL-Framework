@@ -16,7 +16,7 @@ public:
 
     IntervalControl(float rate) {
         lastRun_ns_ = 0;
-        if (rate != 0) setRate(rate);
+        if (rate > 0.0f) setRate(rate);
     }
 
     /**
@@ -25,7 +25,7 @@ public:
      * @param values rate in Hz
      * @return none.
      */
-    inline void setRate(float rate_Hz) {interval_ns_ = SECONDS/rate_Hz;}
+    inline void setRate(float rate_Hz) {interval_ns_ = (int64_t)SECONDS/rate_Hz;}
 
     /**
      * Gets the rate in Hz
@@ -41,7 +41,7 @@ public:
      * @param values interval in milliseconds
      * @return none.
      */
-    inline void setInterval(uint32_t interval_ns) {interval_ns_ = interval_ns; lastRun_ns_ = NOW() - interval_ns_;}
+    inline void setInterval(int64_t interval_ns) {interval_ns_ = interval_ns; lastRun_ns_ = NOW() - interval_ns_;}
 
     /**
      * Gets the interval in milliseconds
@@ -197,11 +197,11 @@ public:
 
 private:
 
-    uint32_t lastRun_ns_ = 0;
+    int64_t lastRun_ns_ = 0;
 
-    uint32_t interval_ns_ = 0;
+    int64_t interval_ns_ = 0;
 
-    bool limit_ = true;
+    bool limit_ = false;
 
     bool block_ = false;
 

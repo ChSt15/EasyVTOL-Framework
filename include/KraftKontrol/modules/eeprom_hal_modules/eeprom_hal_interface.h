@@ -5,7 +5,7 @@
 
 #include "stdint.h"
 
-#include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_message_types.h"
+#include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_data_messages.h"
 
 //#include "Arduino.h"
 
@@ -34,6 +34,12 @@ public:
     bool updateVersion(const uint32_t &version);
 
     /**
+     * Checks if eeprom versoin is correct.
+     * @returns true if version is correct.
+     */
+    bool checkVersionCorrect();
+
+    /**
      * Writes a message at the given address.
      * You must call commitChanges() to actually save changed to EEPROM memory. 
      * If writting lots of things fast then use this and call commitChanges() only once after all calls are finished.
@@ -56,18 +62,20 @@ public:
      * Writes only changed values to EEPROM. This to to reduce wear on EEPROM
      * @returns true if successful
      */
-    virtual bool commitChanges() = 0;
+    virtual bool saveChanges() = 0;
 
 protected:
 
-    virtual bool readBytes(const uint32_t &address, uint8_t* data, const uint32_t &numberBytes) = 0;
+    virtual bool readBytes(const uint32_t &address, void* data, const uint32_t &numberBytes) = 0;
 
-    virtual bool writeBytes(const uint32_t &address, const uint8_t* data, const uint32_t &numberBytes) = 0;
+    virtual bool writeBytes(const uint32_t &address, const void* data, const uint32_t &numberBytes) = 0;
 
 
 private:
 
     uint32_t version_ = 0;
+
+
 
     
 };

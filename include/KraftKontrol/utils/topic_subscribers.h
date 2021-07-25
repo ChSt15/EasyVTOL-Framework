@@ -28,7 +28,7 @@ public:
     /**
      * @param topic Topic to subscribe to.
      */
-    Simple_Subscriber(Topic<TYPE>& topic): Subscriber_Interface<TYPE>(&topic) {}
+    Simple_Subscriber(Topic<TYPE>& topic): Subscriber_Interface<TYPE>(topic) {}
 
     /**
      * @returns True if new data was received
@@ -80,7 +80,7 @@ public:
      * @param topic Topic to subscribe to.
      * @param overwrite Set to true to overwrite oldest values if full. Defaults to false.
      */
-    Buffer_Subscriber(Topic<TYPE>& topic, bool overwrite = false): Subscriber_Interface<TYPE>(&topic) {
+    Buffer_Subscriber(Topic<TYPE>& topic, bool overwrite = false): Subscriber_Interface<TYPE>(topic) {
         overwrite_ = overwrite;
     }
 
@@ -88,7 +88,7 @@ public:
      * Sets if subscriber should overwrite when fifo is full.
      * @param overwrite Whether to overwrite.
      */
-    void setOverwrite(bool& overwrite) {overwrite_ = overwrite;}
+    void setOverwrite(bool overwrite) {overwrite_ = overwrite;}
 
 
 private:
@@ -98,6 +98,38 @@ private:
     }
 
     bool overwrite_ = false;
+
+};
+
+
+
+/**
+ * This subscriber connects 2 topics together by forwarding messages from topic A to B.
+ * Use 2 of these to get bidirectional forwarding.
+ */
+template<typename TYPE> 
+class TopicConnection_Subscriber: public Subscriber_Interface<TYPE> {
+public:
+
+    TopicConnection_Subscriber() {}
+
+    /**
+     * @param topic Topic to subscribe to.
+     * @param overwrite Set to true to overwrite oldest values if full. Defaults to false.
+     */
+    TopicConnection_Subscriber(Topic<TYPE>& topicA, Topic<TYPE>& topicB): Subscriber_Interface<TYPE>(topicA) {
+        topicB_ = topicB;
+    }
+
+
+private:
+
+    void receive(TYPE& item) override {
+        topicB_.publish(item);
+    }
+
+    Topic<TYPE>& topicB_;
+
 
 };
 

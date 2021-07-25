@@ -15,16 +15,6 @@ class Barometer_Interface {
 public:
 
     /**
-     * @returns rate (in Hz) of the thread
-     */
-    virtual uint32_t loopRate() = 0;
-
-    /**
-     * @returns rate (in Hz) of new sensor data
-     */
-    virtual uint32_t pressureRate() = 0;
-
-    /**
      * @returns reference to baro data topic
      */
     Topic<SensorTimestamp<float>>& getBaroTopic() {return baroTopic_;}

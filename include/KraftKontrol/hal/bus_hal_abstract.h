@@ -5,87 +5,42 @@
 #include "stdint.h"
 
 
+/**
+ * Abstract class used for bus communication. This creates a uniform interface for all bus comms.
+ * First select device to communicate with, then do read or write, then you MUST deselect the device.
+ * This is not suitable for direct device communication. For that please use BusDevice_HAL.
+ */
 class Bus_HAL_Abstract {
 public:
 
     /**
-     * First Writes bytes to a starting register, then reads bytes from a starting register
-     * @param deviceAddress Address of device to communicate with.
-     * @param writeRegister Register to start writing bytes to.
-     * @param writeData Pointer to Data that will be written.
-     * @param readRegister Register to start reading from.
-     * @param readData Pointer to where read data will be stored.
-     * @param numBytesRead Number of bytes to read. Defaults to 1.
-     * @param numBytesWrite Number of bytes to write. Defaults to 1.
-     * @returns true if successfull.
+     * Selects the device on given selectAddress. 
+     * @param selectAddress Parameter to select device on bus. Could be a pin(SPI) or Address(I2C).
+     * @param speed Speed of communication.
+     * @param invertChipSelect Only for SPI Chip selection. If true then chip select will be active on low. Default false.
      */
-    bool writeRead(uint32_t deviceAddress, uint32_t writeRegister, const void* writeData, uint32_t readRegister, void* readData, uint32_t numBytesRead = 1, uint32_t numBytesWrite = 1) {
-        
-        if (!writeBytes(deviceAddress, writeRegister, writeData, numBytesWrite, false)) {
-            release(); //Must release device from device from bus before leaving!
-            return false;
-        }
-
-        if (!writeBytes(deviceAddress, readRegister, readData, numBytesRead, true)) {
-            return false;
-        }
-
-        return true;
-
-    }
+    virtual void selectDevice(uint32_t selectAddress, uint32_t speed, bool invertChipSelect = true) = 0;
 
     /**
-     * Writes a byte to a register.
-     * @param deviceAddress Address of device to communicate with.
-     * @param writeRegister Register to write to.
-     * @param writeData Data to be written to device.
-     * @param release Unselect the device from bus. If false then call after transfer release(). Depending on implementation can optimise transfer. Defaults to true.
-     * @returns true if successfull.
+     * Deselects whatever device was being communicated with. Needs to be done after communication to free Bus for other devices.
      */
-    bool writeByte(uint32_t deviceAddress, uint32_t writeRegister, uint8_t writeData, bool release = true) {
-        return writeBytes(deviceAddress, writeRegister, &writeData, 1, release);
-    }
+    virtual void deselectDevice() = 0;
 
     /**
      * Writes bytes to a starting register.
-     * @param deviceAddress Address of device to communicate with.
-     * @param writeRegister Register to start writing bytes to.
      * @param writeData Pointer to Data that will be written.
      * @param numberBytes Number of bytes from writeData to write.
-     * @param release Unselect the device from bus. If false then call after transfer release(). Depending on implementation can optimise transfer. Defaults to true.
      * @returns true if successfull.
      */
-    virtual bool writeBytes(uint32_t deviceAddress, uint32_t writeRegister, const void* writeData, uint32_t numberBytes, bool release = true) = 0;
-
-
-    /**
-     * Reads a byte from a register.
-     * @param deviceAddress Address of device to communicate with.
-     * @param readRegister Register to read from
-     * @param readData Reference to byte to store data.
-     * @param release Unselect the device from bus. If false then call after transfer release(). Depending on implementation can optimise transfer. Defaults to true.
-     * @returns true if successfull.
-     */
-    bool readByte(uint32_t deviceAddress, uint32_t readRegister, uint8_t& readData, bool release = true) {
-        return writeBytes(deviceAddress, readRegister, &readData, 1, release);
-    }
+    virtual bool writeBytes(const void* writeData, uint32_t numberBytes) = 0;
 
     /**
      * Reads bytes from a starting register.
-     * @param deviceAddress Address of device to communicate with.
-     * @param readRegister Register to start reading bytes from.
      * @param readData Pointer to where to store data.
      * @param numberBytes Number of bytes to read from device
-     * @param release Unselect the device from bus. If false then call after transfer release(). Depending on implementation can optimise transfer. Defaults to true.
      * @returns true if successfull.
      */
-    virtual bool readBytes(uint32_t deviceAddress, uint32_t readRegister, void* readData, uint32_t numberBytes, bool release = true) = 0;
-
-    /**
-     * Dependant on implementation on bus. Might have no effect.
-     * Stops communication on bus.
-     */
-    virtual void release() = 0;
+    virtual bool readBytes(void* readData, uint32_t numberBytes) = 0;
 
     
 };

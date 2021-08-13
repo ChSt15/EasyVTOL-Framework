@@ -4,7 +4,7 @@
 
 #include "Wire.h"
 
-#include "KraftKontrol/hal/bus_hal_abstract.h"
+#include "../../../KraftKontrol/hal/bus_hal_abstract.h"
 
 
 class I2CBus_HAL: public Bus_HAL_Abstract {
@@ -14,11 +14,11 @@ public:
         bus_ = &bus;
     }
 
-    bool initBus(const int32_t &speed = -1, const int16_t &scl = -1, const int16_t &sda = -1) {
+    bool initBus(uint32_t speed = 0, const int16_t &scl = -1, const int16_t &sda = -1) {
         
         bus_->begin();
 
-        if (speed != -1) bus_->setClock(speed);
+        if (speed != 0) bus_->setClock(speed);
 
         return true;
 
@@ -26,43 +26,32 @@ public:
 
     /**
      * Writes bytes to a starting register.
-     * @param deviceAddress Address of device to communicate with.
      * @param writeRegister Register to start writing bytes to.
      * @param writeData Pointer to Data that will be written.
      * @param numberBytes Number of bytes from writeData to write.
-     * @param release Unselect the device from bus. If false then call after transfer release(). Depending on implementation can optimise transfer. Defaults to true.
      * @returns true if successfull.
      */
-    bool writeBytes(uint32_t deviceAddress, uint32_t writeRegister, const void* writeData, uint32_t numberBytes, bool release = true) {
+    bool writeBytes(uint32_t writeRegister, const void* writeData, uint32_t numberBytes) {
 
-        bus_->beginTransmission((int)deviceAddress);
-
-        bus_->write(writeRegister);
         bus_->write((uint8_t*)writeData, numberBytes);
 
-        return bus_->endTransmission() == 0;
+        uint32_t sentBytes = bus_->endTransmission(false);
+
+        return sentBytes == numberBytes;
 
     }
 
 
     /**
      * Reads bytes from a starting register.
-     * @param deviceAddress Address of device to communicate with.
      * @param readRegister Register to start reading bytes from.
      * @param readData Pointer to where to store data.
      * @param numberBytes Number of bytes to read from device
-     * @param release Unselect the device from bus. If false then call after transfer release(). Depending on implementation can optimise transfer. Defaults to true.
      * @returns true if successfull.
      */
-    bool readBytes(uint32_t deviceAddress, uint32_t readRegister, void* readData, uint32_t numberBytes, bool release = true) {
+    bool readBytes(uint32_t readRegister, void* readData, uint32_t numberBytes) {
 
-        bus_->beginTransmission((int)deviceAddress);
-        bus_->write(readRegister);
-        if (bus_->endTransmission(false) != 0) {
-            return false;
-        }
-
-        if (bus_->requestFrom((int)deviceAddress, (int)numberBytes) != numberBytes) {
+        if (bus_->requestFrom((int)address_, (int)numberBytes) != numberBytes) {
             return false;
         }
 
@@ -73,14 +62,38 @@ public:
     }
 
     /**
-     * Not implemented yet
+     * Selects the device on given selectAddress. 
+     * @param selectAddress Parameter to select device on bus. Could be a pin(SPI) or Address(I2C).
+     * @param speed Speed of communication.
+     * @param invertChipSelect Only for SPI Chip selection. If true then chip select will be active on low. Default false.
      */
-    void release() {}
+    void selectDevice(uint32_t selectAddress, uint32_t speed, bool invertChipSelect = true) {
+
+        transferBegun_ = true;
+
+        bus_->setClock(speed);
+        bus_->beginTransmission((uint8_t)selectAddress);
+
+    }
+
+    /**
+     * Deselects whatever device was being communicated with. Needs to be done after communication to free Bus for other devices.
+     */
+    void deselectDevice() {
+
+        bus_->endTransmission(true);
+
+    }
+
 
 
 private:
 
+    uint32_t address_;
+
     TwoWire* bus_;
+
+    bool transferBegun_ = false;
 
     
 };

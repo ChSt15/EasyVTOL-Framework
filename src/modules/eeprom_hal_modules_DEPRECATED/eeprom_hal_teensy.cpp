@@ -1,6 +1,6 @@
-#include "KraftKontrol/modules/eeprom_hal_modules/eeprom_hal_teensy.h"
-
 #ifdef ARDUINO_TEENSY40
+
+/*#include "KraftKontrol/modules/eeprom_hal_modules/eeprom_hal_teensy.h"
 
 
 bool EEPROM_Teensy::initialised_ = false;
@@ -52,7 +52,7 @@ bool EEPROM_Teensy::writeBytes(const uint32_t &address, const void* data, const 
 
     return true;
 
-}
+}*/
 
 
 #endif

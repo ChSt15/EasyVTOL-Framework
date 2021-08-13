@@ -1,4 +1,4 @@
-#include "KraftKontrol/modules/eeprom_hal_modules/eeprom_hal_interface.h"
+/*#include "KraftKontrol/modules/eeprom_hal_modules/eeprom_hal_interface.h"
 
 
 
@@ -106,4 +106,4 @@ bool EEPROM_Interface::readMessage(KraftMessage_Interface* message, const uint32
 
     return true;
     
-}
+}*/

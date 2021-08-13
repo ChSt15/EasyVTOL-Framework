@@ -110,11 +110,14 @@ public:
     /**
      * Static function to give internal scheduler time to run tasks.
      * This needs to be ran as often and fast as possible to give all tasks time.
+     * 
+     * Usually the main program loop only constantly calls this.
+     * Warning: Do not call this inside a task! Can cause stack overflow!
      */
     static void schedulerTick() {g_scheduler.tick();}
 
     /**
-     * Static function that talls scheduler to initialize all attached tasks.
+     * Static function that tells scheduler to initialize all attached tasks.
      */
     static void schedulerInitTasks() {g_scheduler.initializeTasks();}
 

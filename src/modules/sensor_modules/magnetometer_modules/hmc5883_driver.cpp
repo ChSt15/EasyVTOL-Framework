@@ -4,7 +4,9 @@
 
 bool QMC5883Driver::getEEPROMData() {
 
-    if (eeprom_ == nullptr) return false;
+    return false;
+
+    /*if (eeprom_ == nullptr) return false;
 
     CommandMessageMagCalValues magValues;
 
@@ -13,14 +15,16 @@ bool QMC5883Driver::getEEPROMData() {
     magMin_ = magValues.getMinValue();
     magMax_ = magValues.getMaxValue();
 
-    return true;
+    return true;*/
 
 }
 
 
 bool QMC5883Driver::setEEPROMData() {
 
-    if (eeprom_ == nullptr) return false;
+    return false;
+
+    /*if (eeprom_ == nullptr) return false;
 
     //KraftMessageMagCalValuesIs magValues = KraftMessageMagCalValuesIs(magMax_, magMin_);
     CommandMessageMagCalValues magValues(magMax_, magMin_);
@@ -29,7 +33,7 @@ bool QMC5883Driver::setEEPROMData() {
 
     eeprom_->saveChanges();
 
-    return true;
+    return true;*/
 
 }
 
@@ -38,7 +42,7 @@ void QMC5883Driver::getData() {
 
     uint8_t buffer[6];
 
-    if (!bus_.readBytes(QMC5883Registers::QMC5883L_X_LSB, buffer, 6)) return;
+    if (!bus_->readBytes(QMC5883Registers::QMC5883L_X_LSB, buffer, 6)) return;
 
     int64_t time = NOW();
 
@@ -123,7 +127,7 @@ bool QMC5883Driver::dataAvailable() {
 
     uint8_t byte = 0;
 
-    if (!bus_.readByte(QMC5883Registers::QMC5883L_STATUS, byte)) return false;
+    if (!bus_->readByte(QMC5883Registers::QMC5883L_STATUS, byte)) return false;
 
     return (byte&0x01) == 0x01;
 
@@ -179,13 +183,13 @@ void QMC5883Driver::init() {
     //uint8_t byte;
     //if (!readByte(address_, QMC5883Registers::QMC5883L_CHIP_ID, &byte)) failed = true;
 
-    if (!bus_.writeByte(QMC5883Registers::QMC5883L_CONFIG2, 0b10000000)) failed = true;
+    if (!bus_->writeByte(QMC5883Registers::QMC5883L_CONFIG2, 0b10000000)) failed = true;
 
     delay(10);
 
-    if (!bus_.writeByte(QMC5883Registers::QMC5883L_CONFIG, 0b00101001)) failed = true;
-    if (!bus_.writeByte(QMC5883Registers::QMC5883L_CONFIG2, 0b00000000)) failed = true;
-    if (!bus_.writeByte(QMC5883Registers::QMC5883L_RESET, 0x01)) failed = true;
+    if (!bus_->writeByte(QMC5883Registers::QMC5883L_CONFIG, 0b00101001)) failed = true;
+    if (!bus_->writeByte(QMC5883Registers::QMC5883L_CONFIG2, 0b00000000)) failed = true;
+    if (!bus_->writeByte(QMC5883Registers::QMC5883L_RESET, 0x01)) failed = true;
 
 
     if (!failed) {

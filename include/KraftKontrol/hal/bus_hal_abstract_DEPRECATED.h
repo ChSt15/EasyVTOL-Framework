@@ -19,12 +19,12 @@ public:
      * @param speed Speed of communication.
      * @param invertChipSelect Only for SPI Chip selection. If true then chip select will be active on low. Default false.
      */
-    virtual void selectDevice(uint32_t selectAddress, uint32_t speed, bool invertChipSelect = true) = 0;
+    //virtual void selectDevice(uint32_t selectAddress, uint32_t speed, bool invertChipSelect = true) = 0;
 
     /**
      * Deselects whatever device was being communicated with. Needs to be done after communication to free Bus for other devices.
      */
-    virtual void deselectDevice() = 0;
+    //virtual void deselectDevice() = 0;
 
     /**
      * Writes bytes to a starting register.

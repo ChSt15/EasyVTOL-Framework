@@ -7,7 +7,7 @@
 
 #include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
 
-#include "KraftKontrol/modules/eeprom_hal_modules/eeprom_hal_interface.h"
+//#include "KraftKontrol/modules/eeprom_hal_modules/eeprom_hal_interface.h"
 #include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_data_messages.h"
 #include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_command_messages.h"
 
@@ -17,7 +17,7 @@
 
 #include "KraftKontrol/utils/buffer.h"
 
-#include "KraftKontrol/hal/bus_device.h"
+#include "KraftKontrol/hal/bus_device_hal_abstract.h"
 
 
 
@@ -55,8 +55,9 @@ public:
      * @param selector For I2C this is the address. For SPI this is the chip select pin.
      * @param eeprom Reference to EEPROM module to use for calibration values.
      */
-    QMC5883Driver(Bus_HAL_Abstract& bus, uint32_t selector, EEPROM_Interface* eeprom = nullptr) : Task_Abstract(250, eTaskPriority_t::eTaskPriority_VeryHigh, true), bus_(selector, bus) {
-        eeprom_ = eeprom;
+    QMC5883Driver(BusDevice_HAL_Abstract& bus, uint32_t selector/*, EEPROM_Interface* eeprom = nullptr*/) : Task_Abstract(250, eTaskPriority_t::eTaskPriority_VeryHigh, true) {
+        //eeprom_ = eeprom;
+        bus_ = &bus;
     }
     
     /**
@@ -118,11 +119,11 @@ private:
 
     Vector<> _lastMag;
 
-    EEPROM_Interface* eeprom_ = nullptr;
+    //EEPROM_Interface* eeprom_ = nullptr;
 
     IntervalControl _rateCalcInterval = IntervalControl(1); 
 
-    BusDevice bus_;
+    BusDevice_HAL_Abstract *bus_;
 
     uint8_t _startAttempts = 0;
 

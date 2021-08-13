@@ -1,22 +1,12 @@
-#ifndef BUS_DEVICE_HAL_H
-#define BUS_DEVICE_HAL_H
+#ifndef BUS_DEVICE_HAL_ABSTRACT_H
+#define BUS_DEVICE_HAL_ABSTRACT_H
 
-
-#include "bus_hal_abstract.h"
 
 #include "stdint.h"
 
 
-class BusDevice_HAL {
+class BusDevice_HAL_Abstract {
 public:
-
-    /**
-     * @param bus Bus that will be used for communication
-     * @param selectAddress Pin(SPI) or address(I2C, CAN, etc.) used for communication.
-     */
-    BusDevice_HAL(Bus_HAL_Abstract& bus, uint32_t selectAddress, uint32_t speed, bool invertChipSelect): bus_(bus) {
-        selectAddress_ = selectAddress;
-    }
 
     /**
      * First Writes bytes to a starting register, then reads bytes from a starting register
@@ -28,14 +18,14 @@ public:
      * @param numBytesWrite Number of bytes to write. Defaults to 1.
      * @returns true if successfull.
      */
-    bool writeRead(uint32_t writeRegister, const void* writeData, uint32_t readRegister, void* readData, uint32_t numBytesRead = 1, uint32_t numBytesWrite = 1) {
+    bool writeRead(uint32_t writeRegister, const void* writeData, uint32_t readRegister, void* readData, uint32_t numBytesRead = 1, uint32_t numBytesWrite = 1, bool release = true) {
         
         if (!writeBytes(writeRegister, writeData, numBytesWrite, false)) {
-            release(); //Must release device from device from bus before leaving!
+            this->release(); //Must release device from device from bus before leaving!
             return false;
         }
 
-        if (!writeBytes(readRegister, readData, numBytesRead, true)) {
+        if (!writeBytes(readRegister, readData, numBytesRead, release)) {
             return false;
         }
 
@@ -63,11 +53,11 @@ public:
      * @returns true if successfull.
      */
     bool readByte(uint32_t readRegister, uint8_t& readData, bool release = true) {
-        return writeBytes(readRegister, &readData, 1, release);
+        return readBytes(readRegister, &readData, 1, release);
     }
 
     /**
-     * All following functions must be implemented!
+     * All following functions must be implemented by inhereting class!
      */
 
     /**
@@ -78,14 +68,14 @@ public:
      * @param release Unselect the device from bus. If false then call after transfer release(). Depending on implementation can optimise transfer. Defaults to true.
      * @returns true if successfull.
      */
-    virtual bool readBytes(uint32_t readRegister, void* readData, uint32_t numberBytes, bool release = true) {
+    virtual bool readBytes(uint32_t readRegister, void* readData, uint32_t numberBytes, bool release = true) = 0; /* {
         bool success = true;
         bus_.selectDevice(selectAddress_);
         success = success && bus_.writeBytes(&readRegister, 1);
         success = success && bus_.readBytes(readData, numberBytes);
         if (release) bus_.deselectDevice();
         return success;
-    }
+    }*/
 
     /**
      * Writes bytes to a starting register.
@@ -95,60 +85,23 @@ public:
      * @param release Unselect the device from bus. If false then call after transfer release(). Depending on implementation can optimise transfer. Defaults to true.
      * @returns true if successfull.
      */
-    virtual bool writeBytes(uint32_t writeRegister, const void* writeData, uint32_t numberBytes, bool release = true) {
+    virtual bool writeBytes(uint32_t writeRegister, const void* writeData, uint32_t numberBytes, bool release = true) = 0; /*{
         bool success = true;
         bus_.selectDevice(selectAddress_);
         success = success && bus_.writeBytes(&writeRegister, 1);
         success = success && bus_.writeBytes(writeData, numberBytes);
         if (release) bus_.deselectDevice();
         return success;
-    }
+    }*/
 
     /**
      * Dependant on implementation of bus. Might have no effect.
      * Stops communication on bus.
      */
-    void release() {
-        bus_.deselectDevice();
-    };
-
-    /**
-     * Sets the device address on Bus. This could be a pin for SPI or address for I2C.
-     * @param deviceAddress
-     */
-    void setAddress(uint32_t selectAddress) {
-        selectAddress_ = selectAddress;
-    }
-
-    /**
-     * @see setAddress(uint32_t address)
-     * @returns device address
-     */
-    uint32_t getAddress() const {
-        return selectAddress_;
-    }
-
-    /**
-     * Sets the bus to use for communication.
-     * @param bus Bus to use
-     */
-    void setBus(Bus_HAL_Abstract& bus) {
-        bus = bus_;
-    }
-
-    /**
-     * @returns device bus
-     */
-    const Bus_HAL_Abstract& getBus() const {
-        return bus_;
-    }
+    virtual void release() {}
 
 
 private:
-
-    Bus_HAL_Abstract& bus_;
-
-    uint32_t selectAddress_ = 0;
 
     
 };

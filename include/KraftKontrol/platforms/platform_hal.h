@@ -10,8 +10,8 @@
 //Arduino platform implementations
 #ifdef Arduino_h
 
-#include "arduino_platform/arduino_i2c_hal.h"
-#include "arduino_platform/arduino_spi_hal.h"
+#include "arduino_platform/arduino_i2c_busdevice_hal.h"
+#include "arduino_platform/arduino_spi_busdevice_hal.h"
 #include "arduino_platform/arduino_systemtime.h"
 #include "arduino_platform/arduino_pin_interrupt_hal.h"
 

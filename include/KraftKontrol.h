@@ -53,8 +53,12 @@
 #include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_telemetry_messages.h"
 #include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_command_messages.h"
 
+#include "KraftKontrol/utils/topic.h"
+#include "KraftKontrol/utils/topic_subscribers.h"
+
 #include "KraftKontrol/modules/networking_modules/kraft_konnect_network.h"
 
 
 
 #endif 
+

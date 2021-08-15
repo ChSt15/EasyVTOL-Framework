@@ -114,10 +114,18 @@ public:
     TopicConnection_Subscriber() {}
 
     /**
-     * @param topic Topic to subscribe to.
-     * @param overwrite Set to true to overwrite oldest values if full. Defaults to false.
+     * @param topicA Topic to forward data from.
+     * @param topicB Topic to forward data to.
      */
     TopicConnection_Subscriber(Topic<TYPE>& topicA, Topic<TYPE>& topicB): Subscriber_Interface<TYPE>(topicA) {
+        topicB_ = topicB;
+    }
+
+    /**
+     * Changes the topic where data in forwarded to.
+     * @param topicB Topic to forward data to.
+     */
+    void forwardTo(Topic<TYPE>& topicB) {
         topicB_ = topicB;
     }
 
@@ -129,6 +137,37 @@ private:
     }
 
     Topic<TYPE>& topicB_;
+
+
+};
+
+
+
+/**
+ * This subscriber calls the given function passing the data received form topic to it.
+ */
+template<typename TYPE> 
+class Callback_Subscriber: public Subscriber_Interface<TYPE> {
+public:
+
+    Callback_Subscriber() {}
+
+    /**
+     * @param topic Topic to subscribe to.
+     * @param callbackFunc Function to call on data receive.
+     */
+    Callback_Subscriber(Topic<TYPE>& topic, void (*callbackFunc)(TYPE& item)): Subscriber_Interface<TYPE>(topic) {
+        callbackFunc_ = callbackFunc;
+    }
+
+
+private:
+
+    void receive(TYPE& item) override {
+        if (callbackFunc_ != nullptr) callbackFunc_(item);
+    }
+
+    void (*callbackFunc_)(TYPE& item) = nullptr;
 
 
 };

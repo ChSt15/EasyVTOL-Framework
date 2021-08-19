@@ -49,6 +49,7 @@ public:
         if (rate_ == 0) return false;
         if (attached_) return true; //Keep from attaching itsself multiple times
         g_scheduler.attachTask(this, rate_, priority_);
+        attached_ = true;
         return true;
     }
 
@@ -58,6 +59,7 @@ public:
     void stopTaskThreading() {
         if (!attached_) return; //Dont need to remove itsself if not attached
         g_scheduler.detachTask(this);
+        attached_ = false;
     }
 
     /**

@@ -131,9 +131,9 @@ enum eTaskPriority_t {
     eTaskPriority_Middle,
     //Will only run if nothing to do at higher priorities.
     eTaskPriority_High,
-    //Will only run if nothing to do at higher priorities.
+    //Will only run if nothing to do at higher priorities. Recommended for I2C comms!
     eTaskPriority_VeryHigh,
-    //Will always run once it needs to.
+    //Will always run once it needs to. Good for devices over SPI. I2C might be too slow use eTaskPriority_VeryHigh!
     eTaskPriority_Realtime,
 };
 

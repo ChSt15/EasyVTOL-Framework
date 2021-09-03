@@ -34,12 +34,12 @@ public:
     /**
      * @returns number of elements in buffer
      */
-    uint32_t available() const;
+    inline uint32_t available() const;
 
     /**
      * @returns number of empty spaces that can be filled.
      */
-    uint32_t availableSpace() const;
+    inline uint32_t availableSpace() const;
 
     /**
      * Places a new element to the front of the buffer.
@@ -48,7 +48,16 @@ public:
      * @param overwrite Overwrites elements at back if true. Default false.
      * @return true if placed into buffer.
      */
-    bool placeFront(const T &element, const bool overwrite = false);
+    inline bool placeFront(const T &element, const bool overwrite = false);
+
+    /**
+     * Places a new element to the front of the buffer.
+     *
+     * @param element element to be placed into buffer.
+     * @param overwrite Overwrites elements at back if true. Default false.
+     * @return true if placed into buffer.
+     */
+    inline bool placeFront(const T &&element, const bool overwrite = false);
 
     /**
      * Places a new element to the back of the buffer.
@@ -57,7 +66,16 @@ public:
      * @param overwrite Overwrites elements at front if true. Default false.
      * @return true if placed into buffer.
      */
-    bool placeBack(const T &element, const bool overwrite = false);
+    inline bool placeBack(const T &element, const bool overwrite = false);
+
+    /**
+     * Places a new element to the back of the buffer.
+     *
+     * @param element element to be placed into buffer.
+     * @param overwrite Overwrites elements at front if true. Default false.
+     * @return true if placed into buffer.
+     */
+    inline bool placeBack(const T &&element, const bool overwrite = false);
 
     /**
      * Takes a element from the front of the buffer and places it into element.
@@ -67,7 +85,7 @@ public:
      * @param element Variable whos data will be overwritten.
      * @return true if removed from buffer.
      */
-    bool takeFront(T* element);
+    inline bool takeFront(T& element);
 
     /**
      * Takes a element from the back of the buffer and places it into element.
@@ -77,7 +95,7 @@ public:
      * @param element Variable whos data will be overwritten.
      * @return true if removed from buffer.
      */
-    bool takeBack(T* element);
+    inline bool takeBack(T& element);
 
     /**
      * Copies a element from the front of the buffer and places it into element.
@@ -87,7 +105,7 @@ public:
      * @param element Variable whos data will be overwritten.
      * @return true if removed from buffer.
      */
-    bool peekFront(T* element);
+    inline bool peekFront(T& element);
 
     /**
      * Copies a element from the back of the buffer and places it into element.
@@ -97,33 +115,33 @@ public:
      * @param element Variable whos data will be overwritten.
      * @return true if removed from buffer.
      */
-    bool peekBack(T* element);
+    inline bool peekBack(T& element);
 
     /**
      * Removes the element at the front.
      * Calling this on an empty buffer will do nothing.
      */
-    void removeFront();
+    inline void removeFront();
 
     /**
      * Removes the element at the back.
      * Calling this on an empty buffer will do nothing.
      */
-    void removeBack();
+    inline void removeBack();
 
     /**
      * Removes element that the given pointer points to.
      * @param pointerToElement Pointer to element to remove.
      * @returns true if element was found and removed.
      */
-    bool removeElement(T* pointerToElement);
+    inline bool removeElement(T* pointerToElement);
 
     /**
      * Removes element at given index.
      * @param index Index of element to be removed.
      * @returns true if element was found and removed.
      */
-    bool removeElementIndex(uint32_t index);
+    inline bool removeElementIndex(uint32_t index);
 
     /**
      * Places element into given index
@@ -135,69 +153,70 @@ public:
     /**
      * @returns the sum of all elements.
      */
-    T getSum() const;
+    inline T getSum() const;
 
     /**
      * @returns the average of all elements.
      */
-    T getAverage() const;
+    inline T getAverage() const;
 
     /**
      * Sorts the elements. This will change the array!
      */
-    void sortElements();
+    inline void sortElements();
 
     /**
      * Sorts elements and returns median.
      * @return median.
      */
-    T getMedian() const;
+    inline T getMedian() const;
 
     /**
      * @returns the standard deviation.
      */
-    T getStandardDeviation() const;
+    inline T getStandardDeviation() const;
 
     /**
      * @returns the standard error.
      */
-    T getStandardError() const;
+    inline T getStandardError() const;
 
     /**
      * Used to access buffer like an array.
-     * Indexes outside of buffer will wrap around
-     * buffer.
+     * Indexes outside of buffer will wrap around buffer.
      * Starts from back of buffer("oldest" element or first that was placed inside).
      * @returns copy of element from index.
      */
-    T& operator[] (const uint32_t &index);
+    inline T& operator[] (uint32_t index);
 
     /**
      * Used to access buffer like an array.
-     * Indexes outside of buffer will wrap around
-     * buffer.
+     * Const version. Returns a const reference to element.
+     * Indexes outside of buffer will wrap around buffer.
      * Starts from back of buffer("oldest" element or first that was placed inside).
      * @returns copy of element from index.
      */
-    T operator[] (const uint32_t &index) const;
+    inline const T& operator[] (uint32_t index) const;
 
     /**
      * Needs to be overloaded to also copy the data to instance.
      * Not doing this will cause 2 buffers to share the exact same elements.
      */
-    Buffer operator = (const Buffer &toBeCopied);
+    inline Buffer operator = (const Buffer &toBeCopied);
 
     /**
      * Removes all items from buffer. Not computationaly intensive.
      */
-    void clear();
+    inline void clear();
 
 
 private:
 
-    void quickSort(const uint32_t &left, const uint32_t &right);
+    inline void quickSort(uint32_t left, uint32_t right);
 
-    uint32_t quickSortPartition(const uint32_t &left, const uint32_t &right);
+    inline uint32_t quickSortPartition(uint32_t left, uint32_t right);
+
+    void insertionSort();
 
     //Array for element storage
     T bufferArray_[size_];
@@ -216,14 +235,14 @@ private:
 
 
 template<typename T, uint32_t size_> 
-T Buffer<T, size_>::getStandardError() const {
+inline T Buffer<T, size_>::getStandardError() const {
     if (numElements_ < 2) return T();
-    return getStandardDeviation()/sqrt(numElements_);
+    return getStandardDeviation()/sqrtf(numElements_);
 }
 
 
 template<typename T, uint32_t size_> 
-T Buffer<T, size_>::getStandardDeviation() const {
+inline T Buffer<T, size_>::getStandardDeviation() const {
 
     if (numElements_ < 2) return T();
 
@@ -239,7 +258,7 @@ T Buffer<T, size_>::getStandardDeviation() const {
 
     }
 
-    standardDev = sqrt(standardDev/(numElements_-1));
+    standardDev = sqrtf(standardDev/(numElements_-1));
 
     return standardDev;
     
@@ -247,13 +266,13 @@ T Buffer<T, size_>::getStandardDeviation() const {
 
 
 template<typename T, uint32_t size_> 
-T Buffer<T, size_>::getMedian() const {
+inline T Buffer<T, size_>::getMedian() const {
 
     if (numElements_ == 0) return T();
 
     T median;
 
-    Buffer<T, size_> bufferSorted;
+    Buffer<T, size_> bufferSorted; //Will not fragment heap as it will immediately be deallocated when this function returns.
 
     bufferSorted = *this;
 
@@ -261,11 +280,11 @@ T Buffer<T, size_>::getMedian() const {
 
     if (numElements_%2 == 0) { //Is even?
 
-        median = ((*this)[numElements_/2] + (*this)[numElements_/2+1])/2;
+        median = (bufferSorted[numElements_/2-1] + bufferSorted[numElements_/2])/2;
 
     } else { //Odd
     
-        median = (*this)[numElements_/2];
+        median = bufferSorted[numElements_/2];
 
     }
 
@@ -275,14 +294,14 @@ T Buffer<T, size_>::getMedian() const {
 
 
 template<typename T, uint32_t size_> 
-T Buffer<T, size_>::getAverage() const {
+inline T Buffer<T, size_>::getAverage() const {
     if (numElements_ == 0) return T();
     return getSum()/numElements_;
 }
 
 
 template<typename T, uint32_t size_> 
-T Buffer<T, size_>::getSum() const {
+inline T Buffer<T, size_>::getSum() const {
 
     T sum_ = 0;
 
@@ -296,7 +315,7 @@ T Buffer<T, size_>::getSum() const {
 
 
 template<typename T, uint32_t size_> 
-uint32_t Buffer<T, size_>::quickSortPartition(const uint32_t &left, const uint32_t &right) {
+inline uint32_t Buffer<T, size_>::quickSortPartition(uint32_t left, uint32_t right) {
 
     T pivot = (*this)[right];
 
@@ -328,7 +347,7 @@ uint32_t Buffer<T, size_>::quickSortPartition(const uint32_t &left, const uint32
 
 
 template<typename T, uint32_t size_> 
-void Buffer<T, size_>::quickSort(const uint32_t &left, const uint32_t &right) {
+inline void Buffer<T, size_>::quickSort(uint32_t left, uint32_t right) {
     
     if (left < right) {
 
@@ -343,7 +362,22 @@ void Buffer<T, size_>::quickSort(const uint32_t &left, const uint32_t &right) {
 
 
 template<typename T, uint32_t size_> 
-void Buffer<T, size_>::sortElements() {
+inline void Buffer<T, size_>::insertionSort() {
+
+    return;
+    
+    for (uint32_t i = 0; i < numElements_; i++) {
+
+
+
+    }
+
+}
+
+
+
+template<typename T, uint32_t size_> 
+inline void Buffer<T, size_>::sortElements() {
 
     //Check if nothing to sort
     if (numElements_ < 2) return;
@@ -355,13 +389,13 @@ void Buffer<T, size_>::sortElements() {
 
 
 template<typename T, uint32_t size_> 
-void Buffer<T, size_>::clear() {
+inline void Buffer<T, size_>::clear() {
     front_ = back_ = numElements_ = 0;
 }
 
 
 template<typename T, uint32_t size_> 
-bool Buffer<T, size_>::removeElementIndex(uint32_t index) {
+inline bool Buffer<T, size_>::removeElementIndex(uint32_t index) {
 
     //Make sure buffer isnt empty
     if (numElements_ == 0) return false;
@@ -388,7 +422,7 @@ bool Buffer<T, size_>::removeElementIndex(uint32_t index) {
 
 
 template<typename T, uint32_t size_> 
-bool Buffer<T, size_>::removeElement(T* pointerToElement) {
+inline bool Buffer<T, size_>::removeElement(T* pointerToElement) {
 
     //Make sure buffer isnt empty
     if (numElements_ == 0) return false;
@@ -412,19 +446,19 @@ bool Buffer<T, size_>::removeElement(T* pointerToElement) {
 
 
 template<typename T, uint32_t size_> 
-T& Buffer<T, size_>::operator[] (const uint32_t &index) {
+inline T& Buffer<T, size_>::operator[] (uint32_t index) {
     return bufferArray_[(back_ + index)%numElements_];
 }
 
 
 template<typename T, uint32_t size_> 
-T Buffer<T, size_>::operator[] (const uint32_t &index) const {
+inline const T& Buffer<T, size_>::operator[] (uint32_t index) const {
     return bufferArray_[(back_ + index)%numElements_];
 }
 
 
 template<typename T, uint32_t size_> 
-Buffer<T, size_> Buffer<T, size_>::operator = (const Buffer &toBeCopied) {
+inline Buffer<T, size_> Buffer<T, size_>::operator = (const Buffer &toBeCopied) {
 
     uint32_t sizeToBeCopied = toBeCopied.available();
 
@@ -436,11 +470,11 @@ Buffer<T, size_> Buffer<T, size_>::operator = (const Buffer &toBeCopied) {
 
 
 template<typename T, uint32_t size_> 
-bool Buffer<T, size_>::peekFront(T* element) {
+inline bool Buffer<T, size_>::peekFront(T& element) {
 
     if (numElements_ == 0) return false;
 
-    *element = bufferArray_[(front_+1)%size_];
+    element = bufferArray_[(front_+1)%size_];
 
     return true;
 
@@ -448,11 +482,11 @@ bool Buffer<T, size_>::peekFront(T* element) {
 
 
 template<typename T, uint32_t size_> 
-bool Buffer<T, size_>::peekBack(T* element) {
+inline bool Buffer<T, size_>::peekBack(T& element) {
 
     if (numElements_ == 0) return false;
 
-    *element = bufferArray_[back_];
+    element = bufferArray_[back_];
 
     return true;
 
@@ -460,14 +494,14 @@ bool Buffer<T, size_>::peekBack(T* element) {
 
 
 template<typename T, uint32_t size_> 
-bool Buffer<T, size_>::takeFront(T* element) {
+inline bool Buffer<T, size_>::takeFront(T& element) {
 
     if (numElements_ == 0) return false;
 
     if (front_ == 0) front_ = size_-1;
     else front_--;
 
-    *element = bufferArray_[front_];
+    element = bufferArray_[front_];
 
     numElements_--;
 
@@ -477,11 +511,11 @@ bool Buffer<T, size_>::takeFront(T* element) {
 
 
 template<typename T, uint32_t size_> 
-bool Buffer<T, size_>::takeBack(T* element) {
+inline bool Buffer<T, size_>::takeBack(T& element) {
 
     if (numElements_ == 0) return false;
 
-    *element = bufferArray_[back_];
+    element = bufferArray_[back_];
 
     back_ = (back_+1)%size_;
 
@@ -493,19 +527,19 @@ bool Buffer<T, size_>::takeBack(T* element) {
 
 
 template<typename T, uint32_t size_>
-uint32_t Buffer<T, size_>::available() const {
+inline uint32_t Buffer<T, size_>::available() const {
     return numElements_;
 }
 
 
 template<typename T, uint32_t size_> 
-uint32_t Buffer<T, size_>::availableSpace() const {
+inline uint32_t Buffer<T, size_>::availableSpace() const {
     return size_ - numElements_;
 }
 
 
 template<typename T, uint32_t size_> 
-void Buffer<T, size_>::removeFront() {
+inline void Buffer<T, size_>::removeFront() {
 
     if (numElements_ == 0) return;
 
@@ -517,7 +551,7 @@ void Buffer<T, size_>::removeFront() {
 
 
 template<typename T, uint32_t size_> 
-void Buffer<T, size_>::removeBack() {
+inline void Buffer<T, size_>::removeBack() {
 
     if (numElements_ == 0) return;
 
@@ -528,7 +562,7 @@ void Buffer<T, size_>::removeBack() {
 
 
 template<typename T, uint32_t size_> 
-bool Buffer<T, size_>::placeFront(const T &element, const bool overwrite) {
+inline bool Buffer<T, size_>::placeFront(const T &element, const bool overwrite) {
 
     if (numElements_ == size_) {
 
@@ -548,7 +582,49 @@ bool Buffer<T, size_>::placeFront(const T &element, const bool overwrite) {
 
 
 template<typename T, uint32_t size_> 
-bool Buffer<T, size_>::placeBack(const T &element, const bool overwrite) {
+inline bool Buffer<T, size_>::placeFront(const T &&element, const bool overwrite) {
+
+    if (numElements_ == size_) {
+
+        if (overwrite) removeBack();
+        else return false;
+
+    }
+
+    bufferArray_[front_] = element;
+
+    front_ = (front_+1)%size_;
+    numElements_++;
+
+    return true;
+
+}
+
+
+template<typename T, uint32_t size_> 
+inline bool Buffer<T, size_>::placeBack(const T &element, const bool overwrite) {
+
+    if (numElements_ == size_) {
+
+        if (overwrite) removeFront();
+        else return false;
+
+    }
+
+    if (back_ == 0) back_ = size_-1;
+    else back_--;
+
+    bufferArray_[back_] = element;
+
+    numElements_++;
+
+    return true;
+
+}
+
+
+template<typename T, uint32_t size_> 
+inline bool Buffer<T, size_>::placeBack(const T &&element, const bool overwrite) {
 
     if (numElements_ == size_) {
 

@@ -72,7 +72,7 @@ public:
      */
     bool readBytes(uint32_t readRegister, void* readData, uint32_t numberBytes, bool release = true) override {
 
-        if (bus_->requestFrom((int)address_, (int)numberBytes, release) != numberBytes) {
+        if (bus_->requestFrom((int)address_, (int)numberBytes, (int)release) != numberBytes) {
             return false;
         }
 

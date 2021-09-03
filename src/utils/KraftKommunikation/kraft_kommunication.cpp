@@ -119,8 +119,8 @@ bool KraftKommunication::getMessage(KraftMessage_Interface& kraftMessage, const 
 
     ReceivedPayloadData payloadData;
     
-    if (!peek) receivedPackets_.takeBack(&payloadData);
-    else receivedPackets_.peekBack(&payloadData);
+    if (!peek) receivedPackets_.takeBack(payloadData);
+    else receivedPackets_.peekBack(payloadData);
 
     return kraftMessage.setRawData(payloadData.dataBuffer, payloadData.messageData.payloadSize);
 
@@ -152,7 +152,7 @@ void KraftKommunication::thread() {
         if (sendPackets_.available()) {
 
             SendPacketData packet;
-            sendPackets_.takeBack(&packet);
+            sendPackets_.takeBack(packet);
             DataMessageBuffer message;
             message.setBuffer(packet.dataBuffer, packet.bufferSize);
             heartbeatTimer_.syncInternal();
@@ -210,7 +210,7 @@ void KraftKommunication::thread() {
         //Serial.println("Kraftkomm sees packet is available!");
 
         DataMessageBuffer message;
-        receivedPacketSub_.takeBack(&message);
+        receivedPacketSub_.takeBack(message);
 
         uint32_t bytes = message.getBufferSize();
         uint8_t packet[bytes];

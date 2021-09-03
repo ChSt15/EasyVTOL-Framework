@@ -73,7 +73,7 @@ public:
      * @param channel Which adc channel to get the voltage from
      * @return bool.
      */
-    virtual bool getVoltage(float* voltageData, uint32_t* voltageTimestamp, uint8_t channel = 0) {
+    virtual bool getVoltage(float& voltageData, uint32_t& voltageTimestamp, uint8_t channel = 0) {
 
         channel = min(channel, (uint8_t)4); 
 
@@ -95,7 +95,7 @@ public:
      * @param voltageTimestamp timestamp in microseconds of when measurement was taken
      * @return bool.
      */
-    virtual bool peekVoltage(float* voltageData, uint32_t* voltageTimestamp, uint8_t channel) {
+    virtual bool peekVoltage(float& voltageData, uint32_t& voltageTimestamp, uint8_t channel) {
 
         channel = min(channel, (uint8_t)4); 
 

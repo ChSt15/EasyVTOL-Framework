@@ -256,7 +256,7 @@ public:
      */
     MessageData getMessageInformation() {
         ReceivedPayloadData buf;
-        receivedPackets_.peekBack(&buf);
+        receivedPackets_.peekBack(buf);
         return buf.messageData;
     };
 

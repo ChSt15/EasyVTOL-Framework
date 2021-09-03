@@ -198,7 +198,7 @@ void NavigationComplementaryFilter::thread() {
         
         //Get IMU data
         SensorTimestamp<Vector<>> sensorTime;
-        gyroSub_.takeBack(&sensorTime);
+        gyroSub_.takeBack(sensorTime);
 
         Vector<> rotationVector = sensorTime.sensorData;
         int64_t timestamp = sensorTime.sensorTimestamp;
@@ -257,7 +257,7 @@ void NavigationComplementaryFilter::thread() {
 
         //Get IMU data
         SensorTimestamp<Vector<>> sensorTime;
-        accelSub_.takeBack(&sensorTime);
+        accelSub_.takeBack(sensorTime);
 
         Vector<> accelVector = sensorTime.sensorData;
         int64_t timestamp = sensorTime.sensorTimestamp;
@@ -356,7 +356,7 @@ void NavigationComplementaryFilter::thread() {
 
         //Get IMU data
         SensorTimestamp<Vector<>> sensorTime;
-        magSub_.takeBack(&sensorTime);
+        magSub_.takeBack(sensorTime);
 
         Vector<>& magVector = sensorTime.sensorData;
         int64_t& timestamp = sensorTime.sensorTimestamp;
@@ -457,7 +457,7 @@ void NavigationComplementaryFilter::thread() {
     while (baroSub_.available() > 0) {
 
         SensorTimestamp<float> sensorTime;
-        baroSub_.takeBack(&sensorTime);
+        baroSub_.takeBack(sensorTime);
 
         float& baroPressure_ = sensorTime.sensorData;
         int64_t& timestamp = sensorTime.sensorTimestamp;
@@ -529,7 +529,7 @@ void NavigationComplementaryFilter::thread() {
     while (gnssSub_.available() > 0) {
 
         GNSSData gnssData;
-        gnssSub_.takeBack(&gnssData);
+        gnssSub_.takeBack(gnssData);
         
         if (gnssData.lockValid) {
 

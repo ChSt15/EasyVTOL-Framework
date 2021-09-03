@@ -86,7 +86,7 @@ public:
      * @param values float and uint32_t.
      * @return bool.
      */
-    bool getTemperature(float* temperatureData, uint32_t* temperatureTimestamp) {
+    bool getTemperature(float& temperatureData, uint32_t& temperatureTimestamp) {
 
         if (_temperatureFifo.available() == 0) return false;
 
@@ -105,7 +105,7 @@ public:
      * @param values float and uint32_t.
      * @return bool.
      */
-    bool peekTemperature(float* temperatureData, uint32_t* temperatureTimestamp) {
+    bool peekTemperature(float& temperatureData, uint32_t& temperatureTimestamp) {
 
         if (_temperatureFifo.available() == 0) return false;
 
@@ -151,7 +151,7 @@ public:
      * @param values float and uint32_t.
      * @return bool.
      */
-    bool getHumidity(float* humidityData, uint32_t* humidityTimestamp) {
+    bool getHumidity(float& humidityData, uint32_t& humidityTimestamp) {
 
         if (_humidityFifo.available() == 0) return false;
 
@@ -170,7 +170,7 @@ public:
      * @param values float and uint32_t.
      * @return bool.
      */
-    bool peekHumidity(float* humidityData, uint32_t* humidityTimestamp) {
+    bool peekHumidity(float& humidityData, uint32_t& humidityTimestamp) {
 
         if (_humidityFifo.available() == 0) return false;
 

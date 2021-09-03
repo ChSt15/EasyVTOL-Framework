@@ -1,4 +1,4 @@
-#ifdef ESP32
+#ifdef _TFT_eSPIH_
 #include "KraftKontrol/modules/hid_modules/display_modules/st7735_driver.h"
 
 

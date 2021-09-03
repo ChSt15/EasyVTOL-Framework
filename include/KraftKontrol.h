@@ -42,7 +42,7 @@
 
 #include "modules/hid_modules/display_modules/display_interface.h"
 #ifdef ESP32
-    #include "modules/hid_modules/display_modules/st7735_driver.h"
+    //#include "modules/hid_modules/display_modules/st7735_driver.h"
 #endif
 
 #include "KraftPacket_KontrolPackets/kraftkontrol_message_types.h"

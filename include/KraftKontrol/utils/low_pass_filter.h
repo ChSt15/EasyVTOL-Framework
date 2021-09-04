@@ -61,7 +61,7 @@ public:
     T update(T input) {
         
         if (_sampleRate == -1) {
-            float dt = (NOW() - _lastRun)/SECONDS;
+            float dt = (double)(NOW() - _lastRun)/SECONDS;
             _lastRun = NOW();
             _alpha = dt/(_RC+dt);
         }
@@ -78,13 +78,13 @@ public:
      * Timestamp of input value (in microseconds) to improve accuracy.
      * This overrides the sampling input at constructor.
      *
-     * @param values input value and timestamp in microseconds
+     * @param values input value and timestamp in nanoseconds
      * @return filtered value.
      */
-    T update(const T &input, int64_t timestampUS) {
+    T update(const T &input, int64_t timestamp) {
         
-        float dt = (timestampUS - _lastRun)/SECONDS;
-        _lastRun = timestampUS;
+        float dt = (double)(timestamp - _lastRun)/SECONDS;
+        _lastRun = timestamp;
         _alpha = dt/(_RC+dt);
 
         T output = _lastValue + (input - _lastValue)*_alpha;

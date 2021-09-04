@@ -2,8 +2,4 @@
 
 
 
-//Scheduler Task_Abstract::scheduler_ = Scheduler();
-
-/*namespace {
-    Scheduler scheduler_;
-}*/
+Scheduler g_scheduler;

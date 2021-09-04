@@ -35,24 +35,32 @@ bool Scheduler::runPrioGroup(ChainObject<Task>* startOfGroup) {
         ChainObject<Task>* nextTask = currentTask->nextObject; // Must be selected before it is removed
         //currentRunningTask_ = &(currentTask->item);
         //if (!currentTask->item.isSuspended) {
-        if (NOW() >= currentTask->item.startTime_ns) {
+        if (!currentTask->item.isRunning && NOW() >= currentTask->item.startTime_ns) {
             if (!currentTask->item.initWasCalled) {
+                currentTask->item.isRunning = true;
                 currentTask->item.thread->init();
+                currentTask->item.isRunning = false;
                 currentTask->item.initWasCalled = true;
             }
             if (currentTask->item.timeLimited) {
                 if (NOW() - currentTask->item.startTime_ns >= currentTask->item.timeLength_ns) {
+                    currentTask->item.isRunning = true;
                     currentTask->item.thread->removal(); //Run removal function before removing.
+                    currentTask->item.isRunning = false;
                     detachTask(currentTask->item.thread);
                 }
             } 
             if (currentTask->item.interval.isTimeToRun()) {
+                currentTask->item.isRunning = true;
                 currentTask->item.thread->run();
+                currentTask->item.isRunning = false;
                 taskRan = true;
                 if (currentTask->item.numberRunsLeft > 0) {
                     currentTask->item.numberRunsLeft--;
                     if (currentTask->item.numberRunsLeft == 0) {
+                        currentTask->item.isRunning = true;
                         currentTask->item.thread->removal(); //Run removal function before removing.
+                        currentTask->item.isRunning = false;
                         detachTask(currentTask->item.thread);
                     }
                 }

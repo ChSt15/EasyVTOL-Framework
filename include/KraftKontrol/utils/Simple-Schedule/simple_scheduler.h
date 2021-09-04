@@ -157,27 +157,15 @@ public:
     void initializeTasks();
 
     /**
-     * Calling this will pause the thread until the given time was reached.
-     * e.g. waitUntil(micros() + 1000) will delay the program for 1000 microseconds.
-     * If no thread is currently running the this will immediatly return. 
-     * 
-     * This might not be accurate if many threads suspend themselves.
-     * 
-     * REMOVED DUE TO MANY PROBLEMS THIS WOULD CREATE
-     * 
-     * @param timeInMicrosecond Time in microseconds at which the thread should continue
+     * Gives other tasks a chance to run. Could cost a LOT of stack memory if many functions call yield.
+     * Due to last in first out nature of this yield function, the first task calling yield might wait a long time till next task yield call is finished.
+     * Only one task should use yield function as a delay!
      */
-    /*void suspendUntil(uint32_t timeInMicrosecond) {
+    void yield() {
 
-        if (currentRunningTask_ != nullptr) currentRunningTask_->isSuspended = true;
+        tick();
 
-        while(timeInMicrosecond > micros()) {
-            tick();
-        }
-
-        if (currentRunningTask_ != nullptr) currentRunningTask_->isSuspended = false;
-
-    }*/
+    }
 
     /**
      * This adds a function to the scheduler. 
@@ -245,6 +233,9 @@ private:
 
         //If set to 0 then no limit. Should be decremented every run.
         uint32_t numberRunsLeft = 0;
+
+        //Set to true if currently running.
+        bool isRunning = false;
 
         //Operator must be overloaded for the Chainbuffer to find the correct Task. Only the function pointers must be the same.
         bool operator == (Task b) {

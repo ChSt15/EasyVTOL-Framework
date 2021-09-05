@@ -85,10 +85,16 @@ public:
     const List<Subscriber_Interface<TYPE>*>& getSubscriberList() const;
 
     /**
-     * Sends copies of given item to all subscribers.
+     * Sends item to all subscribers.
      * @param item Item to be sent.
      */
     void publish(TYPE& item);
+
+    /**
+     * Sends copy of given item to all subscribers.
+     * @param item Item to be sent.
+     */
+    void publish(TYPE&& item);
 
     /**
      * @returns a copy of the last published item.
@@ -143,6 +149,14 @@ template<typename TYPE>
 void Topic<TYPE>::publish(TYPE& item) {
     latestItem = item;
     for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) subscribers_[i]->receive(item);
+}
+
+
+
+template<typename TYPE> 
+void Topic<TYPE>::publish(TYPE&& item) {
+    latestItem = item;
+    for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) subscribers_[i]->receive(latestItem);
 }
 
 

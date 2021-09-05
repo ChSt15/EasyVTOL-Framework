@@ -83,7 +83,7 @@ protected:
         selectDevice();
 
         bus_->transfer(readRegister | readCommand_);
-        bus_->transfer(readData, numberBytes);
+        bus_->transfer((uint8_t*)readData, numberBytes);
 
         if (release) {
             deselectDevice();

@@ -1,5 +1,5 @@
-#ifndef LIST_H
-#define LIST_H
+#ifndef LIST_KRAFT_H
+#define LIST_KRAFT_H
 
 
 #include "stdint.h"

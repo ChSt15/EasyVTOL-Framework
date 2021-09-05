@@ -57,7 +57,7 @@ public:
     /**
      * @returns pointer to function that is run on interrupt.
      */
-    auto getFunction() {return function_;} //No idea how to write the return thing. So ill just use auto :D
+    void (*getFunction())(void) {return function_;} //I should have used a typedef :(
 
     /**
      * Can stop or start the interrupt from getting triggered.

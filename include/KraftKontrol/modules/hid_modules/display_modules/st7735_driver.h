@@ -1,7 +1,8 @@
 #ifndef ST7735_DRIVER_H
 #define ST7735_DRIVER_H
 
-#ifdef ESP32
+#ifdef _TFT_eSPIH_
+
 
 
 

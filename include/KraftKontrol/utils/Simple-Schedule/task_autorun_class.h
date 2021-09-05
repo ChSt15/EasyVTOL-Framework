@@ -7,11 +7,7 @@
 
 
 
-namespace {
-
-    Scheduler g_scheduler;
-
-}
+extern Scheduler g_scheduler;
 
 
 
@@ -95,21 +91,6 @@ public:
     }
 
     /**
-     * Calling this will pause the thread until the given time was reached.
-     * e.g. waitUntil(micros() + 1000) will delay the program for 1000 microseconds.
-     * If no thread is currently running the this will immediatly return. 
-     * 
-     * This might not be accurate if many threads suspend themselves.
-     * 
-     * REMOVED DUE TO MANY PROBLEMS THIS WOULD CREATE
-     * 
-     * @param timeInMicrosecond Time in microseconds at which the thread should continue
-     */
-    /*void suspendUntil(uint32_t timeInMicrosecond) {
-        g_scheduler.suspendUntil(timeInMicrosecond);
-    }*/
-
-    /**
      * Static function to give internal scheduler time to run tasks.
      * This needs to be ran as often and fast as possible to give all tasks time.
      * 
@@ -131,14 +112,31 @@ public:
     static uint32_t getSchedulerTickRate() {return g_scheduler.getTickRate();}
 
     /**
-     * Defined now but can be overridden. This way is does not need to be defined by user.
+     * Defined now but can be overridden. This way it does not need to be defined by user.
      */
     virtual void removal() {}
 
     /**
-     * Defined now but can be overridden. This way is does not need to be defined by user.
+     * Defined now but can be overridden. This way it does not need to be defined by user.
      */
     virtual void init() {}
+
+
+protected:
+
+    /**
+     * Calling this will pause the thread until the given time was reached.
+     * e.g. waitUntil(NOW() + 100*MILLISECONDS) will delay the program for 100 milliseconds.
+     * 
+     * This might not be accurate if many threads suspend themselves. Only one thread should ever call this.
+     * 
+     * @param time Time in nanoseconds at which the thread should continue
+     */
+    void suspendUntil(int64_t time) {
+
+        while(NOW() < time) g_scheduler.yield();
+        
+    }
 
 
 private:

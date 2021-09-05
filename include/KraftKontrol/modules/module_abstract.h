@@ -94,6 +94,12 @@ public:
      */
     const List<Module_Abstract*>& getListExistingModules() {return existingModules_;}
 
+    /**
+     * Sets the system up to be simulated.
+     * @param isSimulation If the system is to be simulated.
+     */
+    static void setSimulationStatus(bool isSimulation) {isSimulation_ = isSimulation;} 
+
 
 protected:
 
@@ -112,6 +118,12 @@ protected:
 
     //Every module can use this to signify its current state.
     eModuleStatus_t moduleStatus_ = eModuleStatus_t::eModuleStatus_NotStarted;
+
+    /**
+     * If set to true then the system is being simulated.
+     * Sensors should disable themselves and actuators should not make hardware calls.
+     */
+    static bool isSimulation_;
 
 private:
 

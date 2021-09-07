@@ -1,5 +1,5 @@
-#ifndef ARDUINO_SPI_HAL_H
-#define ARDUINO_SPI_HAL_H
+#ifndef ARDUINO_SPI_BUSDEVICE_HAL_H
+#define ARDUINO_SPI_BUSDEVICE_HAL_H
 
 
 #include "SPI.h"

@@ -1,5 +1,5 @@
 #ifndef ARDUINO_I2C_BUSDEVICE_HAL_H
-#define ARDUINO_I2C_HAL_H
+#define ARDUINO_I2C_BUSDEVICE_HAL_H
 
 
 #include "Wire.h"

@@ -73,13 +73,13 @@ public:
      * @param index Index of itm to be returned.
      * @returns reference to item in list
      */
-    TYPE& operator [] (const uint32_t index);
+    TYPE& operator [] (uint32_t index);
 
     /**
      * @param index Index of itm to be returned.
      * @returns reference to item in list
      */
-    const TYPE& operator [] (const uint32_t index) const;
+    const TYPE& operator [] (uint32_t index) const;
 
     /**
      * @param index Index of itm to be returned.

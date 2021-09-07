@@ -12,10 +12,10 @@ This is of great importance as testing of modules and switching between them dur
 - [x] Add topic system to all modules.
 - [x] Add new message type system to message structure.
 - [ ] Add data message connection system to KraftKommunication. 
+- [ ] Create topic router.
 - [ ] Prepare for first alpha version to be released.
 - [ ] Released first alpha version. Yay!
 - [ ] Improve sensorfusion algorithm and auto-adjustment algorithm for filter factors.
-- [ ] Implement Starship vehicle and test.
 - [ ] Implement standard modules for common vehicle types. (E.g. Quadcopter, Plane)
 - [ ] Implement Kalman filter for navigation.
 - [ ] Optimise everything.
@@ -28,11 +28,4 @@ To initialise submodules used:
 ```
 git submodule update --init --recursive
 ```
-## ToDo:
-- [x] Add new data containers.
-- [x] Add buffer with queue, stack, sorting, median, average, deviation calculations.
-- [x] Migrate to new buffer class.
-- [x] Migrate to single universal time system. E.g. NOW() and returns runtime int64_t in nanoseconds. Should also solve problem with overflow. This can later be used to simulate modules.
-- [x] Add HMC5883 magnetometer sensor driver.
-- [ ] Add error calculation system for measurements and sensor fusion. This should make error calculation automatic.
 

@@ -4,12 +4,13 @@
 
 /**
  * This header contains the directories to different HAL implementations according to platforms.
- * The Implementations should be automatically selected.
+ * The Implementations should be automatically selected, depending on build environment.
  */
 
 //Arduino platform implementations
 #ifdef Arduino_h
 
+#include "arduino_platform/arduino_gpio_hal.h"
 #include "arduino_platform/arduino_i2c_busdevice_hal.h"
 #include "arduino_platform/arduino_spi_busdevice_hal.h"
 #include "arduino_platform/arduino_systemtime.h"

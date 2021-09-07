@@ -74,18 +74,18 @@ public:
     /**
      * @returns true if the internal buffer is full and adding a new message will result in data loss.
      */
-    virtual bool busy() const override {return toSendBufferSub_.availableSpace() == 0;}
+    bool busy() const override {return toSendBufferSub_.availableSpace() == 0;}
 
     /**
      * Get the last received data SNR. Used for signal strength. Better than RSSI
-     * +10 is string -20 is at limit.
+     * +10 is strong -20 is at limit.
      * 
      * @returns last received datas SNR
      */
     int8_t getSNR() {return receivedDataSNR_;}
 
     /**
-     * Get the last received data RSSI. Used for signal strength. Better than RSSI
+     * Get the last received data RSSI. Used for signal strength.
      * 
      * @returns last received datas RSSI
      */

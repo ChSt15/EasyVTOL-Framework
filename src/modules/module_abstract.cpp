@@ -6,3 +6,5 @@ Topic<KraftMessageContainer> Module_Abstract::globalMessages_;
 Topic<KraftMessageContainer> Module_Abstract::telemetryMessages_;
 
 List<Module_Abstract*> Module_Abstract::existingModules_;
+
+bool Module_Abstract::isSimulation_ = false;

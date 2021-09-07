@@ -100,7 +100,7 @@ uint32_t DataStorageManager::searchMessage(uint32_t messageTypeSet, uint32_t dat
 }
 
 
-bool DataStorageManager::getMessage(KraftMessage_Interface& message, uint32_t id = 0) {
+bool DataStorageManager::getMessage(KraftMessage_Interface& message, uint32_t id) {
 
     uint32_t index = searchMessage(message.getMessageType(), message.getDataType(), id);
 
@@ -127,7 +127,7 @@ bool DataStorageManager::getMessage(KraftMessage_Interface& message, uint32_t id
 }
 
 
-bool DataStorageManager::setMessage(KraftMessage_Interface& message, uint32_t id = 0) {
+bool DataStorageManager::setMessage(KraftMessage_Interface& message, uint32_t id) {
 
     uint32_t index = searchMessage(message.getMessageType(), message.getDataType(), id);
 
@@ -163,7 +163,7 @@ uint32_t DataStorageManager::newMessage(KraftMessage_Interface& message) {
 
     uint32_t spaceNeeded = message.getDataSize() + 20;
 
-    bool exit = false;
+    //bool exit = false;
 
     //Go through messages till last one.
     while (nextMessageIndex != getEndIndex() && freeSpace < spaceNeeded) {
@@ -269,7 +269,7 @@ void DataStorageManager::clear() {
 }
 
 
-bool DataStorageManager::deleteMessage(KraftMessage_Interface& message, uint32_t id = 0) {
+bool DataStorageManager::deleteMessage(KraftMessage_Interface& message, uint32_t id) {
 
     uint32_t index = 1;
     uint32_t lastMessageIndex = 1;

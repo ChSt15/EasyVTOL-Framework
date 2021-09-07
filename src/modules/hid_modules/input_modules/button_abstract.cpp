@@ -17,6 +17,11 @@ bool ButtonHID_Abstract::isPressed() const {
 }
 
 
+eButton_State_t ButtonHID_Abstract::getState() const {
+    return buttonState_;
+}
+
+
 void ButtonHID_Abstract::init() {} //Do nothing if not overridden.
 
 

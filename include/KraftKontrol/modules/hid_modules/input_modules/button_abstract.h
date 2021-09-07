@@ -18,21 +18,26 @@ enum class eButton_Event_t {
 };
 
 
+enum class eButton_State_t {
+    RELEASED,
+    PRESSED,
+    HELD
+};
+
+
 class ButtonHID_Abstract: public Task_Abstract {
 private:
-
-    enum class eButton_State_t {
-        RELEASED,
-        PRESSED,
-        HELD
-    };
     
+    //Current button state.
     eButton_State_t buttonState_ = eButton_State_t::RELEASED;
 
+    //Topic for button event.
     Topic<eButton_Event_t> buttonEventTopic_;
 
+    //Time threshold for long button press.
     int64_t longPressThreshold_ = 0;
 
+    //Timestamp for button pressed 
     int64_t pressTimestamp_ = 0;
 
     bool isPressed_ = false;
@@ -54,6 +59,11 @@ public:
      * @returns current button status. True if pressed.
      */
     bool isPressed() const;
+
+    /**
+     * @returns current button status.
+     */
+    eButton_State_t getState() const;
 
 
 protected:

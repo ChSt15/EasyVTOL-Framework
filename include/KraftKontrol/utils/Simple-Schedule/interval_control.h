@@ -23,14 +23,12 @@ public:
      * Sets the rate in Hz
      *
      * @param values rate in Hz
-     * @return none.
      */
     inline void setRate(float rate_Hz) {interval_ns_ = (int64_t)SECONDS/rate_Hz;}
 
     /**
      * Gets the rate in Hz
-     *
-     * @param values none.
+     *.
      * @return uint32_t.
      */
     inline uint32_t getRate() {return SECONDS/interval_ns_;}
@@ -39,14 +37,12 @@ public:
      * Sets the interval in milliseconds
      *
      * @param values interval in milliseconds
-     * @return none.
      */
     inline void setInterval(int64_t interval_ns) {interval_ns_ = interval_ns; lastRun_ns_ = NOW() - interval_ns_;}
 
     /**
      * Gets the interval in milliseconds
-     *
-     * @param values none.
+     *.
      * @return interval in milliseconds.
      */
     inline int64_t getInterval() {return interval_ns_;}
@@ -55,7 +51,6 @@ public:
      * Returns the amount of time till the next run.
      * Negative number means the how long ago it should have ran
      *
-     * @param values none
      * @return remaining time till next run.
      */
     inline int64_t getTimeRemain() {return -interval_ns_ + NOW() + lastRun_ns_;}
@@ -70,8 +65,7 @@ public:
      * is usefull if somthing has to run a certain amount of times 
      * per second.
      *
-     * @param values limit
-     * @return none.
+     * @param limit true to limit 
      */
     inline void setLimit(bool limit) {limit_ = limit;}
 
@@ -84,8 +78,6 @@ public:
      * for the 1000 lost runs by running 1000 times as fast
      * as possible.
      *
-     * @param values none
-     * @return none.
      */
     inline void syncInternal() {lastRun_ns_ = NOW();}
 
@@ -93,8 +85,6 @@ public:
      * Waits till next Run.
      * See overload to use this time for other functions
      *
-     * @param values none
-     * @return none.
      */
     inline void waitTillNextRun() {
 
@@ -109,8 +99,7 @@ public:
      * Waits till next Run but calls the given
      * method in the time it waits
      *
-     * @param values method to run while waiting
-     * @return none.
+     * @param callMethod method to run while waiting
      */
     inline void waitTillNextRun(void (*callMethod)(void)) {
 
@@ -134,8 +123,8 @@ public:
      *      Stuff to do periodically...
      * }
      *
-     * @param values updateClock
-     * @return none.
+     * @param updateClock Set to true to update internal clock for next run. Defaults to true.
+     * @returns true if it is time to run
      */
     inline bool isTimeToRun(bool updateClock = true) {
 
@@ -165,8 +154,9 @@ public:
      *      Stuff to do periodically...
      * }
      *
-     * @param values updateClock
-     * @return none.
+     * @param timeDelta time since last run.
+     * @param updateClock Set to true to update internal clock for next run. Defaults to true.
+     * @returns true if it is time to run
      */
     inline bool isTimeToRun(int64_t& timeDelta, bool updateClock = true) {
 
@@ -187,10 +177,9 @@ public:
      * never exit. This can be undone by calling the 
      * method and giving false as a parameter.
      *
-     * @param values block
-     * @return none.
+     * @param block true to block, false to not block
      */
-    inline void block(bool block) {
+    inline void block(bool block = true) {
         block_ = block;
     }
 

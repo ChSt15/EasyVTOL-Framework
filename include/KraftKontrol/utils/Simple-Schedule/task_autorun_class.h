@@ -12,10 +12,6 @@
 
 
 
-//extern Scheduler g_scheduler;
-
-
-
 /**
  * Gives a task a priority. 
  * Lower priorities only run if no tasks exist at higher priorities.
@@ -37,7 +33,7 @@ enum eTaskPriority_t: uint32_t {
     //Will only run if nothing to do at higher priorities. Recommended for I2C comms!
     eTaskPriority_VeryHigh = 5,
     //Will always run once it needs to. Good for devices over SPI. I2C might be too slow use eTaskPriority_VeryHigh!
-    eTaskPriority_Realtime = 1000,
+    eTaskPriority_Realtime = UINT32_MAX,
 };
 
 
@@ -109,10 +105,12 @@ public:
      * @param startRunning will auto start threading if set to true. Default is true.
      * @param runs sets the number of times to run the thread function. Set to -1 for infinite. Default is -1.
      */
-    Task_Abstract(uint32_t rate, uint32_t priority, bool startRunning = false) {
+    Task_Abstract(uint32_t rate, uint32_t priority, int64_t startTime = 0, int64_t endTime = END_OF_TIME) {
         interval_ = rate;
         priority_ = priority;
-        isSuspended_ = !startRunning;
+        startTime_ = startTime;
+        endTime_ = endTime;
+        isSuspended_ = false;
         taskList().removeAllEqual(this); //Make sure task isnt already in list.
         taskList().append(this);
     }
@@ -179,6 +177,13 @@ public:
      */
     float getTaskSystemUsage() {
         return systemUsage_;
+    }
+
+    /**
+     * @returns amount of system usage internal scheduler takes in percent.
+     */
+    static float getSchedulerSystemUsage() {
+        return schedulerUsage_;
     }
 
     /**

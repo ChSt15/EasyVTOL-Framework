@@ -13,12 +13,16 @@
 
 //List<Task_Abstract*> Task_Abstract::taskList();
 IntervalControl Task_Abstract::systemResourceCalcInterval_ = 1;
+float Task_Abstract::schedulerUsage_;
 
 
 
 void Task_Abstract::schedulerInitTasks() {
 
-    for (uint32_t i = 0; i < taskList().getNumItems(); i++) taskList()[i]->init();
+    for (uint32_t i = 0; i < taskList().getNumItems(); i++) {
+        taskList()[i]->init();
+        taskList()[i]->initWasCalled_ = true;
+    }
 
 }
 
@@ -26,34 +30,13 @@ void Task_Abstract::schedulerInitTasks() {
 void Task_Abstract::schedulerTick() {
 
     uint32_t lastPriority = UINT32_MAX;
-    uint32_t currentPriority = 0;
+    uint32_t currentPriority = UINT32_MAX;
 
     bool taskRan = false;
-    bool taskFound = false;
+    bool taskFound = true;
 
     Task_Abstract* task;
 
-
-    //Find the next lower highest priority in task list
-    if (!taskRan) {
-
-        lastPriority = currentPriority;
-        currentPriority = 0;
-
-        taskFound = false;
-
-        for (uint32_t i = 0; i < taskList().getNumItems(); i++) {
-
-            task = taskList()[i];
-
-            if (!task->isSuspended_ && task->priority_ > currentPriority && task->priority_ < lastPriority) {
-                currentPriority = task->priority_;
-                taskFound = true;
-            }
-
-        }
-
-    }
 
     while (!taskRan && taskFound) {
 
@@ -117,14 +100,21 @@ void Task_Abstract::schedulerTick() {
 
         //Calculate time usage for each task.
         int64_t totalTime = dTime;  
+        int64_t timeLeft = totalTime;
         for (uint32_t i = 0; i < taskList().getNumItems(); i++) {
 
             task = taskList()[i];
 
-            task->systemUsage_ = task->systemTimeUsageCounter_/totalTime;
+            task->systemUsage_ = (float)task->systemTimeUsageCounter_/totalTime;
+            timeLeft -= task->systemTimeUsageCounter_;
             task->systemTimeUsageCounter_ = 0;
 
+            task->runRate_ = task->runCounter_/((double)dTime/SECONDS);
+            task->runCounter_ = 0;
+
         }
+
+        schedulerUsage_ = (float)timeLeft/totalTime;
 
     }
 

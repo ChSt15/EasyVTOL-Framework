@@ -30,18 +30,31 @@ public:
     /**
      * @returns current max size.
      */
-    inline const uint32_t& getNumItems() const;
+    inline uint32_t getNumItems() const;
 
     /**
      * @returns current internal array size.
      */
-    inline const uint32_t& getInternalArrayLength() const;
+    inline uint32_t getInternalArrayLength() const;
 
     /**
      * Adds a copy of the given item to the list.
      * @param item Item to add to list.
      */
     void append(const TYPE& item);
+
+    /**
+     * Inserts copy of item into list behind infront of the first larger item.
+     * @param item Item to add to list.
+     */
+    //void sortedAppend(const TYPE& item);
+
+    /**
+     * Places a copy of item into given index, all items after it will be pushed down.
+     * If index goes beyond end, then it will be placed at end of list.
+     * @param item Item to add to list.
+     */
+    //void insert(const TYPE& item, uint32_t index);
 
     /**
      * Removes the item the pointer points to.
@@ -112,10 +125,9 @@ private:
      * Copies items to new array.
      * @param size Size to change to.
      */
-    void changeSizeTo(const uint32_t& size);
+    void changeSizeTo(uint32_t size);
 
 };
-
 
 
 template<typename TYPE> 
@@ -134,7 +146,7 @@ void List<TYPE>::reduceSize() {
 
 
 template<typename TYPE> 
-void List<TYPE>::changeSizeTo(const uint32_t& size) {
+void List<TYPE>::changeSizeTo(uint32_t size) {
 
     //Leave if already same size
     if (size == maxSize_) return;
@@ -161,14 +173,14 @@ void List<TYPE>::changeSizeTo(const uint32_t& size) {
 
 
 template<typename TYPE> 
-inline const uint32_t& List<TYPE>::getNumItems() const {
+inline uint32_t List<TYPE>::getNumItems() const {
     return size_;
 }
 
 
 
 template<typename TYPE> 
-inline const uint32_t& List<TYPE>::getInternalArrayLength() const {
+inline uint32_t List<TYPE>::getInternalArrayLength() const {
     return maxSize_;
 }
 

@@ -125,8 +125,9 @@ void MPU9250Driver::init() {
         _imu.ConfigDlpf(Mpu9250::DlpfBandwidth::DLPF_BANDWIDTH_250HZ_4kHz);
 
         _lastMeasurement = NOW();
-        
 
+        pinInterrupt_.setEnable(true);
+        
         //imuStatus = DeviceStatus::DEVICE_CALIBRATING;
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Running;
 

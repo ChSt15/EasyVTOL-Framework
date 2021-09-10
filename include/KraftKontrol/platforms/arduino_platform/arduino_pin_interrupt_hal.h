@@ -21,7 +21,7 @@ public:
         pin_ = pin;
         function_ = function;
         onRise_ = onRise;
-        reAttachPin();
+        if (enable) reAttachPin();
     }
 
     /**

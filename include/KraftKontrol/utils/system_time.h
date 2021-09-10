@@ -22,7 +22,7 @@ constexpr int64_t WEEKS = 7*DAYS;
 constexpr int64_t MONTHS = 30*DAYS;
 constexpr int64_t YEARS = 365*DAYS;
 
-constexpr int64_t END_OF_TIME = 0xFFFFFFFFFFFFFFFF;
+constexpr int64_t END_OF_TIME = INT64_MAX;
 
 
 extern int64_t NOW();

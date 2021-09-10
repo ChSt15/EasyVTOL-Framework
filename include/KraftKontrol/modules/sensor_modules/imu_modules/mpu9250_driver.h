@@ -24,7 +24,7 @@
 class MPU9250Driver: public Gyroscope_Interface, public Accelerometer_Interface, public Module_Abstract, public Task_Abstract {
 public:
 
-    MPU9250Driver(int interruptPin, int chipSelect, SPIClass* spiBus) : Task_Abstract(40000, eTaskPriority_t::eTaskPriority_Realtime, true), _imu(spiBus, chipSelect)/*, pinInterrupt_(interruptPin, _interruptRoutine, true, false)*/ {
+    MPU9250Driver(int interruptPin, int chipSelect, SPIClass* spiBus) : Task_Abstract(40000, eTaskPriority_t::eTaskPriority_Realtime), _imu(spiBus, chipSelect), pinInterrupt_(interruptPin, _interruptRoutine, true, false) {
         
     }
     
@@ -89,7 +89,7 @@ private:
 
     IntervalControl _rateCalcInterval = IntervalControl(1); 
 
-    //PinInterrupt_HAL pinInterrupt_;
+    PinInterrupt_HAL pinInterrupt_;
 
     Mpu9250 _imu;
 

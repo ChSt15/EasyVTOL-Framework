@@ -22,30 +22,10 @@ constexpr int64_t WEEKS = 7*DAYS;
 constexpr int64_t MONTHS = 30*DAYS;
 constexpr int64_t YEARS = 365*DAYS;
 
+constexpr int64_t END_OF_TIME = 0xFFFFFFFFFFFFFFFF;
 
 
 extern int64_t NOW();
-
-
-
-//#ifdef Arduino_h
-/*
-inline int64_t NOW() {
-
-    static uint32_t g_lastMicroseconds = 0;
-    static int64_t g_currentTime = 0;
-
-    uint32_t time = micros();
-
-    g_currentTime += int64_t(time-g_lastMicroseconds)*MICROSECONDS;
-    g_lastMicroseconds = time;
-
-    return g_currentTime;
-
-}
-*/
-//#endif
-
 
 
 #endif

@@ -9,7 +9,7 @@ int64_t NOW() {
     uint32_t time = micros();
 
     if (time != g_lastMicroseconds) {
-        g_currentTime = g_currentTime + int64_t(time - g_lastMicroseconds)*MICROSECONDS;
+        g_currentTime += ((int64_t) time - g_lastMicroseconds)*MICROSECONDS;
         g_lastMicroseconds = time;
     }
 

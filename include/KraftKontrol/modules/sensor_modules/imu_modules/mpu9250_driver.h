@@ -17,7 +17,8 @@
 
 #include "KraftKontrol/utils/buffer.h"
 
-#include "KraftKontrol/platforms/platform_hal.h"
+#include "KraftKontrol/platforms/arduino_platform/arduino_pin_interrupt_hal.h"
+
 
 
 

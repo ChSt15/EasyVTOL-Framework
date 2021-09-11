@@ -114,8 +114,8 @@ private:
     Buffer<float, 3> gnssVelocityYBuffer_;
     Buffer<float, 3> gnssVelocityZBuffer_;
 
-    Buffer<float, 50> baroHeightBuffer_;
-    Buffer<float, 50> baroVelBuffer_;
+    Buffer<float, 30> baroHeightBuffer_;
+    Buffer<float, 30> baroVelBuffer_;
 
     //timestamps
     int64_t lastGyroTimestamp_ = 0;

@@ -44,6 +44,13 @@ public:
     void append(const TYPE& item);
 
     /**
+     * Adds a copy of the given item to the list only if there is no other equal item already in the list.
+     * @param item Item to add to list.
+     * @returns true if no item found and new item placed into list.
+     */
+    bool appendIfNotInList(const TYPE& item);
+
+    /**
      * Inserts copy of item into list behind infront of the first larger item.
      * @param item Item to add to list.
      */
@@ -196,6 +203,28 @@ void List<TYPE>::append(const TYPE& item) {
     array_[size_] = item;
 
     size_++;
+    
+}
+
+
+
+template<typename TYPE> 
+bool List<TYPE>::appendIfNotInList(const TYPE& item) {
+
+    //Check if item is inside list
+    for (uint32_t i = 0; i < size_; i++) {
+        if (array_[i] == item) return false;
+    }
+
+    //Double size if array is too small
+    if (maxSize_ == 0) changeSizeTo(1);
+    else if (size_ >= maxSize_) changeSizeTo(maxSize_*2);
+
+    array_[size_] = item;
+
+    size_++;
+
+    return true;
     
 }
 

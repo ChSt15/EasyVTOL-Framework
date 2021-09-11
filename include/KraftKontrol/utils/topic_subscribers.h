@@ -6,6 +6,68 @@
 #include "buffer.h"
 
 
+
+/**
+ * Subscribes to topic(s) and saves a copy of the item.
+ */
+template<typename TYPE> 
+class Subscriber_Generic: public Subscriber_Interface<TYPE> {
+friend Topic<TYPE>;
+public: 
+
+    Subscriber_Generic() {}
+
+    Subscriber_Generic(Topic<TYPE>& topic) {
+        subscribe(topic);
+    }
+
+    virtual ~Subscriber_Generic() {}
+
+    /**
+     * Will remove all subscribtions.
+     */
+    void unsubcribe() override {
+        for (uint32_t i = 0; i < subscribedTopics_.getNumItems(); i++) {
+            subscribedTopics_[i]->removeSubscriber(this);
+        }
+        subscribedTopics_.clear();
+    }
+
+    /**
+     * Will remove subscribtion. Will not receive anymore.
+     */
+    void unsubcribeTopic(Topic<TYPE>& topic) {
+        topic.removeSubscriber(this);
+        subscribedTopics_.removeAllEqual(&topic);
+    }
+
+    /**
+     * Subscribes to given topic. Will remove old subscription.
+     * @param topic Topic to subscribe to.
+     */
+    void subscribe(Topic<TYPE>& topic) {
+        topic.addSubscriber(this);
+        subscribedTopics_.removeAllEqual(&topic);
+        subscribedTopics_.append(&topic);
+    }
+
+    /**
+     * Publishes an item to topic, but will not receive item. Makes it simpler to broadcast items from modules.
+     * @param item Item to publish
+     */
+    void publish(TYPE& item) {
+        for (uint32_t i = 0; i < subscribedTopics_.getNumItems(); i++) subscribedTopics_[i]->publish(item, this);
+    }
+
+
+private:
+
+    //List of pointers to all subscribed topics.
+    List<Topic<TYPE>*> subscribedTopics_;
+
+};
+
+
 /**
  * This header contains the implementation of a few subscriber classes.
  * 
@@ -20,7 +82,7 @@
  * Use isDataNew() to check if an item was updated.
  */
 template<typename TYPE> 
-class Simple_Subscriber: public Subscriber_Interface<TYPE> {
+class Simple_Subscriber: public Subscriber_Generic<TYPE> {
 public:
 
     Simple_Subscriber() {}
@@ -28,17 +90,17 @@ public:
     /**
      * @param topic Topic to subscribe to.
      */
-    Simple_Subscriber(Topic<TYPE>& topic): Subscriber_Interface<TYPE>(topic) {}
+    Simple_Subscriber(Topic<TYPE>& topic): Subscriber_Generic<TYPE>(topic) {}
 
     /**
      * @returns True if new data was received
      */
-    inline const bool& isDataNew() const {return itemIsNew;}
+    inline bool isDataNew() const {return itemIsNew;}
 
     /**
      * @returns true if internal data storage has been updated.
      */
-    inline const bool& isValid() const {return itemIsValid;}
+    inline bool isValid() const {return itemIsValid;}
     
     /**
      * @returns reference to item.
@@ -51,7 +113,7 @@ public:
 
 private:
 
-    void receive(TYPE& item) override {
+    void receive(TYPE& item, Topic<TYPE>* topic) override {
         receivedItem = item;
         itemIsNew = true;
     }
@@ -71,7 +133,7 @@ private:
  * 
  */
 template<typename TYPE, uint32_t SIZE> 
-class Buffer_Subscriber: public Subscriber_Interface<TYPE>, public Buffer<TYPE, SIZE> {
+class Buffer_Subscriber: public Subscriber_Generic<TYPE>, public Buffer<TYPE, SIZE> {
 public:
 
     Buffer_Subscriber(bool overwrite = false) {}
@@ -80,7 +142,7 @@ public:
      * @param topic Topic to subscribe to.
      * @param overwrite Set to true to overwrite oldest values if full. Defaults to false.
      */
-    Buffer_Subscriber(Topic<TYPE>& topic, bool overwrite = false): Subscriber_Interface<TYPE>(topic) {
+    Buffer_Subscriber(Topic<TYPE>& topic, bool overwrite = false): Subscriber_Generic<TYPE>(topic) {
         overwrite_ = overwrite;
     }
 
@@ -93,7 +155,7 @@ public:
 
 private:
 
-    void receive(TYPE& item) override {
+    void receive(TYPE& item, Topic<TYPE>* topic) override {
         this->placeFront(item, overwrite_);
     }
 
@@ -104,50 +166,10 @@ private:
 
 
 /**
- * This subscriber connects 2 topics together by forwarding messages from topic A to B.
- * Use 2 of these to get bidirectional forwarding.
- */
-template<typename TYPE> 
-class TopicConnection_Subscriber: public Subscriber_Interface<TYPE> {
-public:
-
-    TopicConnection_Subscriber() {}
-
-    /**
-     * @param topicA Topic to forward data from.
-     * @param topicB Topic to forward data to.
-     */
-    TopicConnection_Subscriber(Topic<TYPE>& topicA, Topic<TYPE>& topicB): Subscriber_Interface<TYPE>(topicA) {
-        topicB_ = topicB;
-    }
-
-    /**
-     * Changes the topic where data in forwarded to.
-     * @param topicB Topic to forward data to.
-     */
-    void forwardTo(Topic<TYPE>& topicB) {
-        topicB_ = topicB;
-    }
-
-
-private:
-
-    void receive(TYPE& item) override {
-        topicB_.publish(item);
-    }
-
-    Topic<TYPE>& topicB_;
-
-
-};
-
-
-
-/**
  * This subscriber calls the given function passing the data received form topic to it.
  */
 template<typename TYPE> 
-class Callback_Subscriber: public Subscriber_Interface<TYPE> {
+class Callback_Subscriber: public Subscriber_Generic<TYPE> {
 public:
 
     Callback_Subscriber() {}
@@ -156,14 +178,14 @@ public:
      * @param topic Topic to subscribe to.
      * @param callbackFunc Function to call on data receive.
      */
-    Callback_Subscriber(Topic<TYPE>& topic, void (*callbackFunc)(TYPE& item)): Subscriber_Interface<TYPE>(topic) {
+    Callback_Subscriber(Topic<TYPE>& topic, void (*callbackFunc)(TYPE& item)): Subscriber_Generic<TYPE>(topic) {
         callbackFunc_ = callbackFunc;
     }
 
 
 private:
 
-    void receive(TYPE& item) override {
+    void receive(TYPE& item, Topic<TYPE>* topic) override {
         if (callbackFunc_ != nullptr) callbackFunc_(item);
     }
 

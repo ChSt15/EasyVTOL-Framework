@@ -11,46 +11,35 @@
 template<typename TYPE> 
 class Topic;
 
+template<typename TYPE> 
+class Subscriber_Generic;
+
 
 template<typename TYPE> 
 class Subscriber_Interface {
 friend Topic<TYPE>;
 public: 
 
-    Subscriber_Interface() {}
-
-    Subscriber_Interface(Topic<TYPE>& topic) {
-        subscribe(topic);
-    }
-
-    ~Subscriber_Interface() {
-        unsubcribe();
+    virtual ~Subscriber_Interface() {
+        //unsubcribe();
     }
 
     /**
-     * Will remove subscribtion. Will not receive anymore.
+     * Will remove subscribtion(s). Will not receive anymore data.
      */
-    void unsubcribe() {
-        if (topic_ != nullptr) topic_->removeSubscriber(this);
-    }
+    virtual void unsubcribe() = 0;
 
     /**
      * Subscribes to given topic. Will remove old subscription.
      * @param topic Topic to subscribe to.
      */
-    void subscribe(Topic<TYPE>& topic) {
-        unsubcribe();
-        topic_ = &topic;
-        topic_->addSubscriber(this);
-    }
+    virtual void subscribe(Topic<TYPE>& topic) = 0;
 
     /**
      * Publishes an item to topic, but will not receive item. Makes it simpler to broadcast items from modules.
      * @param item Item to publish
      */
-    void publish(TYPE& item) {
-        topic_->publish(item, this);
-    }
+    virtual void publish(TYPE& item) = 0;
 
 
 protected:
@@ -58,13 +47,10 @@ protected:
     /**
      * This is called when subscriber is supposed to receive an item.
      * @param item Item that subscriber will receive.
+     * @param topic Which topic is calling this receive function.
      */
-    virtual void receive(TYPE& item) = 0;
+    virtual void receive(TYPE& item, Topic<TYPE>* topic) = 0;
 
-private:
-
-    //Pointer to subscribed topic
-    Topic<TYPE>* topic_ = nullptr;
 
 };
 
@@ -72,12 +58,12 @@ private:
 
 template<typename TYPE> 
 class Topic {
-friend Subscriber_Interface<TYPE>;
+friend Subscriber_Generic<TYPE>;
 public:
 
     Topic(){}
 
-    ~Topic();
+    virtual ~Topic();
 
     /**
      * @returns list of all subscribers.
@@ -99,7 +85,7 @@ public:
     /**
      * @returns a copy of the last published item.
      */
-    const TYPE& getLatestItem(); 
+    //const TYPE& getLatestItem(); 
 
 
 private:
@@ -118,16 +104,16 @@ private:
     //List of subscribers
     List<Subscriber_Interface<TYPE>*> subscribers_;
 
-    TYPE latestItem;
+    //TYPE latestItem;
 
 };
 
 
 
-template<typename TYPE> 
+/*template<typename TYPE> 
 const TYPE& Topic<TYPE>::getLatestItem() {
     return latestItem;
-}
+}*/
 
 
 
@@ -147,16 +133,16 @@ const List<Subscriber_Interface<TYPE>*>& Topic<TYPE>::getSubscriberList() const 
 
 template<typename TYPE> 
 void Topic<TYPE>::publish(TYPE& item) {
-    latestItem = item;
-    for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) subscribers_[i]->receive(item);
+    //latestItem = item;
+    for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) subscribers_[i]->receive(item, this);
 }
 
 
 
 template<typename TYPE> 
 void Topic<TYPE>::publish(TYPE&& item) {
-    latestItem = item;
-    for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) subscribers_[i]->receive(latestItem);
+    TYPE itemCopy = item;
+    for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) subscribers_[i]->receive(itemCopy, this);
 }
 
 
@@ -165,7 +151,7 @@ template<typename TYPE>
 void Topic<TYPE>::publish(TYPE& item, Subscriber_Interface<TYPE>* subscriber) {
     
     for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) {
-        if (&(subscribers_[i]) != subscriber) subscribers_[i]->receive(item);
+        if (subscribers_[i] != subscriber) subscribers_[i]->receive(item, this);
     }
 
 }

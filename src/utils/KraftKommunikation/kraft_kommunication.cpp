@@ -135,7 +135,7 @@ void KraftKommunication::thread() {
         if (nodeData_[i].online && NOW() - nodeData_[i].lastPacketTimestamp > (int64_t)SECONDS*3/c_heartbeatRate) {
             nodeData_[i].online = false;
             KraftMessageContainer message = KraftMessageContainer(DataMessageNodeStatus(false, i));
-            globalMessages_.publish(message);
+            globalMessages().publish(message);
         }
     }
     if (heartbeatTimer_.isTimeToRun()) {
@@ -260,17 +260,17 @@ void KraftKommunication::thread() {
                     } else if (message.messageData.messageTypeID == eKraftMessageType_t::eKraftMessageType_Telemetry_ID) {
 
                         receivedPackets_.placeFront(message);
-                        telemetryMessages_.publish(messageContained);
+                        telemetryMessages().publish(messageContained);
 
                     } else if (message.messageData.messageTypeID == eKraftMessageType_t::eKraftMessageType_Command_ID) {
 
                         receivedPackets_.placeFront(message);
-                        globalMessages_.publish(messageContained);
+                        globalMessages().publish(messageContained);
 
                     } else if (message.messageData.messageTypeID == eKraftMessageType_t::eKraftMessageType_Data_ID) {
 
                         //receivedPackets_.placeFront(message);
-                        //globalMessages_.publish(messageContained);
+                        //globalMessages().publish(messageContained);
 
                     }
 

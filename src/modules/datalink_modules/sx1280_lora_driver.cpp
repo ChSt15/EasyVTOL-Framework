@@ -156,11 +156,6 @@ void SX1280Driver::internalLoop() {
 
 void SX1280Driver::init() {
 
-    if (isSimulation_) {
-        stopTaskThreading();
-        return;
-    }
-
     SPI.begin();
     //SPI.setFrequency(10000000);
 

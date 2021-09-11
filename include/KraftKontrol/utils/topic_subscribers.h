@@ -36,7 +36,7 @@ public:
     /**
      * Will remove subscribtion. Will not receive anymore.
      */
-    void unsubcribeTopic(Topic<TYPE>& topic) {
+    void unsubcribeTopic(const Topic<TYPE>& topic) {
         topic.removeSubscriber(this);
         subscribedTopics_.removeAllEqual(&topic);
     }
@@ -45,7 +45,7 @@ public:
      * Subscribes to given topic. Will remove old subscription.
      * @param topic Topic to subscribe to.
      */
-    void subscribe(Topic<TYPE>& topic) {
+    void subscribe(const Topic<TYPE>& topic) {
         topic.addSubscriber(this);
         subscribedTopics_.removeAllEqual(&topic);
         subscribedTopics_.append(&topic);

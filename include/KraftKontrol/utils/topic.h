@@ -97,12 +97,14 @@ private:
      */
     void publish(TYPE& item, Subscriber_Interface<TYPE>* subscriber);
 
-    void addSubscriber(Subscriber_Interface<TYPE>* subscriber);
+    //Is constant to allow modules to return const reference and others can subscribe but are unable to publish.
+    void addSubscriber(Subscriber_Interface<TYPE>* subscriber) const;
 
-    void removeSubscriber(Subscriber_Interface<TYPE>* subscriber);
+    //Is constant to allow modules to return const reference and others can subscribe but are unable to publish.
+    void removeSubscriber(Subscriber_Interface<TYPE>* subscriber) const;
 
-    //List of subscribers
-    List<Subscriber_Interface<TYPE>*> subscribers_;
+    //List of subscribers.
+    mutable List<Subscriber_Interface<TYPE>*> subscribers_;
 
     //TYPE latestItem;
 
@@ -159,7 +161,7 @@ void Topic<TYPE>::publish(TYPE& item, Subscriber_Interface<TYPE>* subscriber) {
 
 
 template<typename TYPE> 
-void Topic<TYPE>::addSubscriber(Subscriber_Interface<TYPE>* subscriber) {
+void Topic<TYPE>::addSubscriber(Subscriber_Interface<TYPE>* subscriber) const {
     //Make sure not to have multiple subscribers. So remove.
     subscribers_.removeAllEqual(subscriber);
     subscribers_.append(subscriber);
@@ -168,7 +170,7 @@ void Topic<TYPE>::addSubscriber(Subscriber_Interface<TYPE>* subscriber) {
 
 
 template<typename TYPE> 
-void Topic<TYPE>::removeSubscriber(Subscriber_Interface<TYPE>* subscriber) {
+void Topic<TYPE>::removeSubscriber(Subscriber_Interface<TYPE>* subscriber) const {
     subscribers_.removeAllEqual(subscriber);
 }
 

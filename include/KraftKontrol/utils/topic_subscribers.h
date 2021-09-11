@@ -45,7 +45,7 @@ public:
      * Subscribes to given topic. Will remove old subscription.
      * @param topic Topic to subscribe to.
      */
-    void subscribe(const Topic<TYPE>& topic) {
+    void subscribe(const Topic<TYPE>& topic) override {
         topic.addSubscriber(this);
         subscribedTopics_.removeAllEqual(&topic);
         subscribedTopics_.append(&topic);
@@ -55,15 +55,15 @@ public:
      * Publishes an item to topic, but will not receive item. Makes it simpler to broadcast items from modules.
      * @param item Item to publish
      */
-    void publish(TYPE& item) {
+    /*void publish(TYPE& item) {
         for (uint32_t i = 0; i < subscribedTopics_.getNumItems(); i++) subscribedTopics_[i]->publish(item, this);
-    }
+    }*/
 
 
 private:
 
     //List of pointers to all subscribed topics.
-    List<Topic<TYPE>*> subscribedTopics_;
+    List<const Topic<TYPE>*> subscribedTopics_;
 
 };
 

@@ -33,13 +33,13 @@ public:
      * Subscribes to given topic. Will remove old subscription.
      * @param topic Topic to subscribe to.
      */
-    virtual void subscribe(Topic<TYPE>& topic) = 0;
+    virtual void subscribe(const Topic<TYPE>& topic) = 0;
 
     /**
      * Publishes an item to topic, but will not receive item. Makes it simpler to broadcast items from modules.
      * @param item Item to publish
      */
-    virtual void publish(TYPE& item) = 0;
+    //virtual void publish(TYPE& item) = 0;
 
 
 protected:

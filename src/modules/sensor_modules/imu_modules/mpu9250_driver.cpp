@@ -126,7 +126,7 @@ void MPU9250Driver::init() {
 
         _lastMeasurement = NOW();
 
-        pinInterrupt_.setEnable(true);
+        //pinInterrupt_.setEnable(true);
         
         //imuStatus = DeviceStatus::DEVICE_CALIBRATING;
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Running;

@@ -82,7 +82,7 @@ public:
     /**
      * @returns global topic for module communication
      */
-    static Topic<KraftMessageContainer>& getGlobalMessageTopic() {return globalMessages_;}
+    static Topic<KraftMessageContainer>& getGlobalMessageTopic() {return globalMessages();}
 
     /**
      * @returns module specific topic for module communication
@@ -92,26 +92,18 @@ public:
     /**
      * @returns a reference to a list of pointers to all currently existing modules
      */
-    const List<Module_Abstract*>& getListExistingModules() {return existingModules_;}
-
-    /**
-     * Sets the system up to be simulated.
-     * @param isSimulation If the system is to be simulated.
-     */
-    static void setSimulationStatus(bool isSimulation) {isSimulation_ = isSimulation;} 
+    static const List<Module_Abstract*>& getListExistingModules() {return existingModules();}
 
 
 protected:
 
-    Module_Abstract() {existingModules_.append(this);}
-    ~Module_Abstract() {existingModules_.removeAllEqual(this);}
+    Module_Abstract() {existingModules().append(this);}
+    virtual ~Module_Abstract() {existingModules().removeAllEqual(this);}
 
     //This static topic is used for transfering global messages between modules like disarming, failsafe, startup etc.
-    static Topic<KraftMessageContainer> globalMessages_;
+    static Topic<KraftMessageContainer>& globalMessages();
     //This static topic is used for distributing received telemetry messages
-    static Topic<KraftMessageContainer> telemetryMessages_;
-    //This static topic is used for sending 
-    //static Topic<KraftMessageContainer> commandMessages_; 
+    static Topic<KraftMessageContainer>& telemetryMessages();
 
     //This topic is used for modules to receive messages from specifically this module.
     Topic<KraftMessageContainer> moduleMessages_;
@@ -119,16 +111,10 @@ protected:
     //Every module can use this to signify its current state.
     eModuleStatus_t moduleStatus_ = eModuleStatus_t::eModuleStatus_NotStarted;
 
-    /**
-     * If set to true then the system is being simulated.
-     * Sensors should disable themselves and actuators should not make hardware calls.
-     */
-    static bool isSimulation_;
 
 private:
-
-    static List<Module_Abstract*> existingModules_;
-
+    
+    static List<Module_Abstract*>& existingModules();
 
 };
 

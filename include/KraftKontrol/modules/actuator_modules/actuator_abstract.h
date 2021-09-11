@@ -24,10 +24,8 @@ class Actuator_Abstract {
 private:
 
     ///List of all actuators that exist.
-    static List<Actuator_Abstract*> actuatorList_;
+    static List<Actuator_Abstract*>& actuatorList();
 
-    ///Dummy dynamic data for returning 0 when not inhereted by subclass.
-    const DynamicData dummyData;
 
 protected:
 
@@ -35,9 +33,10 @@ protected:
      * Constructor called by subclasses-
      * @param addToList If true then the actuator will be added to list of all actuators and included in calculations.
      */
-    Actuator_Abstract(bool addToList = false) {
-        if (addToList) actuatorList_.append(this);
+    Actuator_Abstract() {
+        actuatorList().append(this);
     }
+
 
 public:
     
@@ -46,14 +45,14 @@ public:
      * Removes actuator from list
      */
     virtual ~Actuator_Abstract() {
-        actuatorList_.removeAllEqual(this);
+        actuatorList().removeAllEqual(this);
     }
 
     /**
      * Calculates the actuators force and torqe imparted on system.
      * @returns actuator resulting dynamics.
      */
-    virtual const DynamicData& getActuatorDynamicData() const {return dummyData;}; 
+    virtual const DynamicData& getActuatorDynamicData() const = 0;
 
     /**
      * Calculates total resulting system dynamics from all actuators.
@@ -63,9 +62,9 @@ public:
 
         DynamicData totalDynamics;
 
-        for (uint32_t i = 0; i < actuatorList_.getNumItems(); i++) {
+        for (uint32_t i = 0; i < actuatorList().getNumItems(); i++) {
 
-            totalDynamics += actuatorList_[i]->getActuatorDynamicData();
+            totalDynamics += actuatorList()[i]->getActuatorDynamicData();
 
         }
 

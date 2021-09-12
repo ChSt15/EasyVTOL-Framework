@@ -25,9 +25,7 @@
 class MPU9250Driver: public Gyroscope_Interface, public Accelerometer_Interface, public Module_Abstract, public Task_Abstract {
 public:
 
-    MPU9250Driver(int interruptPin, int chipSelect, SPIClass* spiBus): Task_Abstract(40000, eTaskPriority_t::eTaskPriority_Realtime), _imu(spiBus, chipSelect), pinInterrupt_(interruptPin, _interruptRoutine, true, false) {
-        
-    }
+    MPU9250Driver(int interruptPin, int chipSelect, SPIClass* spiBus): Task_Abstract(40000, eTaskPriority_t::eTaskPriority_Realtime), pinInterrupt_(interruptPin, _interruptRoutine, true, false), _imu(spiBus, chipSelect) {}
     
     /**
      * This is where all calculations are done.

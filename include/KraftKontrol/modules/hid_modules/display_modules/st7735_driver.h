@@ -1,135 +1,85 @@
 #ifndef ST7735_DRIVER_H
 #define ST7735_DRIVER_H
 
-#ifdef _TFT_eSPIH_
-
-
 
 
 #include "Arduino.h"
 
+#include "display_abstract.h"
+
 #include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
-
-#include "display_interface.h"
-
 #include "KraftKontrol/modules/module_abstract.h"
 
-#include "TFT_eSPI.h"
+#include "Adafruit_ST7735.h"
 
 
 
-class ST7735Driver: public Display_Interface, public Module_Abstract, public Task_Abstract {
+class ST7735Driver: public Display_Abstract, public Task_Abstract, public Module_Abstract {
 public:
 
-    ST7735Driver(int backlightPin) : Task_Abstract(1000, eTaskPriority_t::eTaskPriority_Low, true) {
-        backlightPin_ = backlightPin;
-    }
-    
-    /**
-     * This is where all calculations are done.
-     *
-     * @param values none.
-     * @return none.
-     */
-    void thread();
+    ST7735Driver(SPIClass& spi, int backlightPin, int CSPin, int DCPin, int RSTPin = -1);
 
-    /**
-     * Init function that sets the module up.
-     *
-     */
-    void init();
+    ~ST7735Driver() override;
 
-    /**
-     * Returns rate (in Hz) of the thread
-     *
-     * @return uint32_t.
-     */
-    uint32_t loopRate() {return loopRate_;}
 
-    /**
-     * Returns update rate (in Hz) of the display
-     *
-     * @return uint32_t.
-     */
-    uint32_t updateRate() {return updateRate_;}
+    Adafruit_ST7735& getDisplay() {return display_;}
 
-    /**
-     * Draws a string on the display at a coordinate. Not giving coordinates will make it draw under last line at left most.
-     *
-     * @param string Test to write
-     * @param x X-Coordinate 
-     * @param y Y-Coordinate 
-     */
-    void drawString(String string, int16_t x = -1, int16_t y = -1);
+    void init() override;
 
     /**
      * Clears everything on the display
      *
      */
-    void clearDisplay();
-
-    void updateDisplay() {}
+    void clear() override;
 
     /**
-     * Returns true if pressure data available
-     *
-     * @param greyscaleBitmap Pointer to array of bytes containing greyscale of each pixel
-     * @param x X-Coordinate 
-     * @param y Y-Coordinate 
-     * @param width Width of bitmap in pixels
-     * @param height Height of bitmap in pixels 
+     * Updates display with new changes.
      */
-    void drawBitmap(uint8_t* greyscaleBitmap, int16_t x, int16_t y, int16_t width, int16_t height);
+    void update() override;
 
     /**
-     * Sets the backlight brightness
-     *
-     * @param brightness Backlight setting. 0 is off and 1 is full on
+     * @returns screen width in pixels.
      */
-    void setBacklight(bool brightness) {
-        if (brightness) digitalWrite(backlightPin_, HIGH);
-        else digitalWrite(backlightPin_, LOW);
-    }
+    uint16_t getDisplayWidth() const override;
 
     /**
-     * Puts display into sleep mode
-     *
-     * @param sleep True to put display into sleep, false to get out of sleep
+     * @returns screen height in pixels.
      */
-    void enableSleep(bool sleep = true) {
-        if (sleep) display_.writecommand(ST7735_DISPOFF);
-        else display_.writecommand(ST7735_DISPON);
-    }
+    uint16_t getDisplayHeight() const override;
+
+    /**
+     * Draws a single pixel on the display at a coordinate.
+     *
+     * @param x X-Coordinate.
+     * @param y Y-Coordinate.
+     * @param color Which color to Draw with. Monochrome displays will only draw white.
+     */
+    void drawPixel(uint16_t x, uint16_t y, const Color& color) override;
+
+    /**
+     * Draws a string on the display at a coordinate.
+     *
+     * @param x X-Coordinate.
+     * @param y Y-Coordinate.
+     * @param color Which color to Draw with. Monochrome displays will only draw white.
+     * @param size Text size.
+     * @param text Text to write
+     */
+    void drawText(uint16_t x, uint16_t y, const Color& color, uint16_t size, const char* text) override;
 
 
 private:
 
-    IntervalControl _rateCalcInterval = IntervalControl(1); 
-
-    TFT_eSPI display_;
+    Adafruit_ST7735 display_;
     int backlightPin_;
-
-    uint8_t currentPin_ = 0;
 
     uint8_t startAttempts_ = 0;
 
-    uint32_t loopRate_ = 0;
-    uint32_t loopCounter_ = 0;
-
-    uint32_t updateRate_ = 0;
-    uint32_t updateCounter_ = 0;
-
-    uint32_t lastMeasurement_ = 0;
-
-    bool block_ = false;
-
-
+    GFXcanvas16 buffer_;
 
     
 };
 
 
 
-
-#endif
 #endif

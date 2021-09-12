@@ -2,16 +2,19 @@
 
 
 
+const ADCChannel& ADS1115Driver::getADCChannel(uint32_t channel) const {
+    return adcChannels_[constrain(channel, 0, 4)];
+}
+
+
 void ADS1115Driver::_getData() {
 
     if (adc_.isBusy()) return;
 
-    adcCounter_++;
-
     //adc_.readADC(currentPin_);
 
-    voltageTimestampFifo_[currentPin_].placeFront(micros(), true);
-    voltageFifo_[currentPin_].placeFront(adc_.toVoltage(adc_.getValue()), true);
+    SensorTimestamp<float> adcValue(adc_.toVoltage(adc_.getValue()), NOW());
+    adcChannels_[currentPin_].setValue(adcValue);
 
     currentPin_++;
     if (currentPin_ >= 4) currentPin_ = 0;
@@ -22,10 +25,6 @@ void ADS1115Driver::_getData() {
 
 
 void ADS1115Driver::thread() {
-
-    if (block_) return;
-
-    loopCounter_++;
 
 
     if (moduleStatus_ == eModuleStatus_t::eModuleStatus_Running) {
@@ -46,19 +45,10 @@ void ADS1115Driver::thread() {
     } else { //This section is for device failure or a wierd mode that should not be set, therefore assume failure
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
-        block_ = true;
-        loopRate_ = 0;
+        stopTaskThreading();
 
     }
 
-
-
-    if (_rateCalcInterval.isTimeToRun()) {
-        loopRate_ = loopCounter_;
-        adcRate_ = adcCounter_;
-        adcCounter_ = 0;
-        loopCounter_ = 0;
-    }
 
 }
 
@@ -80,6 +70,8 @@ void ADS1115Driver::init() {
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Running;
 
         Serial.println("ADC Start Success.");
+
+        i2cBus_.setClock(1000000);
 
     } else {
         moduleStatus_ = eModuleStatus_t::eModuleStatus_RestartAttempt; 

@@ -67,15 +67,15 @@ private:
     //When to start running task. 
     int64_t startTime_ = 0;
 
-    //If set to 0 then no limit. Should be decremented every run.
-    uint64_t numberRuns_ = 0;
+    //If set to 0 then no limit.
     uint64_t removeOnRun = 0;
+    uint64_t numberRuns_ = 0;
 
     //Task Priority
     uint32_t priority_ = eTaskPriority_t::eTaskPriority_None;
 
     //This should be overloaded by task subclass
-    virtual void thread() = 0;
+    virtual void thread() {stopTaskThreading();};
 
     //Counter for number of runs
     uint32_t runCounter_ = 0;
@@ -105,11 +105,12 @@ public:
      * @param startRunning will auto start threading if set to true. Default is true.
      * @param runs sets the number of times to run the thread function. Set to -1 for infinite. Default is -1.
      */
-    Task_Abstract(uint32_t rate, uint32_t priority, int64_t startTime = 0, int64_t endTime = END_OF_TIME) {
+    Task_Abstract(uint32_t rate, uint32_t priority, int64_t startTime = 0, int64_t endTime = END_OF_TIME, uint64_t numberRuns = 0) {
         interval_ = rate;
         priority_ = priority;
         startTime_ = startTime;
         endTime_ = endTime;
+        numberRuns_ = numberRuns;
         isSuspended_ = false;
         taskList().removeAllEqual(this); //Make sure task isnt already in list.
         taskList().append(this);

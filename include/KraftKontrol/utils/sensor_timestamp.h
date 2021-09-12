@@ -3,6 +3,10 @@
 
 
 
+#include "KraftKontrol/utils/system_time.h"
+
+
+
 /**
  * Designed to take sensor data (Or whatever else) and save it directly with a timestamp.
  */

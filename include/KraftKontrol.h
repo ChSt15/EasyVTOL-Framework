@@ -40,15 +40,12 @@
 #include "KraftKontrol/modules/sensor_modules/gnss_modules/gnss_interface.h"
 #include "KraftKontrol/modules/sensor_modules/gnss_modules/ublox_serial_gnss.h"
 
-#include "KraftKontrol/modules/sensor_modules/adc_modules/adc_interface.h"
+#include "KraftKontrol/modules/sensor_modules/adc_modules/adc_abstract.h"
 #include "KraftKontrol/modules/sensor_modules/adc_modules/ads1115_driver.h"
 
 #include "KraftKontrol/modules/hid_modules/input_modules/button_abstract.h"
 #include "KraftKontrol/modules/hid_modules/input_modules/generic_button.h"
-#include "KraftKontrol/modules/hid_modules/display_modules/display_interface.h"
-#ifdef ESP32
-    //#include "KraftKontrol/modules/hid_modules/display_modules/st7735_driver.h"
-#endif
+#include "KraftKontrol/modules/hid_modules/display_modules/display_abstract.h"
 
 #include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_messagetype_abstracts.h"
 #include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_data_messages.h"

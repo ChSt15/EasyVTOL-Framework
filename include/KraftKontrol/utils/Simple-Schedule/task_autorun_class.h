@@ -53,6 +53,9 @@ private:
     
     //Local variables each task has
 
+    //Task name, up to 30 characters long
+    char name_[30];
+
     //Controls task interval
     IntervalControl interval_;
 
@@ -100,12 +103,14 @@ public:
     /**
      * Sets up the task and attaches it to the internal scheduler.
      * 
+     * @param taskName Char array containing name of task. Max 30 characters long.
      * @param rate is the rate at which to run the Task
      * @param priority is of type uint32_t and gives the priority of the task. Higher number is higher priority.
      * @param startRunning will auto start threading if set to true. Default is true.
      * @param runs sets the number of times to run the thread function. Set to -1 for infinite. Default is -1.
      */
-    Task_Abstract(uint32_t rate, uint32_t priority, int64_t startTime = 0, int64_t endTime = END_OF_TIME, uint64_t numberRuns = 0) {
+    Task_Abstract(const char* taskName, uint32_t rate, uint32_t priority, int64_t startTime = 0, int64_t endTime = END_OF_TIME, uint64_t numberRuns = 0) {
+        strncpy(name_, taskName, 20);
         interval_ = rate;
         priority_ = priority;
         startTime_ = startTime;
@@ -178,6 +183,10 @@ public:
      */
     float getTaskSystemUsage() {
         return systemUsage_;
+    }
+
+    const char* getTaskName() {
+        return name_;
     }
 
     /**

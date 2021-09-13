@@ -210,6 +210,9 @@ public:
      */
     static void schedulerInitTasks();
 
+    /**
+     * @returns list containing pointers to all tasks.
+     */
     static List<Task_Abstract*>& getTaskList() {
         return taskList();
     }

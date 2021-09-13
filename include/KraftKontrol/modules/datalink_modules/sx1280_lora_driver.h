@@ -37,7 +37,7 @@
 class SX1280Driver: public KraftLink_Interface, public Module_Abstract, public Task_Abstract {
 public:
 
-    SX1280Driver(int busyPin, int txenPin, int rxenPin, int dio1Pin, int nResetPin, int nssPin/*, SPIClass* spiBus*/) : Task_Abstract(1000, eTaskPriority_t::eTaskPriority_Middle, true) {
+    SX1280Driver(int busyPin, int txenPin, int rxenPin, int dio1Pin, int nResetPin, int nssPin/*, SPIClass* spiBus*/) : Task_Abstract("SX1280 Driver", 1000, eTaskPriority_t::eTaskPriority_Middle) {
         nssPin_ = nssPin;
         busyPin_ = busyPin;
         txenPin_ = txenPin;

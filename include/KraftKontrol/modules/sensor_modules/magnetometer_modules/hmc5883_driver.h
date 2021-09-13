@@ -55,7 +55,7 @@ public:
      * @param selector For I2C this is the address. For SPI this is the chip select pin.
      * @param eeprom Reference to EEPROM module to use for calibration values.
      */
-    QMC5883Driver(BusDevice_HAL_Abstract& bus, uint32_t selector/*, EEPROM_Interface* eeprom = nullptr*/) : Task_Abstract(250, eTaskPriority_t::eTaskPriority_VeryHigh, true) {
+    QMC5883Driver(BusDevice_HAL_Abstract& bus, uint32_t selector/*, EEPROM_Interface* eeprom = nullptr*/) : Task_Abstract("QMC5883 Driver", 250, eTaskPriority_t::eTaskPriority_VeryHigh) {
         //eeprom_ = eeprom;
         bus_ = &bus;
     }

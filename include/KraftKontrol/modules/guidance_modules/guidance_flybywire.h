@@ -27,7 +27,7 @@ public:
      * @param rate is the rate at which it will be ran at.
      * @param priority is the priority the module will have.
      */
-    GuidanceFlyByWire() : Task_Abstract(1000, eTaskPriority_t::eTaskPriority_High, true) {}
+    GuidanceFlyByWire() : Task_Abstract("Guidance Flybywire", 1000, eTaskPriority_t::eTaskPriority_High) {}
 
     /**
      * Tells the guidance to rotate vehicle at set rate.

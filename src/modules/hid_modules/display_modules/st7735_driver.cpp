@@ -2,7 +2,7 @@
 
 
 
-ST7735Driver::ST7735Driver(SPIClass& spi, int backlightPin, int CSPin, int DCPin, int RSTPin): Task_Abstract(1, 0), display_(&spi, CSPin, DCPin, RSTPin), buffer_(getDisplayWidth(), getDisplayHeight()) {
+ST7735Driver::ST7735Driver(SPIClass& spi, int backlightPin, int CSPin, int DCPin, int RSTPin): Task_Abstract("ST7735 Driver", 1, 0), display_(&spi, CSPin, DCPin, RSTPin), buffer_(getDisplayWidth(), getDisplayHeight()) {
 
     backlightPin_ = backlightPin;
 

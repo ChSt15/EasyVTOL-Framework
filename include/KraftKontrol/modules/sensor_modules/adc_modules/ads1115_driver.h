@@ -20,7 +20,7 @@
 class ADS1115Driver: public ADC_Abstract, public Module_Abstract, public Task_Abstract {
 public:
 
-    ADS1115Driver(TwoWire& i2cBus, uint32_t rate = 100) : Task_Abstract(rate*4, eTaskPriority_t::eTaskPriority_VeryHigh), i2cBus_(i2cBus), adc_(0x48) {}
+    ADS1115Driver(TwoWire& i2cBus, uint32_t rate = 100) : Task_Abstract("ADS1115 Driver", rate*4, eTaskPriority_t::eTaskPriority_VeryHigh), i2cBus_(i2cBus), adc_(0x48) {}
     
     /**
      * This is where all calculations are done.

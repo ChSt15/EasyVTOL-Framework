@@ -22,7 +22,7 @@
 class VehicleGeneral: public Vehicle_Interface, public Module_Abstract, public Task_Abstract {
 public:
 
-    VehicleGeneral(Guidance_Interface* guidancePointer, Navigation_Interface* navigationPointer, Control_Interface* controlPointer, Dynamics_Interface* dynamicsPointer) : Task_Abstract(8000, eTaskPriority_t::eTaskPriority_High, true) {
+    VehicleGeneral(Guidance_Interface* guidancePointer, Navigation_Interface* navigationPointer, Control_Interface* controlPointer, Dynamics_Interface* dynamicsPointer) : Task_Abstract("Vehicle General", 8000, eTaskPriority_t::eTaskPriority_High) {
         guidance_ = guidancePointer;
         navigation_ = navigationPointer;
         control_ = controlPointer;

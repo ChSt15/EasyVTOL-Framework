@@ -26,7 +26,7 @@ public:
      * @param rate is the rate at which it will be ran at.
      * @param priority is the priority the module will have.
      */
-    HoverController(Guidance_Interface& guidanceModule, Navigation_Interface& navigationModule) : Task_Abstract(1000, eTaskPriority_t::eTaskPriority_High, true) {
+    HoverController(Guidance_Interface& guidanceModule, Navigation_Interface& navigationModule) : Task_Abstract("Hover Controller", 1000, eTaskPriority_t::eTaskPriority_High) {
         setGuidanceModule(guidanceModule);
         setNavigationModule(navigationModule);
     }

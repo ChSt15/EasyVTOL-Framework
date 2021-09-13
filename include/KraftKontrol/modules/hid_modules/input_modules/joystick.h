@@ -33,10 +33,10 @@ public:
 };
 
 
-class Joystick: Task_Abstract {
+class Joystick: public Task_Abstract {
 public:
 
-    Joystick(): Task_Abstract(30, eTaskPriority_t::eTaskPriority_VeryHigh, true) {}
+    Joystick(): Task_Abstract("Joystick", 30, eTaskPriority_t::eTaskPriority_VeryHigh) {}
 
     void init() override;
 

@@ -204,7 +204,7 @@ public:
      * 
      * @param dataLink is a radio class that inherets from KraftLink_Interface that will be used to send and receive packets 
      */
-    KraftKommunication(KraftLink_Interface* dataLink, eKraftMessageNodeID_t selfID): Task_Abstract(500, eTaskPriority_t::eTaskPriority_Middle, true) {
+    KraftKommunication(KraftLink_Interface* dataLink, eKraftMessageNodeID_t selfID): Task_Abstract("Kraft Kommunication", 500, eTaskPriority_t::eTaskPriority_Middle) {
         dataLink_ = dataLink;
         selfID_ = selfID;
         receivedPacketSub_.subscribe(dataLink->getReceivedDataTopic());

@@ -16,7 +16,7 @@
 class KraftKonnectNetwork: public Module_Abstract, public Task_Abstract {
 public:
 
-    KraftKonnectNetwork(KraftKommunication* communicationPort): Task_Abstract(1000, eTaskPriority_t::eTaskPriority_Middle, true) {
+    KraftKonnectNetwork(KraftKommunication* communicationPort): Task_Abstract("KraftKonnect Network", 1000, eTaskPriority_t::eTaskPriority_Middle) {
         commsPort_ = communicationPort;
     }
     

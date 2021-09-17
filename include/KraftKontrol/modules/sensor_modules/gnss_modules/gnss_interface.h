@@ -34,7 +34,7 @@ public:
     /**
      * @returns reference to gnss data topic
      */
-    Topic<GNSSData>& getGNSSTopic() {return gnssTopic_;}
+    const Topic<GNSSData>& getGNSSTopic() const {return gnssTopic_;}
 
 
 protected:

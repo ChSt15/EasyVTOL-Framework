@@ -22,17 +22,8 @@ class Magnetometer_Interface {
 public:
 
     /**
-     * Returns rate (in Hz) of the thread
-     *
-     * @param values none.
-     * @return uint32_t.
-     */
-    virtual uint32_t loopRate() = 0;
-
-    /**
      * Returns rate (in Hz) of the new sensor data
      *
-     * @param values none.
      * @return uint32_t.
      */
     virtual uint32_t magRate() = 0;
@@ -40,17 +31,17 @@ public:
     /**
      * @returns current calibration status
      */
-    virtual eMagCalibStatus_t getCalibrationStatus() = 0;
+    virtual eMagCalibStatus_t getCalibrationStatus() {return eMagCalibStatus_t::eMagCalibStatus_NotCalibrated;};
 
     /**
      * Starts calibration.
      */
-    virtual void startCalibration() = 0;
+    virtual void startCalibration() {};
 
     /**
      * Stops calibration sequence.
      */
-    virtual void stopCalibration() = 0;
+    virtual void stopCalibration() {};
 
     /**
      * @returns reference to gyro data topic

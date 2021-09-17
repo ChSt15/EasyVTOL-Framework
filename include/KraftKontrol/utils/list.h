@@ -216,13 +216,7 @@ bool List<TYPE>::appendIfNotInList(const TYPE& item) {
         if (array_[i] == item) return false;
     }
 
-    //Double size if array is too small
-    if (maxSize_ == 0) changeSizeTo(1);
-    else if (size_ >= maxSize_) changeSizeTo(maxSize_*2);
-
-    array_[size_] = item;
-
-    size_++;
+    append(item);
 
     return true;
     

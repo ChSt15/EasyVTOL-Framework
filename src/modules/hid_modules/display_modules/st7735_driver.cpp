@@ -41,6 +41,7 @@ void ST7735Driver::drawPixel(uint16_t x, uint16_t y, const Color& color) {
 
 void ST7735Driver::drawText(uint16_t x, uint16_t y, const Color& color, uint16_t size, const char* text) {
     buffer_.setCursor(x, y);
+    buffer_.setTextSize(size);
     buffer_.print(text);
 }
 

@@ -7,7 +7,7 @@ ButtonHID_Abstract::ButtonHID_Abstract(int64_t longPressThresholdTime, uint32_t 
 }
 
 
-Topic<eButton_Event_t>& ButtonHID_Abstract::getTopic() {
+Topic<eButton_Event_t>& ButtonHID_Abstract::getButtonTopic() {
     return buttonEventTopic_;
 }
 
@@ -17,7 +17,7 @@ bool ButtonHID_Abstract::isPressed() const {
 }
 
 
-eButton_State_t ButtonHID_Abstract::getState() const {
+eButton_State_t ButtonHID_Abstract::getButtonState() const {
     return buttonState_;
 }
 
@@ -45,7 +45,6 @@ void ButtonHID_Abstract::thread() {
         } else if (!isPressed_) {
             buttonState_ = eButton_State_t::RELEASED;
             buttonEventTopic_.publish(eButton_Event_t::SHORT);
-            buttonEventTopic_.publish(eButton_Event_t::RELEASED);
         }
         break;
 

@@ -12,7 +12,7 @@
 class DataContainerTimestamped_Base {
 public:
 
-    uint32_t timestamp;
+    int64_t timestamp;
 
 protected:
 

@@ -17,7 +17,7 @@ public:
     /**
      * @returns reference to baro data topic
      */
-    Topic<SensorTimestamp<float>>& getBaroTopic() {return baroTopic_;}
+    const Topic<SensorTimestamp<float>>& getBaroTopic() const {return baroTopic_;}
 
 
 protected:

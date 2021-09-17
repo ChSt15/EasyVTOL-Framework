@@ -64,9 +64,6 @@ void UbloxSerialGNSS::thread() {
     }
 
 
-    loopCounter_++;
-
-
     if (moduleStatus_ == eModuleStatus_t::eModuleStatus_Running) {
 
         //gnss_.getPVT();
@@ -96,7 +93,6 @@ void UbloxSerialGNSS::thread() {
     } else { //This section is for device failure or a wierd mode that should not be set, therefore assume failure
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
-        loopRate_ = 0;
 
         stopTaskThreading();
 
@@ -105,11 +101,26 @@ void UbloxSerialGNSS::thread() {
 
     uint32_t dTime = 0;
     if (rateCalcInterval_.isTimeToRun(dTime)) {
-        loopRate_ = loopCounter_;
         velocityRate_ = velocityCounter_;
         positionRate_ = positionCounter_;
-        loopCounter_ = positionCounter_ = velocityCounter_ = 0;
+        positionCounter_ = velocityCounter_ = 0;
     }
+
+}
+
+
+
+void UbloxSerialGNSS::setupSerial(uint32_t baudRate) {
+
+    #ifdef ESP32 
+
+    serialPort_->begin(baudRate, 134217756U, rxPin_, txPin_);
+
+    #elif
+
+    serialPort_->begin(baudRate);
+
+    #endif
 
 }
 
@@ -123,19 +134,15 @@ void UbloxSerialGNSS::init() {
         return;
     }
 
-    if (moduleStatus_ == eModuleStatus_t::eModuleStatus_NotStarted) serialPort_->begin(115200);
-    else serialPort_->begin(9600*max(serialBaudMulti_,uint32_t(1)));
+    if (moduleStatus_ == eModuleStatus_t::eModuleStatus_NotStarted) setupSerial(115200);
+    else setupSerial(9600*max(serialBaudMulti_,uint32_t(1)));
 
     if (gnss_.begin(*serialPort_)) {
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Running;
 
-        //gnss_.factoryDefault();
-
-        //delay(100);
-
         gnss_.setSerialRate(115200);
-        serialPort_->begin(115200);
+        setupSerial(115200);
 
         gnss_.setUART1Output(COM_TYPE_UBX);
         gnss_.setNavigationFrequency(10);

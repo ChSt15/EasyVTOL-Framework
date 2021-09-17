@@ -44,14 +44,6 @@ public:
     void init();
 
     /**
-     * Returns rate (in Hz) of the thread
-     *
-     * @param values none.
-     * @return uint32_t.
-     */
-    uint32_t loopRate() {return _loopRate;};
-
-    /**
      * Returns rate (in Hz) of the new sensor data
      *
      * @param values none.

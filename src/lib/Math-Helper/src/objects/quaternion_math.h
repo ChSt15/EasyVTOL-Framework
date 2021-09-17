@@ -52,7 +52,7 @@ class Quaternion {
          * @param values axis[Vector] and angle[Rad]
          * @return none.
          */
-        Quaternion<T>(const Vector<T> &axis, const T &angle) {
+        Quaternion<T>(const Vector<T>& axis, const T& angle) {
 
             if (axis.isZeroVector()) {
 
@@ -221,7 +221,7 @@ class Quaternion {
          * @return String.
          */
         inline String toString(const uint8_t &digits = 2) const {
-            return "w: " + String(w, digits) + ", x: " + String(x, digits) + ", y: " + String(y, digits) + ", z: " + String(z, digits);  
+            return "w:" + String(w, digits) + " x:" + String(x, digits) + " y:" + String(y, digits) + " z:" + String(z, digits);  
         }
         #endif
 

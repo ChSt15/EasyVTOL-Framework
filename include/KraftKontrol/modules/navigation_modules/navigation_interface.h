@@ -20,7 +20,7 @@
 
 
 
-class Navigation_Interface: public Module_Abstract {
+class Navigation_Interface {
 public:
 
     /**

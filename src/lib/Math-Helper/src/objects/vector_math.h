@@ -347,7 +347,7 @@ class Vector {
          * @return String.
          */
         inline String toString(const uint8_t &digits = 2) const {
-            return "x: " + String(x, digits) + ", y: " + String(y, digits) + ", z: " + String(z, digits);  
+            return "x:" + String(x, digits) + " y:" + String(y, digits) + " z:" + String(z, digits);  
         }
         #endif
 

@@ -75,8 +75,9 @@ public:
 private:
 
     void reAttachPin() {
+        pinMode(pin_, INPUT);
         detachInterrupt(pin_);
-        attachInterrupt(pin_, function_, onRise_ ? RISING:FALLING);
+        attachInterrupt(digitalPinToInterrupt(pin_), function_, onRise_ ? RISING:FALLING);
     }
 
     uint32_t pin_ = 0;

@@ -14,14 +14,6 @@ class Gyroscope_Interface {
 public:
 
     /**
-     * Returns rate (in Hz) of the thread
-     *
-     * @param values none.
-     * @return uint32_t.
-     */
-    virtual uint32_t loopRate() = 0;
-
-    /**
      * Returns rate (in Hz) of the new sensor data
      *
      * @param values none.

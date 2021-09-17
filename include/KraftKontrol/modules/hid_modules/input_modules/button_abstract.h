@@ -53,7 +53,7 @@ public:
     /**
      * @returns button event topic
      */
-    Topic<eButton_Event_t>& getTopic(); 
+    Topic<eButton_Event_t>& getButtonTopic(); 
 
     /**
      * @returns current button status. True if pressed.
@@ -63,7 +63,7 @@ public:
     /**
      * @returns current button status.
      */
-    eButton_State_t getState() const;
+    eButton_State_t getButtonState() const;
 
 
 protected:

@@ -74,7 +74,7 @@ struct WorldPosition {
      * @param WorldPosition Reference point for position
      * @returns position vector
      */
-    Vector<> getPositionVectorFrom(const WorldPosition &referencePoint) {
+    Vector<> getPositionVectorFrom(const WorldPosition &referencePoint) const {
 
         double heightRef = height - referencePoint.height;
 

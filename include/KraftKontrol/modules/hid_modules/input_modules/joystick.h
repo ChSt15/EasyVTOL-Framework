@@ -2,23 +2,16 @@
 #define JOYSTICK_H
 
 
-#include "KraftKontrol.h"
+#include "KraftKontrol/gui/menu_abstract.h"
 
+#include "KraftKontrol/utils/topic_subscribers.h"
 
+#include "KraftKontrol/modules/sensor_modules/adc_modules/adc_abstract.h"
+#include "KraftKontrol/modules/hid_modules/input_modules/gpio_button.h"
+#include "KraftKontrol/modules/hid_modules/input_modules/analog_button.h"
 
-//State changes from joystick
-enum class eJoystickEvent_t {
-    LEFT_TRIG,
-    LEFT_RETURN,
-    RIGHT_TRIG,
-    RIGHT_RETURN,
-    UP_TRIG,
-    UP_RETURN,
-    DOWN_TRIG,
-    DOWN_RETURN,
-    BUTTON_TRIG,
-    BUTTON_RETURN
-};
+#include "KraftKontrol/utils/low_pass_filter.h"
+
 
 
 //Contains Joystick position and botton data.
@@ -33,34 +26,62 @@ public:
 };
 
 
-class Joystick: public Task_Abstract {
-public:
-
-    Joystick(): Task_Abstract("Joystick", 30, eTaskPriority_t::eTaskPriority_VeryHigh) {}
-
-    void init() override;
-
-    void thread() override;
-
-    const JoystickData& getJoystickData() const {return joystickData_;}
-
-    Topic<eJoystickEvent_t>& getJoystickEventTopic() {return joystickEventTopic_;};
-    Topic<JoystickData>& getJoystickDataTopic() {return joystickDataTopic_;};
-
-
+class Joystick: public Task_Abstract, public MenuControl_Abstract {
 private:
-
-    Topic<eJoystickEvent_t> joystickEventTopic_;
 
     Topic<JoystickData> joystickDataTopic_;
 
     JoystickData joystickData_;
 
-    LowPassFilter<float> lpfPosX_, lpfPosY_;
-
     const float lpfFactor_ = 10; 
 
-    const float joystickEventThreshold_ = 0.7f;
+    const float joystickThreshold_ = 0.3f;
+
+    AnalogButton xAxisPositive_;
+    AnalogButton xAxisNegative_;
+    Simple_Subscriber<eButton_Event_t> xAxisPositiveSubr_;
+    Simple_Subscriber<eButton_Event_t> xAxisNegativeSubr_;
+
+    AnalogButton yAxisPositive_;
+    AnalogButton yAxisNegative_;
+    Simple_Subscriber<eButton_Event_t> yAxisPositiveSubr_;
+    Simple_Subscriber<eButton_Event_t> yAxisNegativeSubr_;
+
+    GPIOButton button_;
+    Simple_Subscriber<eButton_Event_t> buttonSubr_;
+
+
+public:
+
+    /**
+     * ADC channels should output a value between -1 and 1.
+     * No button given. This will never output a signal for button1.
+     * @param adcXChannel ADC channel for x axis.
+     * @param adcYChannel ADC channel for y axis.
+     */
+    Joystick(const ADCChannel& adcXChannel, const ADCChannel& adcYChannel);
+
+    /**
+     * ADC channels should output a value between -1 and 1.
+     * @param adcXChannel ADC channel for x axis.
+     * @param adcYChannel ADC channel for y axis.
+     * @param buttonPin GPIO pin connected to joystick button.
+     */
+    Joystick(const ADCChannel& adcXChannel, const ADCChannel& adcYChannel, int buttonPin);
+
+    void init() override;
+
+    void thread() override;
+
+    /**
+     * @returns raw joystick data.
+     */
+    const JoystickData& getJoystickData() const {return joystickData_;}
+
+    /**
+     * @returns topic for raw joystick data.
+     */
+    Topic<JoystickData>& getJoystickDataTopic() {return joystickDataTopic_;};
 
 
 };

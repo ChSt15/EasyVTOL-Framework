@@ -93,6 +93,9 @@ private:
     float systemUsage_ = 0;
     int64_t systemTimeUsageCounter_ = 0;
 
+    //Set to true if attached to scheduler.
+    bool attached_ = false;
+
 
     void addTaskToScheduler();
     void removeTaskFromScheduler();
@@ -107,7 +110,7 @@ public:
      * @param rate is the rate at which to run the Task
      * @param priority is of type uint32_t and gives the priority of the task. Higher number is higher priority.
      * @param startRunning will auto start threading if set to true. Default is true.
-     * @param runs sets the number of times to run the thread function. Set to -1 for infinite. Default is -1.
+     * @param runs sets the number of times to run the thread function. Set to 0 for infinite. Default is 0.
      */
     Task_Abstract(const char* taskName, uint32_t rate, uint32_t priority, int64_t startTime = 0, int64_t endTime = END_OF_TIME, uint64_t numberRuns = 0) {
         strncpy(name_, taskName, 20);
@@ -116,34 +119,56 @@ public:
         startTime_ = startTime;
         endTime_ = endTime;
         numberRuns_ = numberRuns;
-        isSuspended_ = false;
-        taskList().removeAllEqual(this); //Make sure task isnt already in list.
-        taskList().append(this);
+        attachToScheduler();
+        startTaskThreading();
     }
 
     /**
      * Will remove Task from scheduler.
      */
     virtual ~Task_Abstract() {
-        taskList().removeAllEqual(this);
+        taskList().removeAllEqual(this); //Make sure it is removed.
     }
 
     /**
-     * Starts the threading for the task.
+     * Starts the threading for the task. Wont work if not on scheduler.
      * 
-     * @param numberRuns sets the number of times to run the thread function. Set to -1 for infinite. Default is -1.
-     * @returns true if added or false if rate is set to 0 or scheduler failed to add task.
+     * @returns true if on scheduler, false if not and not running.
      */
     bool startTaskThreading() {
+        if (!attached_) return false;
         isSuspended_ = false;
+        interval_.forceNextRun();
         return true;
     }
 
     /**
-     * Stops threading for task.
+     * Stops threading for task, but remains on scheduler.
      */
     void stopTaskThreading() {
         isSuspended_ = true;
+    }
+
+    /**
+     * Attaches task to scheduler. Wont call init again. Task will be suspended.
+     */
+    void attachToScheduler() {
+        if (attached_) return;
+        stopTaskThreading();
+        taskList().removeAllEqual(this); //Make sure task isnt already in list.
+        taskList().append(this);
+        attached_ = true;
+    }
+
+    /**
+     * Stops threading for task, but remains on scheduler. Calls tasks removal() function.
+     */
+    void removeFromScheduler() {
+        if (!attached_) return;
+        stopTaskThreading();
+        this->removal();
+        taskList().removeAllEqual(this); //Make sure task isnt already in list.
+        attached_ = false;
     }
 
     /**

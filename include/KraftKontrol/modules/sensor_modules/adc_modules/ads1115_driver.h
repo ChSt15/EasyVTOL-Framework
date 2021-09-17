@@ -20,7 +20,7 @@
 class ADS1115Driver: public ADC_Abstract, public Module_Abstract, public Task_Abstract {
 public:
 
-    ADS1115Driver(TwoWire& i2cBus, uint32_t rate = 100) : Task_Abstract("ADS1115 Driver", rate*4, eTaskPriority_t::eTaskPriority_VeryHigh), i2cBus_(i2cBus), adc_(0x48) {}
+    ADS1115Driver(TwoWire& i2cBus, uint32_t rate = 100);
     
     /**
      * This is where all calculations are done.
@@ -42,7 +42,7 @@ public:
      * @param channel Which ADC channel topic to return reference for.
      * @returns reference to adc data topic
      */
-    virtual const ADCChannel& getADCChannel(uint32_t channel = 0) const override;
+    virtual ADCChannel& operator[](uint32_t channel) override;
 
     /**
      * @returns number of channels ADC has. For this device 4.

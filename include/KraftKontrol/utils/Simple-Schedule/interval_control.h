@@ -70,16 +70,14 @@ public:
     inline void setLimit(bool limit) {limit_ = limit;}
 
     /**
-     * This syncs the internal variables. This is usefull
-     * if the limiter is off and to keep for huge amount of 
-     * lost time to keep the system from running at max speed.
-     * e.g. if say rate is set to 1khz and does not run for 1s
-     * and syncRate() is not called then system will make up 
-     * for the 1000 lost runs by running 1000 times as fast
-     * as possible.
-     *
+     * Sets internal clock so that the next call to whether or not to run will always return true.
      */
-    inline void syncInternal() {lastRun_ns_ = NOW();}
+    inline void forceNextRun() {lastRun_ns_ = NOW()-interval_ns_;}
+
+    /**
+     * Resets internal clock so that the next run will be in the set interval from now.
+     */
+    inline void syncClock() {lastRun_ns_ = NOW();}
 
     /**
      * Waits till next Run.

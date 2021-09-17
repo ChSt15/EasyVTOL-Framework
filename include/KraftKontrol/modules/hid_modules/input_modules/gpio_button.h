@@ -1,33 +1,35 @@
-#ifndef GENERIC_BUTTON_H
-#define GENERIC_BUTTON_H
+#ifndef GPIO_BUTTON_H
+#define GPIO_BUTTON_H
 
 
-#include "Arduino.h"
 
 #include "KraftKontrol/modules/hid_modules/input_modules/button_abstract.h"
 #include "KraftKontrol/utils/buffer.h"
-#include "KraftKontrol/utils/low_pass_filter.h"
+#include "KraftKontrol/platforms/platform_hal.h"
 
 
 
-class GenericButton: public ButtonHID_Abstract {
+class GPIOButton: public ButtonHID_Abstract {
 private:
 
     ///Buffer for storing button values.
     Buffer<int, 9> valueBuf_;
 
-    uint32_t pin_ = 0;
-
     bool usePullup_ = false;
+
+    bool onLow_ = true;
+
+    GPIO_HAL pin_;
 
 
 public:
 
     /**
      * @param pin Which pin to use as input.
+     * @param onLow Button is pressed when pin is measured as low. Defaults to true.
      * @param useInternalPullup Use internal pullup. Defaults to true;
      */
-    GenericButton(uint32_t pin, bool useInternalPullup = true, uint32_t rate = 50);
+    GPIOButton(uint32_t pin, bool onLow = true, bool useInternalPullup = true, uint32_t rate = 50);
 
     /**
      * @returns touch value.
@@ -50,6 +52,8 @@ private:
      * @returns true if button pressed.
      */
     bool getButtonStatus() override;
+
+    bool getRawButton();
 
 
 };

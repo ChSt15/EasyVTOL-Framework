@@ -2,7 +2,12 @@
 
 
 
-const ADCChannel& ADS1115Driver::getADCChannel(uint32_t channel) const {
+ADS1115Driver::ADS1115Driver(TwoWire& i2cBus, uint32_t rate) : Task_Abstract("ADS1115 Driver", rate*4, eTaskPriority_t::eTaskPriority_VeryHigh), i2cBus_(i2cBus), adc_(0x48) {
+    
+}
+
+
+ADCChannel& ADS1115Driver::operator[](uint32_t channel) {
     return adcChannels_[constrain(channel, 0, 4)];
 }
 

@@ -20,8 +20,25 @@ private:
 
     SensorTimestamp<float> adcValue_ = 0;
 
+    float offset_ = 0;
+    float scaling_ = 1;
+
 
 public:
+
+    /**
+     * Sets the offset for the voltage.
+     * output = voltage*scaling + offset;
+     * @param offset Voltage offset.
+     */
+    void setOffset(float offset);
+
+    /**
+     * Sets the scaling factor for the voltage.
+     * output = voltage*scaling + offset;
+     * @param scaling Voltage scaling factor.
+     */
+    void setScaling(float scaling);
 
     /**
      * @returns the adc channels topic.
@@ -55,7 +72,13 @@ public:
      * @param channel Which ADC channel topic to return reference for.
      * @returns reference to adc data topic
      */
-    virtual const ADCChannel& getADCChannel(uint32_t channel = 0) const = 0;
+    virtual ADCChannel& operator[](uint32_t channel) = 0;
+
+    /**
+     * @param channel Which ADC channel topic to return reference for.
+     * @returns reference to adc data topic
+     */
+    const ADCChannel& operator[](uint32_t channel) const; 
 
     /**
      * @returns number of channels ADC has

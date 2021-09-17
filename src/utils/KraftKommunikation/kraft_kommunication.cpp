@@ -155,7 +155,7 @@ void KraftKommunication::thread() {
             sendPackets_.takeBack(packet);
             DataMessageBuffer message;
             message.setBuffer(packet.dataBuffer, packet.bufferSize);
-            heartbeatTimer_.syncInternal();
+            heartbeatTimer_.syncClock();
             dataLink_->getToSendDataTopic().publish(message);
             
         } else if (sendPacketsACK_.available()) {
@@ -166,7 +166,7 @@ void KraftKommunication::thread() {
 
                 DataMessageBuffer message;
                 message.setBuffer(packet->dataBuffer, packet->bufferSize);
-                heartbeatTimer_.syncInternal();
+                heartbeatTimer_.syncClock();
                 dataLink_->getToSendDataTopic().publish(message);
 
                 if (packet->sendAttempts > 0) packet->sendAttempts--;
@@ -190,7 +190,7 @@ void KraftKommunication::thread() {
 
                         DataMessageBuffer message;
                         message.setBuffer(packet->dataBuffer, packet->bufferSize);
-                        heartbeatTimer_.syncInternal();
+                        heartbeatTimer_.syncClock();
                         dataLink_->getToSendDataTopic().publish(message);
 
                     }

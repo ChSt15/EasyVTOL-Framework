@@ -44,7 +44,13 @@
 #include "KraftKontrol/modules/sensor_modules/adc_modules/ads1115_driver.h"
 
 #include "KraftKontrol/modules/hid_modules/input_modules/button_abstract.h"
-#include "KraftKontrol/modules/hid_modules/input_modules/generic_button.h"
+#include "KraftKontrol/modules/hid_modules/input_modules/gpio_button.h"
+#include "KraftKontrol/modules/hid_modules/input_modules/analog_button.h"
+#include "KraftKontrol/modules/hid_modules/input_modules/joystick.h"
+
+#include "KraftKontrol/gui/gui.h"
+#include "KraftKontrol/gui/menu_abstract.h"
+
 #include "KraftKontrol/modules/hid_modules/display_modules/display_abstract.h"
 
 #include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_messagetype_abstracts.h"

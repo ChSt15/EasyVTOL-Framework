@@ -5,10 +5,12 @@
 #include "topic.h"
 #include "buffer.h"
 
+#include "Simple-Schedule/task_autorun_class.h"
+
 
 
 /**
- * Subscribes to topic(s) and saves a copy of the item.
+ * Subscribes to topic(s). USed by other subscribers to implement core functions.
  */
 template<typename TYPE> 
 class Subscriber_Generic: public Subscriber_Interface<TYPE> {
@@ -83,6 +85,22 @@ private:
  */
 template<typename TYPE> 
 class Simple_Subscriber: public Subscriber_Generic<TYPE> {
+private:
+
+    bool itemIsNew = false;
+    bool itemIsValid = false;
+
+    TYPE receivedItem;
+
+    Task_Abstract* taskToResume_ = nullptr;
+
+    void receive(TYPE& item, Topic<TYPE>* topic) override {
+        receivedItem = item;
+        itemIsNew = true;
+        if (taskToResume_ != nullptr) taskToResume_->startTaskThreading();
+    }
+
+
 public:
 
     Simple_Subscriber() {}
@@ -110,18 +128,19 @@ public:
         return receivedItem;
     }
 
-
-private:
-
-    void receive(TYPE& item, Topic<TYPE>* topic) override {
-        receivedItem = item;
-        itemIsNew = true;
+    /**
+     * Will resume given task if an item is recieved.
+     */
+    void setTaskToResume(Task_Abstract& task) {
+        taskToResume_ = &task;
     }
 
-    bool itemIsNew = false;
-    bool itemIsValid = false;
-
-    TYPE receivedItem;
+    /**
+     * Stops resuming the given task that was being resumed.
+     */
+    void removeTaskResume() {
+        taskToResume_ = nullptr;
+    }
 
 };
 
@@ -152,14 +171,31 @@ public:
      */
     void setOverwrite(bool overwrite) {overwrite_ = overwrite;}
 
+    /**
+     * Will resume given task if an item is recieved.
+     */
+    void setTaskToResume(Task_Abstract& task) {
+        taskToResume_ = &task;
+    }
+
+    /**
+     * Stops resuming the given task that was being resumed.
+     */
+    void removeTaskResume() {
+        taskToResume_ = nullptr;
+    }
+
 
 private:
 
     void receive(TYPE& item, Topic<TYPE>* topic) override {
         this->placeFront(item, overwrite_);
+        if (taskToResume_ != nullptr) taskToResume_->startTaskThreading();
     }
 
     bool overwrite_ = false;
+
+    Task_Abstract* taskToResume_ = nullptr;
 
 };
 
@@ -182,14 +218,32 @@ public:
         callbackFunc_ = callbackFunc;
     }
 
+    /**
+     * Will resume given task if an item is recieved.
+     * Callback will be called first, then task is resumed.
+     */
+    void setTaskToResume(Task_Abstract& task) {
+        taskToResume_ = &task;
+    }
+
+    /**
+     * Stops resuming the given task that was being resumed.
+     */
+    void removeTaskResume() {
+        taskToResume_ = nullptr;
+    }
+
 
 private:
 
     void receive(TYPE& item, Topic<TYPE>* topic) override {
         if (callbackFunc_ != nullptr) callbackFunc_(item);
+        if (taskToResume_ != nullptr) taskToResume_->startTaskThreading();
     }
 
     void (*callbackFunc_)(TYPE& item) = nullptr;
+
+    Task_Abstract* taskToResume_ = nullptr;
 
 
 };

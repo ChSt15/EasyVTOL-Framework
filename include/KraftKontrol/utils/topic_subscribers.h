@@ -19,7 +19,7 @@ public:
 
     Subscriber_Generic() {}
 
-    Subscriber_Generic(Topic<TYPE>& topic) {
+    Subscriber_Generic(const Topic<TYPE>& topic) {
         subscribe(topic);
     }
 
@@ -108,7 +108,7 @@ public:
     /**
      * @param topic Topic to subscribe to.
      */
-    Simple_Subscriber(Topic<TYPE>& topic): Subscriber_Generic<TYPE>(topic) {}
+    Simple_Subscriber(const Topic<TYPE>& topic): Subscriber_Generic<TYPE>(topic) {}
 
     /**
      * @returns True if new data was received
@@ -161,7 +161,7 @@ public:
      * @param topic Topic to subscribe to.
      * @param overwrite Set to true to overwrite oldest values if full. Defaults to false.
      */
-    Buffer_Subscriber(Topic<TYPE>& topic, bool overwrite = false): Subscriber_Generic<TYPE>(topic) {
+    Buffer_Subscriber(const Topic<TYPE>& topic, bool overwrite = false): Subscriber_Generic<TYPE>(topic) {
         overwrite_ = overwrite;
     }
 
@@ -214,7 +214,7 @@ public:
      * e.g. Callback_Subscriber<int, class> subscriber(intTopic);
      * @param topic Topic to subscribe to. But there is no object or object to call.
      */
-    Callback_Subscriber(Topic<TYPE>& topic): Subscriber_Generic<TYPE>(topic) {
+    Callback_Subscriber(const Topic<TYPE>& topic): Subscriber_Generic<TYPE>(topic) {
         callbackFunc_ = nullptr;
         object_ = nullptr;
     }
@@ -299,7 +299,7 @@ public:
      * @param topic Topic to subscribe to.
      * @param callbackFunc Function to call on data receive.
      */
-    StaticCallback_Subscriber(Topic<TYPE>& topic, void (*callbackFunc)(TYPE& item)): Subscriber_Generic<TYPE>(topic) {
+    StaticCallback_Subscriber(const Topic<TYPE>& topic, void (*callbackFunc)(TYPE& item)): Subscriber_Generic<TYPE>(topic) {
         callbackFunc_ = callbackFunc;
     }
 

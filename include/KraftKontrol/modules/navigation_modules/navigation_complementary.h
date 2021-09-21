@@ -49,7 +49,7 @@ public:
      * @param baro module to use.
      * @param gnss module to use.
      */
-    NavigationComplementaryFilter(Gyroscope_Interface* gyro = nullptr, Accelerometer_Interface* accel = nullptr, Magnetometer_Interface* mag = nullptr, Barometer_Interface* baro = nullptr, GNSS_Interface* gnss = nullptr) : Task_Abstract("Complementary Navigation", 1000, eTaskPriority_t::eTaskPriority_VeryHigh) {
+    NavigationComplementaryFilter(Gyroscope_Interface* gyro = nullptr, Accelerometer_Interface* accel = nullptr, Magnetometer_Interface* mag = nullptr, Barometer_Interface* baro = nullptr, GNSS_Interface* gnss = nullptr) : Task_Abstract("Complementary Navigation", 4000, eTaskPriority_t::eTaskPriority_VeryHigh) {
         if (gyro != nullptr) {
             gyroSub_.subscribe(gyro->getGyroTopic()); 
             gyroSub_.setOverwrite(true);

@@ -24,7 +24,7 @@ public:
      * @param serialPort Pointer to serial port to use. If non default pins used then setup before init run.
      * @param usbPassthrough If true then gps wont be setup and serial data will be passed to USB serial.
      */
-    UbloxSerialGNSS(HardwareSerial& serialPort, int rxPin, int txPin) : Task_Abstract("Ublox GNSS Serial Driver", 400, eTaskPriority_t::eTaskPriority_High) {
+    UbloxSerialGNSS(HardwareSerial& serialPort, int rxPin = -1, int txPin = -1) : Task_Abstract("Ublox GNSS Serial Driver", 100, eTaskPriority_t::eTaskPriority_High) {
         serialPort_ = &serialPort;
         rxPin_ = rxPin;
         txPin_ = txPin;

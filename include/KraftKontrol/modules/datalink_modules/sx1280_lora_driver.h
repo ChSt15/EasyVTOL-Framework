@@ -108,8 +108,6 @@ private:
 
     uint8_t startAttempts_ = 0;
 
-    uint32_t lastMeasurement_ = 0;
-
     
 };
 

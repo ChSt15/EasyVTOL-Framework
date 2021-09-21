@@ -10,7 +10,7 @@
 #include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
 #include "KraftKontrol/modules/module_abstract.h"
 
-#include "Adafruit_ST7735.h"
+#include "lib/Adafruit-ST7735-Library-master/Adafruit_ST7735.h"
 
 
 

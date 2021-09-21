@@ -116,7 +116,7 @@ void Task_Abstract::schedulerTick() {
 
         }
 
-        schedulerUsage_ = (float)timeLeft/totalTime;
+        schedulerUsage_ = (float)(totalTime - timeLeft)/totalTime;
 
     }
 

@@ -3,7 +3,7 @@
 
 
 
-#include "KraftKontrol/utils/KraftKommunikation/kraft_message.h"
+#include "KraftKontrol/modules/communication_modules/kraft_message.h"
 
 #include "lib/Math-Helper/src/3d_math.h"
 

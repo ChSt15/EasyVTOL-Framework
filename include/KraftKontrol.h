@@ -6,7 +6,7 @@
 
 #include "KraftKontrol/utils/constrainers.h"
 
-#include "KraftKontrol/utils/KraftKommunikation/kraft_kommunication.h"
+#include "KraftKontrol/modules/communication_modules/kraft_kommunication.h"
 #include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
 
 #include "KraftKontrol/vehicle/vehicle_interface.h"

@@ -1,4 +1,4 @@
-#include "KraftKontrol/utils/KraftKommunikation/kraft_kommunication.h"
+#include "KraftKontrol/modules/communication_modules/kraft_kommunication.h"
 
 
 
@@ -39,7 +39,7 @@ bool KraftKommunication::decodeMessageFromBuffer(ReceivedPayloadData& payloadDat
 
 
 
-uint32_t KraftKommunication::encodeMessageToBuffer(KraftMessage_Interface& message, const uint8_t &receiveNode, const bool &requestAck, uint8_t* buffer, const uint32_t &bufferSize) {
+uint32_t KraftKommunication::encodeMessageToBuffer(const KraftMessage_Interface& message, uint8_t receiveNode, bool requestAck, uint8_t* buffer, uint32_t bufferSize) {
 
     if (bufferSize < 9 + message.getDataSize()) return 0; //Make sure dataByte is big enough to fit all the data.
 
@@ -75,7 +75,7 @@ uint32_t KraftKommunication::encodeMessageToBuffer(KraftMessage_Interface& messa
 
 
 
-uint8_t KraftKommunication::calculateCRC(uint8_t* buffer, const uint32_t &stopByte) {
+uint8_t KraftKommunication::calculateCRC(uint8_t* buffer, uint32_t stopByte) {
 
     uint8_t crc = 0;
 
@@ -87,7 +87,7 @@ uint8_t KraftKommunication::calculateCRC(uint8_t* buffer, const uint32_t &stopBy
 
 
 
-bool KraftKommunication::sendMessage(KraftMessage_Interface& kraftMessage, const eKraftMessageNodeID_t &receiveNodeID, const bool &requiresAck) {
+bool KraftKommunication::sendMessage(const KraftMessage_Interface& kraftMessage, eKraftMessageNodeID_t receiveNodeID, bool requiresAck) {
 
     SendPacketData packetData;
 
@@ -115,14 +115,17 @@ bool KraftKommunication::sendMessage(KraftMessage_Interface& kraftMessage, const
 
 
 
-bool KraftKommunication::getMessage(KraftMessage_Interface& kraftMessage, const bool &peek) {
+void KraftKommunication::kraftMessageSendCallback(const MessageLinkData& item) {
 
-    ReceivedPayloadData payloadData;
-    
-    if (!peek) receivedPackets_.takeBack(payloadData);
-    else receivedPackets_.peekBack(payloadData);
+    sendMessage(item.message, item.receiverID, item.requiresAck);
 
-    return kraftMessage.setRawData(payloadData.dataBuffer, payloadData.messageData.payloadSize);
+}
+
+
+
+void KraftKommunication::kraftMessageBroadcastCallback(const KraftMessage_Interface& item) {
+
+    sendMessage(item, eKraftMessageNodeID_t::eKraftMessageNodeID_broadcast);
 
 }
 
@@ -134,8 +137,8 @@ void KraftKommunication::thread() {
     for (uint32_t i = 0; i < c_maxNumberNodes; i++) {
         if (nodeData_[i].online && NOW() - nodeData_[i].lastPacketTimestamp > (int64_t)SECONDS*3/c_heartbeatRate) {
             nodeData_[i].online = false;
-            KraftMessageContainer message = KraftMessageContainer(DataMessageNodeStatus(false, i));
-            globalMessages().publish(message);
+            //KraftMessageEmulator message = DataMessageNodeStatus(false, i);
+            globalMessages().publish(DataMessageNodeStatus(false, i));
         }
     }
     if (heartbeatTimer_.isTimeToRun()) {
@@ -147,7 +150,7 @@ void KraftKommunication::thread() {
 
 
     //Send packets waiting to be sent
-    if (!dataLink_->busy()) {
+    if (!dataLink_.busy()) {
 
         if (sendPackets_.available()) {
 
@@ -156,7 +159,7 @@ void KraftKommunication::thread() {
             DataMessageBuffer message;
             message.setBuffer(packet.dataBuffer, packet.bufferSize);
             heartbeatTimer_.syncClock();
-            dataLink_->getToSendDataTopic().publish(message);
+            dataLinkSendSubr_.publish(message);
             
         } else if (sendPacketsACK_.available()) {
 
@@ -167,7 +170,7 @@ void KraftKommunication::thread() {
                 DataMessageBuffer message;
                 message.setBuffer(packet->dataBuffer, packet->bufferSize);
                 heartbeatTimer_.syncClock();
-                dataLink_->getToSendDataTopic().publish(message);
+                dataLinkSendSubr_.publish(message);
 
                 if (packet->sendAttempts > 0) packet->sendAttempts--;
                 packet->sendTimestamp = NOW();
@@ -191,7 +194,7 @@ void KraftKommunication::thread() {
                         DataMessageBuffer message;
                         message.setBuffer(packet->dataBuffer, packet->bufferSize);
                         heartbeatTimer_.syncClock();
-                        dataLink_->getToSendDataTopic().publish(message);
+                        dataLinkSendSubr_.publish(message);
 
                     }
                     
@@ -219,12 +222,12 @@ void KraftKommunication::thread() {
 
         //Serial.println("Kraft komm sees packet is " + String(bytes) + " bytes long!");
 
-        if (bytes > 0) { //Only continue if receive worked.
+        if (bytes > 0) { //Only continue if there is data
 
             ReceivedPayloadData message;
             bool ackRequested;
 
-            if (decodeMessageFromBuffer(message, ackRequested, packet, sizeof(packet))) {
+            if (decodeMessageFromBuffer(message, ackRequested, packet, bytes)) {
 
                 if (ackRequested) {
                     
@@ -235,16 +238,16 @@ void KraftKommunication::thread() {
 
                 if (message.messageData.receiverID == selfID_ || message.messageData.receiverID == eKraftMessageNodeID_t::eKraftMessageNodeID_broadcast) { //Make sure packet is for us.
 
-                    nodeData_[message.messageData.transmitterID].lastPacketTimestamp = millis();
+                    nodeData_[message.messageData.transmitterID].lastPacketTimestamp = NOW();
                     nodeData_[message.messageData.transmitterID].online = true;
 
-                    KraftMessageContainer messageContained(message.dataBuffer, message.messageData.payloadSize, message.messageData.messageTypeID, message.messageData.dataTypeID);
+                    KraftMessageEmulator kraftMessage(message.dataBuffer, message.messageData.payloadSize, message.messageData.messageTypeID, message.messageData.dataTypeID);
 
                     if (message.messageData.messageTypeID == eKraftMessageType_t::eKraftMessageType_Datalink_ID) {
 
                         switch (message.messageData.dataTypeID) {
                         case eDataLinkDataType_t::eDataLinkDataType_ACK:
-                            sendPacketsACK_.removeBack();
+                            //sendPacketsACK_.removeBack();
                             nodeData_[message.messageData.transmitterID].waitingOnPacket = nullptr; 
                             break;
 
@@ -257,22 +260,10 @@ void KraftKommunication::thread() {
 
                         }
 
-                    } else if (message.messageData.messageTypeID == eKraftMessageType_t::eKraftMessageType_Telemetry_ID) {
-
-                        receivedPackets_.placeFront(message);
-                        telemetryMessages().publish(messageContained);
-
-                    } else if (message.messageData.messageTypeID == eKraftMessageType_t::eKraftMessageType_Command_ID) {
-
-                        receivedPackets_.placeFront(message);
-                        globalMessages().publish(messageContained);
-
-                    } else if (message.messageData.messageTypeID == eKraftMessageType_t::eKraftMessageType_Data_ID) {
-
-                        //receivedPackets_.placeFront(message);
-                        //globalMessages().publish(messageContained);
-
                     }
+
+                    //Publish new receive message to topic.
+                    receivedMessagesTopic_.publish(kraftMessage);
 
                 } else {
 
@@ -294,7 +285,7 @@ void KraftKommunication::thread() {
     //Check for timeout on all nodes.
     for (uint8_t i = 0; i < 0; i++) {
 
-        if (millis() - nodeData_[i].lastPacketTimestamp >= 500) {
+        if (nodeData_[i].online && (NOW() - nodeData_[i].lastPacketTimestamp >= 1*SECONDS)) {
             
             nodeData_[i].online = false;
 
@@ -306,3 +297,6 @@ void KraftKommunication::thread() {
     
 
 }
+
+
+

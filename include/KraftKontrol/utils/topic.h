@@ -39,7 +39,7 @@ public:
      * Publishes an item to topic, but will not receive item. Makes it simpler to broadcast items from modules.
      * @param item Item to publish
      */
-    //virtual void publish(TYPE& item) = 0;
+    virtual void publish(const TYPE& item) = 0;
 
 
 protected:
@@ -49,7 +49,7 @@ protected:
      * @param item Item that subscriber will receive.
      * @param topic Which topic is calling this receive function.
      */
-    virtual void receive(TYPE& item, Topic<TYPE>* topic) = 0;
+    virtual void receive(const TYPE& item, const Topic<TYPE>* topic) = 0;
 
 
 };
@@ -74,13 +74,13 @@ public:
      * Sends item to all subscribers.
      * @param item Item to be sent.
      */
-    void publish(TYPE& item);
+    void publish(const TYPE& item);
 
     /**
      * Sends copy of given item to all subscribers.
      * @param item Item to be sent.
      */
-    void publish(TYPE&& item);
+    void publish(const TYPE&& item);
 
     /**
      * @returns a copy of the last published item.
@@ -95,7 +95,7 @@ private:
      * @param item Item to be sent.
      * @param subscriber Subscriber to not receive item
      */
-    void publish(TYPE& item, Subscriber_Interface<TYPE>* subscriber);
+    void publish(const TYPE& item, Subscriber_Interface<TYPE>* subscriber) const ;
 
     //Is constant to allow modules to return const reference and others can subscribe but are unable to publish.
     void addSubscriber(Subscriber_Interface<TYPE>* subscriber) const;
@@ -134,7 +134,7 @@ const List<Subscriber_Interface<TYPE>*>& Topic<TYPE>::getSubscriberList() const 
 
 
 template<typename TYPE> 
-void Topic<TYPE>::publish(TYPE& item) {
+void Topic<TYPE>::publish(const TYPE& item) {
     //latestItem = item;
     for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) subscribers_[i]->receive(item, this);
 }
@@ -142,15 +142,15 @@ void Topic<TYPE>::publish(TYPE& item) {
 
 
 template<typename TYPE> 
-void Topic<TYPE>::publish(TYPE&& item) {
-    TYPE itemCopy = item;
-    for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) subscribers_[i]->receive(itemCopy, this);
+void Topic<TYPE>::publish(const TYPE&& item) {
+    //TYPE itemCopy = item;
+    for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) subscribers_[i]->receive(item, this);
 }
 
 
 
 template<typename TYPE> 
-void Topic<TYPE>::publish(TYPE& item, Subscriber_Interface<TYPE>* subscriber) {
+void Topic<TYPE>::publish(const TYPE& item, Subscriber_Interface<TYPE>* subscriber) const  {
     
     for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) {
         if (subscribers_[i] != subscriber) subscribers_[i]->receive(item, this);

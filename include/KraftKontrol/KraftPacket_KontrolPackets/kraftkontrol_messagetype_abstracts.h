@@ -3,7 +3,7 @@
 
 
 
-#include "KraftKontrol/utils/KraftKommunikation/kraft_message.h"
+#include "KraftKontrol/modules/communication_modules/kraft_message.h"
 
 #include "lib/Math-Helper/src/3d_math.h"
 
@@ -32,7 +32,7 @@ protected:
 
     uint32_t getDataSize() const final {return sizeof(Quaternion<>);}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const override {
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -47,7 +47,7 @@ protected:
 
     }
 
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) override {
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -86,7 +86,7 @@ protected:
 
     uint32_t getDataSize() const final {return sizeof(Vector<>);}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const override {
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -100,7 +100,7 @@ protected:
 
     }
 
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
+    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) override {
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -138,7 +138,7 @@ protected:
 
     uint32_t getDataSize() const {return sizeof(KinematicData);}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const override {
 
         if (dataByteSize < sizeof(KinematicData)) return false;
 
@@ -148,7 +148,7 @@ protected:
 
     }
 
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
+    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) override{
 
         if (dataByteSize < sizeof(KinematicData)) return false;
 
@@ -181,7 +181,7 @@ protected:
 
     uint32_t getDataSize() const {return sizeof(DynamicData);}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const override {
 
         if (dataByteSize < sizeof(DynamicData)) return false;
 
@@ -191,7 +191,7 @@ protected:
 
     }
 
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
+    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) override{
 
         if (dataByteSize < sizeof(DynamicData)) return false;
 
@@ -208,8 +208,8 @@ protected:
 
 
 /**
- * Used to create custom message tapes easily. 
- * Should only be used for primitive datatypes!
+ * Used to create custom message types easily. 
+ * Should only be used for primitive datatypes! Otherwise problems between different platforms may occur!
  */
 template <typename TYPE>
 class MessageGeneric_Abstract: public KraftMessage_Interface {
@@ -230,7 +230,7 @@ protected:
 
     uint32_t getDataSize() const {return sizeof(TYPE);}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const override {
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -242,7 +242,7 @@ protected:
 
     }
 
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
+    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) override{
 
         if (dataByteSize < getDataSize()) return false;
 

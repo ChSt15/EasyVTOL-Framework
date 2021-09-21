@@ -4,10 +4,6 @@
 
 void SX1280Driver::thread() {
 
-    if (block_) return;
-
-    loopCounter_++;
-
 
     if (moduleStatus_ == eModuleStatus_t::eModuleStatus_Running) {
 
@@ -27,17 +23,9 @@ void SX1280Driver::thread() {
     } else { //This section is for device failure or a wierd mode that should not be set, therefore assume failure
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
-        block_ = true;
-        stopTaskThreading();
-        loopRate_ = 0;
+        
+        removeFromScheduler();
 
-    }
-
-
-
-    if (rateCalcInterval_.isTimeToRun()) {
-        loopRate_ = loopCounter_;
-        loopCounter_ = 0;
     }
 
 }
@@ -65,21 +53,24 @@ void SX1280Driver::internalLoop() {
 
             byte packetL = radio_.readRXPacketL();
 
-            if (packetL != 0) { // make sure packet is okay
+            if (packetL > 0) { // make sure packet is okay
 
                 receivedDataRSSI_ = radio_.readPacketRSSI();
                 receivedDataSNR_ = radio_.readPacketSNR();
 
+                DataMessageBuffer receivedData;
+
                 radio_.startReadSXBuffer(0);
 
                 int i;
-                for (i = 0; i < packetL && i < SX1280_DATA_BUFFER_SIZE; i++) receivedData_[i] = radio_.readUint8();
+                for (i = 0; i < packetL && i < SX1280_DATA_BUFFER_SIZE; i++) receivedData.getBuffer()[i] = radio_.readUint8();
                 //radio_.readBuffer(receivedData_);
 
                 radio_.endReadSXBuffer();
 
-                
-                receivedDataSize_ = packetL;
+                //Place inside buffer and publish.
+                receivedData.setBufferSize(packetL);
+                receivedDataTopic_.publish(receivedData);
 
                 #ifdef SX1280_DEBUG
                     Serial.println("Data Received and is " + String(packetL) + " bytes long. At RSSI: " + receivedDataRSSI_ + ", SNR: " + receivedDataSNR_);
@@ -106,7 +97,6 @@ void SX1280Driver::internalLoop() {
         if (irqStatus & (IRQ_TX_DONE)) {
 
             isBusySending_ = false;
-            toSendDataSize_ = 0;
 
             #ifdef SX1280_DEBUG
                 Serial.println("Interrupt says tx done!");
@@ -133,16 +123,11 @@ void SX1280Driver::internalLoop() {
 
 
     
-    if (toSendDataSize_ > 0 && !isBusySending_ && !digitalRead(busyPin_)) { 
+    if (toSendBufferSub_.available() > 0 && !isBusySending_) { 
 
         isBusySending_ = true;
 
-        radio_.transmit(toSendData_, toSendDataSize_, 0, SX1280_POWER_dB, NO_WAIT);
-        /*radio_.startWriteSXBuffer(0);
-        radio_.writeBuffer(toSendData_, toSendDataSize_);
-        radio_.endWriteSXBuffer();
-
-        radio_.transmitSXBuffer(0, toSendDataSize_, 0, SX1280_POWER_dB, NO_WAIT);*/
+        radio_.transmit(toSendBufferSub_[0].getBuffer(), toSendBufferSub_[0].getBufferSize(), 0, SX1280_POWER_dB, NO_WAIT);
 
         #ifdef SX1280_DEBUG
             Serial.println("Sending data packet!");
@@ -167,9 +152,11 @@ void SX1280Driver::init() {
         radio_.setDioIrqParams(IRQ_RADIO_ALL, IRQ_RADIO_ALL, 0, 0);
         radio_.setHighSensitivity();
 
-        radio_.receive(receivedData_, SX1280_DATA_BUFFER_SIZE, 0, NO_WAIT);
+        radio_.receiveSXBuffer(0, 0, NO_WAIT);
 
         Serial.println("SX1280 start success!");
+
+        toSendBufferSub_.subscribe(toSendDataTopic_);
 
         startAttempts_ = 0;
 

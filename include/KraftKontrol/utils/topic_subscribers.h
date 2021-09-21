@@ -57,9 +57,9 @@ public:
      * Publishes an item to topic, but will not receive item. Makes it simpler to broadcast items from modules.
      * @param item Item to publish
      */
-    /*void publish(TYPE& item) {
+    void publish(const TYPE& item) {
         for (uint32_t i = 0; i < subscribedTopics_.getNumItems(); i++) subscribedTopics_[i]->publish(item, this);
-    }*/
+    }
 
 
 private:
@@ -94,7 +94,7 @@ private:
 
     Task_Abstract* taskToResume_ = nullptr;
 
-    void receive(TYPE& item, Topic<TYPE>* topic) override {
+    void receive(const TYPE& item, const Topic<TYPE>* topic) override {
         receivedItem = item;
         itemIsNew = true;
         if (taskToResume_ != nullptr) taskToResume_->startTaskThreading();
@@ -188,7 +188,7 @@ public:
 
 private:
 
-    void receive(TYPE& item, Topic<TYPE>* topic) override {
+    void receive(const TYPE& item, const Topic<TYPE>* topic) override {
         this->placeFront(item, overwrite_);
         if (taskToResume_ != nullptr) taskToResume_->startTaskThreading();
     }
@@ -204,17 +204,102 @@ private:
 /**
  * This subscriber calls the given function passing the data received form topic to it.
  */
-template<typename TYPE> 
+template<typename TYPE, typename CALLBACKTYPE> 
 class Callback_Subscriber: public Subscriber_Generic<TYPE> {
 public:
 
     Callback_Subscriber() {}
 
     /**
+     * e.g. Callback_Subscriber<int, class> subscriber(intTopic);
+     * @param topic Topic to subscribe to. But there is no object or object to call.
+     */
+    Callback_Subscriber(Topic<TYPE>& topic): Subscriber_Generic<TYPE>(topic) {
+        callbackFunc_ = nullptr;
+        object_ = nullptr;
+    }
+
+    /**
+     * e.g. Callback_Subscriber<int, class> subscriber(intTopic, this, class::intTopicEventCallback);
+     * @param topic Topic to subscribe to.
+     * @param objectPointer Which object to call the callback function on.
+     * @param callbackFunc Function to call on data receive. Returns void and parameter is <TYPE>& item.
+     */
+    Callback_Subscriber(Topic<TYPE>& topic, CALLBACKTYPE* objectPointer, void (CALLBACKTYPE::*callbackFunc)(const TYPE&)): Subscriber_Generic<TYPE>(topic) {
+        callbackFunc_ = callbackFunc;
+        object_ = objectPointer;
+    }
+
+    /**
+     * Sets what object to call the callback function on, on receive.
+     * @param objectPointer Which object to call the function on.
+     */
+    void setCallbackObject(CALLBACKTYPE* objectPointer) {
+        object_ = objectPointer;
+    }
+
+    /**
+     * Sets what callback function to be called on receive.
+     * @param callbackFunc Which function to call on receive.
+     */
+    void setCallbackFunction(void (CALLBACKTYPE::*callbackFunc)(const TYPE&)) {
+        callbackFunc_ = callbackFunc;
+    }
+    
+    /**
+     * @returns callback function to be called on receive. If none then returns nullptr.
+     */
+    /*void ()(TYPE& item) getCallbackFunction() {
+        return callbackFunc_;
+    }*/
+
+    /**
+     * Will resume given task if an item is recieved.
+     * Callback will be called first, then task is resumed.
+     */
+    void setTaskToResume(Task_Abstract& task) {
+        taskToResume_ = &task;
+    }
+
+    /**
+     * Stops resuming the given task that was being resumed.
+     */
+    void removeTaskResume() {
+        taskToResume_ = nullptr;
+    }
+
+
+private:
+
+    void receive(const TYPE& item, const Topic<TYPE>* topic) override {
+        if (callbackFunc_ != nullptr && object_ != nullptr) (object_->*callbackFunc_)(item);
+        if (taskToResume_ != nullptr) taskToResume_->startTaskThreading();
+    }
+
+    void (CALLBACKTYPE::*callbackFunc_)(const TYPE&) = nullptr;
+    CALLBACKTYPE* object_ = nullptr;
+
+    Task_Abstract* taskToResume_ = nullptr;
+
+
+};
+
+
+
+/**
+ * This subscriber calls the given function passing the data received form topic to it.
+ */
+template<typename TYPE> 
+class StaticCallback_Subscriber: public Subscriber_Generic<TYPE> {
+public:
+
+    StaticCallback_Subscriber() {}
+
+    /**
      * @param topic Topic to subscribe to.
      * @param callbackFunc Function to call on data receive.
      */
-    Callback_Subscriber(Topic<TYPE>& topic, void (*callbackFunc)(TYPE& item)): Subscriber_Generic<TYPE>(topic) {
+    StaticCallback_Subscriber(Topic<TYPE>& topic, void (*callbackFunc)(TYPE& item)): Subscriber_Generic<TYPE>(topic) {
         callbackFunc_ = callbackFunc;
     }
 
@@ -236,7 +321,7 @@ public:
 
 private:
 
-    void receive(TYPE& item, Topic<TYPE>* topic) override {
+    void receive(const TYPE& item, const Topic<TYPE>* topic) override {
         if (callbackFunc_ != nullptr) callbackFunc_(item);
         if (taskToResume_ != nullptr) taskToResume_->startTaskThreading();
     }

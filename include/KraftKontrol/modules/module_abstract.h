@@ -12,7 +12,7 @@
 
 
 #include "KraftKontrol/utils/topic.h"
-#include "KraftKontrol/utils/KraftKommunikation/kraft_message.h"
+#include "KraftKontrol/modules/communication_modules/kraft_message.h"
 
 
 
@@ -24,45 +24,6 @@ enum eModuleStatus_t {
     eModuleStatus_Failure
 };
 
-
-#ifdef ARDUINO_H
-
-inline String deviceStatusToString(eModuleStatus_t status) {
-
-    String buff = "UNKNOWN STATE";
-
-    switch (status)
-    {
-    case eModuleStatus_t::eModuleStatus_NotStarted :
-        buff = "Device not started";
-        break;
-
-    case eModuleStatus_t::eModuleStatus_Starting :
-        buff = "Device starting";
-        break;
-
-    case eModuleStatus_t::eModuleStatus_Running :
-        buff = "Device running";
-        break;
-
-    case eModuleStatus_t::eModuleStatus_RestartAttempt :
-        buff = "Device attempting restart";
-        break;
-
-    case eModuleStatus_t::eModuleStatus_Failure :
-        buff = "Device failure";
-        break;
-    
-    default:
-        buff = "UNKNOWN STATE: " + String(status);
-        break;
-    }
-
-    return buff;
-
-}
-
-#endif
 
 
 /**
@@ -82,12 +43,12 @@ public:
     /**
      * @returns global topic for module communication
      */
-    static Topic<KraftMessageContainer>& getGlobalMessageTopic() {return globalMessages();}
+    static Topic<KraftMessage_Interface>& getGlobalMessageTopic() {return globalMessages();}
 
     /**
      * @returns module specific topic for module communication
      */
-    Topic<KraftMessageContainer>& getModuleMessageTopic() {return moduleMessages_;}
+    Topic<KraftMessage_Interface>& getModuleMessageTopic() {return moduleMessages_;}
 
     /**
      * @returns a reference to a list of pointers to all currently existing modules
@@ -101,12 +62,10 @@ protected:
     virtual ~Module_Abstract() {existingModules().removeAllEqual(this);}
 
     //This static topic is used for transfering global messages between modules like disarming, failsafe, startup etc.
-    static Topic<KraftMessageContainer>& globalMessages();
-    //This static topic is used for distributing received telemetry messages
-    static Topic<KraftMessageContainer>& telemetryMessages();
+    static Topic<KraftMessage_Interface>& globalMessages();
 
     //This topic is used for modules to receive messages from specifically this module.
-    Topic<KraftMessageContainer> moduleMessages_;
+    Topic<KraftMessage_Interface> moduleMessages_;
 
     //Every module can use this to signify its current state.
     eModuleStatus_t moduleStatus_ = eModuleStatus_t::eModuleStatus_NotStarted;

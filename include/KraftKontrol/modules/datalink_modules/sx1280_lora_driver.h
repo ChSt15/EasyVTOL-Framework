@@ -6,7 +6,7 @@
 #include "Arduino.h"
 #include "SPI.h"
 
-#include "KraftKontrol/utils/KraftKommunikation/kraft_kommunication.h"
+#include "KraftKontrol/modules/communication_modules/kraft_link.h"
 #include "lib/SX12XX-LoRa-master/src/SX128XLT.h"
 
 #include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
@@ -34,10 +34,10 @@
 
 
 
-class SX1280Driver: public KraftLink_Interface, public Module_Abstract, public Task_Abstract {
+class SX1280Driver: public KraftLink_Abstract, public Module_Abstract, public Task_Abstract {
 public:
 
-    SX1280Driver(int busyPin, int txenPin, int rxenPin, int dio1Pin, int nResetPin, int nssPin/*, SPIClass* spiBus*/) : Task_Abstract("SX1280 Driver", 1000, eTaskPriority_t::eTaskPriority_Middle) {
+    SX1280Driver(int busyPin, int txenPin, int rxenPin, int dio1Pin, int nResetPin, int nssPin/*, SPIClass* spiBus*/) : Task_Abstract("SX1280 Driver", 2000, eTaskPriority_t::eTaskPriority_Middle) {
         nssPin_ = nssPin;
         busyPin_ = busyPin;
         txenPin_ = txenPin;
@@ -62,14 +62,6 @@ public:
      * @return none.
      */
     void init();
-
-    /**
-     * Returns rate (in Hz) of the thread
-     *
-     * @param values none.
-     * @return uint32_t.
-     */
-    uint32_t loopRate() {return loopRate_;};
 
     /**
      * @returns true if the internal buffer is full and adding a new message will result in data loss.
@@ -97,20 +89,13 @@ private:
     void internalLoop();
 
     //Buffer for data that was received by radio
-    uint8_t receivedData_[SX1280_DATA_BUFFER_SIZE];
-    uint8_t receivedDataSize_ = 0;
     int8_t receivedDataSNR_ = -100;
     int8_t receivedDataRSSI_ = -100;
-    //Buffer for data that is to be sent by radio
-    uint8_t toSendData_[SX1280_DATA_BUFFER_SIZE];
-    uint8_t toSendDataSize_ = 0;
 
-    //Should be true whileits waiting for send to complete
+    //Should be true while its waiting for send to complete
     bool isBusySending_ = false;
 
-    IntervalControl rateCalcInterval_ = IntervalControl(1); 
-
-    Buffer_Subscriber<DataMessageBuffer, 10> toSendBufferSub_ = Buffer_Subscriber<DataMessageBuffer, 10>(toSendDataTopic_);
+    Buffer_Subscriber<DataMessageBuffer, 10> toSendBufferSub_;
 
     int nssPin_;
     int busyPin_;
@@ -123,12 +108,7 @@ private:
 
     uint8_t startAttempts_ = 0;
 
-    uint32_t loopRate_ = 0;
-    uint32_t loopCounter_ = 0;
-
     uint32_t lastMeasurement_ = 0;
-
-    bool block_ = false;
 
     
 };

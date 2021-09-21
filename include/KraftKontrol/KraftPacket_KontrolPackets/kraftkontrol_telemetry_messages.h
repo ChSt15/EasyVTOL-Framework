@@ -6,38 +6,6 @@
 #include "kraftkontrol_data_messages.h"
 
 
-/*
-enum eKraftMessageType_KraftKontrol_t : uint8_t {
-    eKraftMessageType_KraftKontrol_AttitudeSet,
-    eKraftMessageType_KraftKontrol_AttitudeIs,
-    eKraftMessageType_KraftKontrol_PositionSet,
-    eKraftMessageType_KraftKontrol_PositionIs,
-    eKraftMessageType_KraftKontrol_FullKinematics,
-    eKraftMessageType_KraftKontrol_VehicleModeSet,
-    eKraftMessageType_KraftKontrol_VehicleModeIs,
-    eKraftMessageType_KraftKontrol_VehicleStatus,
-    eKraftMessageType_KraftKontrol_RCChannels,
-    eKraftMessageType_KraftKontrol_GNSSData,
-    eKraftMessageType_KraftKontrol_MagCalibIs,
-    eKraftMessageType_KraftKontrol_MagCalibSet,
-    eKraftMessageType_KraftKontrol_CountDown,
-    eKraftMessageType_KraftKontrol_ProgramStart
-};
-enum eMessageTypeData_t: uint32_t {
-    eMessageTypeData_AngularAcceleration,
-    eMessageTypeData_AngularVelocity,
-    eMessageTypeData_Attitude,
-    eMessageTypeData_Acceleration,
-    eMessageTypeData_Velocity,
-    eMessageTypeData_Position,
-    eMessageTypeData_FullKinematics,
-    eMessageTypeData_Force,
-    eMessageTypeData_Torque,
-    eMessageTypeData_FullDynamics,
-    eMessageTypeData_VehicleModeSet,
-    eMessageTypeData_ProgramStart,
-    eMessageTypeData_RCChannels
-};*/
 
 enum eMessageTypeTelemetry_t: uint32_t {
     eMessageTypeTelemetry_AngularAcceleration,
@@ -120,6 +88,21 @@ public:
     TelemetryMessageTorque(const Vector<> &torque): MessageVector_Abstract(torque) {}
 
     uint32_t getDataType() const final {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_Torque;}
+
+};
+
+
+
+class TelemetryMessageAngularVelocity: public MessageVector_Abstract {
+public:
+
+    TelemetryMessageAngularVelocity() {}
+
+    TelemetryMessageAngularVelocity(const Vector<> &angularVelocity): MessageVector_Abstract(angularVelocity) {}
+
+    uint32_t getDataType() const final {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_AngularVelocity;}
+    
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Telemetry_ID;}
 
 };
 

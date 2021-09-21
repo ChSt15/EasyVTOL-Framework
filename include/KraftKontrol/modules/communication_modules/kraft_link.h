@@ -3,7 +3,6 @@
 
 
 
-#include "stdint.h"
 #include "KraftKontrol/utils/topic_subscribers.h"
 #include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_data_messages.h"
 //#include "KraftKontrol/modules/module_abstract.h"
@@ -13,7 +12,7 @@
 /**
  * Abstract class used for interfacing with radio modules
  */
-class KraftLink_Interface {
+class KraftLink_Abstract {
 public:
 
     /**
@@ -25,18 +24,16 @@ public:
      * Use this topic to get received data packets.
      * @returns topic of received packets.
      */
-    Topic<DataMessageBuffer>& getReceivedDataTopic() {return receivedDataTopic_;}
+    const Topic<DataMessageBuffer>& getReceivedDataTopic() const {return receivedDataTopic_;}
 
     /**
      * Use this topic to send data packets.
      * @returns topic of data packets to send.
      */
-    Topic<DataMessageBuffer>& getToSendDataTopic() {return toSendDataTopic_;}
+    const Topic<DataMessageBuffer>& getToSendDataTopic() const {return toSendDataTopic_;}
 
 
 protected:
-
-    KraftLink_Interface() {}
 
     //Place received data into this buffer.
     Topic<DataMessageBuffer> receivedDataTopic_; 

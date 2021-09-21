@@ -67,7 +67,7 @@ public:
      * @param startByte Index of the starting position to place raw data. Defaults to 0.
      * @returns true if successfull, false if something was not right.
      */
-    virtual bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const = 0;
+    virtual bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const = 0;
 
     /**
      * Places the contents of the message into the given buffer at the requested start position.
@@ -76,7 +76,8 @@ public:
      * @param startByte Index of the starting position to take data from and increment from.
      * @returns true if successfull, false if something was not right.
      */
-    virtual bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) = 0;
+    virtual bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) = 0;
+
 
 private:
 
@@ -94,7 +95,7 @@ protected:
      * @param startIndex Index of buffer to start reading from. Default 0.
      * @param maxIndex Index of buffer to limit reading. Default max of uint32_t.
      */
-    inline void startBufferWrite(void* pointerToBuffer, const uint32_t &startIndex = 0, const uint32_t &maxIndex = UINT32_MAX) const {bufferIndex = startIndex; bufferMaxIndex = maxIndex; bufferWritePointer = pointerToBuffer;}
+    inline void startBufferWrite(void* pointerToBuffer, uint32_t startIndex = 0, uint32_t maxIndex = UINT32_MAX) const {bufferIndex = startIndex; bufferMaxIndex = maxIndex; bufferWritePointer = pointerToBuffer;}
 
     /**
      * Call this after using bufferWrite(..). 
@@ -108,7 +109,7 @@ protected:
      * @param numberBytes Number of bytes to be copied. Simply use sizeof("data type to be copied").
      * @returns true if copied, false if failure.
      */
-    inline bool bufferWrite(const void* data, const uint32_t &numberBytes) const {
+    inline bool bufferWrite(const void* data, uint32_t numberBytes) const {
 
         if (bufferWritePointer == nullptr || bufferIndex + numberBytes >= bufferMaxIndex) return false;
 
@@ -125,7 +126,7 @@ protected:
      * @param startIndex Index of buffer to start writting to. Default 0.
      * @param maxIndex Index of buffer to limit writting. Default max of uint32_t.
      */
-    inline void startBufferRead(const void* pointerToBuffer, const uint32_t &startIndex = 0, const uint32_t &maxIndex = UINT32_MAX) {bufferIndex = startIndex; bufferMaxIndex = maxIndex; bufferReadPointer = pointerToBuffer;}
+    inline void startBufferRead(const void* pointerToBuffer, uint32_t startIndex = 0, uint32_t maxIndex = UINT32_MAX) {bufferIndex = startIndex; bufferMaxIndex = maxIndex; bufferReadPointer = pointerToBuffer;}
 
     /**
      * Call this after using bufferWrite(..). 
@@ -139,7 +140,7 @@ protected:
      * @param numberBytes Number of bytes to be copied. Simply use sizeof("data type to be copied").
      * @returns true if copied, false if failure.
      */
-    inline bool bufferRead(void* data, const uint32_t &numberBytes) {
+    inline bool bufferRead(void* data, uint32_t numberBytes) {
 
         if (bufferReadPointer == nullptr || bufferIndex + numberBytes >= bufferMaxIndex) return false;
 
@@ -207,28 +208,23 @@ public:
 };
 
 
-
 /**
- * This can be used to copy any type of KraftMessage and store it.
- * Max size is c_messageContainerArraySize_ bytes. Anything over will result in a failure.
- * @see c_messageContainerArraySize_
- */
-class KraftMessageContainer {
+ * Can be used to publish a kraft message to a topic without needing to create the type. Or to store.
+ */ 
+class KraftMessageEmulator: public KraftMessage_Interface {
 public:
-
-    KraftMessageContainer() {}
 
     /**
      * @param message Reference to message.
      */
-    KraftMessageContainer(const KraftMessage_Interface& message) {
+    KraftMessageEmulator(const KraftMessage_Interface& message) {
         setMessage(message);
     }
 
     /**
      * @param message Reference to message.
      */
-    KraftMessageContainer(const KraftMessage_Interface&& message) {
+    KraftMessageEmulator(const KraftMessage_Interface&& message) {
         setMessage(message);
     }
 
@@ -239,17 +235,153 @@ public:
      * @param messageTypeID ID of message type.
      * @param dataTypeID ID of data type.
      */
-    KraftMessageContainer(const uint8_t* dataBytes, uint32_t numberBytes, uint32_t messageTypeID, uint32_t dataTypeID) {
+    KraftMessageEmulator(const uint8_t* dataBytes, uint32_t numberBytes, uint32_t messageTypeID, uint32_t dataTypeID) {
         setMessage(dataBytes, numberBytes, dataTypeID, messageTypeID);
     }
 
-    ~KraftMessageContainer() {}
+    ~KraftMessageEmulator() {}
 
     /**
      * @param message Reference to message.
      * @returns true if successfull.
      */
-    inline bool setMessage(const KraftMessage_Interface& message) {
+    bool setMessage(const KraftMessage_Interface& message) {
+        dataType_ = message.getDataType();
+        dataSize_ = message.getDataSize();
+        if (dataSize_ > KraftMessage::c_messageContainerArraySize_) return false;
+        messageType_ = message.getMessageType();
+        if (message.getRawData(data_, dataSize_)) {
+            return true;
+        }
+        return false;
+
+    }
+
+    /**
+     * Used to store the data directly even if its an unknown data type.
+     * @param dataBytes Pointer to buffer containing data.
+     * @param numberBytes Exact number of raw bytes to contain.
+     * @param messageTypeID ID of message type.
+     * @param dataTypeID ID of data type.
+     * @returns true if successfull.
+     */
+    bool setMessage(const uint8_t* dataBytes, const uint32_t& numberBytes, const uint32_t& dataTypeID, const uint32_t& messageTypeID) {
+        dataType_ = dataTypeID;
+        dataSize_ = numberBytes;
+        if (dataSize_ > KraftMessage::c_messageContainerArraySize_) return false;
+        messageType_ = messageTypeID;
+        for (uint32_t i = 0; i < dataSize_;i++) data_[i] = dataBytes[i];
+        return true;
+    }
+
+    uint32_t getDataType() const override {return dataType_;}
+
+    uint32_t getMessageType() const override {return messageType_;}
+
+    uint32_t getDataSize() const override {return dataSize_;}
+
+    bool getMessage(KraftMessage_Interface& message) const {
+        return message.setRawData(data_, dataSize_);
+    }
+
+    /**
+     * Places the contents of the message into the given buffer at the requested start position.
+     * @param dataBytes Pointer to the buffer the will receive the raw data.
+     * @param dataByteSize Max size of the given buffer to make sure given buffer is large enough.
+     * @param startByte Index of the starting position to place raw data. Defaults to 0.
+     * @returns true if successfull, false if something was not right.
+     */
+    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const override {
+
+        if (dataByteSize != getDataSize()) return false;
+
+        startBufferWrite(dataBytes, startByte);
+        bufferWrite(data_, dataSize_);
+        endBufferWrite();
+
+        return true;
+
+    }
+
+    /**
+     * Places the contents of the message into the given buffer at the requested start position.
+     * @param dataBytes Pointer to the buffer that containes the raw data.
+     * @param dataByteSize Size of the given buffer to make sure given data if correct.
+     * @param startByte Index of the starting position to take data from and increment from.
+     * @returns true if successfull, false if something was not right.
+     */
+    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) override {
+
+        if (dataByteSize != getDataSize()) return false;
+
+        startBufferRead(dataBytes, startByte);
+        bufferRead(data_, dataSize_);
+        endBufferRead();
+
+        return true;
+
+    }
+
+
+    KraftMessageEmulator& operator=(const KraftMessage_Interface& message) {
+        setMessage(message);
+        return *this;
+    }
+     
+
+private:
+
+    uint8_t data_[KraftMessage::c_messageContainerArraySize_];
+    uint32_t dataType_ = 0;
+    uint32_t messageType_ = eKraftMessageType_t::eKraftMessageType_Invalid_ID;
+    uint8_t dataSize_ = 0;
+
+};
+
+
+
+/**
+ * This can be used to copy any type of KraftMessage and store it.
+ * Max size is c_messageContainerArraySize_ bytes. Anything over will result in a failure.
+ * @see c_messageContainerArraySize_
+ */
+class KraftMessageContainer_DEPRECATED {
+public:
+
+    KraftMessageContainer_DEPRECATED() {}
+
+    /**
+     * @param message Reference to message.
+     */
+    KraftMessageContainer_DEPRECATED(const KraftMessage_Interface& message) {
+        setMessage(message);
+    }
+
+    /**
+     * @param message Reference to message.
+     */
+    KraftMessageContainer_DEPRECATED(const KraftMessage_Interface&& message) {
+        setMessage(message);
+    }
+
+    /**
+     * Used to store the data directly even if its an unknown data type.
+     * @param dataBytes Pointer to buffer containing data.
+     * @param numberBytes Exact number of raw bytes to contain.
+     * @param messageTypeID ID of message type.
+     * @param dataTypeID ID of data type.
+     */
+    KraftMessageContainer_DEPRECATED(const uint8_t* dataBytes, uint32_t numberBytes, uint32_t messageTypeID, uint32_t dataTypeID) {
+        setMessage(dataBytes, numberBytes, dataTypeID, messageTypeID);
+    }
+
+    ~KraftMessageContainer_DEPRECATED() {}
+
+    /**
+     * @param message Reference to message.
+     * @returns true if successfull.
+     */
+    bool setMessage(const KraftMessage_Interface& message) {
         dataType_ = message.getDataType();
         dataSize_ = message.getDataSize();
         if (dataSize_ > KraftMessage::c_messageContainerArraySize_) return false;
@@ -271,7 +403,7 @@ public:
      * @param dataTypeID ID of data type.
      * @returns true if successfull.
      */
-    inline bool setMessage(const uint8_t* dataBytes, const uint32_t& numberBytes, const uint32_t& dataTypeID, const uint32_t& messageTypeID) {
+    bool setMessage(const uint8_t* dataBytes, const uint32_t& numberBytes, const uint32_t& dataTypeID, const uint32_t& messageTypeID) {
         dataType_ = dataTypeID;
         dataSize_ = numberBytes;
         if (dataSize_ > KraftMessage::c_messageContainerArraySize_) return false;
@@ -281,16 +413,19 @@ public:
         return true;
     }
 
-    inline const uint32_t& getDataType() const {return dataType_;}
+    uint32_t getDataType() const {return dataType_;}
 
-    inline uint32_t getMessageType() const {return messageType_;}
+    uint32_t getMessageType() const {return messageType_;}
 
-    inline const bool& isValid() const {return isValid_;}
+    uint32_t getDataSize() const {return dataSize_;}
 
-    inline bool getMessage(KraftMessage_Interface& message) const {
+    bool isValid() const {return isValid_;}
+
+    bool getMessage(KraftMessage_Interface& message) const {
         if (!isValid_) return false;
         return message.setRawData(data_, dataSize_);
     }
+     
 
 private:
 

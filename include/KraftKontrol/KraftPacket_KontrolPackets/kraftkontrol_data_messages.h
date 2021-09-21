@@ -18,10 +18,16 @@ enum eMessageTypeData_t: uint32_t {
     eMessageTypeData_Force,
     eMessageTypeData_Torque,
     eMessageTypeData_FullDynamics,
+    ///Current vehicle mode status.
     eMessageTypeData_VehicleModeSet,
+    ///Tells vehicle to run a program at a certain time.
     eMessageTypeData_ProgramStart,
+    ///Basestation rc channels sent to vehicle.
     eMessageTypeData_RCChannels,
-    eMessageTypeData_Buffer
+    ///A simple buffer containing raw data. (Might be deprecated in future)
+    eMessageTypeData_Buffer,
+    ///Current node status change. Meaning if node connected or was disconnected. Usually published onto global module topic.
+    eMessageTypeData_NodeStatus
 };
 
 
@@ -104,7 +110,7 @@ public:
         nodeID_ = nodeID;
     }
 
-    uint32_t getDataType() const final {return eMessageTypeData_t::eMessageTypeData_Torque;}
+    uint32_t getDataType() const final {return eMessageTypeData_t::eMessageTypeData_NodeStatus;}
 
     /**
      * @returns true if node is connected to network.
@@ -119,7 +125,7 @@ public:
 
     uint32_t getDataSize() const {return sizeof(nodeConnected_) + sizeof(nodeID_);}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const {
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -132,7 +138,7 @@ public:
 
     }
 
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
+    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0){
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -154,6 +160,9 @@ private:
 
 
 
+/**
+ * Stores raw bytes for data transfer.
+ */
 class DataMessageBuffer: public KraftMessageData_Abstract {
 public:
 
@@ -174,10 +183,12 @@ public:
         return true;
     }
 
-    uint8_t* getBuffer() {return buffer_;}
-    const uint32_t& getBufferSize() const {return bufferSize_;}
+    void setBufferSize(uint32_t size) {bufferSize_ = size;} 
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+    uint8_t* getBuffer() {return buffer_;}
+    uint32_t getBufferSize() const {return bufferSize_;}
+
+    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const {
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -190,7 +201,7 @@ public:
 
     }
 
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
+    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0){
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -264,7 +275,7 @@ public:
 
     void setChannel(const int16_t &value, const uint8_t &channel) {channels_[channel] = value;}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const {
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -276,7 +287,7 @@ public:
 
     }
 
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
+    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0){
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -303,23 +314,23 @@ public:
 
     DataMessageProgramStart() {}
 
-    DataMessageProgramStart(const uint32_t& programID, const int64_t& programStartTime) {
+    DataMessageProgramStart(uint32_t programID, int64_t programStartTime) {
         programID_ = programID;
         programStartTime_ = programStartTime;
     }
 
-    void setProgramID(const uint32_t& programID) {programID_ = programID;} 
-    const uint32_t& getProgramID() const {return programID_;}
+    void setProgramID(uint32_t programID) {programID_ = programID;} 
+    uint32_t getProgramID() const {return programID_;}
 
-    void setProgramStartTime(const uint32_t& programStartTime) {programStartTime_ = programStartTime;} 
-    const int64_t& getProgramStartTime() const {return programStartTime_;}
+    void setProgramStartTime(uint32_t programStartTime) {programStartTime_ = programStartTime;} 
+    int64_t getProgramStartTime() const {return programStartTime_;}
 
     uint32_t getDataType() const final {return eMessageTypeData_t::eMessageTypeData_ProgramStart;}
 
 
     uint32_t getDataSize() const {return sizeof(programID_) + sizeof(programStartTime_);}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const {
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -332,7 +343,7 @@ public:
 
     }
 
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
+    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0){
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -374,7 +385,7 @@ public:
 
     void setMinMax(const Vector<> &magMax, const Vector<> &magMin) {magMin_ = magMin; magMax_ = magMax;}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const {
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -391,7 +402,7 @@ public:
 
     }
 
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) {
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -437,7 +448,7 @@ public:
 
     void setMinMax(const Vector<> &magMax, const Vector<> &magMin) {magMin_ = magMin; magMax_ = magMax;}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const {
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -454,7 +465,7 @@ public:
 
     }
 
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) {
 
         if (dataByteSize < getDataSize()) return false;
 

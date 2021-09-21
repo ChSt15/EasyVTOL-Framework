@@ -83,11 +83,11 @@ public:
 
     uint32_t getDataSize() const {return 0;}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const {
         return true;
     }
 
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) {
         return true;
     }
 
@@ -104,79 +104,15 @@ public:
 
     uint32_t getDataSize() const {return 0;};
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const {
         return true;
     }
 
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) {
         return true;
     }
 
 };
-
-
-/*
-class KraftMessageStringPacket final: public KraftMessage_Interface {
-public:
-
-    KraftMessageStringPacket() {}
-
-    KraftMessageStringPacket(const char string[]) {
-        setString(string);
-    }
-
-    ~KraftMessageStringPacket() {
-        delete[] stringPointer;
-    }
-
-    uint32_t getDataType() const {return eKraftMessageType_t::eKraftMessageType_String_ID;}
-
-    uint32_t getDataSize() const {return sizeStringPointer;};
-
-    uint32_t getStringLength() const {return sizeStringPointer;}
-
-    bool getString(char string[], const uint32_t &sizeStringDest) const {
-
-        if (sizeStringDest < sizeStringPointer || stringPointer == nullptr) return false;
-
-        memcpy(string, stringPointer, sizeStringPointer);
-
-        return true;
-
-    }
-
-    void setString(const char string[]) {
-        
-        if (stringPointer != nullptr) delete[] stringPointer;
-
-        sizeStringPointer = strlen(string)+1;
-        stringPointer = new char[sizeStringPointer];
-
-        memcpy(stringPointer, string, sizeStringPointer);
-
-    }
-
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
-
-        return getString((char*)dataBytes+startByte, dataByteSize);
-
-    }
-
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
-
-        setString((char*)(dataBytes)+startByte);
-
-        return true;
-
-    }
-
-
-private:
-
-    char* stringPointer = nullptr;
-    uint32_t sizeStringPointer = 0;
-
-};*/
 
 
 
@@ -192,6 +128,33 @@ struct MessageData {
     uint8_t signalRSSI = 0;
     uint8_t signalSNR = 0;
 
+}; 
+
+
+
+/**
+ * Used to store data of where data should be sent to or was received from and if it should be lossless.
+ */
+struct MessageLinkData {
+
+    //Container for message.
+    KraftMessageEmulator message;
+
+    //What device sent this message.
+    eKraftMessageNodeID_t transmitterID;
+    //What device should receive this message.
+    eKraftMessageNodeID_t receiverID;
+
+    //Set to true for the system to wait for an ack after sending.
+    bool requiresAck = false; 
+
+    //Received data RSSI. Signifies signal strength but for LoRa SNR is better.
+    uint8_t signalRSSI = 0;
+    //Received data RSSI. Signifies signal strength in reference to noise. Better for LoRa.
+    uint8_t signalSNR = 0;
+    //What power in dB to send the message at.
+    uint8_t sendPowerdB = 10;
+
 };
 
 
@@ -204,10 +167,12 @@ public:
      * 
      * @param dataLink is a radio class that inherets from KraftLink_Interface that will be used to send and receive packets 
      */
-    KraftKommunication(KraftLink_Interface* dataLink, eKraftMessageNodeID_t selfID): Task_Abstract("Kraft Kommunication", 500, eTaskPriority_t::eTaskPriority_Middle) {
-        dataLink_ = dataLink;
+    KraftKommunication(KraftLink_Abstract& dataLink, eKraftMessageNodeID_t selfID): Task_Abstract("Kraft Kommunication", 500, eTaskPriority_t::eTaskPriority_Middle), dataLink_(dataLink) {
         selfID_ = selfID;
-        receivedPacketSub_.subscribe(dataLink->getReceivedDataTopic());
+        receivedPacketSub_.subscribe(dataLink.getReceivedDataTopic());
+        dataLinkSendSubr_.subscribe(dataLink.getToSendDataTopic());
+        sendBroadcastMessageSubr_ = Callback_Subscriber<KraftMessage_Interface, KraftKommunication>(sendBroadcastMessageTopic_, this, &KraftKommunication::kraftMessageBroadcastCallback);
+        sendMessageSubr_ = Callback_Subscriber<MessageLinkData, KraftKommunication>(sendMessageTopic_, this, &KraftKommunication::kraftMessageSendCallback);
     }
 
     /**
@@ -216,30 +181,7 @@ public:
      * @param kraftMessage is a KraftMessage_Interface class containing the data to be sent.
      * @returns false if queue is full. loop() needs to be ran to give link time to send data and make room.
      */
-    bool sendMessage(KraftMessage_Interface& kraftMessage, const eKraftMessageNodeID_t& receiveNodeID, const bool &requiresAck = false);
-
-    /**
-     * Checks if a message is available.
-     * 
-     * @returns Number of messages available
-     */
-    uint16_t messageAvailable() {return receivedPackets_.available();}
-
-    /**
-     * Checks if transmitter buffers are full. Sending a packet when buffers are full will fail or erase oldest message in buffer waiting to be sent.
-     * 
-     * @see networkAckBusy() for ack buffer
-     * @returns Whether the buffer is full
-     */
-    bool networkBusy() {return sendPackets_.availableSpace() == 0;}
-
-    /**
-     * Checks if transmitter buffers are full. Sending a packet when buffers are full will fail or erase oldest message in buffer waiting to be sent.
-     * 
-     * @see networkBusy() for nona ack buffer
-     * @returns Whether the buffer is full
-     */
-    bool networkAckBusy() {return sendPacketsACK_.availableSpace() == 0;}
+    bool sendMessage(const KraftMessage_Interface& kraftMessage, eKraftMessageNodeID_t receiveNodeID, bool requiresAck = false);
 
     /**
      * Checks if node is online.
@@ -250,33 +192,19 @@ public:
     bool getNodeStatus(eKraftMessageNodeID_t node) {return nodeData_[constrain(node, 0, 255)].online;}
 
     /**
-     * Returns latest received message data. Use this to find out what KraftMessage_Interface class needs to be given.
-     * 
-     * @returns MessageData struct.
+     * @returns topic to which received messages are published.
      */
-    MessageData getMessageInformation() {
-        ReceivedPayloadData buf;
-        receivedPackets_.peekBack(buf);
-        return buf.messageData;
-    };
+    const Topic<KraftMessage_Interface>& getReceivedMessageTopic() const {return receivedMessagesTopic_;}
 
     /**
-     * Returns latest received message data. Use this to find out what KraftMessage_Interface class needs to be given.
-     * 
-     * @param kraftMessage is a pointer to a class that inherets from KraftMessage_Interface.
-     * @param peek is a bool. If set to true then the message will not be removed from queue. Default value if false.
-     * @returns true if message valid.
+     * @returns topic to which messages can be published that will be broadcasted to network.
      */
-    bool getMessage(KraftMessage_Interface& kraftMessage, const bool &peek = false);
+    const Topic<KraftMessage_Interface>& getBroadcastMessageTopic() const {return receivedMessagesTopic_;}
 
     /**
-     * Returns latest received message data. Use this to find out what KraftMessage_Interface class needs to be given.
-     * 
-     * @param kraftMessage is a pointer to a class that inherets from KraftMessage_Interface.
-     * @param peek is a bool. If set to true then the message will not be removed from queue. Default value if false.
-     * @returns true if message valid.
+     * @returns topic to which messages can be published that will be sent to network with user specified settings.
      */
-    void removeMessage() {receivedPackets_.removeBack();}
+    const Topic<KraftMessage_Interface>& getSendMessageTopic() const {return receivedMessagesTopic_;}
 
     /**
      * Gets the nodes ID it uses when communicating with other transceivers
@@ -345,22 +273,42 @@ private:
     bool decodeMessageFromBuffer(ReceivedPayloadData& payloadData, bool& ackRequested, uint8_t* buffer, uint32_t bufferSize);
 
     //Returns number of bytes written into buffer
-    uint32_t encodeMessageToBuffer(KraftMessage_Interface& message, const uint8_t &receiveNode, const bool &requestAck, uint8_t* buffer, const uint32_t &bufferSize);
+    uint32_t encodeMessageToBuffer(const KraftMessage_Interface& message, uint8_t receiveNode, bool requestAck, uint8_t* buffer, uint32_t bufferSize);
 
     //Calculate CRC of packet.
-    uint8_t calculateCRC(uint8_t* buffer, const uint32_t &stopByte);
+    uint8_t calculateCRC(uint8_t* buffer, uint32_t stopByte);
+
+    //Sends kraftmessage to data link
+    void kraftMessageSendCallback(const MessageLinkData& item);
+    //Sends kraftmessage to data link
+    void kraftMessageBroadcastCallback(const KraftMessage_Interface& item);
 
 
-    KraftLink_Interface* dataLink_; //Link used for sending receiving packets
+    //Link used for sending and receiving packets
+    KraftLink_Abstract& dataLink_;
 
+    //Topic that gets messages published to when messages are received.
+    Topic<KraftMessage_Interface> receivedMessagesTopic_;
+
+    //Buffer for data packets received by data link
     Buffer_Subscriber<DataMessageBuffer, 10> receivedPacketSub_;
+    //Subscriber for data packets to be published to datalink
+    Simple_Subscriber<DataMessageBuffer> dataLinkSendSubr_;
 
-    //Queue containing all received packets.
-    Buffer<ReceivedPayloadData, 10> receivedPackets_;
-    //Queue containing all packets to send.
+    //Topic to which messages with user specified settings can be sent to network.
+    Topic<MessageLinkData> sendMessageTopic_;
+    Callback_Subscriber<MessageLinkData, KraftKommunication> sendMessageSubr_;
+
+    //Topic to which messages can be published and automatically broadcasted.
+    Topic<KraftMessage_Interface> sendBroadcastMessageTopic_;
+    Callback_Subscriber<KraftMessage_Interface, KraftKommunication> sendBroadcastMessageSubr_;
+
+
+    //Buffer containing messages to be sent but without ack
     Buffer<SendPacketData, 10> sendPackets_;
-    //Queue containing all packets to send that require an ACK. These must wait until the one before it is finished
+    //Buffer containing messages to be sent but with ack.
     Buffer<SendPacketData, 10> sendPacketsACK_;
+
 
     NodeData nodeData_[c_maxNumberNodes];
 

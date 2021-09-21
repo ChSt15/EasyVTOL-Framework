@@ -5,7 +5,7 @@
 
 #include "stdint.h"
 
-#include "KraftKontrol/utils/KraftKommunikation/kraft_message.h"
+#include "KraftKontrol/modules/communication_modules/kraft_message.h"
 
 
 /**

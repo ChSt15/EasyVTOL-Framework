@@ -38,7 +38,7 @@ private:
      * @param item Item to forward to other topic.
      * @param topic Which toic called this receive() function that will not get item forwarded to.
      */
-    void receive(TYPE& item, Topic<TYPE>& topic) override;
+    void receive(TYPE& item, const Topic<TYPE>* topic) override;
 
 
 };
@@ -51,7 +51,7 @@ void TopicRouter<TYPE>::addTopicToForward(Topic<TYPE>& topicToForward) {
 
 
 template<typename TYPE> 
-void TopicRouter<TYPE>::receive(TYPE& item, Topic<TYPE>* topic) {
+void TopicRouter<TYPE>::receive(TYPE& item, const Topic<TYPE>* topic) {
     for (uint32_t i = 0; i < topicsList_.getNumItems(); i++) {
         Topic<TYPE>* topicForward = topicsList_[i];
         if (topicForward != &topic) topicForward->publish(item, this);

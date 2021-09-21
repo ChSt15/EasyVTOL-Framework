@@ -2,22 +2,22 @@
 
 
 
-Topic<KraftMessageContainer>& Module_Abstract::globalMessages() {
+Topic<KraftMessage_Interface>& Module_Abstract::globalMessages() {
 
-    static Topic<KraftMessageContainer> g_globalMessages;
+    static Topic<KraftMessage_Interface> g_globalMessages;
 
     return g_globalMessages;
 
 }
 
 
-Topic<KraftMessageContainer>& Module_Abstract::telemetryMessages() {
+/*Topic<KraftMessageContainer>& Module_Abstract::telemetryMessages() {
 
     static Topic<KraftMessageContainer> g_telemetryMessages;
 
     return g_telemetryMessages;
 
-}
+}*/
 
 
 List<Module_Abstract*>& Module_Abstract::existingModules() {

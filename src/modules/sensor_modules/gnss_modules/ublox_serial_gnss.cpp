@@ -116,7 +116,7 @@ void UbloxSerialGNSS::setupSerial(uint32_t baudRate) {
 
     serialPort_->begin(baudRate, 134217756U, rxPin_, txPin_);
 
-    #elif
+    #else
 
     serialPort_->begin(baudRate);
 

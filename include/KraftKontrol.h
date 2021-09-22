@@ -60,6 +60,7 @@
 
 #include "KraftKontrol/utils/topic.h"
 #include "KraftKontrol/utils/topic_subscribers.h"
+#include "KraftKontrol/modules/communication_modules/kraft_message_subscriber.h"
 
 #include "KraftKontrol/modules/networking_modules/kraft_konnect_network.h"
 

@@ -170,32 +170,6 @@ public:
 
 
 
-class KraftMessageTelemetry_Abstract: public KraftMessage_Interface {
-public:
-
-    /**
-     * Message type is to differentiate between telemetry, telecommands, and general data.
-     * @returns the type of message. Not the type of data its holding.
-     */
-    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Telemetry_ID;}
-
-};
-
-
-
-class KraftMessageCommand_Abstract: public KraftMessage_Interface {
-public:
-
-    /**
-     * Message type is to differentiate between telemetry, telecommands, and general data.
-     * @returns the type of message. Not the type of data its holding.
-     */
-    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Command_ID;}
-
-};
-
-
-
 class KraftMessageDatalink_Abstract: public KraftMessage_Interface {
 public:
 
@@ -213,6 +187,8 @@ public:
  */ 
 class KraftMessageEmulator: public KraftMessage_Interface {
 public:
+
+    KraftMessageEmulator() {}
 
     /**
      * @param message Reference to message.

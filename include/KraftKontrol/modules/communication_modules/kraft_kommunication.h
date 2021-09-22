@@ -171,8 +171,15 @@ public:
         selfID_ = selfID;
         receivedPacketSub_.subscribe(dataLink.getReceivedDataTopic());
         dataLinkSendSubr_.subscribe(dataLink.getToSendDataTopic());
-        sendBroadcastMessageSubr_ = Callback_Subscriber<KraftMessage_Interface, KraftKommunication>(sendBroadcastMessageTopic_, this, &KraftKommunication::kraftMessageBroadcastCallback);
-        sendMessageSubr_ = Callback_Subscriber<MessageLinkData, KraftKommunication>(sendMessageTopic_, this, &KraftKommunication::kraftMessageSendCallback);
+
+        sendBroadcastMessageSubr_.subscribe(sendBroadcastMessageTopic_);
+        sendBroadcastMessageSubr_.setCallbackObject(this);
+        sendBroadcastMessageSubr_.setCallbackFunction(&KraftKommunication::kraftMessageBroadcastCallback);
+
+        sendMessageSubr_.subscribe(sendMessageTopic_);
+        sendMessageSubr_.setCallbackObject(this);
+        sendMessageSubr_.setCallbackFunction(&KraftKommunication::kraftMessageSendCallback);
+
     }
 
     /**
@@ -199,12 +206,12 @@ public:
     /**
      * @returns topic to which messages can be published that will be broadcasted to network.
      */
-    const Topic<KraftMessage_Interface>& getBroadcastMessageTopic() const {return receivedMessagesTopic_;}
+    Topic<KraftMessage_Interface>& getBroadcastMessageTopic() {return sendBroadcastMessageTopic_;}
 
     /**
      * @returns topic to which messages can be published that will be sent to network with user specified settings.
      */
-    const Topic<KraftMessage_Interface>& getSendMessageTopic() const {return receivedMessagesTopic_;}
+    Topic<MessageLinkData>& getSendMessageTopic() {return sendMessageTopic_;}
 
     /**
      * Gets the nodes ID it uses when communicating with other transceivers

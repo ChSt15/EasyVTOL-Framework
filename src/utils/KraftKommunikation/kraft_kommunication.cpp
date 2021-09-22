@@ -247,7 +247,7 @@ void KraftKommunication::thread() {
 
                         switch (message.messageData.dataTypeID) {
                         case eDataLinkDataType_t::eDataLinkDataType_ACK:
-                            //sendPacketsACK_.removeBack();
+                            sendPacketsACK_.removeBack();
                             nodeData_[message.messageData.transmitterID].waitingOnPacket = nullptr; 
                             break;
 

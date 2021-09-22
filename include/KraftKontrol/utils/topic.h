@@ -18,16 +18,42 @@ class Subscriber_Generic;
 template<typename TYPE> 
 class Subscriber_Interface {
 friend Topic<TYPE>;
+private:
+    
+    //Topic should only give items if this is true.
+    bool receiveItems_ = true;
+
+
 public: 
+
+    Subscriber_Interface() {receiveItems_ = true;}
 
     virtual ~Subscriber_Interface() {
         //unsubcribe();
     }
 
     /**
-     * Will remove subscribtion(s). Will not receive anymore data.
+     * Sets the subscriber to receive a item from Topic. Removes need to subscribe and unsubscribe which can be costly.
+     * @param isEnabled Set to true to receive items. Defaults to true.
+     */
+    void receiveEnable(bool isEnabled = true) {
+        receiveItems_ = isEnabled;
+    }
+
+    /**
+     * @returns whether or not receiving is enabled.
+     */
+    bool isReceiveEnabled() {return receiveItems_;}
+
+    /**
+     * Will remove all subscribtions. Will not receive anymore data.
      */
     virtual void unsubcribe() = 0;
+
+    /**
+     * Will remove only given. Will not receive anymore data from this topic.
+     */
+    virtual void unsubcribeTopic(const Topic<TYPE>& topic) = 0;
 
     /**
      * Subscribes to given topic. Will remove old subscription.
@@ -50,7 +76,6 @@ protected:
      * @param topic Which topic is calling this receive function.
      */
     virtual void receive(const TYPE& item, const Topic<TYPE>* topic) = 0;
-
 
 };
 
@@ -121,7 +146,7 @@ const TYPE& Topic<TYPE>::getLatestItem() {
 
 template<typename TYPE> 
 Topic<TYPE>::~Topic() {
-    for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) subscribers_[i]->unsubcribe();
+    for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) subscribers_[i]->unsubcribeTopic(*this);
 }
 
 
@@ -136,15 +161,23 @@ const List<Subscriber_Interface<TYPE>*>& Topic<TYPE>::getSubscriberList() const 
 template<typename TYPE> 
 void Topic<TYPE>::publish(const TYPE& item) {
     //latestItem = item;
-    for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) subscribers_[i]->receive(item, this);
+    for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) {
+        if (subscribers_[i]->receiveItems_) {
+            subscribers_[i]->receive(item, this);
+        }
+    }
 }
 
 
 
 template<typename TYPE> 
 void Topic<TYPE>::publish(const TYPE&& item) {
-    //TYPE itemCopy = item;
-    for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) subscribers_[i]->receive(item, this);
+    for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) {
+        if (subscribers_[i]->receiveItems_) {
+            subscribers_[i]->receive(item, this);
+        }
+    }
+    //for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) subscribers_[i]->receive(item, this);
 }
 
 
@@ -153,7 +186,7 @@ template<typename TYPE>
 void Topic<TYPE>::publish(const TYPE& item, Subscriber_Interface<TYPE>* subscriber) const  {
     
     for (uint32_t i = 0; i < subscribers_.getNumItems(); i++) {
-        if (subscribers_[i] != subscriber) subscribers_[i]->receive(item, this);
+        if (subscribers_[i] != subscriber && subscribers_[i]->receiveItems_) subscribers_[i]->receive(item, this);
     }
 
 }

@@ -20,6 +20,43 @@ enum eVehicleMode_t : uint8_t {
 };
 
 
+/**
+ * Sets c_str to name for given mode.
+ * @param c_str Char array to receive mode name.
+ * @param c_strSize length of c_str.
+ * @param mode Which mode to write into c_str
+ */
+inline void getVehicleModeString(char* c_str, uint32_t c_strSize, eVehicleMode_t mode) {
+
+    switch (mode) {
+    case eVehicleMode_t::eVehicleMode_Arm :
+        strncpy(c_str, "Armed", c_strSize);
+        break;
+
+    case eVehicleMode_t::eVehicleMode_Disarm :
+        strncpy(c_str, "Disarmed", c_strSize);
+        break;
+
+    case eVehicleMode_t::eVehicleMode_Error :
+        strncpy(c_str, "Error", c_strSize);
+        break;
+
+    case eVehicleMode_t::eVehicleMode_Failsafe :
+        strncpy(c_str, "Failsafe", c_strSize);
+        break;
+
+    case eVehicleMode_t::eVehicleMode_Prepare :
+        strncpy(c_str, "Prepare", c_strSize);
+        break;
+    
+    default:
+        strncpy(c_str, "Unknown", c_strSize);
+        break;
+    }
+
+}
+
+
 
 /**
  * Struct containing all vehicle data.

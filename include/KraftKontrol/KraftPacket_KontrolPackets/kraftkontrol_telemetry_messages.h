@@ -28,66 +28,106 @@ enum eMessageTypeTelemetry_t: uint32_t {
 
 
 
-class TelemetryMessageAttitude: public KraftMessageTelemetry_Abstract, public MessageQuaternion_Abstract {
+class TelemetryMessageAttitude: public MessageQuaternion_Abstract {
 public:
 
     TelemetryMessageAttitude() {}
 
     TelemetryMessageAttitude(const Quaternion<> &attitude): MessageQuaternion_Abstract(attitude) {}
 
-    uint32_t getDataType() const final {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_Attitude;}
+    uint32_t getDataType() const final override {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_Attitude;}
+
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Telemetry_ID;}
 
 };
 
 
 
-class TelemetryMessagePosition: public KraftMessageTelemetry_Abstract, public MessageVector_Abstract {
+class TelemetryMessageVehicleModeIs: public MessageGeneric_Abstract<eVehicleMode_t> {
+public:
+
+    TelemetryMessageVehicleModeIs() {}
+
+    TelemetryMessageVehicleModeIs(eVehicleMode_t vehicleModeIs): MessageGeneric_Abstract<eVehicleMode_t>(vehicleModeIs) {}
+
+    uint32_t getDataType() const final override {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_VehicleMode;}
+
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Telemetry_ID;}
+
+};
+
+
+
+class TelemetryMessagePosition: public MessageVector_Abstract {
 public:
 
     TelemetryMessagePosition() {}
 
     TelemetryMessagePosition(const Vector<> &position): MessageVector_Abstract(position) {}
 
-    uint32_t getDataType() const final {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_Position;}
+    uint32_t getDataType() const final override {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_Position;}
+
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Telemetry_ID;}
 
 };
 
 
 
-class TelemetryMessageFullKinematics: public KraftMessageTelemetry_Abstract, public MessageFullKinematics_Abstract {
+class TelemetryMessageVelocity: public MessageVector_Abstract {
+public:
+
+    TelemetryMessageVelocity() {}
+
+    TelemetryMessageVelocity(const Vector<> &velocity): MessageVector_Abstract(velocity) {}
+
+    uint32_t getDataType() const final override {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_Velocity;}
+
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Telemetry_ID;}
+
+};
+
+
+
+class TelemetryMessageFullKinematics: public MessageFullKinematics_Abstract {
 public:
 
     TelemetryMessageFullKinematics() {}
 
     TelemetryMessageFullKinematics(const KinematicData &kinematics): MessageFullKinematics_Abstract(kinematics) {}
 
-    uint32_t getDataType() const final {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_FullKinematics;}
+    uint32_t getDataType() const final override {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_FullKinematics;}
+
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Telemetry_ID;}
 
 };
 
 
 
-class TelemetryMessageForce: public KraftMessageTelemetry_Abstract, public MessageVector_Abstract {
+class TelemetryMessageForce: public MessageVector_Abstract {
 public:
 
     TelemetryMessageForce() {}
 
     TelemetryMessageForce(const Vector<> &force): MessageVector_Abstract(force) {}
 
-    uint32_t getDataType() const final {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_Force;}
+    uint32_t getDataType() const final override {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_Force;}
+
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Telemetry_ID;}
 
 };
 
 
 
-class TelemetryMessageTorque: public KraftMessageTelemetry_Abstract, public MessageVector_Abstract {
+class TelemetryMessageTorque: public MessageVector_Abstract {
 public:
 
     TelemetryMessageTorque() {}
 
     TelemetryMessageTorque(const Vector<> &torque): MessageVector_Abstract(torque) {}
 
-    uint32_t getDataType() const final {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_Torque;}
+    uint32_t getDataType() const final override {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_Torque;}
+
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Telemetry_ID;}
 
 };
 
@@ -100,7 +140,7 @@ public:
 
     TelemetryMessageAngularVelocity(const Vector<> &angularVelocity): MessageVector_Abstract(angularVelocity) {}
 
-    uint32_t getDataType() const final {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_AngularVelocity;}
+    uint32_t getDataType() const final override {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_AngularVelocity;}
     
     uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Telemetry_ID;}
 
@@ -108,14 +148,16 @@ public:
 
 
 
-class TelemetryMessageFullDynamics: public KraftMessageTelemetry_Abstract, public MessageFullDynamics_Abstract {
+class TelemetryMessageFullDynamics: public MessageFullDynamics_Abstract {
 public:
 
     TelemetryMessageFullDynamics() {}
 
     TelemetryMessageFullDynamics(const DynamicData &dynamics): MessageFullDynamics_Abstract(dynamics) {}
 
-    uint32_t getDataType() const final {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_FullDynamics;}
+    uint32_t getDataType() const final override {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_FullDynamics;}
+
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Telemetry_ID;}
 
 };
 

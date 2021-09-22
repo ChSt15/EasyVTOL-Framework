@@ -25,7 +25,7 @@ enum eMessageTypeCommand_t : uint32_t {
 
 
 
-class CommandMessageAttitudeSet: public KraftMessageCommand_Abstract, public MessageQuaternion_Abstract {
+class CommandMessageAttitudeSet: public MessageQuaternion_Abstract {
 public:
 
     CommandMessageAttitudeSet() {}
@@ -34,11 +34,13 @@ public:
 
     uint32_t getDataType() const final {return eMessageTypeCommand_t::eKraftMessageType_KraftKontrol_Attitude;}
 
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Command_ID;}
+
 };
 
 
 
-class CommandMessagePositionSet: public KraftMessageCommand_Abstract, public MessageVector_Abstract {
+class CommandMessagePositionSet: public MessageVector_Abstract {
 public:
 
     CommandMessagePositionSet() {}
@@ -47,11 +49,13 @@ public:
 
     uint32_t getDataType() const final {return eMessageTypeCommand_t::eKraftMessageType_KraftKontrol_Position;}
 
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Command_ID;}
+
 };
 
 
 
-class CommandMessageVehicleModeSet: public KraftMessageCommand_Abstract, public MessageGeneric_Abstract<eVehicleMode_t> {
+class CommandMessageVehicleModeSet: public MessageGeneric_Abstract<eVehicleMode_t> {
 public:
 
     CommandMessageVehicleModeSet() {}
@@ -60,11 +64,13 @@ public:
 
     uint32_t getDataType() const final {return eMessageTypeCommand_t::eKraftMessageType_KraftKontrol_VehicleMode;}
 
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Command_ID;}
+
 };
 
 
 
-class CommandMessageProgramStart: public KraftMessageCommand_Abstract {
+class CommandMessageProgramStart: public KraftMessage_Interface {
 public:
 
     CommandMessageProgramStart() {}
@@ -82,6 +88,7 @@ public:
 
     uint32_t getDataType() const final {return eMessageTypeCommand_t::eKraftMessageType_KraftKontrol_ProgramStart;}
 
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Command_ID;}
 
     uint32_t getDataSize() const {return sizeof(programID_) + sizeof(programStartTime_);}
 
@@ -121,7 +128,7 @@ protected:
 
 
 
-class CommandMessageRCChannels: public KraftMessageCommand_Abstract {
+class CommandMessageRCChannels: public KraftMessage_Interface {
 public:
 
     CommandMessageRCChannels() {}
@@ -138,6 +145,8 @@ public:
     virtual uint32_t getDataType() const {return eMessageTypeCommand_t::eKraftMessageType_KraftKontrol_RCChannels;}
 
     uint32_t getDataSize() const {return sizeof(channels_);}
+
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Command_ID;}
 
     int16_t getChannel(const uint8_t &channel) {return channels_[channel];}
 
@@ -180,7 +189,7 @@ protected:
 
 
 
-class CommandMessageMagCalValues: public KraftMessageCommand_Abstract {
+class CommandMessageMagCalValues: public KraftMessage_Interface {
 public:
 
     CommandMessageMagCalValues() {}
@@ -193,6 +202,8 @@ public:
     uint32_t getDataType() const {return eMessageTypeCommand_t::eKraftMessageType_KraftKontrol_MagCalib;}
 
     uint32_t getDataSize() const {return sizeof(magMin_) + sizeof(magMax_);}
+
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Command_ID;}
 
     Vector<> getMinValue() const {return magMin_;}
     Vector<> getMaxValue() const {return magMax_;}
@@ -243,7 +254,7 @@ private:
 
 
 
-class CommandMessageAccelCalValues: public KraftMessageCommand_Abstract {
+class CommandMessageAccelCalValues: public KraftMessage_Interface {
 public:
 
     CommandMessageAccelCalValues() {}
@@ -256,6 +267,8 @@ public:
     uint32_t getDataType() const {return eMessageTypeCommand_t::eKraftMessageType_KraftKontrol_MagCalib;}
 
     uint32_t getDataSize() const {return sizeof(accelMin_) + sizeof(accelMax_);}
+
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Command_ID;}
 
     Vector<> getMinValue() const {return accelMin_;}
     Vector<> getMaxValue() const {return accelMax_;}

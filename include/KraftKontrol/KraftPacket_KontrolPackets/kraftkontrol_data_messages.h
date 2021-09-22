@@ -32,7 +32,7 @@ enum eMessageTypeData_t: uint32_t {
 
 
 
-class DataMessageAttitude: public KraftMessageData_Abstract, public MessageQuaternion_Abstract {
+class DataMessageAttitude: public MessageQuaternion_Abstract {
 public:
 
     DataMessageAttitude() {}
@@ -41,11 +41,13 @@ public:
 
     uint32_t getDataType() const final {return eMessageTypeData_t::eMessageTypeData_Attitude;}
 
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Data_ID;}
+
 };
 
 
 
-class DataMessagePosition: public KraftMessageData_Abstract, public MessageVector_Abstract {
+class DataMessagePosition: public MessageVector_Abstract {
 public:
 
     DataMessagePosition() {}
@@ -54,11 +56,13 @@ public:
 
     uint32_t getDataType() const final {return eMessageTypeData_t::eMessageTypeData_Position;}
 
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Data_ID;}
+
 };
 
 
 
-class DataMessageFullKinematics: public KraftMessageData_Abstract, public MessageFullKinematics_Abstract {
+class DataMessageFullKinematics: public MessageFullKinematics_Abstract {
 public:
 
     DataMessageFullKinematics() {}
@@ -67,11 +71,13 @@ public:
 
     uint32_t getDataType() const final {return eMessageTypeData_t::eMessageTypeData_FullKinematics;}
 
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Data_ID;}
+
 };
 
 
 
-class DataMessageForce: public KraftMessageData_Abstract, public MessageVector_Abstract {
+class DataMessageForce: public MessageVector_Abstract {
 public:
 
     DataMessageForce() {}
@@ -80,11 +86,13 @@ public:
 
     uint32_t getDataType() const final {return eMessageTypeData_t::eMessageTypeData_Force;}
 
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Data_ID;}
+
 };
 
 
 
-class DataMessageTorque: public KraftMessageData_Abstract, public MessageVector_Abstract {
+class DataMessageTorque: public MessageVector_Abstract {
 public:
 
     DataMessageTorque() {}
@@ -93,11 +101,13 @@ public:
 
     uint32_t getDataType() const final {return eMessageTypeData_t::eMessageTypeData_Torque;}
 
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Data_ID;}
+
 };
 
 
 
-class DataMessageNodeStatus: public KraftMessageData_Abstract {
+class DataMessageNodeStatus: public KraftMessage_Interface {
 public:
 
     DataMessageNodeStatus() {}
@@ -111,6 +121,8 @@ public:
     }
 
     uint32_t getDataType() const final {return eMessageTypeData_t::eMessageTypeData_NodeStatus;}
+
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Data_ID;}
 
     /**
      * @returns true if node is connected to network.
@@ -163,7 +175,7 @@ private:
 /**
  * Stores raw bytes for data transfer.
  */
-class DataMessageBuffer: public KraftMessageData_Abstract {
+class DataMessageBuffer: public KraftMessage_Interface{
 public:
 
     DataMessageBuffer() {}
@@ -173,6 +185,8 @@ public:
     }
 
     uint32_t getDataType() const final {return eMessageTypeData_t::eMessageTypeData_Buffer;}
+
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Data_ID;}
 
     uint32_t getDataSize() const {return getBufferSize() + sizeof(bufferSize_);}
 
@@ -225,7 +239,7 @@ protected:
 
 
 
-class DataMessageFullDynamics: public KraftMessageData_Abstract, public MessageFullDynamics_Abstract {
+class DataMessageFullDynamics: public MessageFullDynamics_Abstract {
 public:
 
     DataMessageFullDynamics() {}
@@ -234,11 +248,13 @@ public:
 
     uint32_t getDataType() const final {return eMessageTypeData_t::eMessageTypeData_FullDynamics;}
 
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Data_ID;}
+
 };
 
 
 
-class DataMessageVehicleModeSet: public KraftMessageData_Abstract, public MessageGeneric_Abstract<eVehicleMode_t> {
+class DataMessageVehicleModeSet: public MessageGeneric_Abstract<eVehicleMode_t> {
 public:
 
     DataMessageVehicleModeSet() {}
@@ -247,11 +263,13 @@ public:
 
     uint32_t getDataType() const final {return eMessageTypeData_t::eMessageTypeData_VehicleModeSet;}
 
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Data_ID;}
+
 };
 
 
 
-class DataMessageRCChannels: public KraftMessageData_Abstract {
+class DataMessageRCChannels: public KraftMessage_Interface{
 public:
 
     DataMessageRCChannels() {}
@@ -268,6 +286,8 @@ public:
     uint32_t getDataType() const final {return eMessageTypeData_t::eMessageTypeData_RCChannels;}
 
     uint32_t getDataSize() const {return sizeof(channels_);}
+
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Data_ID;}
 
     int16_t getChannel(const uint8_t &channel) {return channels_[channel];}
 
@@ -309,7 +329,7 @@ protected:
 };
 
 
-class DataMessageProgramStart: public KraftMessageData_Abstract {
+class DataMessageProgramStart: public KraftMessage_Interface{
 public:
 
     DataMessageProgramStart() {}
@@ -327,6 +347,7 @@ public:
 
     uint32_t getDataType() const final {return eMessageTypeData_t::eMessageTypeData_ProgramStart;}
 
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Data_ID;}
 
     uint32_t getDataSize() const {return sizeof(programID_) + sizeof(programStartTime_);}
 
@@ -366,7 +387,7 @@ protected:
 
 
 /*
-class KraftMessageMagCalValuesIs: public KraftMessageData_Abstract {
+class KraftMessageMagCalValuesIs:{
 public:
 
     KraftMessageMagCalValuesIs() {}
@@ -429,7 +450,7 @@ protected:
 
 
 
-class KraftMessageMagCalValuesSet: public KraftMessageData_Abstract {
+class KraftMessageMagCalValuesSet:{
 public:
 
     KraftMessageMagCalValuesSet() {}

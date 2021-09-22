@@ -20,7 +20,7 @@ void Menu_List::removeMenuFromList(Menu_Abstract& menu) {
 }
 
 
-void Menu_List::resetMenu() {
+void Menu_List::enter() {
 
     menuControlSubscriber_.subscribe(menuControl_.getMenuInputTopic());
 

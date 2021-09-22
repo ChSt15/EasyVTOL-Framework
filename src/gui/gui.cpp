@@ -25,16 +25,16 @@ void Gui::thread() {
 
     if (menuReturn == nullptr && menu != mainMenu_) { //Return to last menu. Remove last menu in list and reset gui task settings, like FPS.
 
+        if (menuPath_.getNumItems() > 0 ) menuPath_[menuPath_.getNumItems()-1]->exit();
+
         menuPath_.removeAtIndex(menuPath_.getNumItems()-1); //Remove last item. Shouldnt be expensive.
-        
-        if (menuPath_.getNumItems() > 0 ) menuPath_[menuPath_.getNumItems()-1]->resetMenu();
 
         setTaskRate(30);
         setTaskPriority(eTaskPriority_t::eTaskPriority_Middle);
 
     } else if (menuReturn != menu) { //New menu selected. Add to end of list.
 
-        menuReturn->resetMenu();
+        menuReturn->enter();
         menuPath_.append(menuReturn);
 
     }

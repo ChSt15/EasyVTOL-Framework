@@ -139,10 +139,16 @@ protected:
     virtual Menu_Abstract* menuDisplayUpdate(Display_Abstract& display, Task_Abstract& gui) = 0;
 
     /**
-     * Will be called once before menuDisplayUpdate() is called when menu is selected. 
+     * Will be called once before menuDisplayUpdate() after menu was selected.
      * To be implemented by subclasses. Places display into known mode.
      */
-    virtual void resetMenu() {}
+    virtual void enter() {}
+
+    /**
+     * Will be called once after menuDisplayUpdate() is called when menu is exited 
+     * To be implemented by subclasses. Places display into known mode.
+     */
+    virtual void exit() {}
 
 
 };

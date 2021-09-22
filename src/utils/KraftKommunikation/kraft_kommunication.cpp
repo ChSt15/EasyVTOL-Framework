@@ -27,11 +27,11 @@ bool KraftKommunication::decodeMessageFromBuffer(ReceivedPayloadData& payloadDat
 
     for (uint32_t i = 0; i < payloadData.messageData.payloadSize; i++) payloadData.dataBuffer[i] = buffer[9+i]; //Move data from buffer into output
 
-    //uint8_t crc = buffer[8+payloadData.messageData.payloadSize];
+    uint8_t crc = buffer[9+payloadData.messageData.payloadSize];
 
     if (buffer[10+payloadData.messageData.payloadSize] != c_kraftPacketEndMarker) return false;
 
-    //if (crc != calculateCRC(buffer, payloadSize + 8)) return false; //Commented for testing, Should be readded and tested later!
+    if (crc != calculateCRC(buffer, payloadData.messageData.payloadSize + 8)) return false; //Commented for testing, Should be readded and tested later!
 
     return true;
 
@@ -239,7 +239,13 @@ void KraftKommunication::thread() {
                 if (message.messageData.receiverID == selfID_ || message.messageData.receiverID == eKraftMessageNodeID_t::eKraftMessageNodeID_broadcast) { //Make sure packet is for us.
 
                     nodeData_[message.messageData.transmitterID].lastPacketTimestamp = NOW();
-                    nodeData_[message.messageData.transmitterID].online = true;
+
+                    if (!nodeData_[message.messageData.transmitterID].online) {
+
+                        nodeData_[message.messageData.transmitterID].online = true;
+                        globalMessages().publish(DataMessageNodeStatus(true, message.messageData.transmitterID));
+
+                    }
 
                     KraftMessageEmulator kraftMessage(message.dataBuffer, message.messageData.payloadSize, message.messageData.messageTypeID, message.messageData.dataTypeID);
 
@@ -280,20 +286,6 @@ void KraftKommunication::thread() {
         }
 
     }
-
-
-    //Check for timeout on all nodes.
-    for (uint8_t i = 0; i < 0; i++) {
-
-        if (nodeData_[i].online && (NOW() - nodeData_[i].lastPacketTimestamp >= 1*SECONDS)) {
-            
-            nodeData_[i].online = false;
-
-        }
-
-    }
-
-
     
 
 }

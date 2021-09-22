@@ -10,6 +10,15 @@
 
 
 /**
+ * This header contains the implementation of a few subscriber classes.
+ * 
+ * Simple_Subscriber is fastest and only contains one item.
+ * Buffer_Subscriber is identical to FiFoBuffer but auto adds items to beginning of buffer.
+ */
+
+
+
+/**
  * Subscribes to topic(s). USed by other subscribers to implement core functions.
  */
 template<typename TYPE> 
@@ -38,7 +47,7 @@ public:
     /**
      * Will remove subscribtion. Will not receive anymore.
      */
-    void unsubcribeTopic(const Topic<TYPE>& topic) {
+    void unsubcribeTopic(const Topic<TYPE>& topic) override {
         topic.removeSubscriber(this);
         subscribedTopics_.removeAllEqual(&topic);
     }
@@ -68,14 +77,6 @@ private:
     List<const Topic<TYPE>*> subscribedTopics_;
 
 };
-
-
-/**
- * This header contains the implementation of a few subscriber classes.
- * 
- * Simple_Subscriber is fastest and only contains one item.
- * Buffer_Subscriber is identical to FiFoBuffer but auto adds items to beginning of buffer.
- */
 
 
 /**

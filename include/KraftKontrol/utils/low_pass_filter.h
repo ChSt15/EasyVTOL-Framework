@@ -25,7 +25,7 @@ public:
         _cutOffFreq = 1;
         _RC = 1.0/(_cutOffFreq*2*3.14);
 
-        if (_sampleRate != -1) {
+        if (_sampleRate > 0) {
             float dt = 1.0/_sampleRate;
             _alpha = dt/(_RC+dt);
         }
@@ -45,7 +45,7 @@ public:
         _cutOffFreq = cutOffFreq;
         _RC = 1.0/(_cutOffFreq*2*3.14);
 
-        if (_sampleRate != -1) {
+        if (_sampleRate > 0) {
             float dt = 1.0/_sampleRate;
             _alpha = dt/(_RC+dt);
         }
@@ -60,7 +60,7 @@ public:
      */
     T update(T input) {
         
-        if (_sampleRate == -1) {
+        if (_sampleRate < 0) {
             float dt = (double)(NOW() - _lastRun)/SECONDS;
             _lastRun = NOW();
             _alpha = dt/(_RC+dt);
@@ -91,6 +91,26 @@ public:
         _lastValue = output;
 
         return output;
+
+    }
+
+
+    /**
+     * Ccanges the response frequency
+     * @param freq
+     * @param sampleRate
+     */
+    void setParameters(float freq, float sampleRate = -1) {
+
+        _cutOffFreq = freq;
+        _sampleRate = sampleRate;
+        
+        _RC = 1.0/(_cutOffFreq*2*3.14);
+
+        if (_sampleRate > 0) {
+            float dt = 1.0/_sampleRate;
+            _alpha = dt/(_RC+dt);
+        }
 
     }
 

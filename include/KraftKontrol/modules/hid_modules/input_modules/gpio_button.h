@@ -13,7 +13,8 @@ class GPIOButton: public ButtonHID_Abstract {
 private:
 
     ///Buffer for storing button values.
-    Buffer<int, 9> valueBuf_;
+    Buffer<int, 3> valueBuf_;
+    uint32_t numberReadings_;
 
     bool usePullup_ = false;
 
@@ -28,6 +29,8 @@ public:
      * @param pin Which pin to use as input.
      * @param onLow Button is pressed when pin is measured as low. Defaults to true.
      * @param useInternalPullup Use internal pullup. Defaults to true;
+     * @param rate What rate to read button at.
+     * @param numberReadings What number of readings to save in buffer for averaging. Max 20.
      */
     GPIOButton(uint32_t pin, bool onLow = true, bool useInternalPullup = true, uint32_t rate = 50);
 

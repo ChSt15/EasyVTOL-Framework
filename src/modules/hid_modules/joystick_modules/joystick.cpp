@@ -28,7 +28,7 @@ Joystick::Joystick(const ADCChannel& adcXChannel, const ADCChannel& adcYChannel,
     xAxisNegative_(adcXChannel, joystickThreshold_, true),
     yAxisPositive_(adcYChannel, joystickThreshold_, false),
     yAxisNegative_(adcYChannel, joystickThreshold_, true),
-    button_(buttonPin) 
+    button_(buttonPin)
 {
 
     buttonSubr_.subscribe(button_.getButtonTopic());

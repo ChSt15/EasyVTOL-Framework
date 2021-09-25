@@ -32,6 +32,7 @@ public:
     virtual void setHome(const WorldPosition& homePosition) {
         navigationData_.homePosition = homePosition;
         navigationData_.position = 0;
+        navigationData_.velocity = 0;
     };
 
     /**

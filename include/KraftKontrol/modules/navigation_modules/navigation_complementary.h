@@ -94,8 +94,11 @@ private:
 
     //Filter data
     LowPassFilter<Vector<>> gyroLPF_ = LowPassFilter<Vector<>>(0.01);
-    LowPassFilter<Vector<>> accelBiasLPF_ = LowPassFilter<Vector<>>(0.2);
+    LowPassFilter<Vector<>> accelBiasLPF_ = LowPassFilter<Vector<>>(0.2, 8000);
     LowPassFilter<Vector<>> accelLPF_ = LowPassFilter<Vector<>>(3000);
+
+    Vector<> accelBias_ = 0;
+    Vector<> gravity_ = Vector<>(0,0,9.81);
 
     //Buffers
     Buffer<float, 10> gyroXBuffer_;

@@ -19,7 +19,7 @@
 #define SX1280_FREQUENCY        2445000000UL    
 #define SX1280_SPREADFACTOR     LORA_SF5        
 #define SX1280_BANDWIDTH        LORA_BW_1600
-#define SX1280_CODINGRATE       LORA_CR_4_5
+#define SX1280_CODINGRATE       LORA_CR_4_6
 
 //Keep at 10mW to stay legal. 100mW is allowed in europe only if spread spectrum is implemented. (It currently isnt so dont)
 #define SX1280_POWER_dB         10       

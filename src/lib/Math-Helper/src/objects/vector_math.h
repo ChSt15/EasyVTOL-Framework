@@ -36,13 +36,13 @@ class Vector {
         /**
          * This constructor sets all components to n.
          */
-        Vector<T>(const T &n) {
+        Vector<T>(T n) {
             x = n;
             y = n;
             z = n;
         }
 
-        Vector<T>(const T &nx, const T &ny, const T &nz) {
+        Vector<T>(T nx, T ny, T nz) {
             x = nx;
             y = ny;
             z = nz;

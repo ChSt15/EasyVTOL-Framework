@@ -7,7 +7,8 @@
 
 #include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
 
-//#include "KraftKontrol/modules/eeprom_hal_modules/eeprom_hal_interface.h"
+#include "KraftKontrol/modules/data_manager_modules/data_manager_nonvolatile.h"
+
 #include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_data_messages.h"
 #include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_command_messages.h"
 
@@ -55,8 +56,8 @@ public:
      * @param selector For I2C this is the address. For SPI this is the chip select pin.
      * @param eeprom Reference to EEPROM module to use for calibration values.
      */
-    QMC5883Driver(BusDevice_HAL_Abstract& bus, uint32_t selector/*, EEPROM_Interface* eeprom = nullptr*/) : Task_Abstract("QMC5883 Driver", 250, eTaskPriority_t::eTaskPriority_VeryHigh) {
-        //eeprom_ = eeprom;
+    QMC5883Driver(BusDevice_HAL_Abstract& bus, uint32_t selector, DataManager_NonVolatile* eeprom = nullptr) : Task_Abstract("QMC5883 Driver", 250, eTaskPriority_t::eTaskPriority_VeryHigh) {
+        eeprom_ = eeprom;
         bus_ = &bus;
     }
     
@@ -75,22 +76,6 @@ public:
      * @return none.
      */
     void init();
-
-    /**
-     * Returns rate (in Hz) of the thread
-     *
-     * @param values none.
-     * @return uint32_t.
-     */
-    uint32_t loopRate() {return _loopRate;};
-
-    /**
-     * Returns rate (in Hz) of the new sensor data
-     *
-     * @param values none.
-     * @return uint32_t.
-     */
-    uint32_t magRate() {return _magRate;};
 
     /**
      * @returns current calibration status
@@ -119,26 +104,16 @@ private:
 
     Vector<> _lastMag;
 
-    //EEPROM_Interface* eeprom_ = nullptr;
-
-    IntervalControl _rateCalcInterval = IntervalControl(1); 
+    DataManager_NonVolatile* eeprom_ = nullptr;
 
     BusDevice_HAL_Abstract *bus_;
 
     uint8_t _startAttempts = 0;
 
-    uint32_t _loopRate = 0;
-    uint32_t _loopCounter = 0;
-
-    uint32_t _magRate = 0;
-    uint32_t magCounter_ = 0;
-
     uint32_t _lastMeasurement = 0;
 
     Vector<> magMin_ = -1;
     Vector<> magMax_ = 1;
-
-    bool _block = false;
 
     bool calibrate_ = false;
     uint32_t calibrationStart_ = 0;

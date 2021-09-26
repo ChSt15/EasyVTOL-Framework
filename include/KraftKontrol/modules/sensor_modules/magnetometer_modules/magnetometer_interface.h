@@ -22,13 +22,6 @@ class Magnetometer_Interface {
 public:
 
     /**
-     * Returns rate (in Hz) of the new sensor data
-     *
-     * @return uint32_t.
-     */
-    virtual uint32_t magRate() = 0;
-
-    /**
      * @returns current calibration status
      */
     virtual eMagCalibStatus_t getCalibrationStatus() {return eMagCalibStatus_t::eMagCalibStatus_NotCalibrated;};

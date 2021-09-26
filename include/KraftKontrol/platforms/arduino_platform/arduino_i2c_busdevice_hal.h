@@ -50,14 +50,14 @@ public:
      */
     bool writeBytes(uint32_t writeRegister, const void* writeData, uint32_t numberBytes, bool release = true) override {
 
+        //Serial.println(String("Input register: ") + writeRegister + ", num Bytes: " + numberBytes + ", release: " + release);
+
         bus_->beginTransmission((uint8_t)address_);
 
         bus_->write((uint8_t*)&writeRegister, 1);
         bus_->write((uint8_t*)writeData, numberBytes);
 
-        uint32_t sentBytes = bus_->endTransmission(release);
-
-        return sentBytes == numberBytes;
+        return bus_->endTransmission(release) == 0; // Should return 0 if successfull.
 
     }
 
@@ -72,13 +72,18 @@ public:
      */
     bool readBytes(uint32_t readRegister, void* readData, uint32_t numberBytes, bool release = true) override {
 
+        bus_->beginTransmission((uint8_t)address_);
+        bus_->write(readRegister);
+        bus_->endTransmission(false);
+
         if (bus_->requestFrom((int)address_, (int)numberBytes, (int)release) != numberBytes) {
             return false;
         }
 
-        for (uint32_t i = 0; i < numberBytes; i++) ((uint8_t*)readData)[i] = bus_->read();
+        uint32_t i;
+        for (i = 0; i < numberBytes; i++) ((uint8_t*)readData)[i] = bus_->read();
 
-        return true;
+        return i == numberBytes;
 
     }
 

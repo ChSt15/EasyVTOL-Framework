@@ -3,7 +3,11 @@
 
 DataManager_InternalEEPROM::DataManager_InternalEEPROM() {
 
+    #ifdef ESP32
+    EEPROM.begin(4000);
+    #else
     EEPROM.begin();
+    #endif
 
     dataSize_ = EEPROM.length();
     dataPointer_ = new uint8_t[dataSize_]; //create data buffer in RAM.

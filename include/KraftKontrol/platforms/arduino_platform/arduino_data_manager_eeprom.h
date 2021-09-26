@@ -5,6 +5,7 @@
 
 #include "../../modules/data_manager_modules/data_manager_nonvolatile.h"
 
+#include "Arduino.h"
 #include "EEPROM.h"
 
 

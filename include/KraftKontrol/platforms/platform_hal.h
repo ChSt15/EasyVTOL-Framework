@@ -15,6 +15,7 @@
 #include "arduino_platform/arduino_spi_busdevice_hal.h"
 #include "arduino_platform/arduino_systemtime.h"
 #include "arduino_platform/arduino_pin_interrupt_hal.h"
+#include "arduino_platform/arduino_data_manager_eeprom.h"
 
 #endif
 

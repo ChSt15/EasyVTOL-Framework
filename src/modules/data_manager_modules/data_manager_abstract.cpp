@@ -1,27 +1,15 @@
-#include "KraftKontrol/modules/data_manager_modules/data_storage_manager.h"
+#include "KraftKontrol/modules/data_manager_modules/data_manager_abstract.h"
 
 
 
-DataStorageManager::DataStorageManager(uint32_t dataSize) {
-    maxDataSize_ = dataSize;
-    dataPointer_ = new uint8_t[maxDataSize_];
-    if (dataPointer_ != nullptr) dataValid_ = true;
-}
+DataManager_Abstract::DataManager_Abstract() {}
 
 
-DataStorageManager::~DataStorageManager() {
-    if (!dataValid_) return;
-    delete[] dataPointer_;
-    maxDataSize_ = 0;
-    dataValid_ = false;
-}
+DataManager_Abstract::~DataManager_Abstract() {}
 
 
-//////ToDo implementation
 
-bool DataStorageManager::readData(uint32_t index, uint8_t* data, uint32_t numBytes) const {
-
-    if (!dataValid_) return false;
+/*bool DataManager_Abstract::readData(uint32_t index, uint8_t* data, uint32_t numBytes) const {
 
     //Make sure we wont read past the end of array.
     if ((index + numBytes - 1) >= maxDataSize_) return false;
@@ -33,9 +21,7 @@ bool DataStorageManager::readData(uint32_t index, uint8_t* data, uint32_t numByt
 }
 
 
-bool DataStorageManager::writeData(uint32_t index, const uint8_t* data, uint32_t numBytes) {
-
-    if (!dataValid_) return false;
+bool DataManager_Abstract::writeData(uint32_t index, const uint8_t* data, uint32_t numBytes) {
 
     //Make sure we wont write past the end of array.
     if ((index + numBytes - 1) >= maxDataSize_) return false;
@@ -44,15 +30,10 @@ bool DataStorageManager::writeData(uint32_t index, const uint8_t* data, uint32_t
 
     return true;
 
-}
+}*/
 
 
-uint32_t DataStorageManager::getEndIndex() {
-    return maxDataSize_ == 0 ? 0:maxDataSize_-1;
-}
-
-
-uint32_t DataStorageManager::searchMessage(uint32_t messageTypeSet, uint32_t dataTypeSet, uint32_t id, uint32_t startIndex) {
+uint32_t DataManager_Abstract::searchMessage(uint32_t messageTypeSet, uint32_t dataTypeSet, uint32_t id, uint32_t startIndex) {
 
     uint32_t index = startIndex;
 
@@ -100,7 +81,7 @@ uint32_t DataStorageManager::searchMessage(uint32_t messageTypeSet, uint32_t dat
 }
 
 
-bool DataStorageManager::getMessage(KraftMessage_Interface& message, uint32_t id) {
+bool DataManager_Abstract::getMessage(KraftMessage_Interface& message, uint32_t id) {
 
     uint32_t index = searchMessage(message.getMessageType(), message.getDataType(), id);
 
@@ -127,7 +108,7 @@ bool DataStorageManager::getMessage(KraftMessage_Interface& message, uint32_t id
 }
 
 
-bool DataStorageManager::setMessage(KraftMessage_Interface& message, uint32_t id) {
+bool DataManager_Abstract::setMessage(KraftMessage_Interface& message, uint32_t id) {
 
     uint32_t index = searchMessage(message.getMessageType(), message.getDataType(), id);
 
@@ -154,7 +135,7 @@ bool DataStorageManager::setMessage(KraftMessage_Interface& message, uint32_t id
 }
 
 
-uint32_t DataStorageManager::newMessage(KraftMessage_Interface& message) {
+uint32_t DataManager_Abstract::newMessage(KraftMessage_Interface& message) {
 
     uint32_t index = 0;
     uint32_t nextMessageIndex = 1;
@@ -178,20 +159,30 @@ uint32_t DataStorageManager::newMessage(KraftMessage_Interface& message) {
 
         //Calculate free space
         freeSpace = nextMessageIndex - (index + size);
+        if (index == 1) freeSpace = nextMessageIndex-9;
+
+        //Serial.println(String("Current Index: ") + index + ", Next Index: " + nextMessageIndex + ", End Index: " + getEndIndex() + ", Size: " + freeSpace);
 
     }
+
+    //Serial.println(String("Found spot at index: ") + index + ", Size: " + freeSpace);
 
     //determine index of new data.
     uint32_t sizeLast;
     if (!readData(index, (uint8_t*)&sizeLast, 4)) return 0;
     uint32_t newIndex = index + sizeLast + 20; //Start is byte at end of the last message.
 
+    //If the index is 1 then this is the first message being saved to memory
+    if (index == 1) newIndex = 9;
+
+    //Serial.println(String("Placing at index: ") + newIndex);
+
     //Update data with parameters from message.
     uint32_t newSize = message.getDataSize();
     uint32_t newMessageType = message.getMessageType();
     uint32_t newDataType = message.getDataType();
     uint32_t newID = 1;
-    uint32_t nextIndex = 0;
+    uint32_t nextIndex = getEndIndex();
     if (!writeData(newIndex, (uint8_t*)&newSize, 4)) return 0;
     if (!writeData(newIndex + 4, (uint8_t*)&nextIndex, 4)) return 0;
     if (!writeData(newIndex + 8, (uint8_t*)&newMessageType, 4)) return 0;
@@ -201,15 +192,15 @@ uint32_t DataStorageManager::newMessage(KraftMessage_Interface& message) {
     if (!message.getRawData(buffer, newSize)) return 0;
     if (!writeData(newIndex + 20, buffer, newSize)) return 0;
     
-    //Update last message with new message index.
-    if (!writeData(index + 4, (uint8_t*)&nextMessageIndex, 4)) return 0;
+    //Update last message with new message index. Must be done here so its only changed when everything was sucessfull.
+    if (!writeData(index + 4, (uint8_t*)&newIndex, 4)) return 0;
 
     return newID;
 
 }
 
 
-uint32_t DataStorageManager::getNumberMessages(KraftMessage_Interface& message) {
+uint32_t DataManager_Abstract::getNumberMessages(KraftMessage_Interface& message) {
 
     uint32_t index = 1;
     uint32_t nextMessageIndex = 0;
@@ -255,21 +246,21 @@ uint32_t DataStorageManager::getNumberMessages(KraftMessage_Interface& message) 
 }
 
 
-void DataStorageManager::clear() {
+void DataManager_Abstract::clear() {
 
     uint32_t buf = storageVersion;
-    if (writeData(0, (uint8_t*)&buf, 1)) return;
+    if (!writeData(0, (uint8_t*)&buf, 1)) return;
 
     buf = 0;
-    if (writeData(1, (uint8_t*)&buf, 4)) return;
+    if (!writeData(1, (uint8_t*)&buf, 4)) return;
 
     buf = getEndIndex();
-    if (writeData(1 + 4, (uint8_t*)&buf, 4)) return;
+    if (!writeData(1 + 4, (uint8_t*)&buf, 4)) return;
 
 }
 
 
-bool DataStorageManager::deleteMessage(KraftMessage_Interface& message, uint32_t id) {
+bool DataManager_Abstract::deleteMessage(KraftMessage_Interface& message, uint32_t id) {
 
     uint32_t index = 1;
     uint32_t lastMessageIndex = 1;
@@ -336,7 +327,7 @@ bool DataStorageManager::deleteMessage(KraftMessage_Interface& message, uint32_t
 }
 
 
-uint32_t DataStorageManager::deleteAllMessages(KraftMessage_Interface& message) {
+uint32_t DataManager_Abstract::deleteAllMessages(KraftMessage_Interface& message) {
 
     uint32_t counter = 0;
 
@@ -348,7 +339,14 @@ uint32_t DataStorageManager::deleteAllMessages(KraftMessage_Interface& message) 
 }
 
 
-DataStorageManager& DataStorageManager::operator = (DataStorageManager& dataStorage) {
+uint8_t DataManager_Abstract::operator [] (uint32_t index) {
+    uint8_t buf;
+    readData(index, &buf);
+    return buf;
+}
+
+
+/*DataManager_Abstract& DataManager_Abstract::operator = (DataManager_Abstract& dataStorage) {
 
     for (uint32_t i = 0; i < maxDataSize_; i++) {
 
@@ -362,4 +360,4 @@ DataStorageManager& DataStorageManager::operator = (DataStorageManager& dataStor
     
     return *this;
 
-}
+}*/

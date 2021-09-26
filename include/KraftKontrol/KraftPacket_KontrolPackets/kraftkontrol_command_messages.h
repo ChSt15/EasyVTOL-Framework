@@ -92,7 +92,7 @@ public:
 
     uint32_t getDataSize() const {return sizeof(programID_) + sizeof(programStartTime_);}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const {
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -105,7 +105,7 @@ public:
 
     }
 
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
+    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0){
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -154,7 +154,7 @@ public:
 
     void setChannel(const int16_t &value, const uint8_t &channel) {channels_[channel] = value;}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const {
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -166,7 +166,7 @@ public:
 
     }
 
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0){
+    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0){
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -210,7 +210,7 @@ public:
 
     void setMinMax(const Vector<> &magMax, const Vector<> &magMin) {magMin_ = magMin; magMax_ = magMax;}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const {
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -227,7 +227,7 @@ public:
 
     }
 
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) {
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -264,7 +264,7 @@ public:
         accelMax_ = accelMax;
     }
 
-    uint32_t getDataType() const {return eMessageTypeCommand_t::eKraftMessageType_KraftKontrol_MagCalib;}
+    uint32_t getDataType() const {return eMessageTypeCommand_t::eKraftMessageType_KraftKontrol_AccelCalib;}
 
     uint32_t getDataSize() const {return sizeof(accelMin_) + sizeof(accelMax_);}
 
@@ -275,7 +275,7 @@ public:
 
     void setMinMax(const Vector<> &magMax, const Vector<> &magMin) {accelMin_ = magMin; accelMax_ = magMax;}
 
-    bool getRawData(void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) const {
+    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const {
 
         if (dataByteSize < getDataSize()) return false;
 
@@ -292,7 +292,7 @@ public:
 
     }
 
-    bool setRawData(const void* dataBytes, const uint32_t &dataByteSize, const uint32_t &startByte = 0) {
+    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) {
 
         if (dataByteSize < getDataSize()) return false;
 

@@ -95,6 +95,9 @@ private:
     //Should be true while its waiting for send to complete
     bool isBusySending_ = false;
 
+    //is true if the channel is busy.
+    bool channelBusy_ = false;
+
     Buffer_Subscriber<DataMessageBuffer, 10> toSendBufferSub_;
 
     int nssPin_;

@@ -114,6 +114,26 @@ void SX1280Driver::internalLoop() {
 
         }
 
+        if (irqStatus & (IRQ_CAD_ACTIVITY_DETECTED)) {
+
+            channelBusy_ = true;
+
+            #ifdef SX1280_DEBUG
+                Serial.println("Channel is now busy!");
+            #endif
+
+        }
+
+        if (irqStatus & (IRQ_CAD_DONE)) {
+
+            channelBusy_ = false;
+
+            #ifdef SX1280_DEBUG
+                Serial.println("Channel is now busy!");
+            #endif
+
+        }
+
         radio_.clearIrqStatus(IRQ_RADIO_ALL); 
 
         //radio_.receive(receivedData_, SX1280_DATA_BUFFER_SIZE, 0, NO_WAIT);
@@ -123,7 +143,7 @@ void SX1280Driver::internalLoop() {
 
 
     
-    if (toSendBufferSub_.available() > 0 && !isBusySending_) { 
+    if (toSendBufferSub_.available() > 0 && !isBusySending_ && !channelBusy_) { 
 
         isBusySending_ = true;
 

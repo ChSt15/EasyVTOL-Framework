@@ -37,15 +37,15 @@ enum ePPMProtocol_t {
 class PPMChannel {
 public:
 
-    PPMChannel(int16_t pin, const ePPMProtocol_t &protocol, float offset = 0, float scaler = 1);
+    PPMChannel(int16_t pin, ePPMProtocol_t protocol, float offset = 0, float scaler = 1);
     ~PPMChannel();
 
-    bool setAngle(const float &angle, const bool &limit = true);
+    bool setAngle(float angle, bool limit = true);
 
-    bool setChannel(const float &percent, const bool &limit = true);
+    bool setChannel(float percent, bool limit = true);
     float getChannel();
 
-    void activateChannel(const bool &activate = true);
+    void activateChannel(bool activate = true);
     bool getActive();
 
     void setProtocol(const ePPMProtocol_t &protocol);
@@ -54,7 +54,7 @@ public:
 
 private:
 
-    void _getProtocolTiming(uint32_t &min, uint32_t max, const ePPMProtocol_t &protocol);
+    void _getProtocolTiming(uint32_t &min, uint32_t &max, ePPMProtocol_t protocol);
 
     int16_t _pin = -1;  
 

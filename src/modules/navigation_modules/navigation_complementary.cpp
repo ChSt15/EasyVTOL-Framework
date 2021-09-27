@@ -302,7 +302,7 @@ void NavigationComplementaryFilter::thread() {
 
 
             //Update gravity 
-            if ((navigationData_.acceleration - gravity_).magnitude() < 1) {
+            /*if ((navigationData_.acceleration - gravity_).magnitude() < 1) {
 
                 float magBuf = navigationData_.acceleration.magnitude();
                 float magTrue = gravity_.magnitude();
@@ -313,11 +313,11 @@ void NavigationComplementaryFilter::thread() {
 
                 //Serial.println(gravity_.toString());
 
-            }
+            }*/
 
             //Update acceleration bias
-            navigationData_.acceleration = (navigationData_.attitude*accelVector*navigationData_.attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
             Vector<> localLinearAccel = accelVector - navigationData_.attitude.copy().conjugate().rotateVector(gravity_);
+            //Serial.println(localLinearAccel.toString());
             if (abs(localLinearAccel.magnitude()) < 1.0f) {
                 accelBiasLPF_.setParameters(0.5/(1 + localLinearAccel.magnitude()*10), 8000);
                 accelBiasLPF_.update(localLinearAccel);
@@ -325,14 +325,19 @@ void NavigationComplementaryFilter::thread() {
                 //Serial.println(accelBiasLPF_.getValue().toString());
             }
 
-            navigationData_.acceleration -= accelBiasLPF_.getValue();
+
+            navigationData_.acceleration = (navigationData_.attitude*(accelVector-accelBiasLPF_.getValue())*navigationData_.attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
+
             //navigationData_.acceleration -= navigationData_.attitude.rotateVector(accelBias_);
             
             navigationData_.linearAcceleration = navigationData_.acceleration - gravity_;
 
             //Update error
-            Vector<> accelError(accelXBuffer_.getStandardError(), accelYBuffer_.getStandardError(), accelZBuffer_.getStandardError());
-            navigationData_.accelerationError = (navigationData_.attitude*accelError*navigationData_.attitude.copy().conjugate()).toVector();
+            Vector<> accelError(accelXBuffer_.getStandardDeviation(), accelYBuffer_.getStandardDeviation(), accelZBuffer_.getStandardDeviation());
+            accelError = (navigationData_.attitude*accelError*navigationData_.attitude.copy().conjugate()).toVector();
+            navigationData_.accelerationError.x = abs(accelError.x);
+            navigationData_.accelerationError.y = abs(accelError.y);
+            navigationData_.accelerationError.z = abs(accelError.z);
 
             //Serial.println(String("Accel: x: ") + navigationData_.linearAcceleration.x + ", y: " + navigationData_.linearAcceleration.y + ", z: " + navigationData_.linearAcceleration.z);
             
@@ -358,7 +363,7 @@ void NavigationComplementaryFilter::thread() {
             navigationData_.attitude.normalize(true);
             //navigationData_.attitude = Quaternion(0,0,1,0);
 
-            accelBiasLPF_.setValue(navigationData_.acceleration - Vector<>(0,0,9.81));
+            //accelBiasLPF_.setValue(navigationData_.acceleration);
 
         }
 
@@ -499,8 +504,8 @@ void NavigationComplementaryFilter::thread() {
             baroHeightBuffer_.placeFront(heightAbsolute, true);
             baroVelBuffer_.placeFront(zVelocity, true);
 
-            float heightMedian = baroHeightBuffer_.getMedian();
-            float heightError = baroHeightBuffer_.getStandardDeviation();
+            float heightMedian = baroHeightBuffer_.getAverage();
+            float heightError = baroHeightBuffer_.getStandardDeviation()+3;
 
             float velMedian = baroVelBuffer_.getAverage();
             float velError = baroVelBuffer_.getStandardDeviation();
@@ -509,6 +514,8 @@ void NavigationComplementaryFilter::thread() {
 
             //Serial.println(String("Height: ") + heightAbsolute + " +- " + String(heightError,5) + ", velMed: " + velMedian + ",\tvel: " + zVelocity + "+-" + velError);
             //Serial.println(String("") + (heightMedian - navigationData_.homePosition.height) + "  " + velMedian);
+
+            //Serial.println(String("Height: ") + heightMedian + " +- " + heightError + ", vel: ")
 
             //correct dead reckoning values with new ones.
             ValueError<> heightVel = ValueError<>(navigationData_.velocity.z, navigationData_.velocityError.z).weightedAverage(ValueError<>(velMedian, velError));

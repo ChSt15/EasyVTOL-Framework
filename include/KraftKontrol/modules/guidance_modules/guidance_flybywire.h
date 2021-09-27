@@ -154,7 +154,7 @@ private:
 
     ControlData vehicleControlSettings_;
 
-    uint32_t _lastRunTimestamp = 0;
+    int64_t _lastRunTimestamp = 0;
 
     bool initialised = false;
 

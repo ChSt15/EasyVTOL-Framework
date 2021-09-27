@@ -4,7 +4,7 @@
 
 void GuidanceFlyByWire::thread() {
 
-    if (!initialised) init();
+    //if (!initialised) init();
 
     float dT = float(NOW() - _lastRunTimestamp)/SECONDS; //Get time delta in seconds
     _lastRunTimestamp = NOW(); //Save current run timestamp for next run.
@@ -14,6 +14,8 @@ void GuidanceFlyByWire::thread() {
     vehicleControlSettings_.position += vehicleControlSettings_.velocity*dT;
 
     vehicleControlSettings_.attitude = vehicleControlSettings_.attitude*Quaternion<>(vehicleControlSettings_.angularRate.copy().normalize(), vehicleControlSettings_.angularRate.magnitude()*dT);
+
+    controlSetpointTopic_.publish(vehicleControlSettings_);
 
 }   
 

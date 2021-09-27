@@ -101,9 +101,9 @@ public:
      * @param actuatorNum actuator to change.
      * @return none.
      */
-    virtual void setActuatorsRawData(const float &actuatorSetpoint, const uint16_t &actuatorNum) = 0;
+    virtual void setActuatorsRawData(float actuatorSetpoint, uint16_t actuatorNum) = 0;
 
-    /**
+    /*
      * Used to send raw actuator commands to actuators.
      * Only valid if in actuator manual mode. Call _enterActuatorManualMode()
      * to enter this mode.
@@ -120,13 +120,13 @@ public:
      * @param actuatorNum actuator to get.
      * @returns actuator setting.
      */
-    virtual float getActuatorsRawData(const uint16_t &actuatorNum) = 0;
+    virtual float getActuatorsRawData(uint16_t actuatorNum) = 0;
 
     /**
      * Sets the actuator status. 
      * @param actuatorStatus Actuator mode to set to.
      */
-    virtual void setActuatorStatus(const eActuatorStatus_t &actuatorStatus) = 0;
+    virtual void setActuatorStatus(eActuatorStatus_t actuatorStatus) = 0;
 
     /**
      * Checks if module is ready. Should only return true if all actuators are in position and ready to follow commands.

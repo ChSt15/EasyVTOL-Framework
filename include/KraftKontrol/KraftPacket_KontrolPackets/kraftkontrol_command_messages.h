@@ -4,6 +4,7 @@
 
 
 #include "KraftKontrol/modules/communication_modules/kraft_message.h"
+#include "kraftkontrol_messagetype_abstracts.h"
 
 #include "lib/Math-Helper/src/3d_math.h"
 

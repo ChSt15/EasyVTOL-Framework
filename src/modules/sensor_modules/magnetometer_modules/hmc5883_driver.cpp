@@ -8,11 +8,11 @@ bool QMC5883Driver::getEEPROMData() {
 
     CommandMessageMagCalValues magValues;
 
-    Serial.println("Trying to retrieve mag calib data.");
+    //Serial.println("Trying to retrieve mag calib data.");
 
     if (!eeprom_->getMessage(magValues)) {
 
-        Serial.println("Failed to retreive!");
+        //Serial.println("Failed to retreive!");
 
         return false;
 
@@ -21,7 +21,7 @@ bool QMC5883Driver::getEEPROMData() {
     magMin_ = magValues.getMinValue();
     magMax_ = magValues.getMaxValue();
 
-    Serial.println(String("Got values. Max: ") + magMax_.toString() + ", Min: " + magMin_.toString());
+    //Serial.println(String("Got values. Max: ") + magMax_.toString() + ", Min: " + magMin_.toString());
 
     return true;
 

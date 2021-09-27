@@ -56,7 +56,7 @@ public:
      * @param selector For I2C this is the address. For SPI this is the chip select pin.
      * @param eeprom Reference to EEPROM module to use for calibration values.
      */
-    QMC5883Driver(BusDevice_HAL_Abstract& bus, uint32_t selector, DataManager_NonVolatile* eeprom = nullptr) : Task_Abstract("QMC5883 Driver", 250, eTaskPriority_t::eTaskPriority_VeryHigh) {
+    QMC5883Driver(BusDevice_HAL_Abstract& bus, uint32_t selector, DataManager_NonVolatile* eeprom = nullptr) : Task_Abstract("QMC5883 Driver", 100, eTaskPriority_t::eTaskPriority_Middle) {
         eeprom_ = eeprom;
         bus_ = &bus;
     }
@@ -85,7 +85,7 @@ public:
     /**
      * Starts calibration sequence.
      */
-    void startCalibration() {calibrate_ = true; calibrationStart_ = micros();}
+    void startCalibration() {calibrate_ = true; calibrationStart_ = NOW();}
 
     /**
      * Stops calibration sequence.
@@ -116,7 +116,7 @@ private:
     Vector<> magMax_ = 1;
 
     bool calibrate_ = false;
-    uint32_t calibrationStart_ = 0;
+    int64_t calibrationStart_ = 0;
 
     eMagCalibStatus_t calibrationStatus_ = eMagCalibStatus_t::eMagCalibStatus_NotCalibrated;
 

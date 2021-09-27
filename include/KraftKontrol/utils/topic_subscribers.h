@@ -89,7 +89,6 @@ class Simple_Subscriber: public Subscriber_Generic<TYPE> {
 private:
 
     bool itemIsNew = false;
-    bool itemIsValid = false;
 
     TYPE receivedItem;
 
@@ -115,11 +114,6 @@ public:
      * @returns True if new data was received
      */
     inline bool isDataNew() const {return itemIsNew;}
-
-    /**
-     * @returns true if internal data storage has been updated.
-     */
-    inline bool isValid() const {return itemIsValid;}
     
     /**
      * @returns reference to item.

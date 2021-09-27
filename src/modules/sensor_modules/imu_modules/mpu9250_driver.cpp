@@ -7,6 +7,52 @@ bool MPU9250Driver::_newDataInterrupt = false;
 
 
 
+bool MPU9250Driver::getEEPROMData() {
+
+    if (eeprom_ == nullptr) return false;
+
+    CommandMessageAccelCalValues accelValues;
+
+    //Serial.println("Trying to retrieve accel calib data.");
+
+    if (!eeprom_->getMessage(accelValues)) {
+
+        //Serial.println("Failed to retreive!");
+
+        return false;
+
+    }
+
+    accelMin_ = accelValues.getMinValue();
+    accelMax_ = accelValues.getMaxValue();
+
+    //Serial.println(String("Got values. Max: ") + accelMax_.toString() + ", Min: " + accelMin_.toString());
+
+    return true;
+
+}
+
+
+/*bool MPU9250Driver::setEEPROMData() {
+
+    if (eeprom_ == nullptr) return false;
+
+    CommandMessageAccelCalValues accelValues(accelMax_, accelMin_);
+
+    if (!eeprom_->setMessage(accelValues)) {
+
+        //Failed see if we can create a new message. If not then return false.
+        if (!eeprom_->newMessage(accelValues)) {
+            return false;
+        }
+
+    }
+
+    return true;
+
+}*/
+
+
 void MPU9250Driver::_getData() {
 
     _imu.Read();
@@ -21,6 +67,70 @@ void MPU9250Driver::_getData() {
 
     bufVec = SensorTimestamp<Vector<>>(Vector<>(-_imu.accel_x_mps2(), _imu.accel_y_mps2(), -_imu.accel_z_mps2()), _newDataTimestamp);
     if (_lastAccel != bufVec.sensorData || true) {
+
+        /*if (calibrate_) {
+
+            Serial.println(bufVec.sensorData.toString());
+
+            switch (accelCalibState_)
+            {
+            case 0:
+                calibBuf_.placeFront(bufVec.sensorData.x, true);
+                if (NOW() - accelCalibStateTime_ >= 10*SECONDS) {
+                    accelCalibState_ = 1;
+                    accelCalibStateTime_ = NOW();
+                    accelMax_.x = calibBuf_.getMedian();
+                }
+                break;
+
+            case 1:
+                calibBuf_.placeFront(bufVec.sensorData.x, true);
+                if (NOW() - accelCalibStateTime_ >= 10*SECONDS) {
+                    accelCalibState_ = 1;
+                    accelCalibStateTime_ = NOW();
+                }
+                break;
+
+            case 2:
+                calibBuf_.placeFront(bufVec.sensorData.x, true);
+                if (NOW() - accelCalibStateTime_ >= 10*SECONDS) {
+                    accelCalibState_ = 1;
+                    accelCalibStateTime_ = NOW();
+                }
+                break;
+
+            case 3:
+                calibBuf_.placeFront(bufVec.sensorData.x, true);
+                if (NOW() - accelCalibStateTime_ >= 10*SECONDS) {
+                    accelCalibState_ = 1;
+                    accelCalibStateTime_ = NOW();
+                }
+                break;
+
+            case 4:
+                calibBuf_.placeFront(bufVec.sensorData.x, true);
+                if (NOW() - accelCalibStateTime_ >= 10*SECONDS) {
+                    accelCalibState_ = 1;
+                    accelCalibStateTime_ = NOW();
+                }
+                break;
+
+            case 5:
+                calibBuf_.placeFront(bufVec.sensorData.x, true);
+                if (NOW() - accelCalibStateTime_ >= 10*SECONDS) {
+                    accelCalibState_ = 1;
+                    accelCalibStateTime_ = NOW();
+                }
+                break;
+            
+            default:
+                break;
+            }
+
+        }*/
+
+        bufVec.sensorData = ((bufVec.sensorData - accelMin_)/(accelMax_ - accelMin_)*2-1)*9.81;
+
         accelTopic_.publish(bufVec);
         _lastAccel = bufVec.sensorData;
         _accelCounter++;
@@ -39,10 +149,6 @@ void MPU9250Driver::_getData() {
 
 
 void MPU9250Driver::thread() {
-
-    if (_block) return;
-
-    _loopCounter++;
 
 
     if (moduleStatus_ == eModuleStatus_t::eModuleStatus_Running) {
@@ -76,8 +182,7 @@ void MPU9250Driver::thread() {
     } else { //This section is for device failure or a wierd mode that should not be set, therefore assume failure
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
-        _block = true;
-        _loopRate = 0;
+        stopTaskThreading();
 
     }
 
@@ -85,14 +190,12 @@ void MPU9250Driver::thread() {
     int64_t dTime;
     if (_rateCalcInterval.isTimeToRun(dTime)) {
         float dTime_s = (float)dTime/SECONDS;
-        _loopRate = _loopCounter/dTime_s;
         _gyroRate = _gyroCounter/dTime_s;
         _accelRate = _accelCounter/dTime_s;
         _magRate = _magCounter/dTime_s;
         _gyroCounter = 0;
         _accelCounter = 0;
         _magCounter = 0;
-        _loopCounter = 0;
     }
 
 }
@@ -125,6 +228,11 @@ void MPU9250Driver::init() {
         _imu.ConfigDlpf(Mpu9250::DlpfBandwidth::DLPF_BANDWIDTH_250HZ_4kHz);
 
         _lastMeasurement = NOW();
+
+        //Check for calibration in EEPROM.
+        if (getEEPROMData()) {
+            //calibrationStatus_ = eMagCalibStatus_t::eMagCalibStatus_Calibrated;
+        }// else startCalibration();
 
         pinInterrupt_.setEnable(true);
         

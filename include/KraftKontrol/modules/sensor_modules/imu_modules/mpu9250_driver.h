@@ -11,6 +11,10 @@
 #include "KraftKontrol/modules/sensor_modules/accelerometer_modules/accelerometer_interface.h"
 #include "KraftKontrol/modules/sensor_modules/magnetometer_modules/magnetometer_interface.h"
 
+#include "KraftKontrol/modules/data_manager_modules/data_manager_nonvolatile.h"
+
+#include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_command_messages.h"
+
 #include "KraftKontrol/modules/module_abstract.h"
 
 #include "lib/MPU9250_Lib/src/mpu9250.h"
@@ -25,7 +29,9 @@
 class MPU9250Driver: public Gyroscope_Interface, public Accelerometer_Interface, public Module_Abstract, public Task_Abstract {
 public:
 
-    MPU9250Driver(int interruptPin, int chipSelect, SPIClass* spiBus): Task_Abstract("MPU9250 Driver", 40000, eTaskPriority_t::eTaskPriority_Realtime), pinInterrupt_(interruptPin, _interruptRoutine, true, false), _imu(spiBus, chipSelect) {}
+    MPU9250Driver(int interruptPin, int chipSelect, SPIClass* spiBus, DataManager_NonVolatile* eeprom = nullptr): Task_Abstract("MPU9250 Driver", 40000, eTaskPriority_t::eTaskPriority_Realtime), pinInterrupt_(interruptPin, _interruptRoutine, true, false), _imu(spiBus, chipSelect) {
+        eeprom_ = eeprom;
+    }
     
     /**
      * This is where all calculations are done.
@@ -67,12 +73,30 @@ public:
      */
     uint32_t magRate() {return _magRate;};
 
+    /**
+     * Starts calibration sequence.
+     */
+    //void startCalibration() {calibrate_ = true; accelCalibStateTime_ = calibrationStart_ = NOW();}
+
+    /**
+     * Stops calibration sequence.
+     */
+    //void stopCalibration() {calibrate_ = false;}
+
 
 private:
 
     static void _interruptRoutine();
 
     void _getData();
+
+    bool getEEPROMData();
+    //bool setEEPROMData();
+
+    //bool calibrate_ = false;
+    //int64_t calibrationStart_ = 0;
+
+    //Buffer<float, 100> calibBuf_;
 
     Vector<> _lastGyro;
     Vector<> _lastAccel;
@@ -100,13 +124,18 @@ private:
 
     int64_t _lastMeasurement = 0;
 
-    bool _block = false;
+    DataManager_NonVolatile* eeprom_ = nullptr;
 
     static int64_t _newDataTimestamp;
     static bool _newDataInterrupt;
 
+    Vector<> accelMin_ = Vector<>(-9.81);
+    Vector<> accelMax_ = Vector<>(9.81);
 
+    //eMagCalibStatus_t calibrationStatus_ = eMagCalibStatus_t::eMagCalibStatus_NotCalibrated;
 
+    //uint8_t accelCalibState_ = 0;
+    //int64_t accelCalibStateTime_ = 0;
     
 };
 

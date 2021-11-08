@@ -118,7 +118,7 @@ public:
         priority_ = priority;
         startTime_ = startTime;
         endTime_ = endTime;
-        numberRuns_ = numberRuns;
+        removeOnRun = numberRuns;
         attachToScheduler();
         startTaskThreading();
     }

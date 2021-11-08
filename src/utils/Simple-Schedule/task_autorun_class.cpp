@@ -54,8 +54,7 @@ void Task_Abstract::schedulerTick() {
                 if (NOW() >= task->endTime_) {
                     task->removal(); //Run removal function before removing.
                     task->stopTaskThreading();
-                }
-                if (task->interval_.isTimeToRun()) {
+                } else if (task->interval_.isTimeToRun()) {
                     task->run();
                     taskRan = true;
                     if (task->removeOnRun > 0) {

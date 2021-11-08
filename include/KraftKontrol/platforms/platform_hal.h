@@ -11,6 +11,7 @@
 #ifdef Arduino_h
 
 #include "arduino_platform/arduino_gpio_hal.h"
+#include "arduino_platform/arduino_pwm_hal.h"
 #include "arduino_platform/arduino_i2c_busdevice_hal.h"
 #include "arduino_platform/arduino_spi_busdevice_hal.h"
 #include "arduino_platform/arduino_systemtime.h"

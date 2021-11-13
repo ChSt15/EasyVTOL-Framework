@@ -112,7 +112,7 @@ public:
      * @param startRunning will auto start threading if set to true. Default is true.
      * @param runs sets the number of times to run the thread function. Set to 0 for infinite. Default is 0.
      */
-    Task_Abstract(const char* taskName, uint32_t rate, uint32_t priority, int64_t startTime = 0, int64_t endTime = END_OF_TIME, uint64_t numberRuns = 0) {
+    Task_Abstract(const char* taskName, float rate, uint32_t priority, int64_t startTime = 0, int64_t endTime = END_OF_TIME, uint64_t numberRuns = 0) {
         strncpy(name_, taskName, 20);
         interval_ = rate;
         priority_ = priority;

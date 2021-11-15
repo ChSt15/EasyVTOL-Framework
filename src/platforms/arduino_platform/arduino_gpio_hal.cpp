@@ -53,6 +53,8 @@ GPIO_HAL::~GPIO_HAL() {
     pinMode(pin_, INPUT);
 }
 
+void GPIO_HAL::init() {}
+
 uint32_t GPIO_HAL::getPin() {
     return pin_;
 }

@@ -53,6 +53,11 @@ public:
     ~GPIO_HAL();
 
     /**
+     * Initialises GPIO.
+     */
+    void init() override;
+
+    /**
      * @returns Which pin this controls.
      */
     uint32_t getPin() override;

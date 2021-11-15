@@ -35,6 +35,11 @@ public:
     virtual ~GPIO_HAL_Abstract() {} //Do nothing
 
     /**
+     * Initialises GPIO.
+     */
+    virtual void init() = 0;
+
+    /**
      * @returns Which pin this controls.
      */
     virtual uint32_t getPin() = 0;

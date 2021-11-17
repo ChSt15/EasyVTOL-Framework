@@ -55,8 +55,8 @@ public:
     virtual const DynamicData& getActuatorDynamicData() const = 0;
 
     /**
-     * Calculates total resulting system dynamics from all actuators.
-     * @returns total system force.
+     * Calculates total resulting system dynamics from all actuators in local coordinate system.
+     * @returns total system force/torque.
      */
     static DynamicData getSumDynamics() {
 

@@ -32,7 +32,7 @@ float AnalogButton::getAnalogValue() {
 
 void AnalogButton::forceStatusUpdate() {
 
-    lpf_.setValue(adcChannelSubr_.getItem().sensorData);
+    lpf_.setValue(adcChannelSubr_.getItem().data);
 
 }
 
@@ -42,7 +42,7 @@ void AnalogButton::init() {}
 
 bool AnalogButton::getButtonStatus() {
 
-    lpf_.update(adcChannelSubr_.getItem().sensorData);
+    lpf_.update(adcChannelSubr_.getItem().data);
 
     return getButtonValue();
 

@@ -60,6 +60,14 @@ bool DataManager_InternalEEPROM::loadData() {
 
     }
 
+    if (dataPointer_[0] != storageVersion_) {
+
+        clear();
+
+        return false;
+
+    }
+
     return true;
 
 }

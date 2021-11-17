@@ -57,25 +57,25 @@ void MPU9250Driver::_getData() {
 
     _imu.Read();
 
-    SensorTimestamp<Vector<>> bufVec(Vector<>(-_imu.gyro_x_radps(), _imu.gyro_y_radps(), -_imu.gyro_z_radps()), _newDataTimestamp);
-    if (_lastGyro != bufVec.sensorData || true) {
+    DataTimestamped<Vector<>> bufVec(Vector<>(-_imu.gyro_x_radps(), _imu.gyro_y_radps(), -_imu.gyro_z_radps()), _newDataTimestamp);
+    if (_lastGyro != bufVec.data || true) {
         //Serial.println(String("Gyro: x:") + bufVec.x + ", y:" + bufVec.y + ", z:" + bufVec.z + ", Rate:" + _gyroRate);
         gyroTopic_.publish(bufVec);
-        _lastGyro = bufVec.sensorData;
+        _lastGyro = bufVec.data;
         _gyroCounter++;
     }
 
-    bufVec = SensorTimestamp<Vector<>>(Vector<>(-_imu.accel_x_mps2(), _imu.accel_y_mps2(), -_imu.accel_z_mps2()), _newDataTimestamp);
-    if (_lastAccel != bufVec.sensorData || true) {
+    bufVec = DataTimestamped<Vector<>>(Vector<>(-_imu.accel_x_mps2(), _imu.accel_y_mps2(), -_imu.accel_z_mps2()), _newDataTimestamp);
+    if (_lastAccel != bufVec.data || true) {
 
         /*if (calibrate_) {
 
-            Serial.println(bufVec.sensorData.toString());
+            Serial.println(bufVec.data.toString());
 
             switch (accelCalibState_)
             {
             case 0:
-                calibBuf_.placeFront(bufVec.sensorData.x, true);
+                calibBuf_.placeFront(bufVec.data.x, true);
                 if (NOW() - accelCalibStateTime_ >= 10*SECONDS) {
                     accelCalibState_ = 1;
                     accelCalibStateTime_ = NOW();
@@ -84,7 +84,7 @@ void MPU9250Driver::_getData() {
                 break;
 
             case 1:
-                calibBuf_.placeFront(bufVec.sensorData.x, true);
+                calibBuf_.placeFront(bufVec.data.x, true);
                 if (NOW() - accelCalibStateTime_ >= 10*SECONDS) {
                     accelCalibState_ = 1;
                     accelCalibStateTime_ = NOW();
@@ -92,7 +92,7 @@ void MPU9250Driver::_getData() {
                 break;
 
             case 2:
-                calibBuf_.placeFront(bufVec.sensorData.x, true);
+                calibBuf_.placeFront(bufVec.data.x, true);
                 if (NOW() - accelCalibStateTime_ >= 10*SECONDS) {
                     accelCalibState_ = 1;
                     accelCalibStateTime_ = NOW();
@@ -100,7 +100,7 @@ void MPU9250Driver::_getData() {
                 break;
 
             case 3:
-                calibBuf_.placeFront(bufVec.sensorData.x, true);
+                calibBuf_.placeFront(bufVec.data.x, true);
                 if (NOW() - accelCalibStateTime_ >= 10*SECONDS) {
                     accelCalibState_ = 1;
                     accelCalibStateTime_ = NOW();
@@ -108,7 +108,7 @@ void MPU9250Driver::_getData() {
                 break;
 
             case 4:
-                calibBuf_.placeFront(bufVec.sensorData.x, true);
+                calibBuf_.placeFront(bufVec.data.x, true);
                 if (NOW() - accelCalibStateTime_ >= 10*SECONDS) {
                     accelCalibState_ = 1;
                     accelCalibStateTime_ = NOW();
@@ -116,7 +116,7 @@ void MPU9250Driver::_getData() {
                 break;
 
             case 5:
-                calibBuf_.placeFront(bufVec.sensorData.x, true);
+                calibBuf_.placeFront(bufVec.data.x, true);
                 if (NOW() - accelCalibStateTime_ >= 10*SECONDS) {
                     accelCalibState_ = 1;
                     accelCalibStateTime_ = NOW();
@@ -129,19 +129,19 @@ void MPU9250Driver::_getData() {
 
         }*/
 
-        bufVec.sensorData = ((bufVec.sensorData - accelMin_)/(accelMax_ - accelMin_)*2-1)*9.81;
+        bufVec.data = ((bufVec.data - accelMin_)/(accelMax_ - accelMin_)*2-1)*9.81;
 
         accelTopic_.publish(bufVec);
-        _lastAccel = bufVec.sensorData;
+        _lastAccel = bufVec.data;
         _accelCounter++;
     }
 
     if (_imu.MagnetometerFailed()) return; //Do not get mag data if mag failed to start.
 
-    bufVec = SensorTimestamp<Vector<>>(Vector<>(-_imu.mag_x_ut(), _imu.mag_y_ut(), -_imu.mag_z_ut()), _newDataTimestamp);
-    if (_lastMag != bufVec.sensorData || true) {
+    bufVec = DataTimestamped<Vector<>>(Vector<>(-_imu.mag_x_ut(), _imu.mag_y_ut(), -_imu.mag_z_ut()), _newDataTimestamp);
+    if (_lastMag != bufVec.data || true) {
         //topic.publish(bufVec);
-        _lastMag = bufVec.sensorData;
+        _lastMag = bufVec.data;
         _magCounter++;
     }
 

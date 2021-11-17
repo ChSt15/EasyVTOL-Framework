@@ -18,7 +18,7 @@ void ADS1115Driver::_getData() {
 
     //adc_.readADC(currentPin_);
 
-    SensorTimestamp<float> adcValue(adc_.toVoltage(adc_.getValue()), NOW());
+    DataTimestamped<float> adcValue(adc_.toVoltage(adc_.getValue()), NOW());
     adcChannels_[currentPin_].setValue(adcValue);
 
     currentPin_++;

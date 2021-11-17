@@ -4,20 +4,19 @@
 
 
 #include "lib/Math-Helper/src/3d_math.h"
-#include "data_container_base.h"
 
 
 
 /**
  * Container for attitude kinematic data.
  */
-class AttitudeData: virtual public DataContainerTimestamped_Base {
+class AttitudeData {
 public:
 
-    Vector<> angularAcceleration;
+    Vector<> angularAcceleration = 0;
     Vector<> angularAccelerationError = 0;
 
-    Vector<> angularRate;
+    Vector<> angularRate = 0;
     Vector<> angularRateError = 0;
 
     Quaternion<> attitude = Quaternion<>(1,0,0,0);
@@ -30,19 +29,19 @@ public:
 /**
  * Container for position kinematic data.
  */
-class PositionData: virtual public DataContainerTimestamped_Base {
+class PositionData {
 public:
 
     //Total acceleration
-    Vector<> acceleration;
+    Vector<> acceleration = 0;
     Vector<> accelerationError = 0;
     //Acceleration with gravity removed. Error is the same as accelerationError
     Vector<> linearAcceleration;
 
-    Vector<> velocity;
+    Vector<> velocity = 0;
     Vector<> velocityError = 0;
 
-    Vector<> position;
+    Vector<> position = 0;
     Vector<> positionError = 0;
 
 };
@@ -59,9 +58,9 @@ public:
      * Uses data to predict next state after dTime
      * @param dTime Amount of time to predict in micros
      */
-    KinematicData getStatePrediction(const uint32_t &dTime) {
+    /*KinematicData getStatePrediction(int64_t dTime) {
         return *this;
-    }
+    }*/
     
 };
 

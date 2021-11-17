@@ -20,12 +20,12 @@ void BNO080Driver::prediction() {
     float dTime = (float)(NOW() - navigationData_.timestamp)/SECONDS;
 
     //Predict current state and its error
-    navigationData_.velocity += navigationData_.linearAcceleration*dTime;
-    navigationData_.velocityError += navigationData_.accelerationError*dTime;
+    navigationData_.data.velocity += navigationData_.data.linearAcceleration*dTime;
+    navigationData_.data.velocityError += navigationData_.data.accelerationError*dTime;
 
-    navigationData_.position += navigationData_.velocity*dTime;
-    navigationData_.absolutePosition.height = navigationData_.position.z + navigationData_.homePosition.height;
-    navigationData_.positionError += navigationData_.velocityError*dTime;
+    navigationData_.data.position += navigationData_.data.velocity*dTime;
+    navigationData_.data.absolutePosition.height = navigationData_.data.position.z + navigationData_.data.homePosition.height;
+    navigationData_.data.positionError += navigationData_.data.velocityError*dTime;
     
     
 }
@@ -33,29 +33,29 @@ void BNO080Driver::prediction() {
 
 void BNO080Driver::getGNSSData() {
 
-    const GNSSData& data = gnssSubr_.getItem();
+    const DataTimestamped<GNSSData>& data = gnssSubr_.getItem();
 
-    ValueError<Vector<>> posBuf = ValueError<Vector<>>(data.positionValueTimestamp.sensorData.getPositionVectorFrom(navigationData_.homePosition), data.positionError);
-    ValueError<Vector<>> velBuf = ValueError<Vector<>>(data.velocityValueTimestamp.sensorData, data.velocityError);
+    ValueError<Vector<>> posBuf = ValueError<Vector<>>(data.data.position.getPositionVectorFrom(navigationData_.data.homePosition), data.data.positionError);
+    ValueError<Vector<>> velBuf = ValueError<Vector<>>(data.data.velocity, data.data.velocityError);
 
-    posBuf = ValueError<Vector<>>(navigationData_.position, navigationData_.positionError).weightedAverage(posBuf);
-    velBuf = ValueError<Vector<>>(navigationData_.velocity, navigationData_.velocityError).weightedAverage(velBuf);
+    posBuf = ValueError<Vector<>>(navigationData_.data.position, navigationData_.data.positionError).weightedAverage(posBuf);
+    velBuf = ValueError<Vector<>>(navigationData_.data.velocity, navigationData_.data.velocityError).weightedAverage(velBuf);
 
-    navigationData_.position.x = posBuf.value.x;
-    navigationData_.position.y = posBuf.value.y;
-    navigationData_.position.z = posBuf.value.z;
+    navigationData_.data.position = posBuf.value;
+    //navigationData_.data.position.y = posBuf.value.y;
+    //navigationData_.data.position.z = posBuf.value.z;
 
-    navigationData_.positionError.x = posBuf.error.x;
-    navigationData_.positionError.y = posBuf.error.y;
-    navigationData_.positionError.z = posBuf.error.z;
+    navigationData_.data.positionError = posBuf.error;
+    //navigationData_.data.positionError.y = posBuf.error.y;
+    //navigationData_.data.positionError.z = posBuf.error.z;
 
-    navigationData_.velocity.x = velBuf.value.x;
-    navigationData_.velocity.y = velBuf.value.y;
-    navigationData_.velocity.z = velBuf.value.z;
+    navigationData_.data.velocity = velBuf.value;
+    //navigationData_.data.velocity.y = velBuf.value.y;
+    //navigationData_.data.velocity.z = velBuf.value.z;
 
-    navigationData_.velocityError.x = velBuf.error.x;
-    navigationData_.velocityError.y = velBuf.error.y;
-    navigationData_.velocityError.z = velBuf.error.z;
+    navigationData_.data.velocityError = velBuf.error;
+    //navigationData_.velocityError.y = velBuf.error.y;
+    //navigationData_.velocityError.z = velBuf.error.z;
 
     
 
@@ -70,7 +70,7 @@ void BNO080Driver::getBaroData() {
 
         baroSub_.takeBack(sensorTime);
 
-        float& baroPressure_ = sensorTime.sensorData;
+        float& baroPressure_ = sensorTime.data;
         int64_t& timestamp = sensorTime.sensorTimestamp;
 
         //calculate height from new pressure value
@@ -122,19 +122,19 @@ void BNO080Driver::getIMUData() {
 
     Quaternion<> transform = Quaternion<>(Vector<>(0,0,1), -90*DEG_TO_RAD)*Quaternion<>(Vector<>(0,0,1), 90*DEG_TO_RAD)*Quaternion<>(Vector<>(1,0,0), 180*DEG_TO_RAD);
 
-    SensorTimestamp<Quaternion<>> quat(0, _newDataTimestamp);
-    _imu.getQuat(quat.sensorData.x, quat.sensorData.y, quat.sensorData.z, quat.sensorData.w, angleAccuracy, accuracy);
-    navigationData_.attitude = quat.sensorData*transform;
+    DataTimestamped<Quaternion<>> quat(0, _newDataTimestamp);
+    _imu.getQuat(quat.data.x, quat.data.y, quat.data.z, quat.data.w, angleAccuracy, accuracy);
+    navigationData_.data.attitude = quat.data*transform;
 
-    SensorTimestamp<Vector<>> bufVec(0, _newDataTimestamp);
-    _imu.getGyro(bufVec.sensorData.x, bufVec.sensorData.y, bufVec.sensorData.z, accuracy);
-    navigationData_.angularRate = navigationData_.attitude.rotateVector(bufVec.sensorData);
+    DataTimestamped<Vector<>> bufVec(0, _newDataTimestamp);
+    _imu.getGyro(bufVec.data.x, bufVec.data.y, bufVec.data.z, accuracy);
+    navigationData_.data.angularRate = navigationData_.data.attitude.rotateVector(bufVec.data);
 
-    _imu.getAccel(bufVec.sensorData.x, bufVec.sensorData.y, bufVec.sensorData.z, accuracy);
-    navigationData_.acceleration = navigationData_.attitude.rotateVector(bufVec.sensorData);
+    _imu.getAccel(bufVec.data.x, bufVec.data.y, bufVec.data.z, accuracy);
+    navigationData_.data.acceleration = navigationData_.data.attitude.rotateVector(bufVec.data);
 
-    _imu.getLinAccel(bufVec.sensorData.x, bufVec.sensorData.y, bufVec.sensorData.z, accuracy);
-    navigationData_.linearAcceleration = navigationData_.attitude.rotateVector(bufVec.sensorData);
+    _imu.getLinAccel(bufVec.data.x, bufVec.data.y, bufVec.data.z, accuracy);
+    navigationData_.data.linearAcceleration = navigationData_.data.attitude.rotateVector(bufVec.data);
     
 
 }

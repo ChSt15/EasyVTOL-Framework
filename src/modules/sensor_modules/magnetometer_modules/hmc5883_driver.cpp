@@ -12,7 +12,7 @@ bool QMC5883Driver::getEEPROMData() {
 
     if (!eeprom_->getMessage(magValues)) {
 
-        //Serial.println("Failed to retreive!");
+        Serial.println("Failed to retrieve mag calib data!");
 
         return false;
 
@@ -99,7 +99,7 @@ void QMC5883Driver::getData() {
             magMin_.z = mag.z;
         }
 
-        //Serial.println(String("Min: ") + magMin_.toString() + ", Max: " + magMax_.toString());
+        Serial.println(String("Min: ") + magMin_.toString() + ", Max: " + magMax_.toString());
 
         //timeout for calibration
         if (NOW() - calibrationStart_ >= 60*SECONDS) stopCalibration();
@@ -116,7 +116,7 @@ void QMC5883Driver::getData() {
 
         mag = (mag - magMin_)/(magMax_ - magMin_)*2-1;
 
-        SensorTimestamp<Vector<>> magTime(mag, time);
+        DataTimestamped<Vector<>> magTime(mag, time);
         magTopic_.publish(magTime);
 
     }

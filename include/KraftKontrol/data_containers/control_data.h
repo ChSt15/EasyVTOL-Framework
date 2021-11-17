@@ -10,21 +10,24 @@
 /**
  * This enum is for the Control setting
  */
-enum eControlMode_t {
-    //Disable control.
-    eControlMode_Disable,
-    //Control acceleration/rate acceleration
-    eControlMode_Acceleration,
-    //Control velocity/rate
-    eControlMode_Velocity,
-    //Control both velocity/rate and acceleration/rate acceleration
-    eControlMode_Acceleration_Velocity,
+class ControlMode {
+public:
+
+    ControlMode() {
+        accelerationControl = false;
+        velocityControl = false;
+        positionControl = false;
+    }
+    
+    //Control acceleration
+    bool accelerationControl = false;
+
+    //Control velocity
+    bool velocityControl = false;
+
     //Control position
-    eControlMode_Position,
-    //Control velocity/rate and position
-    eControlMode_Velocity_Position,
-    //Control acceleration/rate acceleration and velocity/rate and position
-    eControlMode_Acceleration_Velocity_Position
+    bool positionControl = false;
+
 };
 
 
@@ -32,12 +35,13 @@ enum eControlMode_t {
  * Inherits from Kinematic but add ability to show what needs to be controlled.
  * Used to input to control modules and output from guidance.
  */
-struct ControlData: public KinematicData {
+class ControlData: public KinematicData {
+public:
 
     //Position controller mode
-    eControlMode_t positionControlMode = eControlMode_t::eControlMode_Disable;
+    ControlMode positionControlMode;
     //Attitude controller mode
-    eControlMode_t attitudeControlMode = eControlMode_t::eControlMode_Disable;
+    ControlMode attitudeControlMode;
     
 };
 

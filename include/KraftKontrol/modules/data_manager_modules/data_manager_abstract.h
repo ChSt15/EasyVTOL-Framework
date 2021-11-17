@@ -29,8 +29,12 @@ private:
     ///Current length of data.
     uint32_t currentDataSize_ = 0;
 
+
+protected:
+
     ///Storage version 
-    const uint8_t storageVersion = 0xAE + 1;
+    const uint8_t storageVersion_ = 0xAE + 1;
+    
 
 public:
 

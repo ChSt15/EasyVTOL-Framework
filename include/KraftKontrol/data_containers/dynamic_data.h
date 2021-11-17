@@ -4,14 +4,13 @@
 
 
 #include "lib/Math-Helper/src/3d_math.h"
-#include "data_container_base.h"
 
 
 
 /**
  * Dynamic data is usually in local coordinate system!.
  */
-class DynamicData: public DataContainerTimestamped_Base {
+class DynamicData {
 public:
 
     /**

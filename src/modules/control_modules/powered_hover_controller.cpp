@@ -8,14 +8,14 @@ void HoverController::thread() {
     
     //Attitude control section
 
-    if (controlSetpoint_->attitudeControlMode == eControlMode_t::eControlMode_Disable) {
+    if (!(controlSetpoint_->attitudeControlMode.accelerationControl || controlSetpoint_->attitudeControlMode.velocityControl || controlSetpoint_->attitudeControlMode.positionControl)) {
 
-        controlOutput_.force = 0;
-        controlOutput_.torqe = 0;
+        controlOutput_.data.force = 0;
+        controlOutput_.data.torqe = 0;
 
     } else {    
 
-        controlOutput_.torqe = 0;
+        controlOutput_.data.torqe = 0;
 
         ControlData setpoint = *controlSetpoint_;
 
@@ -25,7 +25,7 @@ void HoverController::thread() {
 
         Vector<> outputTotal(0);
 
-        if (setpoint.attitudeControlMode == eControlMode_t::eControlMode_Position || setpoint.attitudeControlMode == eControlMode_t::eControlMode_Velocity_Position || setpoint.attitudeControlMode == eControlMode_t::eControlMode_Acceleration_Velocity_Position) {
+        if (setpoint.attitudeControlMode.positionControl) {
 
             Vector<> error = (setpoint.attitude*navigationData_->attitude.copy().conjugate()).toVector(); //Error is calculated here already in local coordinate system.
 
@@ -67,7 +67,7 @@ void HoverController::thread() {
 
         }
 
-        if (setpoint.attitudeControlMode == eControlMode_t::eControlMode_Velocity || setpoint.attitudeControlMode == eControlMode_t::eControlMode_Velocity_Position || setpoint.attitudeControlMode == eControlMode_t::eControlMode_Acceleration_Velocity_Position) {
+        if (setpoint.attitudeControlMode.velocityControl) {
 
             Vector<> error = navigationData_->attitude.copy().conjugate().rotateVector(setpoint.angularRate - navigationData_->angularRate); //Calculate setpoint error and then rotate to local coordinate system.
 
@@ -110,7 +110,7 @@ void HoverController::thread() {
 
         }
 
-        if (setpoint.attitudeControlMode == eControlMode_t::eControlMode_Acceleration || setpoint.attitudeControlMode == eControlMode_t::eControlMode_Acceleration_Velocity || setpoint.attitudeControlMode == eControlMode_t::eControlMode_Acceleration_Velocity_Position) {
+        if (setpoint.attitudeControlMode.accelerationControl) {
 
             Vector<> error = navigationData_->attitude.copy().conjugate().rotateVector(setpoint.angularAcceleration - navigationData_->angularAcceleration); //Calculate setpoint error and then rotate to local coordinate system.
 
@@ -149,15 +149,15 @@ void HoverController::thread() {
 
         }
 
-        controlOutput_.torqe = outputTotal;
+        controlOutput_.data.torqe = outputTotal;
 
     }
 
-    controlOutput_.force = -navigationData_->linearAcceleration.z*1; //Multiplied by vehicle mass
-    controlOutput_.force = navigationData_->attitude.copy().conjugate().rotateVector(controlOutput_.force); //Rotate to local coordinate system
+    controlOutput_.data.force = -navigationData_->linearAcceleration.z*1; //Multiplied by vehicle mass
+    controlOutput_.data.force = navigationData_->attitude.copy().conjugate().rotateVector(controlOutput_.data.force); //Rotate to local coordinate system
 
     //Update control output timestamp
-    controlOutput_.timestamp = micros();
+    controlOutput_.timestamp = NOW();
 
 
 

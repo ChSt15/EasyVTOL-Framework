@@ -30,6 +30,8 @@ void GuidanceFlyByWire::init() {
     vehicleControlSettings_.linearAcceleration = 0;
     vehicleControlSettings_.angularRate = 0;
 
-    vehicleControlSettings_.attitudeControlMode = eControlMode_t::eControlMode_Acceleration_Velocity_Position;
+    vehicleControlSettings_.attitudeControlMode.accelerationControl = true;
+    vehicleControlSettings_.attitudeControlMode.velocityControl = true;
+    vehicleControlSettings_.attitudeControlMode.positionControl = true;
 
 }

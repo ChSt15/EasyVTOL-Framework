@@ -3,20 +3,10 @@
 
 
 
-/**
- * This is where the vehicle sensor measurements (sensorfusion) is done. This takes
- * the sensor measurements and calculates all inertial parameters of the vehicle.
- * This allows the navigation to be written in a general way for the simulator.
- * Because this class will be augmented by the simulator, this structure also allows for very
- * easy testing of the vehicle code in the simulator in a very "drag and drop" type way.
-*/
-
-
-
 #include "KraftKontrol/data_containers/navigation_data.h"
-#include "KraftKontrol/utils/topic.h"
 
-#include "KraftKontrol/modules/module_abstract.h"
+#include "KraftKontrol/utils/data_timestamped.h"
+#include "KraftKontrol/utils/topic.h"
 
 
 
@@ -30,9 +20,9 @@ public:
      * @param homePosition Is the position to be used as home.
      */
     virtual void setHome(const WorldPosition& homePosition) {
-        navigationData_.homePosition = homePosition;
-        navigationData_.position = 0;
-        navigationData_.velocity = 0;
+        navigationData_.data.homePosition = homePosition;
+        navigationData_.data.position = 0;
+        navigationData_.data.velocity = 0;
     };
 
     /**
@@ -41,7 +31,7 @@ public:
      * @param startPose
      */
     virtual void setStartKinematics(const KinematicData& startPose) {
-        navigationData_ = startPose;
+        navigationData_.data = startPose;
     }
 
     /**
@@ -50,21 +40,21 @@ public:
      *
      * @return navigation parameters.
      */
-    const NavigationData& getNavigationData() {return navigationData_;}
+    const DataTimestamped<NavigationData>& getNavigationData() const {return navigationData_;}
 
     /**
      * @returns reference to nav modules output topic
      */
-    Topic<NavigationData>& getNavigationDataTopic() {return navigationDataTopic_;}
+    const Topic<DataTimestamped<NavigationData>>& getNavigationDataTopic() const {return navigationDataTopic_;}
 
 
 protected:
 
     //Topic to distributing new navigation data.
-    Topic<NavigationData> navigationDataTopic_;
+    Topic<DataTimestamped<NavigationData>> navigationDataTopic_;
 
     //Storage container for navigationData.
-    NavigationData navigationData_;
+    DataTimestamped<NavigationData> navigationData_;
 
 
 };

@@ -8,15 +8,15 @@
 #include "KraftKontrol/data_containers/navigation_data.h"
 
 #include "KraftKontrol/utils/topic.h"
-#include "KraftKontrol/utils/sensor_timestamp.h"
+#include "KraftKontrol/utils/data_timestamped.h"
 
 
 
 
 struct GNSSData {
 
-    SensorTimestamp<WorldPosition> positionValueTimestamp;
-    SensorTimestamp<Vector<>> velocityValueTimestamp;
+    WorldPosition position;
+    Vector<> velocity;
 
     float positionError = 100000;
     float altitudeError = 100000;
@@ -34,13 +34,13 @@ public:
     /**
      * @returns reference to gnss data topic
      */
-    const Topic<GNSSData>& getGNSSTopic() const {return gnssTopic_;}
+    const Topic<DataTimestamped<GNSSData>>& getGNSSTopic() const {return gnssTopic_;}
 
 
 protected:
 
     //Topic for distributing new measurements.
-    Topic<GNSSData> gnssTopic_;
+    Topic<DataTimestamped<GNSSData>> gnssTopic_;
     
 };
 

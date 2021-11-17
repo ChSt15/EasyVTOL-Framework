@@ -7,7 +7,7 @@
 
 
 #include "KraftKontrol/utils/topic.h"
-#include "KraftKontrol/utils/sensor_timestamp.h"
+#include "KraftKontrol/utils/data_timestamped.h"
 
 
 
@@ -17,13 +17,13 @@ public:
     /**
      * @returns reference to baro data topic
      */
-    const Topic<SensorTimestamp<float>>& getBaroTopic() const {return baroTopic_;}
+    const Topic<DataTimestamped<float>>& getBaroTopic() const {return baroTopic_;}
 
 
 protected:
 
     //Topic for distributing new measurements.
-    Topic<SensorTimestamp<float>> baroTopic_;
+    Topic<DataTimestamped<float>> baroTopic_;
 
     
 };

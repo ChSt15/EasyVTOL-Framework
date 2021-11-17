@@ -6,7 +6,7 @@
 #include "lib/Math-Helper/src/3d_math.h"
 
 #include "KraftKontrol/utils/topic.h"
-#include "KraftKontrol/utils/sensor_timestamp.h"
+#include "KraftKontrol/utils/data_timestamped.h"
 
 
 
@@ -16,13 +16,13 @@ public:
     /**
      * @returns reference to accel data topic
      */
-    Topic<SensorTimestamp<Vector<>>>& getAccelTopic() {return accelTopic_;}
+    const Topic<DataTimestamped<Vector<>>>& getAccelTopic() const {return accelTopic_;}
 
 
 protected:
 
     //Topic for distributing new measurements.
-    Topic<SensorTimestamp<Vector<>>> accelTopic_;
+    Topic<DataTimestamped<Vector<>>> accelTopic_;
     
     
 };

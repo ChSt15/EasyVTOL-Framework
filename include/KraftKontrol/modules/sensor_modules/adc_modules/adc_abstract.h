@@ -6,7 +6,7 @@
 #include "stdint.h"
 
 #include "KraftKontrol/utils/topic.h"
-#include "KraftKontrol/utils/sensor_timestamp.h"
+#include "KraftKontrol/utils/data_timestamped.h"
 
 
 
@@ -16,9 +16,9 @@
 class ADCChannel {
 private:
 
-    Topic<SensorTimestamp<float>> adcChannelTopic_;
+    Topic<DataTimestamped<float>> adcChannelTopic_;
 
-    SensorTimestamp<float> adcValue_ = 0;
+    DataTimestamped<float> adcValue_ = 0;
 
     float offset_ = 0;
     float scaling_ = 1;
@@ -43,18 +43,18 @@ public:
     /**
      * @returns the adc channels topic.
      */
-    const Topic<SensorTimestamp<float>>& getADCChannelTopic() const;
+    const Topic<DataTimestamped<float>>& getADCChannelTopic() const;
 
     /**
      * Updates internal ADC value and publishes it to topic.
      * @param value New adc value with timestamp and publish to topic.
      */
-    void setValue(const SensorTimestamp<float>& value);
+    void setValue(const DataTimestamped<float>& value);
 
     /**
      * @returns adc value.
      */
-    const SensorTimestamp<float>& getValue() const;
+    const DataTimestamped<float>& getValue() const;
 
 
 };

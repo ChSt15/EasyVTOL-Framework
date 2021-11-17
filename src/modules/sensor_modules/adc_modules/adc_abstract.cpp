@@ -11,19 +11,19 @@ void ADCChannel::setScaling(float scaling) {
 }
 
 
-const Topic<SensorTimestamp<float>>& ADCChannel::getADCChannelTopic() const {
+const Topic<DataTimestamped<float>>& ADCChannel::getADCChannelTopic() const {
     return adcChannelTopic_;
 }
 
 
-void ADCChannel::setValue(const SensorTimestamp<float>& value) {
-    adcValue_.sensorData = value.sensorData*scaling_ + offset_;
-    adcValue_.sensorTimestamp = value.sensorTimestamp;
+void ADCChannel::setValue(const DataTimestamped<float>& value) {
+    adcValue_.data = value.data*scaling_ + offset_;
+    adcValue_.timestamp = value.timestamp;
     adcChannelTopic_.publish(adcValue_);
 }
 
 
-const SensorTimestamp<float>& ADCChannel::getValue() const {
+const DataTimestamped<float>& ADCChannel::getValue() const {
     return adcValue_;
 }
 

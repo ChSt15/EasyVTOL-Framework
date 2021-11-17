@@ -129,7 +129,7 @@ private:
     NavigationData* navigationData_;
 
     Simple_Subscriber<ControlData> guidanceSub_;
-    Simple_Subscriber<NavigationData> navigationSub_;
+    Simple_Subscriber<DataTimestamped<NavigationData>> navigationSub_;
 
     //P factor for angular acceleration 
     Vector<> angAccelPF_ = 0;

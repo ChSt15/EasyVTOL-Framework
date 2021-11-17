@@ -35,12 +35,12 @@ public:
      *
      * @return dynamicSetpoint.
      */
-    DynamicData& getDynamicsOutput() {return controlOutput_;};
+    DataTimestamped<DynamicData>& getDynamicsOutput() {return controlOutput_;};
 
     /**
      * @returns topic for control output.
      */
-    Topic<DynamicData>& getControlDataTopic() {return controlTopic_;};
+    Topic<DataTimestamped<DynamicData>>& getControlDataTopic() {return controlTopic_;};
 
     /**
      * Resets control module. Things like PID I values are set to 0.
@@ -53,10 +53,10 @@ protected:
     Control_Interface() {}
 
     //Newest output data.
-    DynamicData controlOutput_;
+    DataTimestamped<DynamicData> controlOutput_;
 
     //Topic for distributing new control data.
-    Topic<DynamicData> controlTopic_;
+    Topic<DataTimestamped<DynamicData>> controlTopic_;
 
 };
 

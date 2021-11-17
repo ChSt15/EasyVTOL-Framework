@@ -66,8 +66,8 @@ private:
     Buffer<float, 20> baroHeightBuf_;
     Buffer<float, 20> baroVelBuf_;
 
-    Buffer_Subscriber<SensorTimestamp<float>, 10> baroSubr_;
-    Simple_Subscriber<GNSSData> gnssSubr_;
+    Buffer_Subscriber<DataTimestamped<float>, 10> baroSubr_;
+    Simple_Subscriber<DataTimestamped<GNSSData>> gnssSubr_;
 
     volatile static int64_t _newDataTimestamp;
     volatile static bool _newDataInterrupt;

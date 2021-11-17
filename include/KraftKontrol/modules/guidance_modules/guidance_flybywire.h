@@ -95,7 +95,7 @@ public:
      * @param values attitudeControlMode.
      * @return none.
      */
-    void setAttitudeControlMode(const eControlMode_t &attitudeControlMode) {vehicleControlSettings_.attitudeControlMode = attitudeControlMode;};
+    void setAttitudeControlMode(const ControlMode &attitudeControlMode) {vehicleControlSettings_.attitudeControlMode = attitudeControlMode;};
 
     /**
      * Gets the attitude control mode
@@ -103,7 +103,7 @@ public:
      * @param values none.
      * @return eControlMode_t.
      */
-    eControlMode_t getAttitudeControlMode() {return vehicleControlSettings_.attitudeControlMode;};
+    ControlMode getAttitudeControlMode() {return vehicleControlSettings_.attitudeControlMode;};
 
     /**
      * Sets the position control mode
@@ -111,7 +111,7 @@ public:
      * @param values positionControlMode.
      * @return none.
      */
-    void setPositionControlMode(const eControlMode_t &positionControlMode) {vehicleControlSettings_.positionControlMode = positionControlMode;};
+    void setPositionControlMode(const ControlMode &positionControlMode) {vehicleControlSettings_.positionControlMode = positionControlMode;};
 
     /**
      * Gets the postion control mode
@@ -119,7 +119,7 @@ public:
      * @param values none.
      * @return eControlMode_t.
      */
-    eControlMode_t getPositionControlMode() {return vehicleControlSettings_.positionControlMode;};
+    ControlMode getPositionControlMode() {return vehicleControlSettings_.positionControlMode;};
 
     /**
      * Returns a pointer to a struct containing all the 

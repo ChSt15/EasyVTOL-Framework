@@ -11,7 +11,7 @@ void BME280Driver::getData() {
 
     float bufMeasurement = measurements.pressure;
     if (bufMeasurement > 100) {
-        SensorTimestamp<float> value(bufMeasurement, _newDataTimestamp);
+        DataTimestamped<float> value(bufMeasurement, _newDataTimestamp);
         baroTopic_.publish(value);
         _lastPressure = bufMeasurement;
         _pressureCounter++;

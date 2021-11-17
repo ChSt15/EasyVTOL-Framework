@@ -19,35 +19,40 @@ namespace {
 /**
  * This enum is for the navigation attitude solution
  */
-enum eNavAttitudeMode_t: uint8_t {
-    //No attitude solution.
-    eNavAttitudeMode_None,
-    //Only angular rate can be measured.
-    eNavAttitudeMode_AngularRate,
-    //Attitude solution but no heading (No yaw reference).
-    eNavAttitudeMode_Attitude,
-    //Attitude and heading solution.
-    eNavAttitudeMode_AHRS
+class NavAttitudeMode {
+public:
+
+    NavAttitudeMode() {
+        attitudeValid = false;
+        headingCorrect = false;
+    }
+
+    //True if attitude is valid. Roll/Pitch reference to Gravity.
+    bool attitudeValid = false;
+
+    //True if heading is Valid. Yaw in reference to North.
+    bool headingCorrect = false;
+
 };
+
 
 /**
  * This enum is for the navigation position solution
  */
-enum eNavPositionMode_t: uint8_t {
-    //No position solution.
-    eNavPositionMode_None,
-    //Solution using only barometer data. No position available. Height accuracy is medium.
-    eNavPositionMode_BarometerOnly,
-    //Solution using only GNSS data. Position and height available. Height and position accuracy is low.
-    eNavPositionMode_GNSSOnly,
-    //Solution using both GNSS and barometer data. Position and height available. Height accuracy is medium and position accuracy is medium.
-    eNavPositionMode_GNSSAndBarometer,
-    //Solution using GNSS and IMU data. Position and height available. Height accuracy is medium and position is high.
-    eNavPositionMode_GNSSAndIMU,
-    //Solution using barometer and IMU data. Only height available. Height accuracy is high.
-    eNavPositionMode_BarometerAndIMU,
-    //Solution using GNSS, barometer and IMU data. Position and height available. Height and position accuracy is high.
-    eNavPositionMode_GNSSAndBarometerAndIMU,
+class NavPositionMode {
+public:
+
+    NavPositionMode() {
+        heightValid = false;
+        positionValid = false;
+    }
+    
+    //True if height is valid and can be used.
+    bool heightValid = false;
+
+    //True if horizontal position is valid and can be used.
+    bool positionValid = false;
+
 };
 
 
@@ -120,8 +125,9 @@ struct WorldPosition {
 };
 
 
+
 /**
- * Inherits from Kinematic but add ability to show what the current state of attitude and position solution.
+ * Inherits from NavPositionData and NavAttitudeData to combine them and add other important information.
  */
 class NavigationData: public KinematicData {
 public:
@@ -147,16 +153,19 @@ public:
 
     }
 
+
+    //Current attitude solution state.
+    NavAttitudeMode attitudeMode;
+
+    //Current position solution state.
+    NavPositionMode positionMode;
+
     //Current home position. Output is in reference to this position
     WorldPosition homePosition;
 
     //Current absolute position
     WorldPosition absolutePosition;
 
-    //Current attitude solution state.
-    eNavAttitudeMode_t attitudeMode = eNavAttitudeMode_t::eNavAttitudeMode_None;
-    //Current position solution state.
-    eNavPositionMode_t positionMode = eNavPositionMode_t::eNavPositionMode_None;
     
 };
 

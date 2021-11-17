@@ -24,7 +24,7 @@ private:
 
     bool invert_ = false;
 
-    Simple_Subscriber<SensorTimestamp<float>> adcChannelSubr_;
+    Simple_Subscriber<DataTimestamped<float>> adcChannelSubr_;
 
 
 public:

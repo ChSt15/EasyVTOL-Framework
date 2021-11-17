@@ -248,7 +248,7 @@ uint32_t DataManager_Abstract::getNumberMessages(KraftMessage_Interface& message
 
 void DataManager_Abstract::clear() {
 
-    uint32_t buf = storageVersion;
+    uint32_t buf = storageVersion_;
     if (!writeData(0, (uint8_t*)&buf, 1)) return;
 
     buf = 0;

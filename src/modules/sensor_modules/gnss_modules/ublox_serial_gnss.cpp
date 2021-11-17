@@ -39,13 +39,13 @@ void UbloxSerialGNSS::_getData() {
         lockValid_ = false;
     }
 
-    GNSSData data;
-    data.lockValid = lockValid_;
-    data.altitudeError = altitudeDeviation_;
-    data.positionError = positionDeviation_;
-    data.positionValueTimestamp.sensorData = position;
-    data.velocityValueTimestamp.sensorData = velocity;
-    data.positionValueTimestamp.sensorTimestamp = data.velocityValueTimestamp.sensorTimestamp = time;
+    DataTimestamped<GNSSData> data;
+    data.data.lockValid = lockValid_;
+    data.data.altitudeError = altitudeDeviation_;
+    data.data.positionError = positionDeviation_;
+    data.data.position = position;
+    data.data.velocity = velocity;
+    data.timestamp = time;
 
     gnssTopic_.publish(data);
 

@@ -82,20 +82,20 @@ public:
 private:
 
     //Subscriber for gyro with fifo function
-    Buffer_Subscriber<SensorTimestamp<Vector<>>, 100> gyroSub_;
+    Buffer_Subscriber<DataTimestamped<Vector<>>, 100> gyroSub_;
     //Subscriber for accel with fifo function
-    Buffer_Subscriber<SensorTimestamp<Vector<>>, 100> accelSub_;
+    Buffer_Subscriber<DataTimestamped<Vector<>>, 100> accelSub_;
     //Subscriber for mag with fifo function
-    Buffer_Subscriber<SensorTimestamp<Vector<>>, 20> magSub_;
+    Buffer_Subscriber<DataTimestamped<Vector<>>, 20> magSub_;
     //Subscriber for baro with fifo function
-    Buffer_Subscriber<SensorTimestamp<float>, 10> baroSub_;
+    Buffer_Subscriber<DataTimestamped<float>, 10> baroSub_;
     //Subscriber for gnssdata with fifo function
-    Buffer_Subscriber<GNSSData, 10> gnssSub_;
+    Buffer_Subscriber<DataTimestamped<GNSSData>, 10> gnssSub_;
 
     //Filter data
     LowPassFilter<Vector<>> gyroLPF_ = LowPassFilter<Vector<>>(0.01);
     LowPassFilter<Vector<>> accelBiasLPF_ = LowPassFilter<Vector<>>(0.2, 8000);
-    LowPassFilter<Vector<>> accelLPF_ = LowPassFilter<Vector<>>(3000);
+    LowPassFilter<Vector<>> accelLPF_ = LowPassFilter<Vector<>>(100);
 
     Vector<> accelBias_ = 0;
     Vector<> gravity_ = Vector<>(0,0,9.81);

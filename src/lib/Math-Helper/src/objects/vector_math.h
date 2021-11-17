@@ -276,6 +276,18 @@ class Vector {
         }
 
         /**
+         * Squares the components the the vector
+         * @return Vector.
+         */
+        inline Vector<T> square() const {
+            return Vector<T>(
+                x*x,
+                y*y,
+                z*z
+            );
+        } 
+
+        /**
          * Computes cross multiplication of 2 vectors.
          * 
          *
@@ -356,7 +368,7 @@ class Vector {
 
 
 //Is a vector<T> with a z component of -9.81.
-#define GRAVITY_VECTOR Vector<>(0,0,-9.81)
+#define GRAVITY_VECTOR Vector<>(0,0,-9.8066)
 
 template <typename T = float>
 inline Vector<T> sqrt(Vector<T> a)  {

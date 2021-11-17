@@ -6,7 +6,7 @@
 #include "lib/Math-Helper/src/3d_math.h"
 
 #include "KraftKontrol/utils/topic.h"
-#include "KraftKontrol/utils/sensor_timestamp.h"
+#include "KraftKontrol/utils/data_timestamped.h"
 
 
 
@@ -39,13 +39,13 @@ public:
     /**
      * @returns reference to gyro data topic
      */
-    Topic<SensorTimestamp<Vector<>>>& getMagTopic() {return magTopic_;}
+    const Topic<DataTimestamped<Vector<>>>& getMagTopic() const {return magTopic_;}
 
 
 protected:
 
     //Topic for distributing new measurements.
-    Topic<SensorTimestamp<Vector<>>> magTopic_;
+    Topic<DataTimestamped<Vector<>>> magTopic_;
 
 
 

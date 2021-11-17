@@ -45,10 +45,13 @@ bool PPMChannel::setChannel(float percent, bool limit) {
 
     float dutyCycle = ((float)_highMinUS + _percent*_deltaHighUS)/_periodUS;
 
-    dutyCycle = constrain(dutyCycle, 0.0f, 1.0f);
+    //dutyCycle = constrain(dutyCycle, 0.0f, 1.0f);
+
+    int32_t val = dutyCycle*_maxValue;
+    val = constrain(val, 0, _maxValue);
 
     #ifndef ESP32 
-    if (_active) analogWrite(_pin, dutyCycle*_maxValue);
+    if (_active) analogWrite(_pin, val);
     else {
         analogWrite(_pin, 0);
         digitalWrite(_pin, LOW);

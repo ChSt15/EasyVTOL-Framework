@@ -98,6 +98,9 @@ private:
     //is true if the channel is busy.
     bool channelBusy_ = false;
 
+    //For giving others time to send data.
+    int64_t lastSendTimestamp_ = 0;
+
     Buffer_Subscriber<DataMessageBuffer, 10> toSendBufferSub_;
 
     int nssPin_;

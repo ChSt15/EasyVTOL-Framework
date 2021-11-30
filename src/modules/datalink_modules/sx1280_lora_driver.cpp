@@ -143,8 +143,9 @@ void SX1280Driver::internalLoop() {
 
 
     
-    if (toSendBufferSub_.available() > 0 && !isBusySending_ && !channelBusy_) { 
+    if (toSendBufferSub_.available() > 0 && !isBusySending_ && !channelBusy_ && NOW() - lastSendTimestamp_ > 2*MILLISECONDS) { 
 
+        lastSendTimestamp_ = NOW();
         isBusySending_ = true;
 
         radio_.transmit(toSendBufferSub_[0].getBuffer(), toSendBufferSub_[0].getBufferSize(), 0, SX1280_POWER_dB, NO_WAIT);

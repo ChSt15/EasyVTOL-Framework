@@ -97,6 +97,7 @@ void SX1280Driver::internalLoop() {
         if (irqStatus & (IRQ_TX_DONE)) {
 
             isBusySending_ = false;
+            lastSendTimestamp_ = NOW();
 
             #ifdef SX1280_DEBUG
                 Serial.println("Interrupt says tx done!");
@@ -107,6 +108,7 @@ void SX1280Driver::internalLoop() {
         if (irqStatus & (IRQ_TX_TIMEOUT)) {
 
             isBusySending_ = false;
+            lastSendTimestamp_ = NOW();
 
             #ifdef SX1280_DEBUG
                 Serial.println("Interrupt says tx timeout!");
@@ -127,6 +129,7 @@ void SX1280Driver::internalLoop() {
         if (irqStatus & (IRQ_CAD_DONE)) {
 
             channelBusy_ = false;
+            lastSendTimestamp_ = NOW();
 
             #ifdef SX1280_DEBUG
                 Serial.println("Channel is now busy!");
@@ -145,7 +148,6 @@ void SX1280Driver::internalLoop() {
     
     if (toSendBufferSub_.available() > 0 && !isBusySending_ && !channelBusy_ && NOW() - lastSendTimestamp_ > 2*MILLISECONDS) { 
 
-        lastSendTimestamp_ = NOW();
         isBusySending_ = true;
 
         radio_.transmit(toSendBufferSub_[0].getBuffer(), toSendBufferSub_[0].getBufferSize(), 0, SX1280_POWER_dB, NO_WAIT);

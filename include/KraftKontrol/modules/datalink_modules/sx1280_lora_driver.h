@@ -101,7 +101,7 @@ private:
     //For giving others time to send data.
     int64_t lastSendTimestamp_ = 0;
 
-    Buffer_Subscriber<DataMessageBuffer, 10> toSendBufferSub_;
+    Buffer_Subscriber<DataMessageBuffer, 50> toSendBufferSub_;
 
     int nssPin_;
     int busyPin_;

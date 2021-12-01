@@ -146,7 +146,7 @@ void SX1280Driver::internalLoop() {
 
 
     
-    if (toSendBufferSub_.available() > 0 && !isBusySending_ && !channelBusy_/* && NOW() - lastSendTimestamp_ > 2*MILLISECONDS*/) { 
+    if (toSendBufferSub_.available() > 0 && !isBusySending_ && !channelBusy_ && NOW() - lastSendTimestamp_ > 2*MILLISECONDS) { 
 
         isBusySending_ = true;
 

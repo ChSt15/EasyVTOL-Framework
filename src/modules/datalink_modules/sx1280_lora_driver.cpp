@@ -58,19 +58,28 @@ void SX1280Driver::internalLoop() {
                 receivedDataRSSI_ = radio_.readPacketRSSI();
                 receivedDataSNR_ = radio_.readPacketSNR();
 
-                DataMessageBuffer receivedData;
+                
 
                 radio_.startReadSXBuffer(0);
 
-                int i;
-                for (i = 0; i < packetL && i < SX1280_DATA_BUFFER_SIZE; i++) receivedData.getBuffer()[i] = radio_.readUint8();
-                //radio_.readBuffer(receivedData_);
+                for (uint32_t i = 0; i < packetL;) {
+
+                    uint32_t size = radio_.readUint8();
+
+                    DataMessageBuffer receivedData;
+
+                    for (uint32_t j = 0; j < size && j < SX1280_DATA_BUFFER_SIZE; j++) receivedData.getBuffer()[j] = radio_.readUint8();
+                    receivedData.setBufferSize(size);
+
+                    //Place inside buffer and publish.
+                    receivedDataTopic_.publish(receivedData);
+
+                    i += size;
+
+                }
 
                 radio_.endReadSXBuffer();
 
-                //Place inside buffer and publish.
-                receivedData.setBufferSize(packetL);
-                receivedDataTopic_.publish(receivedData);
 
                 #ifdef SX1280_DEBUG
                     Serial.println("Data Received and is " + String(packetL) + " bytes long. At RSSI: " + receivedDataRSSI_ + ", SNR: " + receivedDataSNR_);
@@ -150,9 +159,21 @@ void SX1280Driver::internalLoop() {
 
         isBusySending_ = true;
 
-        radio_.transmit(toSendBufferSub_[0].getBuffer(), toSendBufferSub_[0].getBufferSize(), 0, SX1280_POWER_dB, NO_WAIT);
+        uint8_t buffer[255];
+        uint32_t bufferSize = 0;
 
-        toSendBufferSub_.removeFront();
+        uint32_t i;
+        for (i = 0; bufferSize + toSendBufferSub_[i].getBufferSize() + 1 < 220 && i < toSendBufferSub_.available(); i++) {
+            
+            buffer[bufferSize] = toSendBufferSub_[i].getBufferSize();
+            memcpy(buffer + bufferSize + 1, toSendBufferSub_[i].getBuffer(), toSendBufferSub_[i].getBufferSize());
+            bufferSize += toSendBufferSub_[i].getBufferSize();
+
+        }
+
+        radio_.transmit(buffer, bufferSize, 0, SX1280_POWER_dB, NO_WAIT);
+
+        for (uint32_t j = 0; j < i; j++) toSendBufferSub_.removeFront();
 
         #ifdef SX1280_DEBUG
             Serial.println("Sending data packet!");

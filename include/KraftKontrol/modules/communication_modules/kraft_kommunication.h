@@ -298,7 +298,7 @@ private:
     Topic<KraftMessage_Interface> receivedMessagesTopic_;
 
     //Buffer for data packets received by data link
-    Buffer_Subscriber<DataMessageBuffer, 50> receivedPacketSub_;
+    Buffer_Subscriber<DataMessageBuffer, 10> receivedPacketSub_;
     //Subscriber for data packets to be published to datalink
     Simple_Subscriber<DataMessageBuffer> dataLinkSendSubr_;
 

@@ -167,7 +167,7 @@ void SX1280Driver::internalLoop() {
             
             buffer[bufferSize] = toSendBufferSub_[i].getBufferSize();
             memcpy(buffer + bufferSize + 1, toSendBufferSub_[i].getBuffer(), toSendBufferSub_[i].getBufferSize());
-            bufferSize += toSendBufferSub_[i].getBufferSize();
+            bufferSize += toSendBufferSub_[i].getBufferSize() + 1;
 
         }
 
@@ -176,7 +176,7 @@ void SX1280Driver::internalLoop() {
         for (uint32_t j = 0; j < i; j++) toSendBufferSub_.removeFront();
 
         #ifdef SX1280_DEBUG
-            Serial.println("Sending data packet!");
+            Serial.println(String("Sent ") + i + " packets at once! Size: " + bufferSize + " bytes.");
         #endif
 
     }

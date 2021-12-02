@@ -150,7 +150,7 @@ void KraftKommunication::thread() {
 
 
     //Send packets waiting to be sent
-    if (!dataLink_.busy()) {
+    while (!dataLink_.busy() && (sendPackets_.available() > 0 || sendPacketsACK_.available() > 0)) {
 
         if (sendPackets_.available()) {
 

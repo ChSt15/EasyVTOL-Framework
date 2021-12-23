@@ -148,8 +148,8 @@ void NavigationKalman::thread() {
 
 
             //Calculate angular acceleration value and error
-            Vector<> gyroAccel = (angularRateRaw.data-lastAngularRateValue_)/max(dTime, 0.0001);
-            Vector<> gyroAccelCov = (gyroCov+lastAngularRateCov_)/max(dTime, 0.0001);
+            Vector<> gyroAccel = (angularRateRaw.data-lastAngularRateValue_)/max(dTime, 0.0001f);
+            Vector<> gyroAccelCov = (gyroCov+lastAngularRateCov_)/max(dTime, 0.0001f);
 
 
             //Correct state prediction

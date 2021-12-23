@@ -5,7 +5,7 @@
 
 #include "../menu_abstract.h"
 
-#include "lib/Math-Helper/src/3d_math.h"
+#include "lib/MathHelperLibrary/vector_math.h"
 
 #include "KraftKontrol/utils/topic_subscribers.h"
 

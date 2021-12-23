@@ -3,7 +3,8 @@
 
 
 
-#include "lib/Math-Helper/src/3d_math.h"
+#include "lib/MathHelperLibrary/vector_math.h"
+#include "lib/MathHelperLibrary/FML.h"
 
 
 
@@ -19,8 +20,8 @@ public:
     Vector<> angularRate = 0;
     Vector<> angularRateError = 0;
 
-    Quaternion<> attitude = Quaternion<>(1,0,0,0);
-    Quaternion<> attitudeError = 0;
+    FML::Quaternion<> attitude = FML::Quaternion<>(1,0,0,0);
+    FML::Quaternion<> attitudeError = 0;
 
 };
 

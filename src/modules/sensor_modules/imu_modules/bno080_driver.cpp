@@ -8,7 +8,7 @@ Task_Abstract* BNO080Driver::driverTask_ = nullptr;
 
 
 
-BNO080Driver::BNO080Driver(int interruptPin, TwoWire& i2cBus, const Barometer_Interface* baro, const GNSS_Interface* gnss): Task_Abstract("BNO080 Driver", 200, eTaskPriority_t::eTaskPriority_VeryHigh), pinInterrupt_(interruptPin, _interruptRoutine, false, true), i2c_(i2cBus) {
+BNO080Driver::BNO080Driver(int interruptPin, TwoWire& i2cBus, const Barometer_Abstract* baro, const GNSS_Abstract* gnss): Task_Abstract("BNO080 Driver", 200, eTaskPriority_t::eTaskPriority_VeryHigh), pinInterrupt_(interruptPin, _interruptRoutine, false, true), i2c_(i2cBus) {
     if (baro != nullptr) baroSubr_.subscribe(baro->getBaroTopic());
     if (gnss != nullptr) gnssSubr_.subscribe(gnss->getGNSSTopic());
 }
@@ -120,9 +120,9 @@ void BNO080Driver::getIMUData() {
 
     float angleAccuracy;
 
-    Quaternion<> transform = Quaternion<>(Vector<>(0,0,1), -90*DEG_TO_RAD)*Quaternion<>(Vector<>(0,0,1), 90*DEG_TO_RAD)*Quaternion<>(Vector<>(1,0,0), 180*DEG_TO_RAD);
+    FML::Quaternion<> transform = FML::Quaternion<>(Vector<>(0,0,1), -90*DEG_TO_RAD)*FML::Quaternion<>(Vector<>(0,0,1), 90*DEG_TO_RAD)*FML::Quaternion<>(Vector<>(1,0,0), 180*DEG_TO_RAD);
 
-    DataTimestamped<Quaternion<>> quat(0, _newDataTimestamp);
+    DataTimestamped<FML::Quaternion<>> quat(0, _newDataTimestamp);
     _imu.getQuat(quat.data.x, quat.data.y, quat.data.z, quat.data.w, angleAccuracy, accuracy);
     navigationData_.data.attitude = quat.data*transform;
 

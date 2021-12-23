@@ -4,181 +4,6 @@
 
 void NavigationComplementaryFilter::thread() {
 
-    //We will go through the history of sensor values to correct our model predictions.
-
-    /*while (navigationData_.data.timestamp < micros()) {
-
-        //Used to exit loop
-        bool newData = false;
-
-        //Used to determine oldest sensor value
-        int64_t smallestTime = micros();
-
-        //Gather valid sensor values
-        Vector<> angularRateRaw; uint32_t angularRateTime = 0;
-        if (gyro_->peekGyro(&angularRateRaw, &angularRateTime)) {
-            if (angularRateTime < smallestTime) smallestTime = angularRateTime;
-            newData = true;
-        }
-
-        Vector<> accelRaw; uint32_t accelTime = 0;
-        if (accel_->peekAccel(&accelRaw, &accelTime)) {
-            if (accelTime < smallestTime) smallestTime = accelTime;
-            newData = true;
-        }
-
-        Vector<> magRaw; uint32_t magTime = 0;
-        if ((mag_ != nullptr) ? mag_->peekMag(&magRaw, &magTime):false) {
-            if (magTime < smallestTime) smallestTime = magTime;
-            newData = true;
-        }
-
-        float baroRaw; uint32_t baroTime = 0;
-        if ((baro_ != nullptr) ? baro_->peekPressure(&baroRaw, &baroTime):false) {
-            if (baroTime < smallestTime) smallestTime = baroTime;
-            newData = true;
-        }
-
-        Vector<> gnssVelRaw; uint32_t gnssVelTime = 0;
-        if ((gnss_ != nullptr) ? gnss_->peekVelocity(&gnssVelRaw, &gnssVelTime):false) {
-            if (gnssVelTime < smallestTime) smallestTime = gnssVelTime;
-            newData = true;
-        }
-
-        Vector<> gnssPosRaw; uint32_t gnssPosTime = 0;
-        if ((gnss_ != nullptr) ? gnss_->peekVelocity(&gnssPosRaw, &gnssPosTime):false) {
-            if (gnssPosTime < smallestTime) smallestTime = gnssPosTime;
-            newData = true;
-        }
-
-
-        //Predict system state until oldest sensor timestamp
-        KinematicData statePrediction = predictState(navigationData_, smallestTime);
-
-
-        //Correct state prediction with gyro values.
-        if (angularRateTime != 0 && angularRateTime == smallestTime) {
-            
-            //Retreive gyro data
-            gyro_->getGyro(&angularRateRaw, &angularRateTime);
-
-            //Get delta time from last gyro data
-            float dTime = float(angularRateTime - lastGyroTimestamp_)/1000000.0f;
-            lastGyroTimestamp_ = angularRateTime;
-
-            //Update filters
-            if (angularRateRaw.magnitude() < 0.1f) angularRateRaw =- gyroLPF_.update(angularRateRaw);
-
-            //update buffers
-            gyroXBuffer_.placeFront(angularRateRaw.x, true);
-            gyroYBuffer_.placeFront(angularRateRaw.y, true);
-            gyroZBuffer_.placeFront(angularRateRaw.z, true);
-
-            if (gyroXBuffer_.available() >= 2) {
-
-                _gyroInitialized = true;
-
-                //Calulate measured values
-                ValueError<Vector<>> angularRate = ValueError<Vector<>>(Vector<>(gyroXBuffer_.getMedian(), gyroYBuffer_.getMedian(), gyroZBuffer_.getMedian()), Vector<>(gyroXBuffer_.getStandardError(), gyroYBuffer_.getStandardError(), gyroZBuffer_.getStandardError()));
-                ValueError<Vector<>> angularAccel = (angularRate - lastAngularRateValue_)/dTime;
-
-                //Calculate best prediction of current system
-                ValueError<Vector<>> angularAccelBest = angularAccel.weightedAverage(ValueError<Vector<>>(statePrediction.attitude.rotateVector(statePrediction.angularAcceleration), statePrediction.attitude.rotateVector(statePrediction.angularAccelerationError)));
-                ValueError<Vector<>> angularRateBest = angularRate.weightedAverage(ValueError<Vector<>>(statePrediction.attitude.rotateVector(statePrediction.angularRate), statePrediction.attitude.rotateVector(statePrediction.angularRateError)));
-
-                //Predict next system state with measured values
-                Vector<> angleChange = angularRate.value*dTime;//(navigationData_.data.angularAcceleration + angularAccelBest.value)*0.5*dTime*dTime + (navigationData_.data.angularRate + angularRateBest.value)*dTime;
-                Quaternion<> attitude = navigationData_.data.attitude*Quaternion<>(angleChange, angleChange.magnitude());
-
-                //Update state prediction
-                statePrediction.attitude = attitude; // Sadly no error for this yet.
-
-                statePrediction.angularRate = statePrediction.attitude.copy().conjugate().rotateVector(angularRateBest.value);
-                statePrediction.angularRateError = statePrediction.attitude.copy().conjugate().rotateVector(angularRate.error);
-
-                statePrediction.angularAcceleration = statePrediction.attitude.copy().conjugate().rotateVector(angularAccelBest.value);
-                statePrediction.angularAccelerationError = statePrediction.attitude.copy().conjugate().rotateVector(angularAccelBest.error);
-
-                //Update last values
-                lastAngularRateValue_ = angularRate;
-
-            }
-
-        }
-
-
-        //Correct state prediction with accel values
-        if (accelTime != 0 && accelTime == smallestTime) {
-            
-            //Retreive gyro data
-            accel_->getAccel(&accelRaw, &accelTime);
-
-            //Get delta time from last gyro data
-            float dTime = float(accelTime - lastAccelTimestamp_)/1000000.0f;
-            lastAccelTimestamp_ = accelTime;
-
-            //update buffers
-            accelXBuffer_.placeFront(accelRaw.x, true);
-            accelYBuffer_.placeFront(accelRaw.y, true);
-            accelZBuffer_.placeFront(accelRaw.z, true);
-
-            if (accelXBuffer_.available() >= 2) {
-
-                float beta = 0.1f;
-
-                //Z-Axis correction
-                Vector<> zAxisIs = Vector<>(0,0,1);
-                Vector<> zAxisSet = (statePrediction.attitude*accelRaw*statePrediction.attitude.copy().conjugate()).toVector();
-
-                Vector<> zAxisRotationAxis = zAxisSet.cross(zAxisIs);
-                float zAxisRotationAngle = zAxisSet.getAngleTo(zAxisIs);
-
-                Quaternion<> zAxisCorrectionQuat = Quaternion<>(zAxisRotationAxis, zAxisRotationAngle*beta*dTime);
-
-
-                //Apply state correction and normalise attitude quaternion 
-                statePrediction.attitude = zAxisCorrectionQuat*statePrediction.attitude;
-                statePrediction.attitude.normalize(true);
-
-
-                //Update acceleration
-                statePrediction.acceleration = (statePrediction.attitude*accelRaw*statePrediction.attitude.copy().conjugate()).toVector(); //Transform acceleration into world coordinate system and remove gravity
-                Vector<> filtered = accelBiasLPF_.update(statePrediction.acceleration - Vector<>(0,0,9.81));
-                statePrediction.linearAcceleration = statePrediction.acceleration - Vector<>(0,0,9.81) - filtered;
-
-                //Update linear acceleration
-                ValueError<> buf = ValueError<>(navigationData_.data.linearAcceleration.x, accelXBuffer_.getStandardError());
-                navigationData_.data.acceleration.x = buf.value;
-                navigationData_.data.accelerationError.x = buf.error;
-
-                buf = ValueError<>(navigationData_.data.linearAcceleration.y, accelXBuffer_.getStandardError());
-                navigationData_.data.acceleration.y = buf.value;
-                navigationData_.data.accelerationError.y = buf.error;
-
-                buf = ValueError<>(navigationData_.data.linearAcceleration.z, accelXBuffer_.getStandardError());
-                navigationData_.data.acceleration.z = buf.value;
-                navigationData_.data.accelerationError.z = buf.error;
-
-                //Serial.println(String("Accel: x: ") + navigationData_.data.linearAcceleration.x + ", y: " + navigationData_.data.linearAcceleration.y + ", z: " + navigationData_.data.linearAcceleration.z);
-
-            }
-
-        }
-
-        //Serial.println(String("Time: ") + micros() + ", smallest: " + uint32_t(smallestTime));
-
-        //Update for next iteration
-        navigationData_ = statePrediction;
-        navigationData_.data.timestamp = smallestTime;
-
-        if (!newData) break;
-
-
-    }
-
-
-    return;*/
-
 
     //Calculate time delta from last run
     float dTime = (float)(NOW() - lastLoopTimestamp_)/SECONDS;
@@ -197,10 +22,13 @@ void NavigationComplementaryFilter::thread() {
     while (gyroSub_.available() > 0) {
         
         //Get IMU data
-        DataTimestamped<Vector<>> sensorTime;
+        DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>> sensorTime;
         gyroSub_.takeBack(sensorTime);
 
-        Vector<> rotationVector = sensorTime.data;
+        Vector<> rotationVector;
+        rotationVector.x = sensorTime.data.values[0][0];
+        rotationVector.y = sensorTime.data.values[1][0];
+        rotationVector.z = sensorTime.data.values[2][0];
         int64_t timestamp = sensorTime.timestamp;
 
         if (rotationVector.magnitude() < 0.1) {
@@ -229,7 +57,7 @@ void NavigationComplementaryFilter::thread() {
             //Predict system state
             if (!rotationVector.isZeroVector()) {
 
-                Quaternion<> rotationQuat(rotationVector, rotationVector.magnitude()*dt);
+                FML::Quaternion<> rotationQuat(rotationVector, rotationVector.magnitude()*dt);
 
                 navigationData_.data.attitude = navigationData_.data.attitude*rotationQuat;
 
@@ -256,10 +84,13 @@ void NavigationComplementaryFilter::thread() {
         //static Vector lastValue = 0;
 
         //Get IMU data
-        DataTimestamped<Vector<>> sensorTime;
+        DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>> sensorTime;
         accelSub_.takeBack(sensorTime);
 
-        Vector<> accelVector = sensorTime.data;
+        Vector<> accelVector;
+        accelVector.x = sensorTime.data.values[0][0];
+        accelVector.y = sensorTime.data.values[1][0];
+        accelVector.z = sensorTime.data.values[2][0];
         int64_t timestamp = sensorTime.timestamp;
 
         //Serial.println(String("Accel: ") + accelVector.toString());
@@ -292,7 +123,7 @@ void NavigationComplementaryFilter::thread() {
             Vector<> zAxisRotationAxis = zAxisSet.cross(zAxisIs);
             float zAxisRotationAngle = zAxisSet.getAngleTo(zAxisIs);
 
-            Quaternion<> zAxisCorrectionQuat = Quaternion<>(zAxisRotationAxis, zAxisRotationAngle*beta*dt);
+            FML::Quaternion<> zAxisCorrectionQuat = FML::Quaternion<>(zAxisRotationAxis, zAxisRotationAngle*beta*dt);
 
 
             //Apply state correction and normalise attitude quaternion 
@@ -355,7 +186,7 @@ void NavigationComplementaryFilter::thread() {
             Vector<> zAxisRotationAxis = zAxisSet.cross(zAxisIs);
             float zAxisRotationAngle = zAxisSet.getAngleTo(zAxisIs);
 
-            Quaternion<> zAxisCorrectionQuat = Quaternion<>(zAxisRotationAxis, zAxisRotationAngle);
+            FML::Quaternion<> zAxisCorrectionQuat = FML::Quaternion<>(zAxisRotationAxis, zAxisRotationAngle);
 
             //Apply state correction and normalise attitude quaternion 
             navigationData_.data.attitude = zAxisCorrectionQuat*navigationData_.data.attitude;
@@ -377,11 +208,14 @@ void NavigationComplementaryFilter::thread() {
         static Vector scale = 1;*/
 
         //Get IMU data
-        DataTimestamped<Vector<>> sensorTime;
+        DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>> sensorTime;
         magSub_.takeBack(sensorTime);
 
-        Vector<>& magVector = sensorTime.data;
-        int64_t& timestamp = sensorTime.timestamp;
+        Vector<> magVector;
+        magVector.x = sensorTime.data.values[0][0];
+        magVector.y = sensorTime.data.values[1][0];
+        magVector.z = sensorTime.data.values[2][0];
+        int64_t timestamp = sensorTime.timestamp;
 
         if (_magInitialized) {
 
@@ -418,7 +252,7 @@ void NavigationComplementaryFilter::thread() {
             Serial.println();*/
 
             //Mounting orientation compensation
-            //magVector = Quaternion<>(Vector<>(0, -1, 0), 90*DEGREES).rotateVector(magVector);
+            //magVector = FML::Quaternion<>(Vector<>(0, -1, 0), 90*DEGREES).rotateVector(magVector);
 
             Vector<> magBuf = magVector;
             magVector.x = -magBuf.z;
@@ -443,7 +277,7 @@ void NavigationComplementaryFilter::thread() {
             Vector<> xAxisRotationAxis = Vector<>(0,0,1);
             float xAxisRotationAngle = -atan2(xAxisSet.y, xAxisSet.x);
 
-            Quaternion<> xAxisCorrectionQuat = Quaternion<>(xAxisRotationAxis, xAxisRotationAngle*gamma*dt);
+            FML::Quaternion<> xAxisCorrectionQuat = FML::Quaternion<>(xAxisRotationAxis, xAxisRotationAngle*gamma*dt);
 
 
             //Apply state correction and normalise attitude quaternion 
@@ -465,7 +299,7 @@ void NavigationComplementaryFilter::thread() {
             Vector<> xAxisRotationAxis = Vector<>(0,0,1);
             float xAxisRotationAngle = -atan2(xAxisSet.y, xAxisSet.x);
 
-            Quaternion<> xAxisCorrectionQuat = Quaternion<>(xAxisRotationAxis, xAxisRotationAngle);
+            FML::Quaternion<> xAxisCorrectionQuat = FML::Quaternion<>(xAxisRotationAxis, xAxisRotationAngle);
 
             //Apply state correction and normalise attitude quaternion 
             navigationData_.data.attitude = xAxisCorrectionQuat*navigationData_.data.attitude;
@@ -562,8 +396,8 @@ void NavigationComplementaryFilter::thread() {
             WorldPosition& positionAbsolute = gnssData.data.position;
             int64_t& time = gnssData.timestamp;
 
-            float& posError = gnssData.data.positionError;
-            float& heightError = gnssData.data.altitudeError;
+            float posError = gnssData.data.positionError.magnitude();
+            float heightError = gnssData.data.positionError.z;
 
             navigationData_.data.absolutePosition.latitude = positionAbsolute.latitude;
             navigationData_.data.absolutePosition.longitude = positionAbsolute.longitude;

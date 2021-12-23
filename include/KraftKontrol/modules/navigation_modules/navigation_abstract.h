@@ -1,5 +1,5 @@
-#ifndef NAVIGATION_TEMPLATE_H
-#define NAVIGATION_TEMPLATE_H
+#ifndef NAVIGATION_ABSTRACT_H
+#define NAVIGATION_ABSTRACT_H
 
 
 
@@ -10,7 +10,7 @@
 
 
 
-class Navigation_Interface {
+class Navigation_Abstract {
 public:
 
     /**

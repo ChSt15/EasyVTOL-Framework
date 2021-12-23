@@ -4,6 +4,7 @@
 
 int64_t MPU9250Driver::_newDataTimestamp = 0;
 bool MPU9250Driver::_newDataInterrupt = false;
+Task_Abstract* MPU9250Driver::task_ = nullptr;
 
 
 
@@ -57,16 +58,24 @@ void MPU9250Driver::_getData() {
 
     _imu.Read();
 
-    DataTimestamped<Vector<>> bufVec(Vector<>(-_imu.gyro_x_radps(), _imu.gyro_y_radps(), -_imu.gyro_z_radps()), _newDataTimestamp);
-    if (_lastGyro != bufVec.data || true) {
+    DataTimestamped<Vector<>> gyroVec(Vector<>(-_imu.gyro_x_radps(), _imu.gyro_y_radps(), -_imu.gyro_z_radps()), _newDataTimestamp);
+    if (_lastGyro != gyroVec.data || true) {
         //Serial.println(String("Gyro: x:") + bufVec.x + ", y:" + bufVec.y + ", z:" + bufVec.z + ", Rate:" + _gyroRate);
-        gyroTopic_.publish(bufVec);
-        _lastGyro = bufVec.data;
+        DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>> buf;
+        buf.data.values[0][0] = gyroVec.data.x;
+        buf.data.values[1][0] = gyroVec.data.y;
+        buf.data.values[2][0] = gyroVec.data.z;
+        buf.data.covariance = FML::Matrix<float, 3, 3>::eye(1);
+        buf.timestamp = gyroVec.timestamp;
+        publishGyroData(buf);
+        _lastGyro = gyroVec.data;
         _gyroCounter++;
     }
 
-    bufVec = DataTimestamped<Vector<>>(Vector<>(-_imu.accel_x_mps2(), _imu.accel_y_mps2(), -_imu.accel_z_mps2()), _newDataTimestamp);
-    if (_lastAccel != bufVec.data || true) {
+    DataTimestamped<Vector<>> accelVec = DataTimestamped<Vector<>>(Vector<>(-_imu.accel_x_mps2(), _imu.accel_y_mps2(), -_imu.accel_z_mps2()), _newDataTimestamp);
+    //Serial.println(String("Dtime: ") + uint32_t(NOW()-_newDataTimestamp) + ", gyro: " + gyroVec.data.toString() + ", accel: " + accelVec.data.toString());
+    //Serial.println(String() + "x:" + gyroVec.data.x + " y:" + gyroVec.data.y + " z: " + gyroVec.data.z);
+    if (_lastAccel != accelVec.data || true) {
 
         /*if (calibrate_) {
 
@@ -129,20 +138,18 @@ void MPU9250Driver::_getData() {
 
         }*/
 
-        bufVec.data = ((bufVec.data - accelMin_)/(accelMax_ - accelMin_)*2-1)*9.81;
+        accelVec.data = ((accelVec.data - accelMin_)/(accelMax_ - accelMin_)*2-1)*GRAVITY_MAGNITUDE;
 
-        accelTopic_.publish(bufVec);
-        _lastAccel = bufVec.data;
+        DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>> buf;
+        buf.data.values[0][0] = accelVec.data.x;
+        buf.data.values[1][0] = accelVec.data.y;
+        buf.data.values[2][0] = accelVec.data.z;
+        buf.data.covariance = FML::Matrix<float, 3, 3>::eye(0.02);
+        buf.timestamp = accelVec.timestamp;
+
+        publishAccelData(buf);
+        _lastAccel = accelVec.data;
         _accelCounter++;
-    }
-
-    if (_imu.MagnetometerFailed()) return; //Do not get mag data if mag failed to start.
-
-    bufVec = DataTimestamped<Vector<>>(Vector<>(-_imu.mag_x_ut(), _imu.mag_y_ut(), -_imu.mag_z_ut()), _newDataTimestamp);
-    if (_lastMag != bufVec.data || true) {
-        //topic.publish(bufVec);
-        _lastMag = bufVec.data;
-        _magCounter++;
     }
 
 }
@@ -198,6 +205,8 @@ void MPU9250Driver::thread() {
         _magCounter = 0;
     }
 
+    this->stopTaskThreading();
+
 }
 
 
@@ -205,6 +214,7 @@ void MPU9250Driver::thread() {
 void MPU9250Driver::_interruptRoutine() {
     _newDataInterrupt = true;
     _newDataTimestamp =  NOW();
+    task_->startTaskThreading();
 }
 
 
@@ -225,7 +235,7 @@ void MPU9250Driver::init() {
         _imu.EnableDrdyInt();
 
         _imu.ConfigSrd(0);
-        _imu.ConfigDlpf(Mpu9250::DlpfBandwidth::DLPF_BANDWIDTH_250HZ_4kHz);
+        _imu.ConfigDlpf(Mpu9250::DlpfBandwidth::DLPF_BANDWIDTH_184HZ);
 
         _lastMeasurement = NOW();
 

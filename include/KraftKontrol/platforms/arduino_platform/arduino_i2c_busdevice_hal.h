@@ -74,14 +74,14 @@ public:
 
         bus_->beginTransmission((uint8_t)address_);
         bus_->write(readRegister);
-        bus_->endTransmission(false);
+        bus_->endTransmission();
 
         if (bus_->requestFrom((int)address_, (int)numberBytes, (int)release) != numberBytes) {
-            return false;
+            //return false;
         }
 
         uint32_t i;
-        for (i = 0; i < numberBytes; i++) ((uint8_t*)readData)[i] = bus_->read();
+        for (i = 0; i < numberBytes && bus_->available() > 0; i++) ((uint8_t*)readData)[i] = bus_->read();
 
         return i == numberBytes;
 

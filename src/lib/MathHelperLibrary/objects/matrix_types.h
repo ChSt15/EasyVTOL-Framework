@@ -9,6 +9,10 @@
 #include "matrix_forms.h"
 
 
+//No its the Fast Math Library namespace. Nothing else
+namespace FML {
+
+
 /**
  * Creates a matrix with given size and floats as internal type.
  */
@@ -21,6 +25,9 @@ using Matrix_F = Matrix<float, ROWS, COLS>;
 template<uint16_t ROWS, uint16_t COLS>
 using Matrix_D = Matrix<double, ROWS, COLS>;
 
+
+
+} //Namespace end
 
 
 #endif

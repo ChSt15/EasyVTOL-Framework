@@ -3,15 +3,9 @@
 
 
 
-#include "Arduino.h"
-
 #include "KraftKontrol/data_containers/dynamic_data.h"
 
-#include "KraftKontrol/modules/module_abstract.h"
-
 #include "KraftKontrol/utils/list.h"
-
-#include "KraftKontrol/platforms/platform_hal.h"
 
 
 

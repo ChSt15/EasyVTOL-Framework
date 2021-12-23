@@ -7,6 +7,9 @@
 
 #include "KraftKontrol/data_containers/dynamic_data.h"
 
+#include "lib/MathHelperLibrary/vector_math.h"
+#include "lib/MathHelperLibrary/FML.h"
+
 
 
 class TVCDynamics {
@@ -24,7 +27,7 @@ public:
      */
     TVCDynamics (const Vector<> &tvcPosition, const Vector<> &tvcNeutralDirection) {
         _tvcPosition = tvcPosition;
-        _tvcNeutralDirection = Quaternion<>(Vector<>(0,0,1).cross(tvcNeutralDirection), Vector<>(0,0,1).getAngleTo(tvcNeutralDirection)); //get rotation for nuetralDirection vector
+        _tvcNeutralDirection = FML::Quaternion<>(Vector<>(0,0,1).cross(tvcNeutralDirection), Vector<>(0,0,1).getAngleTo(tvcNeutralDirection)); //get rotation for nuetralDirection vector
     }
 
     /**
@@ -41,7 +44,7 @@ public:
      */
     void setTVCParameters(const Vector<> &tvcPosition, const Vector<> &tvcNeutralDirection) {
         _tvcPosition = tvcPosition;
-        _tvcNeutralDirection = Quaternion<>(Vector<>(0,0,1).cross(tvcNeutralDirection), Vector<>(0,0,1).getAngleTo(tvcNeutralDirection));
+        _tvcNeutralDirection = FML::Quaternion<>(Vector<>(0,0,1).cross(tvcNeutralDirection), Vector<>(0,0,1).getAngleTo(tvcNeutralDirection));
         _valid = false;
     }
 
@@ -136,7 +139,7 @@ private:
             float ang = atan2f(FmMag, FpMag); //Get angle of TVC.
             ang = min(ang, _maxAngle); //Limit angle to constraint.
 
-            Quaternion<> rotation = Quaternion<>(_tvcPosition.cross(Fm), ang); //Get TVC rotation in body frame space
+            FML::Quaternion<> rotation = FML::Quaternion<>(_tvcPosition.cross(Fm), ang); //Get TVC rotation in body frame space
             rotation = _tvcNeutralDirection*rotation; //Get TVC rotation in body frame space
 
             _tvcDirection = (rotation*(_tvcPosition.copy().normalize())*rotation.copy().conjugate()).toVector(); //Rotate vector<> to gimble angle.
@@ -169,7 +172,7 @@ private:
     float _maxForce = 0, _maxAngle = 0;
 
     Vector<> _tvcPosition;
-    Quaternion<> _tvcNeutralDirection;
+    FML::Quaternion<> _tvcNeutralDirection;
 
     //Is set to false when variables need to be recalculated.
     bool _valid = false;

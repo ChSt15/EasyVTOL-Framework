@@ -4,6 +4,7 @@
 
 
 #include "kinematic_data.h"
+#include "lib/MathHelperLibrary/vector_math.h"
 
 
 

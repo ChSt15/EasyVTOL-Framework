@@ -1,5 +1,5 @@
-#ifndef DYNAMICS_TEMPLATE_H
-#define DYNAMICS_TEMPLATE_H
+#ifndef DYNAMICS_ABSTRACT_H
+#define DYNAMICS_ABSTRACT_H
 
 
 
@@ -7,9 +7,11 @@
 #include "KraftKontrol/data_containers/dynamic_data.h"
 
 #include "KraftKontrol/modules/control_modules/control_interface.h"
-#include "KraftKontrol/modules/navigation_modules/navigation_interface.h"
+#include "KraftKontrol/modules/navigation_modules/navigation_abstract.h"
 
 #include "KraftKontrol/modules/module_abstract.h"
+
+#include "stdint.h"
 
 
 /**
@@ -47,7 +49,7 @@ public:
      * Sets the control modules navigation module.
      * @param navigationModule Pointer to module to use.
      */
-    virtual void setNavigationModule(Navigation_Interface& navigationModule) = 0;
+    virtual void setNavigationModule(Navigation_Abstract& navigationModule) = 0;
 
     /**
      * Tells dynamics module to test all actuators. 

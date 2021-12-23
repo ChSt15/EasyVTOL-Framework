@@ -1,5 +1,6 @@
 #include "KraftKontrol/modules/guidance_modules/guidance_flybywire.h"
 
+#include "lib/MathHelperLibrary/FML.h"
 
 
 void GuidanceFlyByWire::thread() {
@@ -13,7 +14,7 @@ void GuidanceFlyByWire::thread() {
     vehicleControlSettings_.velocity += vehicleControlSettings_.linearAcceleration*dT;
     vehicleControlSettings_.position += vehicleControlSettings_.velocity*dT;
 
-    vehicleControlSettings_.attitude = vehicleControlSettings_.attitude*Quaternion<>(vehicleControlSettings_.angularRate.copy().normalize(), vehicleControlSettings_.angularRate.magnitude()*dT);
+    vehicleControlSettings_.attitude = vehicleControlSettings_.attitude*FML::Quaternion<>(vehicleControlSettings_.angularRate.copy().normalize(), vehicleControlSettings_.angularRate.magnitude()*dT);
 
     controlSetpointTopic_.publish(vehicleControlSettings_);
 

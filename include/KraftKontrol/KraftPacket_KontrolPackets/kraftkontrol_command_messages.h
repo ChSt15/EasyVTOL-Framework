@@ -6,7 +6,8 @@
 #include "KraftKontrol/modules/communication_modules/kraft_message.h"
 #include "kraftkontrol_messagetype_abstracts.h"
 
-#include "lib/Math-Helper/src/3d_math.h"
+#include "lib/MathHelperLibrary/vector_math.h"
+#include "lib/MathHelperLibrary/FML.h"
 
 #include "KraftKontrol/data_containers/control_data.h"
 #include "KraftKontrol/data_containers/navigation_data.h"
@@ -31,7 +32,7 @@ public:
 
     CommandMessageAttitudeSet() {}
 
-    CommandMessageAttitudeSet(const Quaternion<> &attitude): MessageQuaternion_Abstract(attitude) {}
+    CommandMessageAttitudeSet(const FML::Quaternion<> &attitude): MessageQuaternion_Abstract(attitude) {}
 
     uint32_t getDataType() const final {return eMessageTypeCommand_t::eKraftMessageType_KraftKontrol_Attitude;}
 

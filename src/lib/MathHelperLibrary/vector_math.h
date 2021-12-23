@@ -11,11 +11,11 @@
 
 
 #ifndef PI
-#define PI 3.1415926541f
+#define PI 3.1415926541
 #endif
 
 #ifndef DEGREES
-#define DEGREES (PI/180.0f)
+#define DEGREES (PI/180.0)
 #endif
 
 
@@ -367,8 +367,9 @@ class Vector {
 };
 
 
+#define GRAVITY_MAGNITUDE 9.8066
 //Is a vector<T> with a z component of -9.81.
-#define GRAVITY_VECTOR Vector<>(0,0,-9.8066)
+#define GRAVITY_VECTOR Vector<>(0, 0, -GRAVITY_MAGNITUDE)
 
 template <typename T = float>
 inline Vector<T> sqrt(Vector<T> a)  {

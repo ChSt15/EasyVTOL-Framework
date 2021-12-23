@@ -4,8 +4,6 @@
 
 #include "KraftKontrol/platforms/platform_hal.h"
 
-#include "KraftKontrol/utils/constrainers.h"
-
 #include "KraftKontrol/modules/communication_modules/kraft_kommunication.h"
 #include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
 
@@ -13,7 +11,6 @@
 #include "KraftKontrol/vehicle/vehicle_general.h"
 
 #include "KraftKontrol/modules/control_modules/control_interface.h"
-#include "KraftKontrol/modules/control_modules/powered_hover_controller.h"
 
 #include "KraftKontrol/modules/datalink_modules/sx1280_lora_driver.h"
 
@@ -21,23 +18,25 @@
 
 #include "KraftKontrol/modules/guidance_modules/guidance_interface.h"
 #include "KraftKontrol/modules/guidance_modules/guidance_flybywire.h"
-#include "KraftKontrol/modules/guidance_modules/guidance_path.h"
 
-#include "KraftKontrol/modules/navigation_modules/navigation_interface.h"
+#include "KraftKontrol/modules/system_models/system_model_abstract.h"
+#include "KraftKontrol/modules/system_models/system_model_generic.h"
+
+#include "KraftKontrol/modules/navigation_modules/navigation_abstract.h"
 #include "KraftKontrol/modules/navigation_modules/navigation_complementary.h"
 
-#include "KraftKontrol/modules/sensor_modules/gyroscope_modules/gyroscope_interface.h"
+#include "KraftKontrol/modules/sensor_modules/gyroscope_modules/gyroscope_abstract.h"
 
-#include "KraftKontrol/modules/sensor_modules/accelerometer_modules/accelerometer_interface.h"
+#include "KraftKontrol/modules/sensor_modules/accelerometer_modules/accelerometer_abstract.h"
 
-#include "KraftKontrol/modules/sensor_modules/magnetometer_modules/magnetometer_interface.h"
+#include "KraftKontrol/modules/sensor_modules/magnetometer_modules/magnetometer_abstract.h"
 
 #include "KraftKontrol/modules/sensor_modules/imu_modules/mpu9250_driver.h"
 
-#include "KraftKontrol/modules/sensor_modules/barometer_modules/barometer_interface.h"
+#include "KraftKontrol/modules/sensor_modules/barometer_modules/barometer_abstract.h"
 #include "KraftKontrol/modules/sensor_modules/barometer_modules/bme280_driver.h"
 
-#include "KraftKontrol/modules/sensor_modules/gnss_modules/gnss_interface.h"
+#include "KraftKontrol/modules/sensor_modules/gnss_modules/gnss_abstract.h"
 #include "KraftKontrol/modules/sensor_modules/gnss_modules/ublox_serial_gnss.h"
 
 #include "KraftKontrol/modules/sensor_modules/adc_modules/adc_abstract.h"

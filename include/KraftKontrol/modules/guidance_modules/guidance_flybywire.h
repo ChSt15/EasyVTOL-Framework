@@ -11,6 +11,9 @@
 
 #include "KraftKontrol/data_containers/kinematic_data.h"
 
+#include "lib/MathHelperLibrary/vector_math.h"
+#include "lib/MathHelperLibrary/FML.h"
+
 
 
 /**
@@ -45,7 +48,7 @@ public:
      * @param values attitude.
      * @return none.
      */
-    void setAttitude(const Quaternion<> &attitude) {
+    void setAttitude(const FML::Quaternion<> &attitude) {
         vehicleControlSettings_.attitude = attitude;
     }
 

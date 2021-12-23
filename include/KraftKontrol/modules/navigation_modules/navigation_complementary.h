@@ -17,19 +17,22 @@
 
 #include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
 
-#include "navigation_interface.h"
+#include "navigation_abstract.h"
 
-#include "KraftKontrol/modules/sensor_modules/gyroscope_modules/gyroscope_interface.h"
-#include "KraftKontrol/modules/sensor_modules/accelerometer_modules/accelerometer_interface.h"
-#include "KraftKontrol/modules/sensor_modules/magnetometer_modules/magnetometer_interface.h"
-#include "KraftKontrol/modules/sensor_modules/barometer_modules/barometer_interface.h"
-#include "KraftKontrol/modules/sensor_modules/gnss_modules/gnss_interface.h"
+#include "KraftKontrol/modules/sensor_modules/gyroscope_modules/gyroscope_abstract.h"
+#include "KraftKontrol/modules/sensor_modules/accelerometer_modules/accelerometer_abstract.h"
+#include "KraftKontrol/modules/sensor_modules/magnetometer_modules/magnetometer_abstract.h"
+#include "KraftKontrol/modules/sensor_modules/barometer_modules/barometer_abstract.h"
+#include "KraftKontrol/modules/sensor_modules/gnss_modules/gnss_abstract.h"
 
 #include "KraftKontrol/utils/high_pass_filter.h"
 #include "KraftKontrol/utils/low_pass_filter.h"
 #include "KraftKontrol/utils/buffer.h"
 #include "KraftKontrol/utils/value_error.h"
 #include "KraftKontrol/utils/system_time.h"
+#include "lib/MathHelperLibrary/FML.h"
+
+#include "lib/MathHelperLibrary/vector_math.h"
 
 #include "KraftKontrol/data_containers/kinematic_data.h"
 
@@ -37,7 +40,7 @@
 
 
 
-class NavigationComplementaryFilter: public Navigation_Interface, public Task_Abstract {
+class NavigationComplementaryFilter: public Navigation_Abstract, public Task_Abstract {
 public:
 
     /**
@@ -49,7 +52,7 @@ public:
      * @param baro module to use.
      * @param gnss module to use.
      */
-    NavigationComplementaryFilter(Gyroscope_Interface* gyro = nullptr, Accelerometer_Interface* accel = nullptr, Magnetometer_Interface* mag = nullptr, Barometer_Interface* baro = nullptr, GNSS_Interface* gnss = nullptr) : Task_Abstract("Complementary Navigation", 4000, eTaskPriority_t::eTaskPriority_VeryHigh) {
+    NavigationComplementaryFilter(Gyroscope_Abstract* gyro = nullptr, Accelerometer_Abstract* accel = nullptr, Magnetometer_Abstract* mag = nullptr, Barometer_Abstract* baro = nullptr, GNSS_Abstract* gnss = nullptr) : Task_Abstract("Complementary Navigation", 4000, eTaskPriority_t::eTaskPriority_VeryHigh) {
         if (gyro != nullptr) {
             gyroSub_.subscribe(gyro->getGyroTopic()); 
             gyroSub_.setOverwrite(true);
@@ -82,11 +85,11 @@ public:
 private:
 
     //Subscriber for gyro with fifo function
-    Buffer_Subscriber<DataTimestamped<Vector<>>, 100> gyroSub_;
+    Buffer_Subscriber<DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>>, 100> gyroSub_;
     //Subscriber for accel with fifo function
-    Buffer_Subscriber<DataTimestamped<Vector<>>, 100> accelSub_;
+    Buffer_Subscriber<DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>>, 100> accelSub_;
     //Subscriber for mag with fifo function
-    Buffer_Subscriber<DataTimestamped<Vector<>>, 20> magSub_;
+    Buffer_Subscriber<DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>>, 20> magSub_;
     //Subscriber for baro with fifo function
     Buffer_Subscriber<DataTimestamped<float>, 10> baroSub_;
     //Subscriber for gnssdata with fifo function

@@ -7,7 +7,7 @@
 #include "KraftKontrol/data_containers/vehicle_data.h"
 
 #include "KraftKontrol/modules/guidance_modules/guidance_interface.h"
-#include "KraftKontrol/modules/navigation_modules/navigation_interface.h"
+#include "KraftKontrol/modules/navigation_modules/navigation_abstract.h"
 #include "KraftKontrol/modules/control_modules/control_interface.h"
 #include "KraftKontrol/modules/dynamics_modules/dynamics_interface.h"
 
@@ -20,7 +20,7 @@ public:
      * Returns pointer to the navigation module the vehicle uses. 
      * @returns Navigation_Interface
      */
-    virtual Navigation_Interface* getNavigationModulePointer() = 0;
+    virtual Navigation_Abstract* getNavigationModulePointer() = 0;
 
     /**
      * Returns pointer to the guidance module the vehicle uses. 

@@ -6,7 +6,7 @@
 
 #include "Arduino.h"
 
-
+#ifdef TEENSY
 
 /**
  * Abstract for PWM output pins. To be implemented by subclass for certain platform.
@@ -80,5 +80,6 @@ public:
     
 };
 
+#endif
 
 #endif

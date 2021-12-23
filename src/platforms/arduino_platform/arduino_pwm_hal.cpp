@@ -1,6 +1,6 @@
 #include "../../../include/KraftKontrol/platforms/arduino_platform/arduino_pwm_hal.h"
 
-
+#ifdef TEENSY
 
 PWM_HAL::PWM_HAL(uint32_t pin, float initValue, uint32_t initFrequency, bool enabled) {
 
@@ -89,3 +89,5 @@ void PWM_HAL::setAnalogValue(float percent) {
     analogWrite(pin_, maxValue*percent);
 
 }
+
+#endif

@@ -1,5 +1,5 @@
-#ifndef MPU9250_DRIVER_TEMPLATE_H
-#define MPU9250_DRIVER_TEMPLATE_H
+#ifndef MPU9250_DRIVER_H
+#define MPU9250_DRIVER_H
 
 
 
@@ -7,9 +7,11 @@
 
 #include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
 
-#include "KraftKontrol/modules/sensor_modules/gyroscope_modules/gyroscope_interface.h"
-#include "KraftKontrol/modules/sensor_modules/accelerometer_modules/accelerometer_interface.h"
-#include "KraftKontrol/modules/sensor_modules/magnetometer_modules/magnetometer_interface.h"
+#include "KraftKontrol/modules/sensor_modules/gyroscope_modules/gyroscope_abstract.h"
+#include "KraftKontrol/modules/sensor_modules/accelerometer_modules/accelerometer_abstract.h"
+#include "KraftKontrol/modules/sensor_modules/magnetometer_modules/magnetometer_abstract.h"
+
+#include "KraftKontrol/platforms/arduino_platform/arduino_pin_interrupt_hal.h"
 
 #include "KraftKontrol/modules/data_manager_modules/data_manager_nonvolatile.h"
 
@@ -20,17 +22,21 @@
 #include "lib/MPU9250_Lib/src/mpu9250.h"
 
 #include "KraftKontrol/utils/buffer.h"
-
-#include "KraftKontrol/platforms/arduino_platform/arduino_pin_interrupt_hal.h"
-
+#include "lib/MathHelperLibrary/FML.h"
 
 
 
-class MPU9250Driver: public Gyroscope_Interface, public Accelerometer_Interface, public Module_Abstract, public Task_Abstract {
+
+class MPU9250Driver: public Gyroscope_Abstract, public Accelerometer_Abstract, public Module_Abstract, public Task_Abstract {
 public:
 
-    MPU9250Driver(int interruptPin, int chipSelect, SPIClass* spiBus, DataManager_NonVolatile* eeprom = nullptr): Task_Abstract("MPU9250 Driver", 40000, eTaskPriority_t::eTaskPriority_Realtime), pinInterrupt_(interruptPin, _interruptRoutine, true, false), _imu(spiBus, chipSelect) {
+    MPU9250Driver(int interruptPin, int chipSelect, SPIClass* spiBus, DataManager_NonVolatile* eeprom = nullptr): Task_Abstract("MPU9250 Driver", 32000, eTaskPriority_t::eTaskPriority_Realtime), pinInterrupt_(interruptPin, _interruptRoutine, true, false), _imu(spiBus, chipSelect) {
         eeprom_ = eeprom;
+        task_ = this;
+    }
+
+    ~MPU9250Driver() {
+        task_ = nullptr;
     }
     
     /**
@@ -87,6 +93,7 @@ public:
 private:
 
     static void _interruptRoutine();
+    static Task_Abstract* task_;
 
     void _getData();
 

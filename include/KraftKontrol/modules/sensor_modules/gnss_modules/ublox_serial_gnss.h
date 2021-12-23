@@ -6,7 +6,7 @@
 
 #include "KraftKontrol/data_containers/navigation_data.h"
 
-#include "KraftKontrol/modules/sensor_modules/gnss_modules/gnss_interface.h"
+#include "KraftKontrol/modules/sensor_modules/gnss_modules/gnss_abstract.h"
 
 #include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
 
@@ -17,7 +17,7 @@
 
 
 
-class UbloxSerialGNSS: public GNSS_Interface, public Module_Abstract, public Task_Abstract  {
+class UbloxSerialGNSS: public GNSS_Abstract, public Module_Abstract, public Task_Abstract  {
 public:
 
     /**
@@ -106,10 +106,10 @@ private:
     bool lockValid_ = false;
 
     IntervalControl rateCalcInterval_ = IntervalControl(1); 
-    uint32_t lastMeasurement_ = 0;
+    int64_t lastMeasurement_ = 0;
 
     HardwareSerial* serialPort_;
-    uint32_t serialBaudMulti_ = 1;
+    //uint32_t serialBaudMulti_ = 1;
     bool usbPassthrough_;
 
     SFE_UBLOX_GNSS gnss_;

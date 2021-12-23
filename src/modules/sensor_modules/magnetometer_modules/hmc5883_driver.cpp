@@ -53,11 +53,11 @@ bool QMC5883Driver::setEEPROMData() {
 }
 
 
-void QMC5883Driver::getData() {
+bool QMC5883Driver::getData() {
 
     uint8_t buffer[6];
 
-    if (!bus_->readBytes(QMC5883Registers::QMC5883L_X_LSB, buffer, 6)) return;
+    if (!bus_->readBytes(QMC5883Registers::QMC5883L_X_LSB, buffer, 6)) return false;
 
     int64_t time = NOW();
 
@@ -116,8 +116,16 @@ void QMC5883Driver::getData() {
 
         mag = (mag - magMin_)/(magMax_ - magMin_)*2-1;
 
-        DataTimestamped<Vector<>> magTime(mag, time);
-        magTopic_.publish(magTime);
+        DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>> buf;
+        buf.data.values[0][0] = -mag.z;
+        buf.data.values[1][0] = mag.x;
+        buf.data.values[2][0] = -mag.y;
+        buf.data.covariance = FML::Matrix<float, 3, 3>::eye(1);
+        buf.timestamp = time;
+
+        //Serial.println(String("Mag: ") + mag.toString());
+
+        publishMagData(buf);
 
     }
 
@@ -134,6 +142,8 @@ void QMC5883Driver::getData() {
     //float temp = static_cast<float>(x)/10.0f;
 
     //Serial.println(String("temp: ") + temp);
+
+    return true;
 
 }
 
@@ -154,7 +164,23 @@ void QMC5883Driver::thread() {
 
     if (moduleStatus_ == eModuleStatus_t::eModuleStatus_Running) {
 
-        if (dataAvailable()) getData();
+        if (dataAvailable()) {
+
+            lastMeasurement_ = NOW();
+
+            if (!getData()) {
+
+                //moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
+                stopTaskThreading();
+
+            }
+
+        } else if (NOW() - lastMeasurement_ > 200*MILLISECONDS) {
+
+            //moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
+            //stopTaskThreading();
+
+        }
 
     } else if (moduleStatus_ == eModuleStatus_t::eModuleStatus_NotStarted || moduleStatus_ == eModuleStatus_t::eModuleStatus_RestartAttempt) {
         
@@ -201,7 +227,7 @@ void QMC5883Driver::init() {
             calibrationStatus_ = eMagCalibStatus_t::eMagCalibStatus_Calibrated;
         } else startCalibration();
 
-        _lastMeasurement = micros();
+        lastMeasurement_ = NOW();
 
         //imuStatus = DeviceStatus::DEVICE_CALIBRATING;
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Running;

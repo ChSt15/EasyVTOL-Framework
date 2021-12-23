@@ -113,10 +113,10 @@ void BME280Driver::init() {
         delay(10);
 
         _bme.setHumidityOverSample(1);
-        _bme.setPressureOverSample(4);
+        _bme.setPressureOverSample(16);
         _bme.setTempOverSample(1);
 
-        _bme.setFilter(4);
+        _bme.setFilter(16);
 
         _bme.setStandbyTime(0);
 

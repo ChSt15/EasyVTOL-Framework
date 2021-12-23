@@ -7,18 +7,20 @@
 
 #include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
 
-#include "KraftKontrol/modules/data_manager_modules/data_manager_nonvolatile.h"
-
 #include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_data_messages.h"
 #include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_command_messages.h"
 
-#include "KraftKontrol/modules/sensor_modules/magnetometer_modules/magnetometer_interface.h"
+#include "KraftKontrol/modules/sensor_modules/magnetometer_modules/magnetometer_abstract.h"
 
 #include "KraftKontrol/modules/module_abstract.h"
 
 #include "KraftKontrol/utils/buffer.h"
 
 #include "KraftKontrol/hal/bus_device_hal_abstract.h"
+
+#include "lib/MathHelperLibrary/vector_math.h"
+
+#include "KraftKontrol/modules/data_manager_modules/data_manager_nonvolatile.h"
 
 
 
@@ -45,8 +47,14 @@ namespace QMC5883Registers {
 }
 
 
+enum eMagCalibStatus_t { //Needed for old code. Should be removed along with calibratoin code in the future.
+    eMagCalibStatus_NotCalibrated,
+    eMagCalibStatus_Calibrating,
+    eMagCalibStatus_Calibrated
+};
 
-class QMC5883Driver: public Magnetometer_Interface, public Module_Abstract, public Task_Abstract {
+
+class QMC5883Driver: public Magnetometer_Abstract, public Module_Abstract, public Task_Abstract {
 public:
 
     /**
@@ -56,7 +64,7 @@ public:
      * @param selector For I2C this is the address. For SPI this is the chip select pin.
      * @param eeprom Reference to EEPROM module to use for calibration values.
      */
-    QMC5883Driver(BusDevice_HAL_Abstract& bus, uint32_t selector, DataManager_NonVolatile* eeprom = nullptr) : Task_Abstract("QMC5883 Driver", 100, eTaskPriority_t::eTaskPriority_Middle) {
+    QMC5883Driver(BusDevice_HAL_Abstract& bus, uint32_t selector, DataManager_NonVolatile* eeprom = nullptr) : Task_Abstract("QMC5883 Driver", 50, eTaskPriority_t::eTaskPriority_Middle) {
         eeprom_ = eeprom;
         bus_ = &bus;
     }
@@ -95,7 +103,7 @@ public:
 
 private:
 
-    void getData();
+    bool getData();
 
     bool dataAvailable();
 
@@ -110,7 +118,7 @@ private:
 
     uint8_t _startAttempts = 0;
 
-    uint32_t _lastMeasurement = 0;
+    int64_t lastMeasurement_ = 0;
 
     Vector<> magMin_ = -1;
     Vector<> magMax_ = 1;

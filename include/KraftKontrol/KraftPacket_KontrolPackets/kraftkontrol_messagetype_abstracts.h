@@ -5,7 +5,8 @@
 
 #include "KraftKontrol/modules/communication_modules/kraft_message.h"
 
-#include "lib/Math-Helper/src/3d_math.h"
+#include "lib/MathHelperLibrary/vector_math.h"
+#include "lib/MathHelperLibrary/FML.h"
 
 #include "KraftKontrol/data_containers/dynamic_data.h"
 #include "KraftKontrol/data_containers/control_data.h"
@@ -17,20 +18,20 @@
 class MessageQuaternion_Abstract: public KraftMessage_Interface {
 public:
 
-    void setQuaternion(const Quaternion<>& quaternion) {quat_ = quaternion;}
+    void setQuaternion(const FML::Quaternion<>& quaternion) {quat_ = quaternion;}
 
-    const Quaternion<>& getQuaternion() const {return quat_;}
+    const FML::Quaternion<>& getQuaternion() const {return quat_;}
 
 
 protected:
 
     MessageQuaternion_Abstract() {}
 
-    MessageQuaternion_Abstract(const Quaternion<> &quaternion) {
+    MessageQuaternion_Abstract(const FML::Quaternion<> &quaternion) {
         quat_ = quaternion;
     }
 
-    uint32_t getDataSize() const final {return sizeof(Quaternion<>);}
+    uint32_t getDataSize() const final {return sizeof(float)*4;}
 
     bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const override {
 
@@ -62,7 +63,7 @@ protected:
 
     }
 
-    Quaternion<> quat_;
+    FML::Quaternion<> quat_;
 
 };
 
@@ -84,7 +85,7 @@ protected:
         vector_ = vector;
     }
 
-    uint32_t getDataSize() const final {return sizeof(Vector<>);}
+    uint32_t getDataSize() const final {return sizeof(float)*3;}
 
     bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const override {
 

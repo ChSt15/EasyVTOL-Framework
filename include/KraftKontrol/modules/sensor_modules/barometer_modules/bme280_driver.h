@@ -7,7 +7,7 @@
 
 #include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
 
-#include "barometer_interface.h"
+#include "barometer_abstract.h"
 
 #include "KraftKontrol/modules/module_abstract.h"
 
@@ -17,16 +17,16 @@
 
 
 
-class BME280Driver: public Barometer_Interface, public Module_Abstract, public Task_Abstract {
+class BME280Driver: public Barometer_Abstract, public Module_Abstract, public Task_Abstract {
 public:
 
-    BME280Driver(int chipSelectPin, SPIClass* spiBus) : Task_Abstract("BME280 SPI Driver", 50, eTaskPriority_t::eTaskPriority_Realtime) {
+    BME280Driver(int chipSelectPin, SPIClass* spiBus) : Task_Abstract("BME280 SPI Driver", 20, eTaskPriority_t::eTaskPriority_Realtime) {
         chipSelectPin_ = chipSelectPin;
         spiBus_ = spiBus;
         useSPI_ = true;
     }
 
-    BME280Driver(TwoWire* i2cBus, int address) : Task_Abstract("BME280 I2C Driver", 50, eTaskPriority_t::eTaskPriority_VeryHigh) {
+    BME280Driver(TwoWire* i2cBus, int address) : Task_Abstract("BME280 I2C Driver", 20, eTaskPriority_t::eTaskPriority_VeryHigh) {
         i2cBus_ = i2cBus;
         i2cAddress_ = address;
         useSPI_ = false;

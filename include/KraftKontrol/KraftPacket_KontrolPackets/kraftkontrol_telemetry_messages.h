@@ -5,6 +5,9 @@
 
 #include "kraftkontrol_data_messages.h"
 
+#include "lib/MathHelperLibrary/vector_math.h"
+#include "lib/MathHelperLibrary/FML.h"
+
 
 
 enum eMessageTypeTelemetry_t: uint32_t {
@@ -33,7 +36,7 @@ public:
 
     TelemetryMessageAttitude() {}
 
-    TelemetryMessageAttitude(const Quaternion<> &attitude): MessageQuaternion_Abstract(attitude) {}
+    TelemetryMessageAttitude(const FML::Quaternion<> &attitude): MessageQuaternion_Abstract(attitude) {}
 
     uint32_t getDataType() const final override {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_Attitude;}
 

@@ -3,13 +3,15 @@
 
 
 
-#include "navigation_interface.h"
+#include "navigation_abstract.h"
 
-#include "KraftKontrol/modules/sensor_modules/gyroscope_modules/gyroscope_interface.h"
-#include "KraftKontrol/modules/sensor_modules/accelerometer_modules/accelerometer_interface.h"
-#include "KraftKontrol/modules/sensor_modules/magnetometer_modules/magnetometer_interface.h"
-#include "KraftKontrol/modules/sensor_modules/barometer_modules/barometer_interface.h"
-#include "KraftKontrol/modules/sensor_modules/gnss_modules/gnss_interface.h"
+#include "KraftKontrol/modules/sensor_modules/gyroscope_modules/gyroscope_abstract.h"
+#include "KraftKontrol/modules/sensor_modules/accelerometer_modules/accelerometer_abstract.h"
+#include "KraftKontrol/modules/sensor_modules/magnetometer_modules/magnetometer_abstract.h"
+#include "KraftKontrol/modules/sensor_modules/barometer_modules/barometer_abstract.h"
+#include "KraftKontrol/modules/sensor_modules/gnss_modules/gnss_abstract.h"
+
+#include "KraftKontrol/modules/system_models/system_model_abstract.h"
 
 #include "KraftKontrol/modules/actuator_modules/actuator_abstract.h"
 
@@ -17,10 +19,12 @@
 
 #include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
 #include "KraftKontrol/utils/buffer.h"
+#include "KraftKontrol/utils/low_pass_filter.h"
+#include "lib/MathHelperLibrary/FML.h"
 
 
 
-class NavigationKalman: public Navigation_Interface, public Task_Abstract {
+class NavigationKalman: public Navigation_Abstract, public Task_Abstract {
 private:
 
     //Subscriber for gyro with fifo function
@@ -35,11 +39,11 @@ private:
     Buffer_Subscriber<DataTimestamped<GNSSData>, 10> gnssSub_;*/
 
     //Subscriber for gyro with fifo function
-    Simple_Subscriber<DataTimestamped<Vector<>>> gyroSub_;
+    Simple_Subscriber<DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>>> gyroSub_;
     //Subscriber for accel with fifo function
-    Simple_Subscriber<DataTimestamped<Vector<>>> accelSub_;
+    Simple_Subscriber<DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>>> accelSub_;
     //Subscriber for mag with fifo function
-    Simple_Subscriber<DataTimestamped<Vector<>>> magSub_;
+    Simple_Subscriber<DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>>> magSub_;
     //Subscriber for baro with fifo function
     Simple_Subscriber<DataTimestamped<float>> baroSub_;
     //Subscriber for gnssdata with fifo function
@@ -56,6 +60,8 @@ private:
     Buffer<Vector<>, 10> angularRateCovBuf_;
     //Timestamp of last gyro value
     int64_t lastGyroTimestamp_ = NOW();
+    //Gyro bias LPF
+    LowPassFilter<Vector<>> gyroBiasLPF_ = LowPassFilter<Vector<>>(0.05);
 
     //Last accel value
     Vector<> lastAccelValue_ = 0;
@@ -65,31 +71,44 @@ private:
     Buffer<Vector<>, 10> accelCovBuf_;
     //Timestamp of last accel value
     int64_t lastAccelTimestamp_ = NOW();
+    LowPassFilter<Vector<>> accelBias = LowPassFilter<Vector<>>(0.05);
 
-    //Vehicle mass
-    float vehicleMass = 1.0f;
+    //Last mag value
+    Vector<> lastMagValue_ = 0;
+    //Last accel value error
+    Vector<> lastMagCov_ = 10000;
+    //Accel cov values
+    Buffer<Vector<>, 10> magCovBuf_;
+    //Timestamp of last accel value
+    int64_t lastMagTimestamp_ = NOW();
 
-    //Vehicle moment of inertia
-    Vector<> vehicleMomentInertia = 1;
+    //Last baro height value
+    float lastBaroValue_ = 0;
+    //Last baro height error
+    float lastBaroCov_ = 10000;
+    //Baro height cov values
+    Buffer<float, 1000> baroCovBuf_;
+    //Timestamp of last accel value
+    int64_t lastBaroTimestamp_ = NOW();
+    //Baro sea level pressure
+    float sealevelPressure_ = 1015e2;
 
-    /**
-     * Predicts future state using given start state and up to given time.
-     * 
-     * @param systemState System state at start that will be updated will predicted state.
-     * @param time Absolute time to which state should be predicted.
-     */
-    void predictState(DataTimestamped<NavigationData>& systemState, int64_t time);
+    //Timestamp of last accel value
+    int64_t lastGNSSTimestamp_ = NOW();
+
+    //Model of vehicle
+    SystemModel_Abstract& systemModel_;
 
 
 public:
 
-    NavigationKalman();
+    NavigationKalman(SystemModel_Abstract& systemModel);
 
     /**
      * Sets the gyroscope to be used.
      * @param gyro Gyroscope to use.
      */
-    void setGyroscopeInput(const Gyroscope_Interface& gyro);
+    void setGyroscopeInput(const Gyroscope_Abstract& gyro);
 
     /**
      * Removes the gyroscope input.
@@ -100,7 +119,7 @@ public:
      * Sets the accelerometer to be used.
      * @param accel Accelerometer to use.
      */
-    void setAccelerometerInput(const Accelerometer_Interface& accel);
+    void setAccelerometerInput(const Accelerometer_Abstract& accel);
 
     /**
      * Removes the accelerometer input.
@@ -111,7 +130,7 @@ public:
      * Sets the magnetometer to be used.
      * @param mag Magnetometer to use.
      */
-    void setMagnetometerInput(const Magnetometer_Interface& mag);
+    void setMagnetometerInput(const Magnetometer_Abstract& mag);
 
     /**
      * Removes the magnetometer input.
@@ -122,7 +141,7 @@ public:
      * Sets the barometer to be used.
      * @param baro Barometer to use.
      */
-    void setBarometerInput(const Barometer_Interface& baro);
+    void setBarometerInput(const Barometer_Abstract& baro);
 
     /**
      * Removes the barometer input.
@@ -133,7 +152,7 @@ public:
      * Sets the GNSS to be used.
      * @param gnss GNSS to use.
      */
-    void setGNSSInput(const GNSS_Interface& gnss);
+    void setGNSSInput(const GNSS_Abstract& gnss);
 
     /**
      * Removes the GNSS input.

@@ -11,6 +11,8 @@ void UbloxSerialGNSS::_getData() {
     positionDeviation_ = (float)gnss_.getHorizontalAccEst()/1000.0f;
     altitudeDeviation_ = (float)gnss_.getVerticalAccEst()/1000.0f;
 
+    float velocityError = (float)gnss_.getSpeedAccEst()/1000.0f;
+
     //gnss_.getSurveyInMeanAccuracy();
 
     //gnss_.getPositionAccuracy();
@@ -18,17 +20,16 @@ void UbloxSerialGNSS::_getData() {
     //if ()
 
     WorldPosition position;
-    position.latitude = (double)gnss_.getLatitude()/10e6*DEGREES;
-    position.longitude = (double)gnss_.getLongitude()/10e6*DEGREES;
-    position.height = (float)gnss_.getAltitudeMSL()/1000;
+    position.latitude = (double)gnss_.getLatitude()/1e7*DEGREES;
+    position.longitude = (double)gnss_.getLongitude()/1e7*DEGREES;
+    position.height = (float)gnss_.getAltitudeMSL()/1000.0;
 
     Vector<> velocity;
-    velocity.x = (float)gnss_.getNedNorthVel()/1000;
-    velocity.y = -(float)gnss_.getNedEastVel()/1000;
-    velocity.z = -(float)gnss_.getNedDownVel()/1000;
+    velocity.x = (float)gnss_.getNedNorthVel()/1000.0;
+    velocity.y = -(float)gnss_.getNedEastVel()/1000.0;
+    velocity.z = -(float)gnss_.getNedDownVel()/1000.0;
 
-    //positionDeviation_ = gnss_.getHorizontalAccuracy(0);
-    //altitudeDeviation_ = gnss_.getVerticalAccuracy(0);
+    int64_t tow = gnss_.getTimeOfWeek()*MILLISECONDS;
 
     positionCounter_++;
     velocityCounter_++;
@@ -41,10 +42,11 @@ void UbloxSerialGNSS::_getData() {
 
     DataTimestamped<GNSSData> data;
     data.data.lockValid = lockValid_;
-    data.data.altitudeError = altitudeDeviation_;
-    data.data.positionError = positionDeviation_;
+    data.data.positionError = Vector<>(positionDeviation_/1.414f, positionDeviation_/1.414f, altitudeDeviation_); //Factor due to length of vector conversion
+    data.data.velocityError = velocityError/1.732f; //Factor due to length of vector conversion
     data.data.position = position;
     data.data.velocity = velocity;
+    data.data.gnssTOW = tow;
     data.timestamp = time;
 
     gnssTopic_.publish(data);
@@ -68,17 +70,17 @@ void UbloxSerialGNSS::thread() {
 
         //gnss_.getPVT();
 
-        if (gnss_.getPVT()) { //If high then data is ready in the gps FIFO
+        if (gnss_.getPVT(0)) { //Read data but tell library to not waste time waiting.
 
             _getData();
-            lastMeasurement_ = micros();
+            lastMeasurement_ = NOW();
 
-        } else if (micros() - lastMeasurement_ >= 500000) {
+        } else if (NOW() - lastMeasurement_ >= 500*MILLISECONDS) {
 
             //gnss_.factoryDefault(100);
             //init();
             gnss_.flushPVT();
-            lastMeasurement_ = micros();
+            lastMeasurement_ = NOW();
 
         }
 
@@ -135,13 +137,16 @@ void UbloxSerialGNSS::init() {
     }
 
     if (moduleStatus_ == eModuleStatus_t::eModuleStatus_NotStarted) setupSerial(115200);
-    else setupSerial(9600*max(serialBaudMulti_,uint32_t(1)));
+    else setupSerial(9600);
+
+    //Serial.begin(String("Staring GNSS module with ") + (moduleStatus_ == eModuleStatus_t::eModuleStatus_NotStarted ? "115200":"9600") + " baud...");
 
     if (gnss_.begin(*serialPort_)) {
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Running;
 
         gnss_.setSerialRate(115200);
+        delay(10);
         setupSerial(115200);
 
         gnss_.setUART1Output(COM_TYPE_UBX);
@@ -170,13 +175,11 @@ void UbloxSerialGNSS::init() {
 
     } else {
 
-        if (moduleStatus_ != eModuleStatus_t::eModuleStatus_NotStarted) {
-            serialBaudMulti_ += 2;
-        }
+        Serial.println("GNSS failed to start.");
 
-        moduleStatus_ = eModuleStatus_t::eModuleStatus_RestartAttempt;
-
-        if (serialBaudMulti_ >= 14) moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
+        if (moduleStatus_ == eModuleStatus_t::eModuleStatus_NotStarted) {
+            moduleStatus_ = eModuleStatus_t::eModuleStatus_RestartAttempt;
+        } else moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
 
     }
 

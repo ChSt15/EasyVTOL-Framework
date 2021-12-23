@@ -7,12 +7,12 @@
 
 #include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
 
-#include "KraftKontrol/modules/sensor_modules/gyroscope_modules/gyroscope_interface.h"
-#include "KraftKontrol/modules/sensor_modules/accelerometer_modules/accelerometer_interface.h"
-#include "KraftKontrol/modules/sensor_modules/magnetometer_modules/magnetometer_interface.h"
-#include "KraftKontrol/modules/sensor_modules/barometer_modules/barometer_interface.h"
-#include "KraftKontrol/modules/sensor_modules/gnss_modules/gnss_interface.h"
-#include "KraftKontrol/modules/navigation_modules/navigation_interface.h"
+#include "KraftKontrol/modules/sensor_modules/gyroscope_modules/gyroscope_abstract.h"
+#include "KraftKontrol/modules/sensor_modules/accelerometer_modules/accelerometer_abstract.h"
+#include "KraftKontrol/modules/sensor_modules/magnetometer_modules/magnetometer_abstract.h"
+#include "KraftKontrol/modules/sensor_modules/barometer_modules/barometer_abstract.h"
+#include "KraftKontrol/modules/sensor_modules/gnss_modules/gnss_abstract.h"
+#include "KraftKontrol/modules/navigation_modules/navigation_abstract.h"
 
 #include "KraftKontrol/utils/value_error.h"
 
@@ -26,13 +26,15 @@
 
 #include "KraftKontrol/utils/topic_subscribers.h"
 
+#include "lib/MathHelperLibrary/vector_math.h"
 
 
 
-class BNO080Driver: /*public Gyroscope_Interface, public Accelerometer_Interface, public Magnetometer_Interface*/ public Module_Abstract, public Navigation_Interface, public Task_Abstract {
+
+class BNO080Driver: /*public Gyroscope_Interface, public Accelerometer_Interface, public Magnetometer_Interface*/ public Module_Abstract, public Navigation_Abstract, public Task_Abstract {
 public:
 
-    BNO080Driver(int interruptPin, TwoWire& i2cBus, const Barometer_Interface* baro = nullptr, const GNSS_Interface* gnss = nullptr);
+    BNO080Driver(int interruptPin, TwoWire& i2cBus, const Barometer_Abstract* baro = nullptr, const GNSS_Abstract* gnss = nullptr);
     
     void thread();
 

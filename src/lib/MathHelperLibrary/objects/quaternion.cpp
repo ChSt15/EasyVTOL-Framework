@@ -1,4 +1,7 @@
-#include "quaternion_math.h"
+#include "quaternion.h"
+
+
+using namespace FML;
 
 
 template <typename T = float>

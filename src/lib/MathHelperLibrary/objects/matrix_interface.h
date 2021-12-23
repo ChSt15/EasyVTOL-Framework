@@ -6,6 +6,10 @@
 #include "stdint.h"
 
 
+//No its the Fast Math Library namespace. Nothing else
+namespace FML {
+
+
 /**
  * Matrix giving the interface needed for matrix pointers that can be usefull.
  */
@@ -81,6 +85,8 @@ public:
 
 };
 
+
+} //Namespace end
 
 
 #endif

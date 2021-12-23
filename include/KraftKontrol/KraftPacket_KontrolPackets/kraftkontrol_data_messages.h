@@ -5,6 +5,9 @@
 
 #include "kraftkontrol_messagetype_abstracts.h"
 
+#include "lib/MathHelperLibrary/FML.h"
+#include "lib/MathHelperLibrary/vector_math.h"
+
 
 
 enum eMessageTypeData_t: uint32_t {
@@ -37,7 +40,7 @@ public:
 
     DataMessageAttitude() {}
 
-    DataMessageAttitude(const Quaternion<> &attitude): MessageQuaternion_Abstract(attitude) {}
+    DataMessageAttitude(const FML::Quaternion<> &attitude): MessageQuaternion_Abstract(attitude) {}
 
     uint32_t getDataType() const final {return eMessageTypeData_t::eMessageTypeData_Attitude;}
 

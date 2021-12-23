@@ -1,5 +1,5 @@
-#ifndef _QUATERNION_MATH_H_
-#define _QUATERNION_MATH_H_
+#ifndef QUATERNION_H
+#define QUATERNION_H
 
 
 #include "math.h"
@@ -8,7 +8,8 @@
 #include "WString.h"
 #endif
 
-#include "vector_math.h"
+
+#include "../vector_math.h"
 
 
 
@@ -19,6 +20,10 @@
 #ifndef DEGREES
 #define DEGREES 180.0f/PI
 #endif
+
+
+//No its the Fast Math Library namespace. Nothing else
+namespace FML {
 
 
 template <typename T = float>
@@ -119,7 +124,7 @@ class Quaternion {
          * @param values none
          * @return copy of conjugated Quaternion.
          */
-        inline Quaternion& conjugate() {
+        inline Quaternion<T>& conjugate() {
             x = -x;
             y = -y;
             z = -z;
@@ -279,6 +284,10 @@ class Quaternion {
 
 template <typename T = float>
 inline extern Quaternion<T> sqrt(const Quaternion<T> &a);
+
+
+
+} //Namespace end
 
 
 #endif

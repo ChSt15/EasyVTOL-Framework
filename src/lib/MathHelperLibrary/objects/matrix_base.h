@@ -9,6 +9,8 @@
 #include "matrix_interface.h"
 
 
+//No its the Fast Math Library namespace. Nothing else
+namespace FML {
 
 
 /**
@@ -55,7 +57,7 @@ public:
      * Warning: array must have correct size or undetermined values will be written into matrix.
      * @param array Array containing values.
      */
-    Matrix(const TYPE (&array)[]);
+    //Matrix(const TYPE (&array)[]);
 
     /**
      * An array can be given as so: 
@@ -88,7 +90,7 @@ public:
      * @param mode If true then the starting row/column is the matrix getting written to (this). Defaults to false.
      */
     template<typename TYPE2, uint16_t ROWS2, uint16_t COLS2>
-    Matrix(const Matrix<TYPE2, ROWS2, COLS2>& matrix, uint16_t startingRow = 0, uint16_t startingColumn = 0, bool mode = false);
+    Matrix(const Matrix<TYPE2, ROWS2, COLS2>& matrix, uint16_t startingRow, uint16_t startingColumn = 0, bool mode = false);
 
 
     /**
@@ -152,12 +154,6 @@ public:
      * @returns inverse of matrix.
      */
     Matrix<TYPE, ROWS, COLS> inverse();
-
-    /**
-     * Only for Nx1 matricies
-     * @returns magnitude (length) of a vector.
-     */
-    TYPE magnitude();
 
     /**
      * Below are access operators to access matrix values.
@@ -290,14 +286,14 @@ Matrix<TYPE, ROWS, COLS>::Matrix(TYPE val) {
 }
 
 
-template<typename TYPE, uint16_t ROWS, uint16_t COLS>
+/*template<typename TYPE, uint16_t ROWS, uint16_t COLS>
 Matrix<TYPE, ROWS, COLS>::Matrix(const TYPE (&array)[]) {
 
     static_assert((ROWS > 0 && COLS > 0), "Matrix must be at least 1X1. Number of Rows or Columns or both are 0.");
 
     for (uint16_t i = 0; i < getNumValues(); i++) (*this)(i) = array[i];
 
-}
+}*/
 
 
 template<typename TYPE, uint16_t ROWS, uint16_t COLS>
@@ -362,7 +358,7 @@ Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::eye(TYPE eyeVal) {
 
     Matrix<TYPE, ROWS, COLS> m;
 
-    for (uint16_t i = 0; i < m.getNumValues(); i++) m.r[i][i] = eyeVal;
+    for (uint16_t i = 0; i < ROWS && i < COLS; i++) m.r[i][i] = eyeVal;
 
     return m;
 
@@ -508,25 +504,7 @@ Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::inverse() {
 }
 
 
-template<typename TYPE, uint16_t ROWS, uint16_t COLS>
-TYPE Matrix<TYPE, ROWS, COLS>::magnitude() {
-
-    static_assert((COLS == 1), "Matrix must be Nx1 to be a vector and therefore have a magnitude.");
-    
-    TYPE val = 0;
-
-    for (uint16_t row = 0; row < ROWS; row++) {
-
-        val += r[row][0]*r[row][0];
-
-    }
-
-    return sqrt(val);
-
-}
-
-
-template<>
+/*template<>
 float Matrix<float, 1, 1>::determinant() {
     return r[0][0];
 }
@@ -541,13 +519,15 @@ double Matrix<double, 1, 1>::determinant() {
 template<>
 int32_t Matrix<int32_t, 1, 1>::determinant() {
     return r[0][0];
-}
+}*/
 
 
 template<typename TYPE, uint16_t ROWS, uint16_t COLS>
 TYPE Matrix<TYPE, ROWS, COLS>::determinant() {
 
     static_assert((COLS == ROWS), "Matrix must be square (NxN) to have a determinant");
+
+    if (COLS == 1 && ROWS == 1) return r[0][0];
 
     TYPE determinant = 0;
     Matrix<TYPE, ROWS - 1, COLS - 1> temp;
@@ -758,6 +738,9 @@ Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::operator = (const Matrix<TYPE
 
 }
 
+
+
+} //Namespace end
 
 
 #endif

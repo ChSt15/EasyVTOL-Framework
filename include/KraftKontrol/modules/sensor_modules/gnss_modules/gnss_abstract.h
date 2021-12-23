@@ -1,5 +1,5 @@
-#ifndef GNSS_INTERFACE_H
-#define GNSS_INTERFACE_H
+#ifndef GNSS_ABSTRACT_H
+#define GNSS_ABSTRACT_H
 
 
 
@@ -10,6 +10,8 @@
 #include "KraftKontrol/utils/topic.h"
 #include "KraftKontrol/utils/data_timestamped.h"
 
+#include "lib/MathHelperLibrary/vector_math.h"
+
 
 
 
@@ -18,9 +20,10 @@ struct GNSSData {
     WorldPosition position;
     Vector<> velocity;
 
-    float positionError = 100000;
-    float altitudeError = 100000;
-    float velocityError = 100000;
+    Vector<> positionError = 100000;
+    Vector<> velocityError = 100000;
+
+    int64_t gnssTOW = 0;
 
     bool lockValid = false;
 
@@ -28,7 +31,7 @@ struct GNSSData {
 
 
 
-class GNSS_Interface {
+class GNSS_Abstract {
 public:
 
     /**

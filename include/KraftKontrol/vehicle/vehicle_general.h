@@ -11,7 +11,7 @@
 #include "KraftKontrol/modules/module_abstract.h"
 
 #include "KraftKontrol/modules/guidance_modules/guidance_interface.h"
-#include "KraftKontrol/modules/navigation_modules/navigation_interface.h"
+#include "KraftKontrol/modules/navigation_modules/navigation_abstract.h"
 #include "KraftKontrol/modules/control_modules/control_interface.h"
 #include "KraftKontrol/modules/dynamics_modules/dynamics_interface.h"
 
@@ -22,7 +22,7 @@
 class VehicleGeneral: public Vehicle_Interface, public Module_Abstract, public Task_Abstract {
 public:
 
-    VehicleGeneral(Guidance_Interface* guidancePointer, Navigation_Interface* navigationPointer, Control_Interface* controlPointer, Dynamics_Interface* dynamicsPointer) : Task_Abstract("Vehicle General", 8000, eTaskPriority_t::eTaskPriority_High) {
+    VehicleGeneral(Guidance_Interface* guidancePointer, Navigation_Abstract* navigationPointer, Control_Interface* controlPointer, Dynamics_Interface* dynamicsPointer) : Task_Abstract("Vehicle General", 8000, eTaskPriority_t::eTaskPriority_High) {
         guidance_ = guidancePointer;
         navigation_ = navigationPointer;
         control_ = controlPointer;
@@ -47,9 +47,9 @@ public:
 
     /**
      * Returns pointer to the navigation module the vehicle uses. 
-     * @returns Navigation_Interface
+     * @returns Navigation_Abstract
      */
-    Navigation_Interface* getNavigationModulePointer() {return navigation_;}
+    Navigation_Abstract* getNavigationModulePointer() {return navigation_;}
 
     /**
      * Returns pointer to the guidance module the vehicle uses. 
@@ -101,7 +101,7 @@ protected:
     VehicleData vehicleData_;
 
     //Points to the navigation module to use.
-    Navigation_Interface* navigation_;
+    Navigation_Abstract* navigation_;
 
     //Points to the guidance module to use.
     Guidance_Interface* guidance_;

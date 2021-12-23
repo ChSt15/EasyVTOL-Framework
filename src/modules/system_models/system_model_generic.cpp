@@ -2,7 +2,7 @@
 
 
 
-SystemModelGeneric::SystemModelGeneric(float systemMass = 1, Vector<> systemAngularMass = 1) {
+SystemModelGeneric::SystemModelGeneric(float systemMass, Vector<> systemAngularMass) {
 
     systemMass_ = systemMass;
     systemAngularMass_ = systemAngularMass;

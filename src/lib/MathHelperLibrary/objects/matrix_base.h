@@ -6,8 +6,6 @@
 #include "stdint.h"
 #include "math.h"
 
-#include "matrix_interface.h"
-
 
 //No its the Fast Math Library namespace. Nothing else
 namespace FML {
@@ -18,7 +16,7 @@ namespace FML {
  * Recommended to used the from this derived forms for 3D, 4D etc matrices and specifically Vector and Quaternion for higher performance and more features.
  */
 template<typename TYPE, uint16_t ROWS, uint16_t COLS>
-class Matrix: public Matrix_Interface<TYPE> {
+class Matrix {
 public:
 
     /**
@@ -118,17 +116,17 @@ public:
     /**
      * @returns total number of values the matrix has.
      */
-    uint16_t getNumRows() const override;
+    uint16_t getNumRows() const;
 
     /**
      * @returns number of rows a matrix has.
      */
-    uint16_t getNumColumns() const override;
+    uint16_t getNumColumns() const;
 
     /**
      * @returns number of columns a matrix has.
      */
-    uint32_t getNumValues() const override;
+    uint32_t getNumValues() const;
 
     /**
      * @returns a copy of the matrix.
@@ -163,35 +161,35 @@ public:
      * Another way to access the internal data.
      * Low overhead and direct access to internal data, but no protection against going out of bounds.
      */
-    TYPE* operator [] (uint16_t row) override;
+    TYPE* operator [] (uint16_t row);
 
     /**
      * Another way to access the internal data. Return value is const.
      * Low overhead and direct access to internal data, but no protection against going out of bounds.
      */
-    const TYPE* operator [] (uint16_t row) const override;
+    const TYPE* operator [] (uint16_t row) const;
 
     /**
      * This operator accesses the first row until the end then goes to the beginning of the next row.
      */
-    TYPE& operator () (uint32_t index) override;
+    TYPE& operator () (uint32_t index);
 
     /**
      * Return value is constant.
      * This operator accesses the first row until the end then goes to the beginning of the next row.
      */
-    const TYPE& operator () (uint32_t index) const override;
+    const TYPE& operator () (uint32_t index) const;
     
     /**
      * This operator is to access the matrix values while keeping you inside the bounds of data.
      */
-    TYPE& operator () (uint16_t row, uint16_t column) override;
+    TYPE& operator () (uint16_t row, uint16_t column);
 
     /**
      * Return value is constant.
      * This operator is to access the matrix values while keeping you inside the bounds of data.
      */
-    const TYPE& operator () (uint16_t row, uint16_t column) const override;
+    const TYPE& operator () (uint16_t row, uint16_t column) const;
 
     /**
      * Below are math operations.

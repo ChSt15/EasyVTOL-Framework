@@ -3,7 +3,11 @@
 
 
 
+#include "stdint.h"
+
 #include "KraftKontrol/utils/topic_subscribers.h"
+#include "KraftKontrol/utils/list.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
 
 #include "KraftKontrol/modules/communication_modules/kraft_message.h"
 
@@ -30,7 +34,7 @@ public:
     /**
      * @param receiverItem Item to be written with new data on receive. MUST NOT BE DELETED BEFORE THIS SUBSCRIBER!
      */
-    KraftMessage_Subscriber (KraftMessage_Interface& receiverItem) {
+    KraftMessage_Subscriber(KraftMessage_Interface& receiverItem) {
         addReceiverMessage(receiverItem);
     }
 
@@ -79,17 +83,15 @@ private:
 
     void receive(const KraftMessage_Interface& item, const Topic<KraftMessage_Interface>* topic) override {
 
-        //Serial.println(String("Received!: message: ")  + item.getMessageType() + ", data: " + item.getDataType() + ", size: " + item.getDataSize());
-
         for (uint32_t i = 0; i < receiverItems_.getNumItems(); i++) {
 
-            KraftMessage_Interface& receiverItem_ = *(receiverItems_[i]);
+            KraftMessage_Interface* receiverItem_ = receiverItems_[i];
         
-            if (item.getMessageType() == receiverItem_.getMessageType() && item.getDataType() == receiverItem_.getDataType() && item.getDataSize() == receiverItem_.getDataSize()) {
-                
-                uint8_t buffer[receiverItem_.getDataSize()];
+            if (item.getMessageType() == receiverItem_->getMessageType() && item.getDataType() == receiverItem_->getDataType() && item.getDataSize() == receiverItem_->getDataSize()) {
 
-                if (item.getRawData(buffer, receiverItem_.getDataSize()) && receiverItem_.setRawData(buffer, receiverItem_.getDataSize())) {
+                uint8_t buffer[receiverItem_->getDataSize()];
+
+                if (item.getRawData(buffer, receiverItem_->getDataSize()) && receiverItem_->setRawData(buffer, receiverItem_->getDataSize())) {
                     dataNew_ = true;
                     if (taskToResume_ != nullptr) taskToResume_->startTaskThreading();
                 }

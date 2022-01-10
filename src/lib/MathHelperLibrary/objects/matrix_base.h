@@ -7,7 +7,7 @@
 #include "math.h"
 
 
-//No its the Fast Math Library namespace. Nothing else
+//No, FML stands for Fast Math Library namespace. Nothing else.
 namespace FML {
 
 
@@ -151,7 +151,7 @@ public:
      * Used Gauß-Jordan method from https://www.geeksforgeeks.org/finding-inverse-of-a-matrix-using-gauss-jordan-method/
      * @returns inverse of matrix.
      */
-    Matrix<TYPE, ROWS, COLS> inverse();
+    Matrix<TYPE, ROWS, COLS> getInverse() const;
 
     /**
      * Below are access operators to access matrix values.
@@ -198,12 +198,12 @@ public:
     /**
      * Adds 2 matrices together.
      */ 
-    Matrix<TYPE, ROWS, COLS> operator + (const Matrix<TYPE, ROWS, COLS>& right);
+    Matrix<TYPE, ROWS, COLS> operator + (const Matrix<TYPE, ROWS, COLS>& right) const;
 
     /**
      * Subtracts right matrix from left.
      */
-    Matrix<TYPE, ROWS, COLS> operator - (const Matrix<TYPE, ROWS, COLS>& right);
+    Matrix<TYPE, ROWS, COLS> operator - (const Matrix<TYPE, ROWS, COLS>& right) const;
 
     /**
      * Generates an eye matrix from given value on left und then subtracts right matrix from generated value.
@@ -213,12 +213,12 @@ public:
     /**
      * Multiplies a scaler with the matrix.
      */
-    Matrix<TYPE, ROWS, COLS> operator * (const TYPE& scaler);
+    Matrix<TYPE, ROWS, COLS> operator * (const TYPE& scaler) const;
 
     /**
      * Divides a scaler with the matrix.
      */
-    Matrix<TYPE, ROWS, COLS> operator / (const TYPE& scaler);
+    Matrix<TYPE, ROWS, COLS> operator / (const TYPE& scaler) const;
 
     /**
      * Multiplies a scaler with the matrix just like matrix*float but allows to be swaped to float*matrix.
@@ -231,7 +231,7 @@ public:
      * This is as normal matrix multiplication not commutative meaning: A*B will result in something different than B*A.
      */
     template<uint16_t RIGHTCOLS>
-    Matrix<TYPE, ROWS, RIGHTCOLS> operator * (const Matrix<TYPE, COLS, RIGHTCOLS>& right);
+    Matrix<TYPE, ROWS, RIGHTCOLS> operator * (const Matrix<TYPE, COLS, RIGHTCOLS>& right) const;
 
     /**
      * Copies value from one matrix into the other even with differing internal value types.
@@ -424,13 +424,13 @@ Matrix<TYPE, COLS, ROWS> Matrix<TYPE, ROWS, COLS>::transpose() {
 
 
 template<typename TYPE, uint16_t ROWS, uint16_t COLS>
-Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::inverse() {
+Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::getInverse() const {
 
     static_assert((ROWS == COLS), "Matrix must be square (NxN) in order to get inverse. Pseudoinverse might solve the issue.");
 
     TYPE temp;
 
-    Matrix<TYPE, ROWS, COLS*2> matrix(*this);
+    Matrix<TYPE, ROWS, COLS*2> matrix(*this, 0, 0, false);
 
     // Create the augmented matrix
     // Add the identity matrix
@@ -585,7 +585,7 @@ const TYPE& Matrix<TYPE, ROWS, COLS>::operator () (uint16_t row, uint16_t column
 
 
 template<typename TYPE, uint16_t ROWS, uint16_t COLS>
-Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::operator + (const Matrix<TYPE, ROWS, COLS>& right) {
+Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::operator + (const Matrix<TYPE, ROWS, COLS>& right) const {
 
     Matrix<TYPE, ROWS, COLS> m;
 
@@ -603,7 +603,7 @@ Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::operator + (const Matrix<TYPE
 
 
 template<typename TYPE, uint16_t ROWS, uint16_t COLS>
-Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::operator - (const Matrix<TYPE, ROWS, COLS>& right) {
+Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::operator - (const Matrix<TYPE, ROWS, COLS>& right) const {
 
     Matrix<TYPE, ROWS, COLS> m;
 
@@ -640,7 +640,7 @@ Matrix<TYPE, ROWS, COLS> operator - (const TYPE& val, const Matrix<TYPE, ROWS, C
 
 
 template<typename TYPE, uint16_t ROWS, uint16_t COLS>
-Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::operator * (const TYPE& scaler) {
+Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::operator * (const TYPE& scaler) const {
 
     Matrix<TYPE, ROWS, COLS> m;
 
@@ -658,7 +658,7 @@ Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::operator * (const TYPE& scale
 
 
 template<typename TYPE, uint16_t ROWS, uint16_t COLS>
-Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::operator / (const TYPE& scaler) {
+Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::operator / (const TYPE& scaler) const {
 
     Matrix<TYPE, ROWS, COLS> m;
 
@@ -666,6 +666,24 @@ Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::operator / (const TYPE& scale
         for (uint16_t col = 0; col < COLS; col++) {
 
             m.r[row][col] = this->r[row][col]/scaler;
+
+        }
+    }  
+
+    return m;
+
+}
+
+
+template<typename TYPE, uint16_t ROWS, uint16_t COLS>
+Matrix<TYPE, ROWS, COLS> operator / (const TYPE& scaler, const Matrix<TYPE, ROWS, COLS>& right) {
+
+    Matrix<TYPE, ROWS, COLS> m;
+
+    for (uint16_t row = 0; row < ROWS; row++) {
+        for (uint16_t col = 0; col < COLS; col++) {
+
+            m.r[row][col] =  scaler/right.r[row][col];
 
         }
     }  
@@ -695,14 +713,16 @@ Matrix<TYPE, ROWS, COLS> operator * (const TYPE& scaler, const Matrix<TYPE, ROWS
 
 template<typename TYPE, uint16_t ROWS, uint16_t COLS>
 template<uint16_t RIGHTCOLS>
-Matrix<TYPE, ROWS, RIGHTCOLS> Matrix<TYPE, ROWS, COLS>::operator * (const Matrix<TYPE, COLS, RIGHTCOLS>& right) {
+Matrix<TYPE, ROWS, RIGHTCOLS> Matrix<TYPE, ROWS, COLS>::operator * (const Matrix<TYPE, COLS, RIGHTCOLS>& right) const {
 
     Matrix<TYPE, ROWS, RIGHTCOLS> m;
+
+    TYPE val = 0;
 
     for (uint16_t lr = 0; lr < ROWS; lr++) {
         for (uint16_t rc = 0; rc < RIGHTCOLS; rc++) {
 
-            TYPE val = 0;
+            val = 0;
 
             for (uint16_t i = 0; i < COLS; i++) {
 

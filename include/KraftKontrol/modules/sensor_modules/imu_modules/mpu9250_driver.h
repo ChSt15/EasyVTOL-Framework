@@ -30,8 +30,7 @@
 class MPU9250Driver: public Gyroscope_Abstract, public Accelerometer_Abstract, public Module_Abstract, public Task_Abstract {
 public:
 
-    MPU9250Driver(int interruptPin, int chipSelect, SPIClass* spiBus, DataManager_NonVolatile* eeprom = nullptr): Task_Abstract("MPU9250 Driver", 32000, eTaskPriority_t::eTaskPriority_Realtime), pinInterrupt_(interruptPin, _interruptRoutine, true, false), _imu(spiBus, chipSelect) {
-        eeprom_ = eeprom;
+    MPU9250Driver(int interruptPin, int chipSelect, SPIClass* spiBus): Task_Abstract("MPU9250 Driver", 32000, eTaskPriority_t::eTaskPriority_Realtime), pinInterrupt_(interruptPin, _interruptRoutine, true, false), _imu(spiBus, chipSelect) {
         task_ = this;
     }
 
@@ -130,8 +129,6 @@ private:
     uint32_t _magCounter = 0;
 
     int64_t _lastMeasurement = 0;
-
-    DataManager_NonVolatile* eeprom_ = nullptr;
 
     static int64_t _newDataTimestamp;
     static bool _newDataInterrupt;

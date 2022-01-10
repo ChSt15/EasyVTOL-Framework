@@ -3,6 +3,10 @@
 
 Gyroscope_Abstract::Gyroscope_Abstract() {
 
+    FML::Matrix33_F axisScaleAlignMatrix_;
+    FML::Matrix33_F mountTransformMatrix_;
+    FML::Vector3_F axisBias_;
+
     axisScaleAlignMatrix_[0][0] = 1;
     axisScaleAlignMatrix_[1][1] = 1;
     axisScaleAlignMatrix_[2][2] = 1;
@@ -13,6 +17,15 @@ Gyroscope_Abstract::Gyroscope_Abstract() {
     axisBias_[1][0] = 0;
     axisBias_[2][0] = 0;
 
+    calValues_.setBias(axisBias_);
+    calValues_.setScaleAlign(axisScaleAlignMatrix_);
+    mountValues_.setMatrix(mountTransformMatrix_);
+
+    messageSubr_.addReceiverMessage(calValues_);
+    messageSubr_.addReceiverMessage(mountValues_);
+
+    messageSubr_.subscribe(Module_Abstract::getGlobalMessageTopic());
+
 }
 
 
@@ -22,45 +35,45 @@ const Topic<DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>>>& Gyros
 
 
 void Gyroscope_Abstract::setGyroCalibrationAxisScaleAlign(const FML::Matrix33_F& axisScaleAlign) {
-    axisScaleAlignMatrix_ = axisScaleAlign;
+    calValues_.setScaleAlign(axisScaleAlign);
 }
 
 
 const FML::Matrix33_F& Gyroscope_Abstract::getGyroCalibrationAxisScaleAlign() const {
-    return axisScaleAlignMatrix_;
+    return calValues_.getScaleAlign();
 }
 
 
 void Gyroscope_Abstract::setGyroCalibrationAxisBias(const FML::Vector3_F& axisBias) {
-    axisBias_ = axisBias;
+    calValues_.setBias(axisBias);
 }
 
 
 const FML::Vector3_F& Gyroscope_Abstract::getGyroCalibrationAxisBias() const {
-    return axisBias_;
+    return calValues_.getBias();
 }
 
 
 void Gyroscope_Abstract::setGyroTransform(const FML::Matrix33_F& mountTransform) {
-    mountTransformMatrix_ = mountTransform;
+    mountValues_.setMatrix(mountTransform);
 }
 
 
 const FML::Matrix33_F& Gyroscope_Abstract::getGyroTransform() const {
-    return mountTransformMatrix_;
+    return mountValues_.getMatrix();
 }
 
 
 void Gyroscope_Abstract::publishGyroData(DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>> gyroValues, bool calibrate, bool transform) {
-
+    
     if (calibrate) {
-        gyroValues.data.values = axisScaleAlignMatrix_*(gyroValues.data.values + axisBias_);
-        gyroValues.data.covariance = axisScaleAlignMatrix_*gyroValues.data.covariance;
+        gyroValues.data.values = calValues_.getScaleAlign()*(gyroValues.data.values - calValues_.getBias());
+        gyroValues.data.covariance = calValues_.getScaleAlign()*gyroValues.data.covariance;
     }
 
     if (transform) {
-        gyroValues.data.values = mountTransformMatrix_*gyroValues.data.values;
-        gyroValues.data.covariance = mountTransformMatrix_*gyroValues.data.covariance;
+        gyroValues.data.values = mountValues_.getMatrix()*gyroValues.data.values;
+        gyroValues.data.covariance = mountValues_.getMatrix()*gyroValues.data.covariance;
     }
 
     valueTopic_.publish(gyroValues);

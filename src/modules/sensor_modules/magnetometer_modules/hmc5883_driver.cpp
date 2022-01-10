@@ -2,57 +2,6 @@
 
 
 
-bool QMC5883Driver::getEEPROMData() {
-
-    if (eeprom_ == nullptr) return false;
-
-    CommandMessageMagCalValues magValues;
-
-    //Serial.println("Trying to retrieve mag calib data.");
-
-    if (!eeprom_->getMessage(magValues)) {
-
-        Serial.println("Failed to retrieve mag calib data!");
-
-        return false;
-
-    }
-
-    magMin_ = magValues.getMinValue();
-    magMax_ = magValues.getMaxValue();
-
-    //Serial.println(String("Got values. Max: ") + magMax_.toString() + ", Min: " + magMin_.toString());
-
-    return true;
-
-}
-
-
-bool QMC5883Driver::setEEPROMData() {
-
-    if (eeprom_ == nullptr) return false;
-
-    CommandMessageMagCalValues magValues(magMax_, magMin_);
-
-    if (!eeprom_->setMessage(magValues)) {
-
-        //Failed see if we can create a new message. If not then return false.
-        if (!eeprom_->newMessage(magValues)) {
-            return false;
-        }
-
-    }
-
-    /*if (!eeprom_->saveData()) {
-        Serial.println("Failed to save memory.");
-        return false;
-    }*/
-
-    return true;
-
-}
-
-
 bool QMC5883Driver::getData() {
 
     uint8_t buffer[6];
@@ -67,9 +16,8 @@ bool QMC5883Driver::getData() {
     y = static_cast<int16_t>(buffer[2]) | (static_cast<int16_t>(buffer[3])<<8);
     z = static_cast<int16_t>(buffer[4]) | (static_cast<int16_t>(buffer[5])<<8);
 
-    Vector<> mag = Vector<>(x,y,z)*8.0f/32767.0f;
 
-    if (calibrate_) {
+    /*if (calibrate_) {
 
         if (calibrationStatus_ != eMagCalibStatus_t::eMagCalibStatus_Calibrating) {
             calibrationStatus_ = eMagCalibStatus_t::eMagCalibStatus_Calibrating;
@@ -105,33 +53,21 @@ bool QMC5883Driver::getData() {
         if (NOW() - calibrationStart_ >= 60*SECONDS) stopCalibration();
 
 
-    } else {
+    } else*/ 
 
-        if (calibrationStatus_ == eMagCalibStatus_t::eMagCalibStatus_Calibrating) {
-            calibrationStatus_ = eMagCalibStatus_t::eMagCalibStatus_Calibrated;
 
-            setEEPROMData();
+    DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>> buf;
+    buf.data.values[0][0] = x*8.0f/32767.0f;
+    buf.data.values[1][0] = y*8.0f/32767.0f;
+    buf.data.values[2][0] = z*8.0f/32767.0f;
+    buf.data.covariance = FML::Matrix<float, 3, 3>::eye(0.006);
+    buf.timestamp = time;
 
-        }
-
-        mag = (mag - magMin_)/(magMax_ - magMin_)*2-1;
-
-        DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>> buf;
-        buf.data.values[0][0] = -mag.z;
-        buf.data.values[1][0] = mag.x;
-        buf.data.values[2][0] = -mag.y;
-        buf.data.covariance = FML::Matrix<float, 3, 3>::eye(1);
-        buf.timestamp = time;
-
-        //Serial.println(String("Mag: ") + mag.toString());
-
-        publishMagData(buf);
-
-    }
+    publishMagData(buf);
 
     //Serial.println(String("Min: ") + magMin_.toString() + ", Max: " + magMax_.toString());
 
-    //Serial.println(String("Mag: ") + mag.toString());
+    //Serial.println(String("Mag: x: ") + buf.data.values[0][0] + ", y: " + buf.data.values[1][0] + ", z: " + buf.data.values[2][0]);
 
     //bus_->readBytes(QMC5883Registers::QMC5883L_TEMP_LSB, buffer, 2);
 
@@ -221,11 +157,6 @@ void QMC5883Driver::init() {
     if (failed == 0) {
 
         Serial.println(String("mag start success!"));
-
-        //Check for calibration in EEPROM.
-        if (getEEPROMData()) {
-            calibrationStatus_ = eMagCalibStatus_t::eMagCalibStatus_Calibrated;
-        } else startCalibration();
 
         lastMeasurement_ = NOW();
 

@@ -5,6 +5,11 @@
 
 #include "lib/MathHelperLibrary/FML.h"
 
+#include "../../module_abstract.h"
+#include "../../../utils/topic_subscribers.h"
+#include "../../../KraftPacket_KontrolPackets/kraftkontrol_command_messages.h"
+#include "../../communication_modules/kraft_message_subscriber.h"
+
 #include "../sensordata.h"
 
 #include "KraftKontrol/utils/topic.h"
@@ -18,13 +23,10 @@ private:
     //Topic for distributing new measurements.
     Topic<DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>>> valueTopic_;
 
-    //Mag scale and align calibration matrix.
-    FML::Matrix33_F axisScaleAlignMatrix_;
-    //Mag bias calibration matrix.
-    FML::Vector3_F axisBias_;
+    CommandMessageMagCalValues calValues_;
+    CommandMessageMagMountTransform mountValues_;
 
-    //Mag scale and align calibration matrix.
-    FML::Matrix33_F mountTransformMatrix_;
+    KraftMessage_Subscriber messageSubr_;
 
 
 protected:

@@ -15,6 +15,10 @@ template<typename TYPE>
 class Subscriber_Generic;
 
 
+/**
+ * Interface class used by subscribers to receive topic data.
+ * void receive(const TYPE& item, const Topic<TYPE>* topic) function must be implemented and will be called when receiving a published item.
+ */
 template<typename TYPE> 
 class Subscriber_Interface {
 friend Topic<TYPE>;
@@ -65,7 +69,7 @@ public:
      * Publishes an item to topic, but will not receive item. Makes it simpler to broadcast items from modules.
      * @param item Item to publish
      */
-    virtual void publish(const TYPE& item) = 0;
+    virtual void publish(TYPE const& item) = 0;
 
 
 protected:

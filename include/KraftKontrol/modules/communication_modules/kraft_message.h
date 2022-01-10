@@ -250,6 +250,21 @@ public:
         return true;
     }
 
+    /**
+     * Used to store the data directly even if its an unknown data type. 
+     * @param numberBytes Exact number of raw bytes to contain.
+     * @param messageTypeID ID of message type.
+     * @param dataTypeID ID of data type.
+     * @returns true if successfull.
+     */
+    bool setMessage(const uint32_t& numberBytes, const uint32_t& dataTypeID, const uint32_t& messageTypeID) {
+        dataType_ = dataTypeID;
+        dataSize_ = numberBytes;
+        if (dataSize_ > KraftMessage::c_messageContainerArraySize_) return false;
+        messageType_ = messageTypeID;
+        return true;
+    }
+
     uint32_t getDataType() const override {return dataType_;}
 
     uint32_t getMessageType() const override {return messageType_;}

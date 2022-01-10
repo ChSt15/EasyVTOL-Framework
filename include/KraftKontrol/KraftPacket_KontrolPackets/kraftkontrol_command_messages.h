@@ -20,9 +20,13 @@ enum eMessageTypeCommand_t : uint32_t {
     eKraftMessageType_KraftKontrol_Position,
     eKraftMessageType_KraftKontrol_VehicleMode,
     eKraftMessageType_KraftKontrol_RCChannels,
-    eKraftMessageType_KraftKontrol_MagCalib,
-    eKraftMessageType_KraftKontrol_AccelCalib,
-    eKraftMessageType_KraftKontrol_ProgramStart
+    eKraftMessageType_KraftKontrol_ProgramStart,
+    eKraftMessageType_KraftKontrol_MagCalibData,
+    eKraftMessageType_KraftKontrol_AccelCalibData,
+    eKraftMessageType_KraftKontrol_GyroCalibData,
+    eKraftMessageType_KraftKontrol_MagMountTransform,
+    eKraftMessageType_KraftKontrol_AccelMountTransform,
+    eKraftMessageType_KraftKontrol_GyroMountTransform
 };
 
 
@@ -148,7 +152,7 @@ public:
 
     uint32_t getDataSize() const {return sizeof(channels_);}
 
-    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Command_ID;}
+    uint32_t getMessageType() const override {return eKraftMessageType_t::eKraftMessageType_Command_ID;}
 
     int16_t getChannel(const uint8_t &channel) {return channels_[channel];}
 
@@ -191,133 +195,94 @@ protected:
 
 
 
-class CommandMessageMagCalValues: public KraftMessage_Interface {
+class CommandMessageMagCalValues: public MessageSensorCalibration_Abstract {
 public:
 
     CommandMessageMagCalValues() {}
 
-    CommandMessageMagCalValues(const Vector<> &magMax, const Vector<> &magMin) {
-        magMin_ = magMin;
-        magMax_ = magMax;
-    }
+    CommandMessageMagCalValues(const FML::Vector3_F& bias, const FML::Matrix33_F& scaleAlign) : MessageSensorCalibration_Abstract(bias, scaleAlign) {}
 
-    uint32_t getDataType() const {return eMessageTypeCommand_t::eKraftMessageType_KraftKontrol_MagCalib;}
+    uint32_t getDataType() const {return eMessageTypeCommand_t::eKraftMessageType_KraftKontrol_MagCalibData;}
 
-    uint32_t getDataSize() const {return sizeof(magMin_) + sizeof(magMax_);}
-
-    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Command_ID;}
-
-    Vector<> getMinValue() const {return magMin_;}
-    Vector<> getMaxValue() const {return magMax_;}
-
-    void setMinMax(const Vector<> &magMax, const Vector<> &magMin) {magMin_ = magMin; magMax_ = magMax;}
-
-    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const {
-
-        if (dataByteSize < getDataSize()) return false;
-
-        startBufferWrite(dataBytes, startByte);
-        bufferWrite(&magMin_.x, sizeof(magMin_.x));
-        bufferWrite(&magMin_.y, sizeof(magMin_.y));
-        bufferWrite(&magMin_.z, sizeof(magMin_.z));
-        bufferWrite(&magMax_.x, sizeof(magMax_.x));
-        bufferWrite(&magMax_.y, sizeof(magMax_.y));
-        bufferWrite(&magMax_.z, sizeof(magMax_.z));
-        endBufferWrite();
-
-        return true;
-
-    }
-
-    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) {
-
-        if (dataByteSize < getDataSize()) return false;
-
-        startBufferRead(dataBytes, startByte);
-        bufferRead(&magMin_.x, sizeof(magMin_.x));
-        bufferRead(&magMin_.y, sizeof(magMin_.y));
-        bufferRead(&magMin_.z, sizeof(magMin_.z));
-        bufferRead(&magMax_.x, sizeof(magMax_.x));
-        bufferRead(&magMax_.y, sizeof(magMax_.y));
-        bufferRead(&magMax_.z, sizeof(magMax_.z));
-        endBufferRead();
-
-        return true;
-
-    }
-
-
-private:
-
-    Vector<> magMin_ = 90000000;
-    Vector<> magMax_ = -90000000;
+    uint32_t getMessageType() const override {return eKraftMessageType_t::eKraftMessageType_Command_ID;}
 
 };
 
 
 
-class CommandMessageAccelCalValues: public KraftMessage_Interface {
+class CommandMessageAccelCalValues: public MessageSensorCalibration_Abstract {
 public:
 
     CommandMessageAccelCalValues() {}
 
-    CommandMessageAccelCalValues(const Vector<> &accelMax, const Vector<> &accelMin) {
-        accelMin_ = accelMin;
-        accelMax_ = accelMax;
-    }
+    CommandMessageAccelCalValues(const FML::Vector3_F& bias, const FML::Matrix33_F& scaleAlign) : MessageSensorCalibration_Abstract(bias, scaleAlign) {}
 
-    uint32_t getDataType() const {return eMessageTypeCommand_t::eKraftMessageType_KraftKontrol_AccelCalib;}
+    uint32_t getDataType() const {return eMessageTypeCommand_t::eKraftMessageType_KraftKontrol_AccelCalibData;}
 
-    uint32_t getDataSize() const {return sizeof(accelMin_) + sizeof(accelMax_);}
-
-    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Command_ID;}
-
-    Vector<> getMinValue() const {return accelMin_;}
-    Vector<> getMaxValue() const {return accelMax_;}
-
-    void setMinMax(const Vector<> &magMax, const Vector<> &magMin) {accelMin_ = magMin; accelMax_ = magMax;}
-
-    bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const {
-
-        if (dataByteSize < getDataSize()) return false;
-
-        startBufferWrite(dataBytes, startByte);
-        bufferWrite(&accelMin_.x, sizeof(accelMin_.x));
-        bufferWrite(&accelMin_.y, sizeof(accelMin_.y));
-        bufferWrite(&accelMin_.z, sizeof(accelMin_.z));
-        bufferWrite(&accelMax_.x, sizeof(accelMax_.x));
-        bufferWrite(&accelMax_.y, sizeof(accelMax_.y));
-        bufferWrite(&accelMax_.z, sizeof(accelMax_.z));
-        endBufferWrite();
-
-        return true;
-
-    }
-
-    bool setRawData(const void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) {
-
-        if (dataByteSize < getDataSize()) return false;
-
-        startBufferRead(dataBytes, startByte);
-        bufferRead(&accelMin_.x, sizeof(accelMin_.x));
-        bufferRead(&accelMin_.y, sizeof(accelMin_.y));
-        bufferRead(&accelMin_.z, sizeof(accelMin_.z));
-        bufferRead(&accelMax_.x, sizeof(accelMax_.x));
-        bufferRead(&accelMax_.y, sizeof(accelMax_.y));
-        bufferRead(&accelMax_.z, sizeof(accelMax_.z));
-        endBufferRead();
-
-        return true;
-
-    }
-
-
-private:
-
-    Vector<> accelMin_ = 90000000;
-    Vector<> accelMax_ = -90000000;
+    uint32_t getMessageType() const override {return eKraftMessageType_t::eKraftMessageType_Command_ID;}
 
 };
+
+
+
+class CommandMessageGyroCalValues: public MessageSensorCalibration_Abstract {
+public:
+
+    CommandMessageGyroCalValues() {}
+
+    CommandMessageGyroCalValues(const FML::Vector3_F& bias, const FML::Matrix33_F& scaleAlign) : MessageSensorCalibration_Abstract(bias, scaleAlign) {}
+
+    uint32_t getDataType() const {return eMessageTypeCommand_t::eKraftMessageType_KraftKontrol_GyroCalibData;}
+
+    uint32_t getMessageType() const override {return eKraftMessageType_t::eKraftMessageType_Command_ID;}
+
+};
+
+
+
+class CommandMessageMagMountTransform: public MessageMatrix33_Abstract {
+public:
+
+    CommandMessageMagMountTransform() {}
+
+    CommandMessageMagMountTransform(const FML::Matrix33_F& matrix) : MessageMatrix33_Abstract(matrix) {}
+
+    uint32_t getDataType() const {return eMessageTypeCommand_t::eKraftMessageType_KraftKontrol_MagMountTransform;}
+
+    uint32_t getMessageType() const override {return eKraftMessageType_t::eKraftMessageType_Command_ID;}
+
+};
+
+
+
+class CommandMessageAccelMountTransform: public MessageMatrix33_Abstract {
+public:
+
+    CommandMessageAccelMountTransform() {}
+
+    CommandMessageAccelMountTransform(const FML::Matrix33_F& matrix) : MessageMatrix33_Abstract(matrix) {}
+
+    uint32_t getDataType() const {return eMessageTypeCommand_t::eKraftMessageType_KraftKontrol_AccelMountTransform;}
+
+    uint32_t getMessageType() const override {return eKraftMessageType_t::eKraftMessageType_Command_ID;}
+
+};
+
+
+
+class CommandMessageGyroMountTransform: public MessageMatrix33_Abstract {
+public:
+
+    CommandMessageGyroMountTransform() {}
+
+    CommandMessageGyroMountTransform(const FML::Matrix33_F& matrix) : MessageMatrix33_Abstract(matrix) {}
+
+    uint32_t getDataType() const {return eMessageTypeCommand_t::eKraftMessageType_KraftKontrol_GyroMountTransform;}
+
+    uint32_t getMessageType() const override {return eKraftMessageType_t::eKraftMessageType_Command_ID;}
+
+};
+
 
 
 

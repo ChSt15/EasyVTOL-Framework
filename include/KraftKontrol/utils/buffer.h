@@ -48,7 +48,7 @@ public:
      * @param overwrite Overwrites elements at back if true. Default false.
      * @return true if placed into buffer.
      */
-    inline bool placeFront(const T &element, const bool overwrite = false);
+    inline bool placeFront(const T &element, bool overwrite = false);
 
     /**
      * Places a new element to the front of the buffer.
@@ -57,7 +57,7 @@ public:
      * @param overwrite Overwrites elements at back if true. Default false.
      * @return true if placed into buffer.
      */
-    inline bool placeFront(const T &&element, const bool overwrite = false);
+    inline bool placeFront(const T &&element, bool overwrite = false);
 
     /**
      * Places a new element to the back of the buffer.
@@ -66,7 +66,7 @@ public:
      * @param overwrite Overwrites elements at front if true. Default false.
      * @return true if placed into buffer.
      */
-    inline bool placeBack(const T &element, const bool overwrite = false);
+    inline bool placeBack(const T &element, bool overwrite = false);
 
     /**
      * Places a new element to the back of the buffer.
@@ -75,7 +75,7 @@ public:
      * @param overwrite Overwrites elements at front if true. Default false.
      * @return true if placed into buffer.
      */
-    inline bool placeBack(const T &&element, const bool overwrite = false);
+    inline bool placeBack(const T &&element, bool overwrite = false);
 
     /**
      * Takes a element from the front of the buffer and places it into element.
@@ -237,7 +237,7 @@ private:
 template<typename T, uint32_t size_> 
 inline T Buffer<T, size_>::getStandardError() const {
     if (numElements_ < 2) return T();
-    return getStandardDeviation()/sqrtf(numElements_);
+    return getStandardDeviation()/sqrt(numElements_);
 }
 
 
@@ -258,7 +258,7 @@ inline T Buffer<T, size_>::getStandardDeviation() const {
 
     }
 
-    standardDev = sqrtf(standardDev/(numElements_-1));
+    standardDev = sqrt(standardDev/(numElements_-1));
 
     return standardDev;
     
@@ -562,7 +562,7 @@ inline void Buffer<T, size_>::removeBack() {
 
 
 template<typename T, uint32_t size_> 
-inline bool Buffer<T, size_>::placeFront(const T &element, const bool overwrite) {
+inline bool Buffer<T, size_>::placeFront(const T &element, bool overwrite) {
 
     if (numElements_ == size_) {
 
@@ -582,7 +582,7 @@ inline bool Buffer<T, size_>::placeFront(const T &element, const bool overwrite)
 
 
 template<typename T, uint32_t size_> 
-inline bool Buffer<T, size_>::placeFront(const T &&element, const bool overwrite) {
+inline bool Buffer<T, size_>::placeFront(const T &&element, bool overwrite) {
 
     if (numElements_ == size_) {
 
@@ -602,7 +602,7 @@ inline bool Buffer<T, size_>::placeFront(const T &&element, const bool overwrite
 
 
 template<typename T, uint32_t size_> 
-inline bool Buffer<T, size_>::placeBack(const T &element, const bool overwrite) {
+inline bool Buffer<T, size_>::placeBack(const T &element, bool overwrite) {
 
     if (numElements_ == size_) {
 
@@ -624,7 +624,7 @@ inline bool Buffer<T, size_>::placeBack(const T &element, const bool overwrite) 
 
 
 template<typename T, uint32_t size_> 
-inline bool Buffer<T, size_>::placeBack(const T &&element, const bool overwrite) {
+inline bool Buffer<T, size_>::placeBack(const T &&element, bool overwrite) {
 
     if (numElements_ == size_) {
 

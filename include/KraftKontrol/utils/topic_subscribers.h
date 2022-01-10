@@ -19,7 +19,8 @@
 
 
 /**
- * Subscribes to topic(s). USed by other subscribers to implement core functions.
+ * Subscribes to topic(s). Used by other subscribers to implement core functions.
+ * void receive(TYPE const& item, const Topic<TYPE>* topic) function must be implemented and will be called when receiving a published item.
  */
 template<typename TYPE> 
 class Subscriber_Generic: public Subscriber_Interface<TYPE> {
@@ -53,7 +54,7 @@ public:
     }
 
     /**
-     * Subscribes to given topic. Will remove old subscription.
+     * Subscribes to given topic. Will not remove old subscriptions.
      * @param topic Topic to subscribe to.
      */
     void subscribe(const Topic<TYPE>& topic) override {
@@ -66,7 +67,7 @@ public:
      * Publishes an item to topic, but will not receive item. Makes it simpler to broadcast items from modules.
      * @param item Item to publish
      */
-    void publish(const TYPE& item) {
+    void publish(TYPE const& item) {
         for (uint32_t i = 0; i < subscribedTopics_.getNumItems(); i++) subscribedTopics_[i]->publish(item, this);
     }
 
@@ -94,7 +95,7 @@ private:
 
     Task_Abstract* taskToResume_ = nullptr;
 
-    void receive(const TYPE& item, const Topic<TYPE>* topic) override {
+    void receive(TYPE const& item, const Topic<TYPE>* topic) override {
         receivedItem = item;
         itemIsNew = true;
         if (taskToResume_ != nullptr) taskToResume_->startTaskThreading();
@@ -183,7 +184,7 @@ public:
 
 private:
 
-    void receive(const TYPE& item, const Topic<TYPE>* topic) override {
+    void receive(TYPE const& item, const Topic<TYPE>* topic) override {
         this->placeFront(item, overwrite_);
         if (taskToResume_ != nullptr) taskToResume_->startTaskThreading();
     }
@@ -266,7 +267,7 @@ public:
 
 private:
 
-    void receive(const TYPE& item, const Topic<TYPE>* topic) override {
+    void receive(TYPE const& item, const Topic<TYPE>* topic) override {
         if (callbackFunc_ != nullptr && object_ != nullptr) (object_->*callbackFunc_)(item);
         if (taskToResume_ != nullptr) taskToResume_->startTaskThreading();
     }
@@ -316,7 +317,7 @@ public:
 
 private:
 
-    void receive(const TYPE& item, const Topic<TYPE>* topic) override {
+    void receive(TYPE const& item, const Topic<TYPE>* topic) override {
         if (callbackFunc_ != nullptr) callbackFunc_(item);
         if (taskToResume_ != nullptr) taskToResume_->startTaskThreading();
     }

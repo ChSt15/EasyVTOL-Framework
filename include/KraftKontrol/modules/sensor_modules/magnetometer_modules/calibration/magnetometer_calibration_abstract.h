@@ -3,7 +3,7 @@
 
 
 
-#include "lib/MathHelperLibrary/MHL.h"
+#include "lib/MathHelperLibrary/FML.h"
 
 
 
@@ -17,10 +17,10 @@ class MagnetometerCalibration_Abstract {
 protected:
 
     //Magnetometer hard iron effects.
-    MHL::Vector3_F hardIron_; 
+    FML::Vector3_F hardIron_; 
 
     //Magnetometer soft iron effects.
-    MHL::Matrix33_F softIron_;
+    FML::Matrix33_F softIron_;
 
     //Set to true to signal calibration good.
     bool calibrationGood_ = false;
@@ -37,7 +37,7 @@ protected:
      * Gives calibration method a new value.
      * @param rawValue Raw magnetometer value.
      */
-    virtual void newValue(const MHL::Vector3_F& rawValue) = 0;
+    virtual void newValue(const FML::Vector3_F& rawValue) = 0;
 
 
 public:
@@ -59,13 +59,13 @@ public:
      * Should return 0 vector if no calibration values available.
      * @returns magnetometer hard iron bias vector.
      */
-    const MHL::Vector3_F& getHardIronEffect();
+    const FML::Vector3_F& getHardIronEffect();
 
     /**
      * Sets the hard iron effects of the magnetometer. 
      * @param hardIronEffect Magnetometer hard iron effects after soft iron.
      */
-    void setHardIronEffect(const MHL::Vector3_F& hardIronEffect);
+    void setHardIronEffect(const FML::Vector3_F& hardIronEffect);
 
     /**
      * Gets the soft iron effects of the magnetometer. 
@@ -73,19 +73,19 @@ public:
      * Should return identity (Diagonal matrix with 1s) matrix if no calibration values available. 
      * @returns magnetometer soft iron bias matrix.
      */
-    const MHL::Matrix33_F& getSoftIronEffect();
+    const FML::Matrix33_F& getSoftIronEffect();
 
     /**
      * sets the soft iron effects of the magnetometer. 
      * @param softIronEffect Magnetometer soft iron effects before hard iron effects.
      */
-    void setSoftIronEffect(const MHL::Matrix33_F& softIronEffect);
+    void setSoftIronEffect(const FML::Matrix33_F& softIronEffect);
 
     /**
      * Calibrates given value if calibration finished.
      * @param value Raw magnetometer value to be calibrated.
      */
-    void calibrateValue(MHL::Vector3_F &value);
+    void calibrateValue(FML::Vector3_F &value);
 
     
 };

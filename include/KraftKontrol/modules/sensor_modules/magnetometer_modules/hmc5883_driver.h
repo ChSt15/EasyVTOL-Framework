@@ -54,7 +54,7 @@ enum eMagCalibStatus_t { //Needed for old code. Should be removed along with cal
 };
 
 
-class QMC5883Driver: public Magnetometer_Abstract, public Module_Abstract, public Task_Abstract {
+class QMC5883Driver: public Magnetometer_Abstract, public Task_Abstract, public Module_Abstract {
 public:
 
     /**
@@ -64,8 +64,7 @@ public:
      * @param selector For I2C this is the address. For SPI this is the chip select pin.
      * @param eeprom Reference to EEPROM module to use for calibration values.
      */
-    QMC5883Driver(BusDevice_HAL_Abstract& bus, uint32_t selector, DataManager_NonVolatile* eeprom = nullptr) : Task_Abstract("QMC5883 Driver", 50, eTaskPriority_t::eTaskPriority_Middle) {
-        eeprom_ = eeprom;
+    QMC5883Driver(BusDevice_HAL_Abstract& bus, uint32_t selector) : Task_Abstract("QMC5883 Driver", 100, eTaskPriority_t::eTaskPriority_VeryHigh) {
         bus_ = &bus;
     }
     
@@ -85,21 +84,6 @@ public:
      */
     void init();
 
-    /**
-     * @returns current calibration status
-     */
-    eMagCalibStatus_t getCalibrationStatus() {return calibrationStatus_;}
-
-    /**
-     * Starts calibration sequence.
-     */
-    void startCalibration() {calibrate_ = true; calibrationStart_ = NOW();}
-
-    /**
-     * Stops calibration sequence.
-     */
-    void stopCalibration() {calibrate_ = false;}
-
 
 private:
 
@@ -107,26 +91,13 @@ private:
 
     bool dataAvailable();
 
-    bool getEEPROMData();
-    bool setEEPROMData();
-
     Vector<> _lastMag;
-
-    DataManager_NonVolatile* eeprom_ = nullptr;
 
     BusDevice_HAL_Abstract *bus_;
 
     uint8_t _startAttempts = 0;
 
     int64_t lastMeasurement_ = 0;
-
-    Vector<> magMin_ = -1;
-    Vector<> magMax_ = 1;
-
-    bool calibrate_ = false;
-    int64_t calibrationStart_ = 0;
-
-    eMagCalibStatus_t calibrationStatus_ = eMagCalibStatus_t::eMagCalibStatus_NotCalibrated;
 
     
 };

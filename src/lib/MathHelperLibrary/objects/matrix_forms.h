@@ -20,6 +20,8 @@ public:
 
     Matrix33() {}
 
+    Matrix33(const TYPE& val): Matrix<TYPE, 3, 3>(val) {}
+
     Matrix33(const Matrix<TYPE, 3, 3>& matrix): Matrix<TYPE, 3, 3>(matrix) {}
     
 

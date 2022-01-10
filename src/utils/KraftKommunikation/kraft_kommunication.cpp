@@ -134,13 +134,6 @@ void KraftKommunication::kraftMessageBroadcastCallback(const KraftMessage_Interf
 void KraftKommunication::thread() {
 
     //Check node status and if a packet needs to be sent.
-    for (uint32_t i = 0; i < c_maxNumberNodes; i++) {
-        if (nodeData_[i].online && NOW() - nodeData_[i].lastPacketTimestamp > (int64_t)SECONDS*3/c_heartbeatRate) {
-            nodeData_[i].online = false;
-            //KraftMessageEmulator message = DataMessageNodeStatus(false, i);
-            globalMessages().publish(DataMessageNodeStatus(false, i));
-        }
-    }
     if (heartbeatTimer_.isTimeToRun()) {
 
         KraftMessageHeartbeat message;
@@ -285,6 +278,15 @@ void KraftKommunication::thread() {
 
         }
 
+    }
+
+
+    for (uint32_t i = 0; i < c_maxNumberNodes; i++) {
+        if (nodeData_[i].online && NOW() - nodeData_[i].lastPacketTimestamp > (int64_t)SECONDS*5/c_heartbeatRate) {
+            nodeData_[i].online = false;
+            //KraftMessageEmulator message = DataMessageNodeStatus(false, i);
+            globalMessages().publish(DataMessageNodeStatus(false, i));
+        }
     }
     
 

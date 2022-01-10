@@ -8,148 +8,41 @@ Task_Abstract* MPU9250Driver::task_ = nullptr;
 
 
 
-bool MPU9250Driver::getEEPROMData() {
-
-    if (eeprom_ == nullptr) return false;
-
-    CommandMessageAccelCalValues accelValues;
-
-    //Serial.println("Trying to retrieve accel calib data.");
-
-    if (!eeprom_->getMessage(accelValues)) {
-
-        //Serial.println("Failed to retreive!");
-
-        return false;
-
-    }
-
-    accelMin_ = accelValues.getMinValue();
-    accelMax_ = accelValues.getMaxValue();
-
-    //Serial.println(String("Got values. Max: ") + accelMax_.toString() + ", Min: " + accelMin_.toString());
-
-    return true;
-
-}
-
-
-/*bool MPU9250Driver::setEEPROMData() {
-
-    if (eeprom_ == nullptr) return false;
-
-    CommandMessageAccelCalValues accelValues(accelMax_, accelMin_);
-
-    if (!eeprom_->setMessage(accelValues)) {
-
-        //Failed see if we can create a new message. If not then return false.
-        if (!eeprom_->newMessage(accelValues)) {
-            return false;
-        }
-
-    }
-
-    return true;
-
-}*/
-
-
 void MPU9250Driver::_getData() {
 
     _imu.Read();
 
-    DataTimestamped<Vector<>> gyroVec(Vector<>(-_imu.gyro_x_radps(), _imu.gyro_y_radps(), -_imu.gyro_z_radps()), _newDataTimestamp);
+    DataTimestamped<Vector<>> gyroVec(Vector<>(_imu.gyro_x_radps(), _imu.gyro_y_radps(), _imu.gyro_z_radps()), _newDataTimestamp);
     if (_lastGyro != gyroVec.data || true) {
-        //Serial.println(String("Gyro: x:") + bufVec.x + ", y:" + bufVec.y + ", z:" + bufVec.z + ", Rate:" + _gyroRate);
+        
         DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>> buf;
         buf.data.values[0][0] = gyroVec.data.x;
         buf.data.values[1][0] = gyroVec.data.y;
         buf.data.values[2][0] = gyroVec.data.z;
-        buf.data.covariance = FML::Matrix<float, 3, 3>::eye(1);
+        buf.data.covariance = FML::Matrix<float, 3, 3>::eye(0.002);
         buf.timestamp = gyroVec.timestamp;
         publishGyroData(buf);
         _lastGyro = gyroVec.data;
         _gyroCounter++;
+
     }
 
-    DataTimestamped<Vector<>> accelVec = DataTimestamped<Vector<>>(Vector<>(-_imu.accel_x_mps2(), _imu.accel_y_mps2(), -_imu.accel_z_mps2()), _newDataTimestamp);
+    DataTimestamped<Vector<>> accelVec = DataTimestamped<Vector<>>(Vector<>(_imu.accel_x_mps2(), _imu.accel_y_mps2(), _imu.accel_z_mps2()), _newDataTimestamp);
     //Serial.println(String("Dtime: ") + uint32_t(NOW()-_newDataTimestamp) + ", gyro: " + gyroVec.data.toString() + ", accel: " + accelVec.data.toString());
     //Serial.println(String() + "x:" + gyroVec.data.x + " y:" + gyroVec.data.y + " z: " + gyroVec.data.z);
     if (_lastAccel != accelVec.data || true) {
-
-        /*if (calibrate_) {
-
-            Serial.println(bufVec.data.toString());
-
-            switch (accelCalibState_)
-            {
-            case 0:
-                calibBuf_.placeFront(bufVec.data.x, true);
-                if (NOW() - accelCalibStateTime_ >= 10*SECONDS) {
-                    accelCalibState_ = 1;
-                    accelCalibStateTime_ = NOW();
-                    accelMax_.x = calibBuf_.getMedian();
-                }
-                break;
-
-            case 1:
-                calibBuf_.placeFront(bufVec.data.x, true);
-                if (NOW() - accelCalibStateTime_ >= 10*SECONDS) {
-                    accelCalibState_ = 1;
-                    accelCalibStateTime_ = NOW();
-                }
-                break;
-
-            case 2:
-                calibBuf_.placeFront(bufVec.data.x, true);
-                if (NOW() - accelCalibStateTime_ >= 10*SECONDS) {
-                    accelCalibState_ = 1;
-                    accelCalibStateTime_ = NOW();
-                }
-                break;
-
-            case 3:
-                calibBuf_.placeFront(bufVec.data.x, true);
-                if (NOW() - accelCalibStateTime_ >= 10*SECONDS) {
-                    accelCalibState_ = 1;
-                    accelCalibStateTime_ = NOW();
-                }
-                break;
-
-            case 4:
-                calibBuf_.placeFront(bufVec.data.x, true);
-                if (NOW() - accelCalibStateTime_ >= 10*SECONDS) {
-                    accelCalibState_ = 1;
-                    accelCalibStateTime_ = NOW();
-                }
-                break;
-
-            case 5:
-                calibBuf_.placeFront(bufVec.data.x, true);
-                if (NOW() - accelCalibStateTime_ >= 10*SECONDS) {
-                    accelCalibState_ = 1;
-                    accelCalibStateTime_ = NOW();
-                }
-                break;
-            
-            default:
-                break;
-            }
-
-        }*/
-
-        accelVec.data = ((accelVec.data - accelMin_)/(accelMax_ - accelMin_)*2-1)*GRAVITY_MAGNITUDE;
 
         DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>> buf;
         buf.data.values[0][0] = accelVec.data.x;
         buf.data.values[1][0] = accelVec.data.y;
         buf.data.values[2][0] = accelVec.data.z;
-        buf.data.covariance = FML::Matrix<float, 3, 3>::eye(0.02);
+        buf.data.covariance = FML::Matrix<float, 3, 3>::eye(0.03);
         buf.timestamp = accelVec.timestamp;
 
         publishAccelData(buf);
         _lastAccel = accelVec.data;
         _accelCounter++;
+        
     }
 
 }
@@ -238,11 +131,6 @@ void MPU9250Driver::init() {
         _imu.ConfigDlpf(Mpu9250::DlpfBandwidth::DLPF_BANDWIDTH_184HZ);
 
         _lastMeasurement = NOW();
-
-        //Check for calibration in EEPROM.
-        if (getEEPROMData()) {
-            //calibrationStatus_ = eMagCalibStatus_t::eMagCalibStatus_Calibrated;
-        }// else startCalibration();
 
         pinInterrupt_.setEnable(true);
         

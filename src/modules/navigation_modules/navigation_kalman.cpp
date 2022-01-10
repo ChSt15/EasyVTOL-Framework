@@ -44,7 +44,7 @@ void NavigationKalman::thread() {
             magRaw.data.x = magSub_.getItem().data.values[0][0];
             magRaw.data.y = magSub_.getItem().data.values[1][0];
             magRaw.data.z = magSub_.getItem().data.values[2][0];
-            magRaw.timestamp = gyroSub_.getItem().timestamp;
+            magRaw.timestamp = magSub_.getItem().timestamp;
             if (magRaw.timestamp < smallestTime) smallestTime = magRaw.timestamp;
             newData = true;
         }
@@ -85,13 +85,7 @@ void NavigationKalman::thread() {
             //Get delta time from last gyro data
             float dTime = float(angularRateRaw.timestamp - lastGyroTimestamp_)/SECONDS;
 
-            if ((lastAngularRateValue_ - angularRateRaw.data).magnitude() > 3) {
-
-                //Serial.println(String("Difference of: ") + (lastAngularRateValue_ - angularRateRaw.data).magnitude() + ", old value: " + "x:" + lastAngularRateValue_.x + " y:" + lastAngularRateValue_.y + " z: " + lastAngularRateValue_.z + ", new value " + "x:" + angularRateRaw.data.x + " y:" + angularRateRaw.data.y + " z: " + angularRateRaw.data.z + ", dtime: " + uint32_t(dTime*1000000));
-
-                //while(1);
-
-            }
+            //Serial.println(String("Gyro: ") + angularRateRaw.data.x + ", y: " + angularRateRaw.data.y + ", z: " + angularRateRaw.data.z);
 
             //Update filters
             float beta = 1.0/(abs(angularRateRaw.data.magnitude() - GRAVITY_MAGNITUDE)+1); 
@@ -157,7 +151,7 @@ void NavigationKalman::thread() {
             //Serial.println(String("Val: ") + String(accelRaw.data.x, 4) + ", " + String(accelRaw.data.y, 4) + ", " + String(accelRaw.data.z, 4));
 
             //Remove accel bias.
-            accelRaw.data -= accelBias.getValue();
+            //accelRaw.data -= accelBias.getValue();
 
             //Find out accel covariance and value in world coordinates
             //accelRaw.data = statePrediction.data.attitude.rotateVector(accelRaw.data);
@@ -172,7 +166,7 @@ void NavigationKalman::thread() {
             }
             accelCov = sqrt(accelCov/accelCovBuf_.available());*/
 
-            Vector<> accelCov = Vector<>(0.02);
+            Vector<> accelCov = Vector<>(0.03);
 
             //Serial.println(String("Accel: ") + accelCov.x + ", " + accelCov.y + ", " + accelCov.z);
 
@@ -197,7 +191,7 @@ void NavigationKalman::thread() {
 
             //Rotate to world coordinate system.
             accelRaw.data = statePrediction.data.attitude.rotateVector(accelRaw.data);
-            accelCov = statePrediction.data.attitude.rotateVector(accelCov);
+            //accelCov = statePrediction.data.attitude.rotateVector(accelCov);
 
             //Run kalman filter correction stuff 
             //Vector<> accelGain = statePrediction.data.accelerationError/(statePrediction.data.accelerationError + accelCov);
@@ -206,13 +200,17 @@ void NavigationKalman::thread() {
             statePrediction.data.linearAcceleration = statePrediction.data.acceleration + GRAVITY_VECTOR;
 
 
-            float freq = 1.0f/(abs(accelRaw.data.magnitude() - GRAVITY_MAGNITUDE)+1);
+            /*float freq = 1.0f/(abs(accelRaw.data.magnitude() - GRAVITY_MAGNITUDE)+1);
             freq *= freq;
-            accelBias.setParameters(0.03);
+            accelBias.setParameters(0.03*freq);
             accelBias.update(statePrediction.data.attitude.rotateVector(statePrediction.data.linearAcceleration));
+
+            Serial.println(String("Bias: x: ") + accelBias.getValue().x +  ", y: " + accelBias.getValue().y +  ", z: " + accelBias.getValue().z);*/
             
             //Calculate new state errors
-            statePrediction.data.accelerationError = accelCov;//(Vector<>(1)-accelGain)*statePrediction.data.accelerationError;
+            statePrediction.data.accelerationError = Vector<>(0.03);//(Vector<>(1)-accelGain)*statePrediction.data.accelerationError;
+
+            //Serial.println(String("Cov: x: ") + abs(accelCov.x) + ", y: " + abs(accelCov.y) + ", z: " + abs(accelCov.z));
 
             //Update absolute position.
             statePrediction.data.absolutePosition.height = statePrediction.data.position.z + statePrediction.data.homePosition.height;
@@ -238,6 +236,8 @@ void NavigationKalman::thread() {
             //Get delta time from last gyro data
             float dTime = float(magRaw.timestamp - lastMagTimestamp_)/SECONDS;
 
+            //Serial.println(String("Mag: ") + magRaw.data.x + ", " + magRaw.data.y + ", " + magRaw.data.z);
+
             //Find out mag covariance and value in world coordinates
             magRaw.data = statePrediction.data.attitude.rotateVector(magRaw.data);
             //Vector<> magCov = (magRaw.data-statePrediction.data.attitude.rotateVector(Vector<>(1,0,0))).square();
@@ -248,8 +248,6 @@ void NavigationKalman::thread() {
                 accelCov += accelCovBuf_[i];
             }
             accelCov = sqrt(accelCov/accelCovBuf_.available());*/
-
-            //Serial.println(String("Accel: ") + accelCov.x + ", " + accelCov.y + ", " + accelCov.z);
 
             float gamma = 0.1;
 
@@ -335,17 +333,20 @@ void NavigationKalman::thread() {
             //static LowPassFilter<float> hLPF = 0.05;
 
             //Serial.println(String("H: ") + hLPF.update(heightAbsolute-statePrediction.data.homePosition.height) + " V: " + velLPF.update(zVelocity));
-            //Serial.println(String("H: ") + (heightAbsolute-statePrediction.data.homePosition.height) + ", time: " + uint32_t(NOW()/MILLISECONDS) + ", data: " + uint32_t(baroRaw.timestamp/MILLISECONDS));// + " V: " + zVelocity);
 
 
             //Run kalman filter correction stuff 
-            float heightGain = statePrediction.data.positionError.z/(statePrediction.data.positionError.z + baroCov);
+            float heightGain = statePrediction.data.positionError.z*100/(statePrediction.data.positionError.z*100 + baroCov*100);
             statePrediction.data.absolutePosition.height = statePrediction.data.absolutePosition.height + heightGain*(heightAbsolute - statePrediction.data.absolutePosition.height);
+
+            //float posError = statePrediction.data.positionError.z;
             
             //Calculate new state errors
             statePrediction.data.positionError.z = (1.0f-heightGain)*statePrediction.data.positionError.z;
 
-            float zVelGain = statePrediction.data.velocityError.z/(statePrediction.data.velocityError.z + zVelCov);
+            //Serial.println(String("H: ") + (heightAbsolute-statePrediction.data.homePosition.height) + " V: " + zVelocity + ", G: " + heightGain + ", PE: " + posError + ", NPE: " + statePrediction.data.positionError.z + ", PES: " + statePrediction.data.absolutePosition.height + ", time: " + int32_t(NOW()/SECONDS));
+
+            float zVelGain = statePrediction.data.velocityError.z*100/(statePrediction.data.velocityError.z*100 + zVelCov*100);
             statePrediction.data.velocity.z = statePrediction.data.velocity.z + zVelGain*(zVelocity - statePrediction.data.velocity.z);
             
             //Calculate new state errors
@@ -388,7 +389,7 @@ void NavigationKalman::thread() {
 
 
                 //Run kalman filter correction stuff for pos
-                Vector<> posGain = statePrediction.data.positionError/(statePrediction.data.positionError + gnssRaw.data.positionError);
+                Vector<> posGain = 1;// statePrediction.data.positionError/(statePrediction.data.positionError + gnssRaw.data.positionError);
                 statePrediction.data.position.x = statePrediction.data.position.x + posGain.x*(positionBuf.x - statePrediction.data.position.x);
                 statePrediction.data.position.y = statePrediction.data.position.y + posGain.y*(positionBuf.y - statePrediction.data.position.y);
 
@@ -399,7 +400,7 @@ void NavigationKalman::thread() {
 
 
                 //Run kalman filter correction stuff for vel
-                Vector<> velGain = statePrediction.data.velocityError/(statePrediction.data.velocityError + gnssRaw.data.velocityError);
+                Vector<> velGain = 1;// statePrediction.data.velocityError/(statePrediction.data.velocityError + gnssRaw.data.velocityError);
                 statePrediction.data.velocity.x = statePrediction.data.velocity.x + posGain.x*(gnssRaw.data.velocity.x - statePrediction.data.velocity.x);
                 statePrediction.data.velocity.y = statePrediction.data.velocity.y + posGain.y*(gnssRaw.data.velocity.y - statePrediction.data.velocity.y);
 
@@ -424,6 +425,8 @@ void NavigationKalman::thread() {
         }
 
         //Serial.println(String("Time: ") + micros() + ", smallest: " + uint32_t(smallestTime));
+
+        //Serial.println(String("a: ") + statePrediction.data.accelerationError.z + ", v: " + statePrediction.data.velocityError.z + ", p: "  + statePrediction.data.positionError.z);
 
         //Update for next iteration
         statePrediction.timestamp = smallestTime;

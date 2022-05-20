@@ -9,7 +9,7 @@
 #include "KraftKontrol/modules/communication_modules/kraft_link.h"
 #include "lib/SX12XX-LoRa-master/src/SX128XLT.h"
 
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 
 #include "KraftKontrol/modules/module_abstract.h"
 
@@ -21,7 +21,7 @@
 #define SX1280_BANDWIDTH        LORA_BW_1600
 #define SX1280_CODINGRATE       LORA_CR_4_6
 
-//Keep at 10mW to stay legal. 100mW is allowed in europe only if spread spectrum is implemented. (It currently isnt so dont)
+//Keep at 10mW.
 #define SX1280_POWER_dB         10       
 
 //This id the size of the buffer used to store data that was recieved and to be sent.
@@ -34,10 +34,10 @@
 
 
 
-class SX1280Driver: public KraftLink_Abstract, public Module_Abstract, public Task_Abstract {
+class SX1280Driver: public KraftLink_Abstract, public Module_Abstract, public Task_Threading {
 public:
 
-    SX1280Driver(int busyPin, int txenPin, int rxenPin, int dio1Pin, int nResetPin, int nssPin/*, SPIClass* spiBus*/) : Task_Abstract("SX1280 Driver", 1000, eTaskPriority_t::eTaskPriority_Middle) {
+    SX1280Driver(int busyPin, int txenPin, int rxenPin, int dio1Pin, int nResetPin, int nssPin, float threadRate = 1000) : Task_Threading("SX1280 Driver", eTaskPriority_t::eTaskPriority_Middle, SECONDS/threadRate) {
         nssPin_ = nssPin;
         busyPin_ = busyPin;
         txenPin_ = txenPin;
@@ -83,6 +83,24 @@ public:
      */
     int8_t getRSSI() {return receivedDataRSSI_;}
 
+    /**
+     * @brief Changes the internal LoRa parameters
+     * 
+     */
+    void setLoRaParams(uint32_t frequency, uint8_t spreadFactor, uint8_t bandwidth, uint8_t codingRate, bool highSensitivity);
+
+    /**
+     * @brief Starts receiving packets. Will draw power.
+     * 
+     */
+    void startReceiving();
+
+    /**
+     * @brief Stops receiving packets. Energy saving.
+     * 
+     */
+    void stopReceiving();
+
 
 private:
 
@@ -113,6 +131,8 @@ private:
     SX128XLT radio_;      
 
     uint8_t startAttempts_ = 0;
+
+    bool isReceivingEnabled_ = false;
 
     
 };

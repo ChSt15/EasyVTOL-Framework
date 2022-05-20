@@ -31,9 +31,6 @@ void UbloxSerialGNSS::_getData() {
 
     int64_t tow = gnss_.getTimeOfWeek()*MILLISECONDS;
 
-    positionCounter_++;
-    velocityCounter_++;
-
     if (numSats_ >= minNumSats_ && positionDeviation_ < 100 && altitudeDeviation_ < 100) {
         lockValid_ = true;
     } else {
@@ -96,16 +93,8 @@ void UbloxSerialGNSS::thread() {
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
 
-        stopTaskThreading();
+        suspendUntil(END_OF_TIME);
 
-    }
-
-
-    uint32_t dTime = 0;
-    if (rateCalcInterval_.isTimeToRun(dTime)) {
-        velocityRate_ = velocityCounter_;
-        positionRate_ = positionCounter_;
-        positionCounter_ = velocityCounter_ = 0;
     }
 
 }

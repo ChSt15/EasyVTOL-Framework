@@ -8,7 +8,7 @@
 
 #include "KraftKontrol/modules/sensor_modules/gnss_modules/gnss_abstract.h"
 
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 
 #include "KraftKontrol/modules/module_abstract.h"
 
@@ -17,14 +17,14 @@
 
 
 
-class UbloxSerialGNSS: public GNSS_Abstract, public Module_Abstract, public Task_Abstract  {
+class UbloxSerialGNSS: public GNSS_Abstract, public Module_Abstract, public Task_Threading  {
 public:
 
     /**
      * @param serialPort Pointer to serial port to use. If non default pins used then setup before init run.
      * @param usbPassthrough If true then gps wont be setup and serial data will be passed to USB serial.
      */
-    UbloxSerialGNSS(HardwareSerial& serialPort, int rxPin = -1, int txPin = -1) : Task_Abstract("Ublox GNSS Serial Driver", 400, eTaskPriority_t::eTaskPriority_High) {
+    UbloxSerialGNSS(HardwareSerial& serialPort, int rxPin = -1, int txPin = -1) : Task_Threading("Ublox GNSS Serial Driver", eTaskPriority_t::eTaskPriority_High, SECONDS/400) {
         serialPort_ = &serialPort;
         rxPin_ = rxPin;
         txPin_ = txPin;
@@ -48,13 +48,6 @@ public:
     void init();
 
     /**
-     * Returns rate (in Hz) of new sensor data
-     *
-     * @return uint32_t.
-     */
-    uint32_t positionRate() {return positionRate_;}
-
-    /**
      * @returns the Position accuracy. If unsupported or altitude not available will return -1;
      */
     float getPositionAccuracy() {return positionDeviation_;}
@@ -63,13 +56,6 @@ public:
      * @returns the altitude accuracy. If unsupported or altitude not available will return -1;
      */
     float getAltitudeAccuracy() {return altitudeDeviation_;}
-
-    /**
-     * Returns rate (in Hz) of new sensor data
-     *
-     * @return uint32_t.
-     */
-    uint32_t velocityRate()  {return positionRate_;}
 
     /**
      * @returns the number of satellites used.
@@ -105,7 +91,6 @@ private:
 
     bool lockValid_ = false;
 
-    IntervalControl rateCalcInterval_ = IntervalControl(1); 
     int64_t lastMeasurement_ = 0;
 
     HardwareSerial* serialPort_;
@@ -115,12 +100,6 @@ private:
     SFE_UBLOX_GNSS gnss_;
 
     uint8_t _startAttempts = 0;
-
-    uint32_t positionRate_ = 0;
-    uint32_t positionCounter_ = 0;
-
-    uint32_t velocityRate_ = 0;
-    uint32_t velocityCounter_ = 0;
 
     
 };

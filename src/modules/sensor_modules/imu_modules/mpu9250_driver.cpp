@@ -4,7 +4,7 @@
 
 int64_t MPU9250Driver::_newDataTimestamp = 0;
 bool MPU9250Driver::_newDataInterrupt = false;
-Task_Abstract* MPU9250Driver::task_ = nullptr;
+Task_Threading* MPU9250Driver::task_ = nullptr;
 
 
 
@@ -23,7 +23,6 @@ void MPU9250Driver::_getData() {
         buf.timestamp = gyroVec.timestamp;
         publishGyroData(buf);
         _lastGyro = gyroVec.data;
-        _gyroCounter++;
 
     }
 
@@ -41,7 +40,6 @@ void MPU9250Driver::_getData() {
 
         publishAccelData(buf);
         _lastAccel = accelVec.data;
-        _accelCounter++;
         
     }
 
@@ -82,23 +80,11 @@ void MPU9250Driver::thread() {
     } else { //This section is for device failure or a wierd mode that should not be set, therefore assume failure
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
-        stopTaskThreading();
+        suspendUntil(END_OF_TIME);
 
     }
 
-
-    int64_t dTime;
-    if (_rateCalcInterval.isTimeToRun(dTime)) {
-        float dTime_s = (float)dTime/SECONDS;
-        _gyroRate = _gyroCounter/dTime_s;
-        _accelRate = _accelCounter/dTime_s;
-        _magRate = _magCounter/dTime_s;
-        _gyroCounter = 0;
-        _accelCounter = 0;
-        _magCounter = 0;
-    }
-
-    this->stopTaskThreading();
+    suspendUntil(END_OF_TIME);
 
 }
 
@@ -107,7 +93,7 @@ void MPU9250Driver::thread() {
 void MPU9250Driver::_interruptRoutine() {
     _newDataInterrupt = true;
     _newDataTimestamp =  NOW();
-    task_->startTaskThreading();
+    task_->suspendUntil(NOW());;
 }
 
 

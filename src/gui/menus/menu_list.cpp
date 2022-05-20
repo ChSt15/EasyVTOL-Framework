@@ -2,7 +2,6 @@
 
 
 
-
 Menu_List::Menu_List(const char* menuListName, MenuControl_Abstract& menuControl): Menu_Abstract(menuListName), menuControl_(menuControl) {
 
     menuControlSubscriber_.subscribe(menuControl.getMenuInputTopic());
@@ -27,7 +26,7 @@ void Menu_List::enter() {
 }
 
 
-Menu_Abstract* Menu_List::menuDisplayUpdate(Display_Abstract& display, Task_Abstract& gui) {
+Menu_Abstract* Menu_List::menuDisplayUpdate(Display_Abstract& display, Task_Threading& gui) {
 
     Menu_Abstract* returnValue = this;
 
@@ -60,7 +59,8 @@ Menu_Abstract* Menu_List::menuDisplayUpdate(Display_Abstract& display, Task_Abst
 
     }
 
-    menuCursor_ = constrain(menuCursor_, 0.0, menuList_.getNumItems()-1); //Must be done like this in case menus are removed at some point.
+
+    if (menuCursor_ > menuList_.getNumItems()-1) menuCursor_= menuList_.getNumItems()-1; //Must be done like this in case menus are removed at some point.
 
 
     //Draw menu status

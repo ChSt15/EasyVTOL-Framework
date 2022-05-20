@@ -5,7 +5,7 @@
 #include "topic.h"
 #include "buffer.h"
 
-#include "Simple-Schedule/task_autorun_class.h"
+#include "Simple-Schedule/task_threading.h"
 
 
 
@@ -93,12 +93,12 @@ private:
 
     TYPE receivedItem;
 
-    Task_Abstract* taskToResume_ = nullptr;
+    Task_Threading* taskToResume_ = nullptr;
 
     void receive(TYPE const& item, const Topic<TYPE>* topic) override {
         receivedItem = item;
         itemIsNew = true;
-        if (taskToResume_ != nullptr) taskToResume_->startTaskThreading();
+        if (taskToResume_ != nullptr) taskToResume_->suspendUntil(NOW());
     }
 
 
@@ -127,7 +127,7 @@ public:
     /**
      * Will resume given task if an item is recieved.
      */
-    void setTaskToResume(Task_Abstract& task) {
+    void setTaskToResume(Task_Threading& task) {
         taskToResume_ = &task;
     }
 
@@ -140,6 +140,45 @@ public:
 
 };
 
+
+/**
+ * This subscriber can only publish data to the subscribed topic. Is more optimised than others and allows safe connections.
+ */
+template<typename TYPE> 
+class Topic_Publisher: public Subscriber_Generic<TYPE> {
+private:
+
+    Task_Threading* taskToResume_ = nullptr;
+
+    void receive(TYPE const& item, const Topic<TYPE>* topic) override {
+        if (taskToResume_ != nullptr) taskToResume_->suspendUntil(NOW());
+    }
+
+
+public:
+
+    Topic_Publisher() {}
+
+    /**
+     * @param topic Topic to subscribe to.
+     */
+    Topic_Publisher(const Topic<TYPE>& topic): Subscriber_Generic<TYPE>(topic) {}
+
+    /**
+     * Will resume given task if an item is recieved.
+     */
+    void setTaskToResume(Task_Threading& task) {
+        taskToResume_ = &task;
+    }
+
+    /**
+     * Stops resuming the given task that was being resumed.
+     */
+    void removeTaskResume() {
+        taskToResume_ = nullptr;
+    }
+
+};
 
 
 /**
@@ -170,7 +209,7 @@ public:
     /**
      * Will resume given task if an item is recieved.
      */
-    void setTaskToResume(Task_Abstract& task) {
+    void setTaskToResume(Task_Threading& task) {
         taskToResume_ = &task;
     }
 
@@ -186,12 +225,12 @@ private:
 
     void receive(TYPE const& item, const Topic<TYPE>* topic) override {
         this->placeFront(item, overwrite_);
-        if (taskToResume_ != nullptr) taskToResume_->startTaskThreading();
+        if (taskToResume_ != nullptr) taskToResume_->suspendUntil(NOW());
     }
 
     bool overwrite_ = false;
 
-    Task_Abstract* taskToResume_ = nullptr;
+    Task_Threading* taskToResume_ = nullptr;
 
 };
 
@@ -253,7 +292,7 @@ public:
      * Will resume given task if an item is recieved.
      * Callback will be called first, then task is resumed.
      */
-    void setTaskToResume(Task_Abstract& task) {
+    void setTaskToResume(Task_Threading& task) {
         taskToResume_ = &task;
     }
 
@@ -269,13 +308,13 @@ private:
 
     void receive(TYPE const& item, const Topic<TYPE>* topic) override {
         if (callbackFunc_ != nullptr && object_ != nullptr) (object_->*callbackFunc_)(item);
-        if (taskToResume_ != nullptr) taskToResume_->startTaskThreading();
+        if (taskToResume_ != nullptr) taskToResume_->suspendUntil(NOW());
     }
 
     void (CALLBACKTYPE::*callbackFunc_)(const TYPE&) = nullptr;
     CALLBACKTYPE* object_ = nullptr;
 
-    Task_Abstract* taskToResume_ = nullptr;
+    Task_Threading* taskToResume_ = nullptr;
 
 
 };
@@ -292,10 +331,17 @@ public:
     StaticCallback_Subscriber() {}
 
     /**
+     * @param callbackFunc Function to call on data receive.
+     */
+    StaticCallback_Subscriber(void (*callbackFunc)(TYPE const& item)) {
+        callbackFunc_ = callbackFunc;
+    }
+
+    /**
      * @param topic Topic to subscribe to.
      * @param callbackFunc Function to call on data receive.
      */
-    StaticCallback_Subscriber(const Topic<TYPE>& topic, void (*callbackFunc)(TYPE& item)): Subscriber_Generic<TYPE>(topic) {
+    StaticCallback_Subscriber(const Topic<TYPE>& topic, void (*callbackFunc)(TYPE const& item)): Subscriber_Generic<TYPE>(topic) {
         callbackFunc_ = callbackFunc;
     }
 
@@ -303,7 +349,7 @@ public:
      * Will resume given task if an item is recieved.
      * Callback will be called first, then task is resumed.
      */
-    void setTaskToResume(Task_Abstract& task) {
+    void setTaskToResume(Task_Threading& task) {
         taskToResume_ = &task;
     }
 
@@ -319,12 +365,12 @@ private:
 
     void receive(TYPE const& item, const Topic<TYPE>* topic) override {
         if (callbackFunc_ != nullptr) callbackFunc_(item);
-        if (taskToResume_ != nullptr) taskToResume_->startTaskThreading();
+        if (taskToResume_ != nullptr) taskToResume_->suspendUntil(NOW());
     }
 
-    void (*callbackFunc_)(TYPE& item) = nullptr;
+    void (*callbackFunc_)(TYPE const& item) = nullptr;
 
-    Task_Abstract* taskToResume_ = nullptr;
+    Task_Threading* taskToResume_ = nullptr;
 
 
 };

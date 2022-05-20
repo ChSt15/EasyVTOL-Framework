@@ -47,7 +47,7 @@ protected:
      * @param gui Gui task that called this menu. Can be used to change display fps, etc. 
      * @returns pointer to Menu_Abstract.
      */
-    Menu_Abstract* menuDisplayUpdate(Display_Abstract& display, Task_Abstract& gui) override;
+    Menu_Abstract* menuDisplayUpdate(Display_Abstract& display, Task_Threading& gui) override;
 
 
 };

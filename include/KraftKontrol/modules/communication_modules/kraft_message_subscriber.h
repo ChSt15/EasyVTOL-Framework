@@ -7,7 +7,7 @@
 
 #include "KraftKontrol/utils/topic_subscribers.h"
 #include "KraftKontrol/utils/list.h"
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 
 #include "KraftKontrol/modules/communication_modules/kraft_message.h"
 
@@ -22,7 +22,7 @@ private:
 
     bool dataNew_ = false;
 
-    Task_Abstract* taskToResume_ = nullptr;
+    Task_Threading* taskToResume_ = nullptr;
 
     List<KraftMessage_Interface*> receiverItems_;
 
@@ -67,7 +67,7 @@ public:
     /**
      * Will resume given task if an item is recieved.
      */
-    void setTaskToResume(Task_Abstract& task) {
+    void setTaskToResume(Task_Threading& task) {
         taskToResume_ = &task;
     }
 
@@ -93,7 +93,7 @@ private:
 
                 if (item.getRawData(buffer, receiverItem_->getDataSize()) && receiverItem_->setRawData(buffer, receiverItem_->getDataSize())) {
                     dataNew_ = true;
-                    if (taskToResume_ != nullptr) taskToResume_->startTaskThreading();
+                    if (taskToResume_ != nullptr) taskToResume_->suspendUntil(NOW());
                 }
                 
             }

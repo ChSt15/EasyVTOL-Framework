@@ -5,7 +5,7 @@
 
 #include "Arduino.h"
 
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 
 #include "barometer_abstract.h"
 
@@ -17,16 +17,16 @@
 
 
 
-class BME280Driver: public Barometer_Abstract, public Module_Abstract, public Task_Abstract {
+class BME280Driver: public Barometer_Abstract, public Module_Abstract, public Task_Threading {
 public:
 
-    BME280Driver(int chipSelectPin, SPIClass* spiBus) : Task_Abstract("BME280 SPI Driver", 20, eTaskPriority_t::eTaskPriority_Realtime) {
+    BME280Driver(int chipSelectPin, SPIClass* spiBus) : Task_Threading("BME280 SPI Driver", eTaskPriority_t::eTaskPriority_Realtime, SECONDS/20) {
         chipSelectPin_ = chipSelectPin;
         spiBus_ = spiBus;
         useSPI_ = true;
     }
 
-    BME280Driver(TwoWire* i2cBus, int address) : Task_Abstract("BME280 I2C Driver", 20, eTaskPriority_t::eTaskPriority_VeryHigh) {
+    BME280Driver(TwoWire* i2cBus, int address) : Task_Threading("BME280 I2C Driver", eTaskPriority_t::eTaskPriority_VeryHigh, SECONDS/20) {
         i2cBus_ = i2cBus;
         i2cAddress_ = address;
         useSPI_ = false;
@@ -48,19 +48,6 @@ public:
      */
     void init();
 
-    /**
-     * Returns rate (in Hz) of the thread
-
-     * @return uint32_t.
-     */
-    uint32_t loopRate() {return _loopRate;};
-
-    /**
-     * Returns rate (in Hz) of the new sensor data
-
-     * @return uint32_t.
-     */
-    uint32_t pressureRate() {return _pressureRate;};
 
     /**
      * Returns true if temperature data available
@@ -69,14 +56,6 @@ public:
      * @return bool.
      */
     uint32_t temperatureAvailable() {return _temperatureFifo.available();};
-
-    /**
-     * Returns rate (in Hz) of the new sensor data
-     *
-     * @param values none.
-     * @return uint32_t.
-     */
-    uint32_t temperatureRate() {return _temperatureRate;};
 
     /**
      * Returns true if temperature data valid.
@@ -134,14 +113,6 @@ public:
      * @return bool.
      */
     uint32_t humidityAvailable() {return _humidityFifo.available();};
-
-    /**
-     * Returns rate (in Hz) of the new sensor data
-     *
-     * @param values none.
-     * @return uint32_t.
-     */
-    uint32_t humidityRate() {return _humidityRate;};
 
     /**
      * Returns true if humiditynetometer data valid.
@@ -207,9 +178,6 @@ private:
     float _lastHumidity;
     float _lastTemperature;
 
-    IntervalControl _rateCalcInterval = IntervalControl(1); 
-
-
     int chipSelectPin_ = 0;
     SPIClass* spiBus_;
     bool useSPI_ = false;
@@ -223,23 +191,7 @@ private:
 
     uint8_t _startAttempts = 0;
 
-    uint32_t _loopRate = 0;
-    uint32_t _loopCounter = 0;
-
-    uint32_t _pressureRate = 0;
-    uint32_t _pressureCounter = 0;
-
-    uint32_t _temperatureRate = 0;
-    uint32_t _temperatureCounter = 0;
-
-    uint32_t _humidityRate = 0;
-    uint32_t _humidityCounter = 0;
-
     uint32_t _lastMeasurement = 0;
-
-    bool _block = false;
-
-
 
     
 };

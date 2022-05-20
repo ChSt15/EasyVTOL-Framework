@@ -3,8 +3,11 @@
 
 
 
-#include "KraftKontrol/utils/system_time.h"
+//#include "KraftKontrol/utils/system_time.h"
 
+#include "stdint.h"
+
+#include "time_definitions.h"
 
 
 /**

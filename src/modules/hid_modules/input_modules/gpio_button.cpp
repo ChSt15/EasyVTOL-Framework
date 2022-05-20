@@ -1,7 +1,7 @@
 #include "KraftKontrol/modules/hid_modules/input_modules/gpio_button.h"
 
 
-GPIOButton::GPIOButton(uint32_t pin, bool onLow, bool useInternalPullup, uint32_t rate): ButtonHID_Abstract(500*MILLISECONDS, rate), pin_(pin) {
+GPIOButton::GPIOButton(GPIO_HAL_Abstract& pin, bool onLow, bool useInternalPullup, uint32_t rate): ButtonHID_Abstract(500*MILLISECONDS, rate), pin_(pin) {
     usePullup_ = useInternalPullup;
     onLow_ = onLow;
 }

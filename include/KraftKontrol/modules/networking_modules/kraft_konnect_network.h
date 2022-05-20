@@ -7,16 +7,16 @@
 
 #include "KraftKontrol/modules/communication_modules/kraft_kommunication.h"
 
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 
 #include "KraftKontrol/modules/module_abstract.h"
 
 
 
-class KraftKonnectNetwork: public Module_Abstract, public Task_Abstract {
+class KraftKonnectNetwork: public Module_Abstract, public Task_Threading {
 public:
 
-    KraftKonnectNetwork(KraftKommunication* communicationPort): Task_Abstract("KraftKonnect Network", 1000, eTaskPriority_t::eTaskPriority_Middle) {
+    KraftKonnectNetwork(KraftKommunication* communicationPort): Task_Threading("KraftKonnect Network", eTaskPriority_t::eTaskPriority_Middle, SECONDS/1000) {
         commsPort_ = communicationPort;
     }
     

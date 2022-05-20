@@ -17,14 +17,14 @@
 
 #include "KraftKontrol/utils/topic_subscribers.h"
 
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 #include "KraftKontrol/utils/buffer.h"
 #include "KraftKontrol/utils/low_pass_filter.h"
 #include "lib/MathHelperLibrary/FML.h"
 
 
 
-class NavigationKalman: public Navigation_Abstract, public Task_Abstract {
+class NavigationKalman: public Navigation_Abstract, public Task_Threading {
 private:
 
     //Subscriber for gyro with fifo function

@@ -3,7 +3,7 @@
 
 
 #include "KraftKontrol/utils/topic.h"
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 
 
 enum class eButton_Event_t {
@@ -25,7 +25,7 @@ enum class eButton_State_t {
 };
 
 
-class ButtonHID_Abstract: public Task_Abstract {
+class ButtonHID_Abstract: public Task_Threading {
 private:
     
     //Current button state.

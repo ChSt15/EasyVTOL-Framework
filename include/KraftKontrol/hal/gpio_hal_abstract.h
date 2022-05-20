@@ -9,8 +9,9 @@
  * Sets pin to be either input of output.
  */
 enum class eGPIO_IOMODE_t {
-    eGPIO_IOMODE_INPUT,
-    eGPIO_IOMODE_OUTPUT
+    eGPIO_IOMODE_NONE = 0, //Signals some error or that the state has not been set yet
+    eGPIO_IOMODE_INPUT = 1,
+    eGPIO_IOMODE_OUTPUT = 2,
 };
 
 /**

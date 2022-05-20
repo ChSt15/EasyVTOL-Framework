@@ -5,7 +5,7 @@
 
 #include "KraftKontrol/modules/hid_modules/display_modules/display_abstract.h"
 
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 
 #include "KraftKontrol/utils/topic.h"
 
@@ -136,7 +136,7 @@ protected:
      * @param gui Gui task that called this menu. Can be used to change display fps, etc. 
      * @returns pointer to Menu_Abstract.
      */
-    virtual Menu_Abstract* menuDisplayUpdate(Display_Abstract& display, Task_Abstract& gui) = 0;
+    virtual Menu_Abstract* menuDisplayUpdate(Display_Abstract& display, Task_Threading& gui) = 0;
 
     /**
      * Will be called once before menuDisplayUpdate() after menu was selected.

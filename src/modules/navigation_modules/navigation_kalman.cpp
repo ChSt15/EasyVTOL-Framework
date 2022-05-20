@@ -2,7 +2,7 @@
 
 
 
-NavigationKalman::NavigationKalman(SystemModel_Abstract& systemModel) : Task_Abstract("Nav Kalmanfilter", 1000, eTaskPriority_t::eTaskPriority_High), systemModel_(systemModel) {}
+NavigationKalman::NavigationKalman(SystemModel_Abstract& systemModel) : Task_Threading("Nav Kalmanfilter", eTaskPriority_t::eTaskPriority_High, SECONDS/1000), systemModel_(systemModel) {}
 
 
 

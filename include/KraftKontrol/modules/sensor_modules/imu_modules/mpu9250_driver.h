@@ -5,7 +5,7 @@
 
 #include "Arduino.h"
 
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 
 #include "KraftKontrol/modules/sensor_modules/gyroscope_modules/gyroscope_abstract.h"
 #include "KraftKontrol/modules/sensor_modules/accelerometer_modules/accelerometer_abstract.h"
@@ -27,10 +27,10 @@
 
 
 
-class MPU9250Driver: public Gyroscope_Abstract, public Accelerometer_Abstract, public Module_Abstract, public Task_Abstract {
+class MPU9250Driver: public Gyroscope_Abstract, public Accelerometer_Abstract, public Module_Abstract, public Task_Threading {
 public:
 
-    MPU9250Driver(int interruptPin, int chipSelect, SPIClass* spiBus): Task_Abstract("MPU9250 Driver", 32000, eTaskPriority_t::eTaskPriority_Realtime), pinInterrupt_(interruptPin, _interruptRoutine, true, false), _imu(spiBus, chipSelect) {
+    MPU9250Driver(int interruptPin, int chipSelect, SPIClass* spiBus): Task_Threading("MPU9250 Driver", eTaskPriority_t::eTaskPriority_Realtime, SECONDS/32000), pinInterrupt_(interruptPin, _interruptRoutine, true, false), _imu(spiBus, chipSelect) {
         task_ = this;
     }
 
@@ -55,30 +55,6 @@ public:
     void init();
 
     /**
-     * Returns rate (in Hz) of the new sensor data
-     *
-     * @param values none.
-     * @return uint32_t.
-     */
-    uint32_t gyroRate() {return _gyroRate;};
-
-    /**
-     * Returns rate (in Hz) of the new sensor data
-     *
-     * @param values none.
-     * @return uint32_t.
-     */
-    uint32_t accelRate() {return _accelRate;};
-
-    /**
-     * Returns rate (in Hz) of the new sensor data
-     *
-     * @param values none.
-     * @return uint32_t.
-     */
-    uint32_t magRate() {return _magRate;};
-
-    /**
      * Starts calibration sequence.
      */
     //void startCalibration() {calibrate_ = true; accelCalibStateTime_ = calibrationStart_ = NOW();}
@@ -92,7 +68,7 @@ public:
 private:
 
     static void _interruptRoutine();
-    static Task_Abstract* task_;
+    static Task_Threading* task_;
 
     void _getData();
 
@@ -108,25 +84,11 @@ private:
     Vector<> _lastAccel;
     Vector<> _lastMag;
 
-    IntervalControl _rateCalcInterval = IntervalControl(1); 
-
     PinInterrupt_HAL pinInterrupt_;
 
     Mpu9250 _imu;
 
     uint8_t _startAttempts = 0;
-
-    uint32_t _loopRate = 0;
-    uint32_t _loopCounter = 0;
-
-    uint32_t _gyroRate = 0;
-    uint32_t _gyroCounter = 0;
-
-    uint32_t _accelRate = 0;
-    uint32_t _accelCounter = 0;
-
-    uint32_t _magRate = 0;
-    uint32_t _magCounter = 0;
 
     int64_t _lastMeasurement = 0;
 

@@ -3,7 +3,7 @@
 
 
 
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 
 #include "guidance_interface.h"
 
@@ -21,7 +21,7 @@
  * flybywire system. Its a very simple way of
  * transfering manual control to to vehicle.
  */
-class GuidanceFlyByWire: public Guidance_Interface, public Task_Abstract {
+class GuidanceFlyByWire: public Guidance_Interface, public Task_Threading {
 public:
 
     /**
@@ -30,7 +30,7 @@ public:
      * @param rate is the rate at which it will be ran at.
      * @param priority is the priority the module will have.
      */
-    GuidanceFlyByWire() : Task_Abstract("Guidance Flybywire", 1000, eTaskPriority_t::eTaskPriority_VeryHigh) {}
+    GuidanceFlyByWire() : Task_Threading("Guidance Flybywire", eTaskPriority_t::eTaskPriority_VeryHigh, SECONDS/1000) {}
 
     /**
      * Tells the guidance to rotate vehicle at set rate.

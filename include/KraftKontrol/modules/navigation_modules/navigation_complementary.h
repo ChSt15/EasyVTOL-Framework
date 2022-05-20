@@ -15,7 +15,7 @@
 
 #include "Arduino.h"
 
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 
 #include "navigation_abstract.h"
 
@@ -40,7 +40,7 @@
 
 
 
-class NavigationComplementaryFilter: public Navigation_Abstract, public Task_Abstract {
+class NavigationComplementaryFilter: public Navigation_Abstract, public Task_Threading {
 public:
 
     /**
@@ -52,7 +52,7 @@ public:
      * @param baro module to use.
      * @param gnss module to use.
      */
-    NavigationComplementaryFilter(Gyroscope_Abstract* gyro = nullptr, Accelerometer_Abstract* accel = nullptr, Magnetometer_Abstract* mag = nullptr, Barometer_Abstract* baro = nullptr, GNSS_Abstract* gnss = nullptr) : Task_Abstract("Complementary Navigation", 4000, eTaskPriority_t::eTaskPriority_VeryHigh) {
+    NavigationComplementaryFilter(Gyroscope_Abstract* gyro = nullptr, Accelerometer_Abstract* accel = nullptr, Magnetometer_Abstract* mag = nullptr, Barometer_Abstract* baro = nullptr, GNSS_Abstract* gnss = nullptr) : Task_Threading("Complementary Navigation", eTaskPriority_t::eTaskPriority_VeryHigh, SECONDS/4000) {
         if (gyro != nullptr) {
             gyroSub_.subscribe(gyro->getGyroTopic()); 
             gyroSub_.setOverwrite(true);

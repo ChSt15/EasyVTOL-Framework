@@ -51,17 +51,18 @@ public:
     bool appendIfNotInList(const TYPE& item);
 
     /**
+     * @brief Places item into given index. All other items behind given index will be pushed down. If Index is larger than list, then new items will NOT be instantiated.
+     * 
+     * @param item Item to be placed at index
+     * @param index Index at which to place item
+     */
+    void insert(const TYPE& item, uint32_t index);
+
+    /**
      * Inserts copy of item into list behind infront of the first larger item.
      * @param item Item to add to list.
      */
     //void sortedAppend(const TYPE& item);
-
-    /**
-     * Places a copy of item into given index, all items after it will be pushed down.
-     * If index goes beyond end, then it will be placed at end of list.
-     * @param item Item to add to list.
-     */
-    //void insert(const TYPE& item, uint32_t index);
 
     /**
      * Removes the item the pointer points to.
@@ -75,7 +76,7 @@ public:
      * @param index Index of item to be removed
      * @returns true if found and removed. False if not.
      */
-    bool removeAtIndex(const uint32_t& index);
+    bool removeAtIndex(uint32_t index);
 
     /**
      * Removes all items in list equal to given item
@@ -225,7 +226,35 @@ bool List<TYPE>::appendIfNotInList(const TYPE& item) {
 
 
 template<typename TYPE> 
-bool List<TYPE>::removeAtIndex(const uint32_t& index) {
+void List<TYPE>::insert(const TYPE& item, uint32_t index) {
+
+    //Make sure the list has a size
+    if (maxSize_ == 0) changeSizeTo(1);
+
+    if (index >= maxSize_) {
+
+        while (index >= maxSize_) changeSizeTo(maxSize_*2); //Inefficient but works. Should be changed to calculate the next largest exponent
+        size_ = index;
+        append(item);
+
+    } else {
+
+        if (size_ >= maxSize_) changeSizeTo(maxSize_*2);
+
+        for (uint32_t i = size_; i > index; i--) array_[i] = array_[i-1];
+
+        array_[index] = item;
+
+        size_++;
+
+    }
+    
+}
+
+
+
+template<typename TYPE> 
+bool List<TYPE>::removeAtIndex(uint32_t index) {
 
     if (index >= size_) return false;
 
@@ -299,14 +328,14 @@ void List<TYPE>::clear() {
 
 
 template<typename TYPE> 
-TYPE& List<TYPE>::operator [] (const uint32_t index) {
+TYPE& List<TYPE>::operator [] (uint32_t index) {
     return array_[index];
 }
 
 
 
 template<typename TYPE> 
-const TYPE& List<TYPE>::operator [] (const uint32_t index) const {
+const TYPE& List<TYPE>::operator [] (uint32_t index) const {
     return array_[index];
 }
 

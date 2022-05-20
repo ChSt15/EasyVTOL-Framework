@@ -5,7 +5,7 @@
 
 #include "Arduino.h"
 
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 
 #include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_data_messages.h"
 #include "KraftKontrol/KraftPacket_KontrolPackets/kraftkontrol_command_messages.h"
@@ -54,7 +54,7 @@ enum eMagCalibStatus_t { //Needed for old code. Should be removed along with cal
 };
 
 
-class QMC5883Driver: public Magnetometer_Abstract, public Task_Abstract, public Module_Abstract {
+class QMC5883Driver: public Magnetometer_Abstract, public Task_Threading, public Module_Abstract {
 public:
 
     /**
@@ -64,7 +64,7 @@ public:
      * @param selector For I2C this is the address. For SPI this is the chip select pin.
      * @param eeprom Reference to EEPROM module to use for calibration values.
      */
-    QMC5883Driver(BusDevice_HAL_Abstract& bus, uint32_t selector) : Task_Abstract("QMC5883 Driver", 100, eTaskPriority_t::eTaskPriority_VeryHigh) {
+    QMC5883Driver(BusDevice_HAL_Abstract& bus, uint32_t selector) : Task_Threading("QMC5883 Driver", eTaskPriority_t::eTaskPriority_VeryHigh, SECONDS/100) {
         bus_ = &bus;
     }
     

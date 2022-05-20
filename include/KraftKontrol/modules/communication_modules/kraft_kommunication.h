@@ -10,7 +10,8 @@
 #include "KraftKontrol/utils/buffer.h"
 #include "KraftKontrol/modules/module_abstract.h"
 #include "KraftKontrol/utils/system_time.h"
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
+#include "KraftKontrol/utils/Simple-Schedule/interval_control.h"
 
 #include "kraft_link.h"
 #include "kraft_message.h"
@@ -159,7 +160,7 @@ struct MessageLinkData {
 
 
 
-class KraftKommunication: public Module_Abstract, public Task_Abstract {
+class KraftKommunication: public Module_Abstract, public Task_Threading {
 public:
 
     /**
@@ -167,7 +168,7 @@ public:
      * 
      * @param dataLink is a radio class that inherets from KraftLink_Interface that will be used to send and receive packets 
      */
-    KraftKommunication(KraftLink_Abstract& dataLink, eKraftMessageNodeID_t selfID): Task_Abstract("Kraft Kommunication", 500, eTaskPriority_t::eTaskPriority_Middle), dataLink_(dataLink) {
+    KraftKommunication(KraftLink_Abstract& dataLink, eKraftMessageNodeID_t selfID): Task_Threading("Kraft Kommunication", eTaskPriority_t::eTaskPriority_Middle, SECONDS/500), dataLink_(dataLink) {
         selfID_ = selfID;
         receivedPacketSub_.subscribe(dataLink.getReceivedDataTopic());
         dataLinkSendSubr_.subscribe(dataLink.getToSendDataTopic());

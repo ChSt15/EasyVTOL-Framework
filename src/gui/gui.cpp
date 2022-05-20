@@ -2,7 +2,7 @@
 
 
 
-Gui::Gui(Display_Abstract& display, Menu_Abstract& mainMenu): Task_Abstract("GUI", 30, eTaskPriority_t::eTaskPriority_Middle), display_(display) {
+Gui::Gui(Display_Abstract& display, Menu_Abstract& mainMenu): Task_Threading("GUI", eTaskPriority_t::eTaskPriority_Middle, false, SECONDS/30), display_(display) {
     mainMenu_ = &mainMenu;
 }
 

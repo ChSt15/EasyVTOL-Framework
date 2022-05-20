@@ -4,11 +4,11 @@
 
 volatile int64_t BNO080Driver::_newDataTimestamp = 0;
 volatile bool BNO080Driver::_newDataInterrupt = false;
-Task_Abstract* BNO080Driver::driverTask_ = nullptr;
+Task_Threading* BNO080Driver::driverTask_ = nullptr;
 
 
 
-BNO080Driver::BNO080Driver(int interruptPin, TwoWire& i2cBus, const Barometer_Abstract* baro, const GNSS_Abstract* gnss): Task_Abstract("BNO080 Driver", 200, eTaskPriority_t::eTaskPriority_VeryHigh), pinInterrupt_(interruptPin, _interruptRoutine, false, true), i2c_(i2cBus) {
+BNO080Driver::BNO080Driver(int interruptPin, TwoWire& i2cBus, const Barometer_Abstract* baro, const GNSS_Abstract* gnss): Task_Threading("BNO080 Driver", eTaskPriority_t::eTaskPriority_VeryHigh, SECONDS/200), pinInterrupt_(interruptPin, _interruptRoutine, false, true), i2c_(i2cBus) {
     if (baro != nullptr) baroSubr_.subscribe(baro->getBaroTopic());
     if (gnss != nullptr) gnssSubr_.subscribe(gnss->getGNSSTopic());
 }
@@ -186,7 +186,7 @@ void BNO080Driver::thread() {
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
         driverTask_ = nullptr;
-        stopTaskThreading();
+        suspendUntil(END_OF_TIME);
 
     }
 

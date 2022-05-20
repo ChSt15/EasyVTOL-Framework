@@ -91,6 +91,21 @@ public:
 
 
 
+class TelemetryMessageAccel: public MessageVector_Abstract {
+public:
+
+    TelemetryMessageAccel() {}
+
+    TelemetryMessageAccel(const Vector<> &accel): MessageVector_Abstract(accel) {}
+
+    uint32_t getDataType() const final override {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_Acceleration;}
+
+    uint32_t getMessageType() const final override {return eKraftMessageType_t::eKraftMessageType_Telemetry_ID;}
+
+};
+
+
+
 class TelemetryMessageFullKinematics: public MessageFullKinematics_Abstract {
 public:
 

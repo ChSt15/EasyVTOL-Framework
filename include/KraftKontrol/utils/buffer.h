@@ -141,7 +141,7 @@ public:
      * @param index Index of element to be removed.
      * @returns true if element was found and removed.
      */
-    inline bool removeElementIndex(uint32_t index);
+    inline bool removeElementIndex(int32_t index);
 
     /**
      * Places element into given index
@@ -187,7 +187,7 @@ public:
      * Starts from back of buffer("oldest" element or first that was placed inside).
      * @returns copy of element from index.
      */
-    inline T& operator[] (uint32_t index);
+    inline T& operator[] (int32_t index);
 
     /**
      * Used to access buffer like an array.
@@ -196,7 +196,7 @@ public:
      * Starts from back of buffer("oldest" element or first that was placed inside).
      * @returns copy of element from index.
      */
-    inline const T& operator[] (uint32_t index) const;
+    inline const T& operator[] (int32_t index) const;
 
     /**
      * Needs to be overloaded to also copy the data to instance.
@@ -395,7 +395,7 @@ inline void Buffer<T, size_>::clear() {
 
 
 template<typename T, uint32_t size_> 
-inline bool Buffer<T, size_>::removeElementIndex(uint32_t index) {
+inline bool Buffer<T, size_>::removeElementIndex(int32_t index) {
 
     //Make sure buffer isnt empty
     if (numElements_ == 0) return false;
@@ -446,14 +446,16 @@ inline bool Buffer<T, size_>::removeElement(T* pointerToElement) {
 
 
 template<typename T, uint32_t size_> 
-inline T& Buffer<T, size_>::operator[] (uint32_t index) {
-    return bufferArray_[(back_ + index)%numElements_];
+inline T& Buffer<T, size_>::operator[] (int32_t index) {
+    if (index < 0) index = numElements_ + index;
+    return bufferArray_[back_ + index%numElements_];
 }
 
 
 template<typename T, uint32_t size_> 
-inline const T& Buffer<T, size_>::operator[] (uint32_t index) const {
-    return bufferArray_[(back_ + index)%numElements_];
+inline const T& Buffer<T, size_>::operator[] (int32_t index) const {
+    if (index < 0) index = numElements_ + index;
+    return bufferArray_[back_ + index%numElements_];
 }
 
 

@@ -163,6 +163,7 @@ public:
     void run() {
 
         if (intervalSchedulerEnabled_) suspendUntil(NOW() - NOW()%interval_ + interval_);
+        else suspendUntil(END_OF_TIME);
 
         int64_t start = NOW(); //Needed to measure task time usage.
         thread(); //Run task.

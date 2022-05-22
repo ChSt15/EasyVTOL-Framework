@@ -70,9 +70,6 @@ private:
     //When to run task thread
     int64_t nextRunTimestamp_ = 0;
 
-    //To store whether init function was ran.
-    bool initWasCalled_ = false;
-
     //If the task should be setup to run again in the given interval.
     bool intervalSchedulerEnabled_ = false;
 
@@ -94,6 +91,11 @@ private:
     //Timestamps used to find out task time usage.
     float systemUsage_ = 0;
     int64_t systemTimeUsageCounter_ = 0;
+
+protected:
+
+    //Whether init function was ran. Set to false for scheduler to run init again
+    bool initWasCalled_ = false;
 
     
 public:

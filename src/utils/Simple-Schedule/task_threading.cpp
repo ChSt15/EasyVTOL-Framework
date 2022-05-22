@@ -15,8 +15,8 @@ int64_t Task_Threading::timeSpentSleeping_ = 0;
 void Task_Threading::schedulerInitTasks() {
 
     for (uint32_t i = 0; i < taskList().getNumItems(); i++) {
-        taskList()[i]->init();
         taskList()[i]->initWasCalled_ = true;
+        taskList()[i]->init();
     }
 
 }
@@ -37,8 +37,8 @@ void Task_Threading::schedulerTick() {
     for (uint32_t i = 0; i < taskList().getNumItems(); i++) {
         task = taskList()[i];
         if (!task->initWasCalled_) {
-            task->init();
             task->initWasCalled_ = true;
+            task->init();
         }
         task->checkNextRun();
         task->runTask_ = NOW() >= task->nextRunTimestamp_;

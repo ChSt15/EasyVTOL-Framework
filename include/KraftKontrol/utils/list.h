@@ -12,6 +12,21 @@
  */
 template<typename TYPE> 
 class List {
+private:
+
+    //Current max size.
+    uint32_t maxSize_ = 0;
+
+    //Current size
+    uint32_t size_ = 0;
+
+    //Pointer to start of array.
+    TYPE* array_ = nullptr;
+
+    //Wether to reduce array size automatically.
+    bool sizeControl_ = false;
+
+
 public:
 
     /**
@@ -19,12 +34,14 @@ public:
      */
     List(bool sizeControl = false) {
         sizeControl_ = sizeControl;
-        array_ = new TYPE;
+        array_ = new TYPE[1];
         maxSize_ = 1;
     }
 
     ~List() {
-        delete[] array_;
+        if (array_ != nullptr) {
+            delete[] array_;
+        }
     }
 
     /**
@@ -116,24 +133,13 @@ public:
 
 private:
 
-    //Current max size.
-    uint32_t maxSize_ = 0;
-
-    //Current size
-    uint32_t size_ = 0;
-
-    //Pointer to start of array.
-    TYPE* array_ = nullptr;
-
-    //Wether to reduce array size automatically.
-    bool sizeControl_ = false;
-
     /**
      * Changes size to given parameter.
      * Copies items to new array.
      * @param size Size to change to.
      */
     void changeSizeTo(uint32_t size);
+
 
 };
 

@@ -19,6 +19,20 @@
  */
 template<typename T, uint32_t size_> 
 class Buffer {
+private:
+
+    //Array for element storage
+    T bufferArray_[size_];
+
+    //Should always have number of elements.
+    uint32_t numElements_ = 0;
+
+    //Points to index ahead of first element
+    uint32_t front_ = 0;
+    //Points to index of last element
+    uint32_t back_ = 0;
+
+
 public:
 
     /**
@@ -217,17 +231,6 @@ private:
     inline uint32_t quickSortPartition(uint32_t left, uint32_t right);
 
     void insertionSort();
-
-    //Array for element storage
-    T bufferArray_[size_];
-
-    //Should always have number of elements.
-    uint32_t numElements_ = 0;
-
-    //Points to index ahead of first element
-    uint32_t front_ = 0;
-    //Points to index of last element
-    uint32_t back_ = 0;
 
 
 };

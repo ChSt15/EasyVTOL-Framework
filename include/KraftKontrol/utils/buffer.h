@@ -275,17 +275,17 @@ inline T Buffer<T, size_>::getMedian() const {
 
     T median;
 
-    Buffer<T, size_> bufferSorted; //Will not fragment heap as it will immediately be deallocated when this function returns.
+    Buffer<T, size_> bufferSorted;
 
     bufferSorted = *this;
 
     bufferSorted.sortElements();
 
-    if (numElements_%2 == 0) { //Is even?
+    if (numElements_%2 == 0) {
 
         median = (bufferSorted[numElements_/2-1] + bufferSorted[numElements_/2])/2;
 
-    } else { //Odd
+    } else {
     
         median = bufferSorted[numElements_/2];
 
@@ -451,14 +451,14 @@ inline bool Buffer<T, size_>::removeElement(T* pointerToElement) {
 template<typename T, uint32_t size_> 
 inline T& Buffer<T, size_>::operator[] (int32_t index) {
     if (index < 0) index = numElements_ + index;
-    return bufferArray_[back_ + index%numElements_];
+    return bufferArray_[(back_ + index)%numElements_];
 }
 
 
 template<typename T, uint32_t size_> 
 inline const T& Buffer<T, size_>::operator[] (int32_t index) const {
     if (index < 0) index = numElements_ + index;
-    return bufferArray_[back_ + index%numElements_];
+    return bufferArray_[(back_ + index)%numElements_];
 }
 
 

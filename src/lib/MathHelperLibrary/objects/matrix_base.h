@@ -109,6 +109,7 @@ public:
      */
     static Matrix<TYPE, ROWS, COLS> fill(TYPE fillVal);
 
+
     /**
      * Below are generial functions to get the size of array or copy it.
      */
@@ -148,10 +149,31 @@ public:
     TYPE determinant();
 
     /**
+     * @brief calculates the magnitude of a vector matrix
+     * 
+     * @return TYPE 
+     */
+    TYPE magnitude() const;
+
+    /**
+     * @brief normalizes a Nx1 vector matrix.
+     * 
+     * @return Matrix<TYPE, ROWS, COLS> 
+     */
+    Matrix<TYPE, ROWS, COLS> normalize() const;
+
+    /**
      * Used Gauß-Jordan method from https://www.geeksforgeeks.org/finding-inverse-of-a-matrix-using-gauss-jordan-method/
      * @returns inverse of matrix.
      */
-    Matrix<TYPE, ROWS, COLS> getInverse() const;
+    Matrix<TYPE, ROWS, COLS> invert() const;
+
+    /**
+     * @brief Get the Diagonal vector of a square matrix
+     * 
+     * @return Matrix<TYPE, ROWS, COLS> 
+     */
+    Matrix<TYPE, ROWS, 1> diagonal() const;
 
     /**
      * Below are access operators to access matrix values.
@@ -190,6 +212,10 @@ public:
      * This operator is to access the matrix values while keeping you inside the bounds of data.
      */
     const TYPE& operator () (uint16_t row, uint16_t column) const;
+
+    
+    template<uint16_t ROWS2, uint16_t COLS2>
+    Matrix<TYPE, ROWS2, COLS2> block(uint16_t row, uint16_t col);
 
     /**
      * Below are math operations.
@@ -241,6 +267,7 @@ public:
     
 
 };
+
 
 
 
@@ -424,7 +451,7 @@ Matrix<TYPE, COLS, ROWS> Matrix<TYPE, ROWS, COLS>::transpose() {
 
 
 template<typename TYPE, uint16_t ROWS, uint16_t COLS>
-Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::getInverse() const {
+Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::invert() const {
 
     static_assert((ROWS == COLS), "Matrix must be square (NxN) in order to get inverse. Pseudoinverse might solve the issue.");
 
@@ -521,6 +548,24 @@ int32_t Matrix<int32_t, 1, 1>::determinant() {
 
 
 template<typename TYPE, uint16_t ROWS, uint16_t COLS>
+Matrix<TYPE, ROWS, 1> Matrix<TYPE, ROWS, COLS>::diagonal() const {
+
+    static_assert((COLS == ROWS), "Matrix must be square (NxN) to have a diagonal vector");
+
+    Matrix<TYPE, ROWS, 1> diag;
+
+    for (size_t i = 0; i < ROWS; i++) {
+
+        diag.r[i][0] = this->r[i][i];
+
+    }
+
+    return diag;
+
+}
+
+
+template<typename TYPE, uint16_t ROWS, uint16_t COLS>
 TYPE Matrix<TYPE, ROWS, COLS>::determinant() {
 
     static_assert((COLS == ROWS), "Matrix must be square (NxN) to have a determinant");
@@ -544,6 +589,41 @@ TYPE Matrix<TYPE, ROWS, COLS>::determinant() {
     }
 
     return determinant;
+
+}
+
+
+
+template<typename TYPE, uint16_t ROWS, uint16_t COLS>
+TYPE Matrix<TYPE, ROWS, COLS>::magnitude() const {
+
+    static_assert((COLS == 1), "Matrix must be vector (Nx1) to have a magnitude");
+
+    TYPE buf = 0;
+
+    for (size_t i = 0; i < ROWS; i++) {
+
+        buf += r[i][0]*r[i][0];
+
+    }
+
+    return sqrt(buf);
+
+}
+
+
+template<typename TYPE, uint16_t ROWS, uint16_t COLS>
+Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::normalize() const {
+
+    static_assert((COLS == 1), "Matrix must be vector (Nx1) to have be normalized");
+
+    Matrix<TYPE, ROWS, COLS> copy = *this;
+
+    TYPE mag = copy.magnitude();
+
+    copy = copy/mag;
+
+    return copy;
 
 }
 
@@ -585,6 +665,26 @@ const TYPE& Matrix<TYPE, ROWS, COLS>::operator () (uint16_t row, uint16_t column
 
 
 template<typename TYPE, uint16_t ROWS, uint16_t COLS>
+template<uint16_t ROWS2, uint16_t COLS2>
+Matrix<TYPE, ROWS2, COLS2> Matrix<TYPE, ROWS, COLS>::block(uint16_t row, uint16_t col) {
+
+    Matrix<TYPE, ROWS2, COLS2> blockMat;
+
+    for (size_t rw = row; rw < ROWS && rw < ROWS2 + row; rw++) {
+
+        for (size_t cw = col; cw < COLS && cw < COLS2 + col; cw++) {
+
+            blockMat.r[rw-row][cw-col] = r[rw][cw];
+        
+        }
+
+
+    }
+
+}
+
+
+template<typename TYPE, uint16_t ROWS, uint16_t COLS>
 Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::operator + (const Matrix<TYPE, ROWS, COLS>& right) const {
 
     Matrix<TYPE, ROWS, COLS> m;
@@ -592,7 +692,7 @@ Matrix<TYPE, ROWS, COLS> Matrix<TYPE, ROWS, COLS>::operator + (const Matrix<TYPE
     for (uint16_t row = 0; row < ROWS; row++) {
         for (uint16_t col = 0; col < COLS; col++) {
 
-            m.r[row][col] =  r[row][col] + right.r[row][col];
+            m.r[row][col] = r[row][col] + right.r[row][col];
 
         }
     }  

@@ -7,8 +7,7 @@
 #include "objects/matrix_forms.h"
 #include "objects/matrix_types.h"
 #include "objects/matrix_vector.h"
-#include "objects/quaternion.h"
-
+#include "objects/matrix_quaternion.h"
 
 
 #endif

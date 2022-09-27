@@ -18,6 +18,8 @@
 struct GNSSData {
 
     WorldPosition position;
+
+    /// @brief in North west up coordinates
     Vector<> velocity;
 
     Vector<> positionError = 100000;

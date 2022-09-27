@@ -36,7 +36,7 @@ void MPU9250Driver::_getData() {
         buf.data.values[0][0] = accelVec.data.x;
         buf.data.values[1][0] = accelVec.data.y;
         buf.data.values[2][0] = accelVec.data.z;
-        buf.data.covariance = FML::Matrix<float, 3, 3>::eye(0.03);
+        buf.data.covariance = FML::Matrix<float, 3, 3>::eye(0.07);
         buf.timestamp = accelVec.timestamp;
 
         publishAccelData(buf);
@@ -123,7 +123,7 @@ void MPU9250Driver::init() {
 
         if (_imu.MagnetometerFailed()) Serial.println("Magnetometer failed, But gyro and accel are working!!!!");
 
-        _imu.ConfigAccelRange(Mpu9250::AccelRange::ACCEL_RANGE_8G);
+        _imu.ConfigAccelRange(Mpu9250::AccelRange::ACCEL_RANGE_16G);
         _imu.ConfigGyroRange(Mpu9250::GyroRange::GYRO_RANGE_2000DPS);
         _imu.EnableDrdyInt();
 

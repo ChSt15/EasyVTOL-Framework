@@ -267,24 +267,6 @@ void NavigationKalman::thread() {
             statePrediction.data.attitude = xAxisCorrectionQuat*statePrediction.data.attitude;
             statePrediction.data.attitude.normalize(true);
 
-            //Fusion below for attitude is still a complementary filter.
-            float beta = 0.1f; 
-
-            //Z-Axis correction
-            Vector<> zAxisIs = Vector<>(0,0,1);
-            Vector<> zAxisSet = statePrediction.data.attitude.rotateVector(accelRaw.data);
-
-            Vector<> zAxisRotationAxis = zAxisSet.cross(zAxisIs);
-            float zAxisRotationAngle = zAxisSet.getAngleTo(zAxisIs);
-
-            FML::Quaternion<> zAxisCorrectionQuat = FML::Quaternion<>(zAxisRotationAxis, zAxisRotationAngle*beta*dTime);
-
-
-            //Apply state correction and normalise attitude quaternion 
-            statePrediction.data.attitude = zAxisCorrectionQuat*statePrediction.data.attitude;
-            statePrediction.data.attitude.normalize(true);
-
-
 
             //Update old values
             lastMagValue_ = magRaw.data;

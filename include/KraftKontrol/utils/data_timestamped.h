@@ -13,7 +13,9 @@
 template<typename T>
 struct DataTimestamped {
 
-    DataTimestamped() {}
+    DataTimestamped() {
+        timestamp = 0;
+    }
 
     /**
      * @param data Sensordata to take.

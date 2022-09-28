@@ -17,22 +17,22 @@
 
 #include "KraftKontrol/utils/topic_subscribers.h"
 
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 #include "KraftKontrol/utils/buffer.h"
 #include "KraftKontrol/utils/low_pass_filter.h"
 #include "lib/MathHelperLibrary/FML.h"
 
 
 
-class NavigationKalman: public Navigation_Abstract, public Task_Abstract {
+class NavigationKalman: public Navigation_Abstract, public Task_Threading {
 private:
 
     //Subscriber for gyro with fifo function
-    /*Buffer_Subscriber<DataTimestamped<Vector<>>, 100> gyroSub_;
+    /*Buffer_Subscriber<DataTimestamped<VectorOLD<>>, 100> gyroSub_;
     //Subscriber for accel with fifo function
-    Buffer_Subscriber<DataTimestamped<Vector<>>, 100> accelSub_;
+    Buffer_Subscriber<DataTimestamped<VectorOLD<>>, 100> accelSub_;
     //Subscriber for mag with fifo function
-    Buffer_Subscriber<DataTimestamped<Vector<>>, 100> magSub_;
+    Buffer_Subscriber<DataTimestamped<VectorOLD<>>, 100> magSub_;
     //Subscriber for baro with fifo function
     Buffer_Subscriber<DataTimestamped<float>, 20> baroSub_;
     //Subscriber for gnssdata with fifo function
@@ -53,32 +53,32 @@ private:
     int64_t lastLoopTimestamp_ = NOW();
 
     //Last gyroscope value
-    Vector<> lastAngularRateValue_ = 0;
+    VectorOLD<> lastAngularRateValue_ = 0;
     //Last gyroscope value error
-    Vector<> lastAngularRateCov_ = 10000;
+    VectorOLD<> lastAngularRateCov_ = 10000;
     //Gyroscope cov values
-    Buffer<Vector<>, 10> angularRateCovBuf_;
+    Buffer<VectorOLD<>, 10> angularRateCovBuf_;
     //Timestamp of last gyro value
     int64_t lastGyroTimestamp_ = NOW();
     //Gyro bias LPF
-    LowPassFilter<Vector<>> gyroBiasLPF_ = LowPassFilter<Vector<>>(0.05);
+    LowPassFilter<VectorOLD<>> gyroBiasLPF_ = LowPassFilter<VectorOLD<>>(0.05);
 
     //Last accel value
-    Vector<> lastAccelValue_ = 0;
+    VectorOLD<> lastAccelValue_ = 0;
     //Last accel value error
-    Vector<> lastAccelCov_ = 10000;
+    VectorOLD<> lastAccelCov_ = 10000;
     //Accel cov values
-    Buffer<Vector<>, 10> accelCovBuf_;
+    Buffer<VectorOLD<>, 10> accelCovBuf_;
     //Timestamp of last accel value
     int64_t lastAccelTimestamp_ = NOW();
-    LowPassFilter<Vector<>> accelBias = LowPassFilter<Vector<>>(0.05);
+    LowPassFilter<VectorOLD<>> accelBias = LowPassFilter<VectorOLD<>>(0.05);
 
     //Last mag value
-    Vector<> lastMagValue_ = 0;
+    VectorOLD<> lastMagValue_ = 0;
     //Last accel value error
-    Vector<> lastMagCov_ = 10000;
+    VectorOLD<> lastMagCov_ = 10000;
     //Accel cov values
-    Buffer<Vector<>, 10> magCovBuf_;
+    Buffer<VectorOLD<>, 10> magCovBuf_;
     //Timestamp of last accel value
     int64_t lastMagTimestamp_ = NOW();
 

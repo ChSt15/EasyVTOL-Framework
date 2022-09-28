@@ -55,7 +55,7 @@ public:
 
     DataMessagePosition() {}
 
-    DataMessagePosition(const Vector<> &position): MessageVector_Abstract(position) {}
+    DataMessagePosition(const VectorOLD<> &position): MessageVector_Abstract(position) {}
 
     uint32_t getDataType() const final {return eMessageTypeData_t::eMessageTypeData_Position;}
 
@@ -85,7 +85,7 @@ public:
 
     DataMessageForce() {}
 
-    DataMessageForce(const Vector<> &force): MessageVector_Abstract(force) {}
+    DataMessageForce(const VectorOLD<> &force): MessageVector_Abstract(force) {}
 
     uint32_t getDataType() const final {return eMessageTypeData_t::eMessageTypeData_Force;}
 
@@ -100,7 +100,7 @@ public:
 
     DataMessageTorque() {}
 
-    DataMessageTorque(const Vector<> &torque): MessageVector_Abstract(torque) {}
+    DataMessageTorque(const VectorOLD<> &torque): MessageVector_Abstract(torque) {}
 
     uint32_t getDataType() const final {return eMessageTypeData_t::eMessageTypeData_Torque;}
 
@@ -395,7 +395,7 @@ public:
 
     KraftMessageMagCalValuesIs() {}
 
-    KraftMessageMagCalValuesIs(const Vector<> &magMax, const Vector<> &magMin) {
+    KraftMessageMagCalValuesIs(const VectorOLD<> &magMax, const VectorOLD<> &magMin) {
         magMin_ = magMin;
         magMax_ = magMax;
     }
@@ -404,10 +404,10 @@ public:
 
     uint32_t getDataSize() const {return sizeof(magMin_) + sizeof(magMax_);}
 
-    const Vector<>& getMinValue() const {return magMin_;}
-    const Vector<>& getMaxValue() const {return magMax_;}
+    const VectorOLD<>& getMinValue() const {return magMin_;}
+    const VectorOLD<>& getMaxValue() const {return magMax_;}
 
-    void setMinMax(const Vector<> &magMax, const Vector<> &magMin) {magMin_ = magMin; magMax_ = magMax;}
+    void setMinMax(const VectorOLD<> &magMax, const VectorOLD<> &magMin) {magMin_ = magMin; magMax_ = magMax;}
 
     bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const {
 
@@ -446,8 +446,8 @@ public:
 
 protected:
 
-    Vector<> magMin_ = 90000000;
-    Vector<> magMax_ = -90000000;
+    VectorOLD<> magMin_ = 90000000;
+    VectorOLD<> magMax_ = -90000000;
 
 };
 
@@ -458,7 +458,7 @@ public:
 
     KraftMessageMagCalValuesSet() {}
 
-    KraftMessageMagCalValuesSet(const Vector<> &magMax, const Vector<> &magMin) {
+    KraftMessageMagCalValuesSet(const VectorOLD<> &magMax, const VectorOLD<> &magMin) {
         magMin_ = magMin;
         magMax_ = magMax;
     }
@@ -467,10 +467,10 @@ public:
 
     uint32_t getDataSize() const {return sizeof(magMin_) + sizeof(magMax_);}
 
-    const Vector<>& getMinValue() const {return magMin_;}
-    const Vector<>& getMaxValue() const {return magMax_;}
+    const VectorOLD<>& getMinValue() const {return magMin_;}
+    const VectorOLD<>& getMaxValue() const {return magMax_;}
 
-    void setMinMax(const Vector<> &magMax, const Vector<> &magMin) {magMin_ = magMin; magMax_ = magMax;}
+    void setMinMax(const VectorOLD<> &magMax, const VectorOLD<> &magMin) {magMin_ = magMin; magMax_ = magMax;}
 
     bool getRawData(void* dataBytes, uint32_t dataByteSize, uint32_t startByte = 0) const {
 
@@ -509,8 +509,8 @@ public:
 
 protected:
 
-    Vector<> magMin_ = 90000000;
-    Vector<> magMax_ = -90000000;
+    VectorOLD<> magMin_ = 90000000;
+    VectorOLD<> magMax_ = -90000000;
 
 };*/
 

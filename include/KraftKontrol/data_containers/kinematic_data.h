@@ -14,11 +14,11 @@
 class AttitudeData {
 public:
 
-    Vector<> angularAcceleration = 0;
-    Vector<> angularAccelerationError = 0;
+    VectorOLD<> angularAcceleration = 0;
+    VectorOLD<> angularAccelerationError = 0;
 
-    Vector<> angularRate = 0;
-    Vector<> angularRateError = 0;
+    VectorOLD<> angularRate = 0;
+    VectorOLD<> angularRateError = 0;
 
     FML::Quaternion<> attitude = FML::Quaternion<>(1,0,0,0);
     FML::Quaternion<> attitudeError = 0;
@@ -34,16 +34,16 @@ class PositionData {
 public:
 
     //Total acceleration
-    Vector<> acceleration = 0;
-    Vector<> accelerationError = 0;
+    VectorOLD<> acceleration = 0;
+    VectorOLD<> accelerationError = 0;
     //Acceleration with gravity removed. Error is the same as accelerationError
-    Vector<> linearAcceleration;
+    VectorOLD<> linearAcceleration;
 
-    Vector<> velocity = 0;
-    Vector<> velocityError = 0;
+    VectorOLD<> velocity = 0;
+    VectorOLD<> velocityError = 0;
 
-    Vector<> position = 0;
-    Vector<> positionError = 0;
+    VectorOLD<> position = 0;
+    VectorOLD<> positionError = 0;
 
 };
 

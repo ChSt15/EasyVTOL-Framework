@@ -6,13 +6,13 @@
 #include "KraftKontrol/modules/hid_modules/display_modules/display_abstract.h"
 
 #include "KraftKontrol/utils/list.h"
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 
 #include "menu_abstract.h"
 
 
 
-class Gui: public Task_Abstract {
+class Gui: public Task_Threading {
 private:
 
     //Save the path through menus. When entering a new menu, the menu gets added to list and last element is displayed. When exiting, the menu will be removed from list.

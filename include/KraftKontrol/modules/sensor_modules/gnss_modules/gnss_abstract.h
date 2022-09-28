@@ -20,10 +20,10 @@ struct GNSSData {
     WorldPosition position;
 
     /// @brief in North west up coordinates
-    Vector<> velocity;
+    VectorOLD<> velocity;
 
-    Vector<> positionError = 100000;
-    Vector<> velocityError = 100000;
+    VectorOLD<> positionError = 100000;
+    VectorOLD<> velocityError = 100000;
 
     int64_t gnssTOW = 0;
 

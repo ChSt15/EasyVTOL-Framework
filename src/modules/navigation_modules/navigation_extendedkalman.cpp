@@ -2,7 +2,7 @@
 
 
 
-NavigationExtendedKalman::NavigationExtendedKalman() : Task_Abstract("Nav Extended Kalmanfilter", 20, eTaskPriority_t::eTaskPriority_High) {}
+NavigationExtendedKalman::NavigationExtendedKalman() : Task_Threading("Nav Extended Kalmanfilter", eTaskPriority_t::eTaskPriority_High, 1*MILLISECONDS) {}
 
 
 

@@ -19,15 +19,15 @@ public:
      * tvcNeutralDirection is the direction of the force the TVC will produce 
      * when its angle is at 0.
      * 
-     * tvcPosition is a vector<> pointing from vehicle CG to the point the TVC applies 
+     * tvcPosition is a VectorOLD<> pointing from vehicle CG to the point the TVC applies 
      * its force.
      *
      * @param values tvcPosition and tvcNeutralDirection.
      * @return none.
      */
-    TVCDynamics (const Vector<> &tvcPosition, const Vector<> &tvcNeutralDirection) {
+    TVCDynamics (const VectorOLD<> &tvcPosition, const VectorOLD<> &tvcNeutralDirection) {
         _tvcPosition = tvcPosition;
-        _tvcNeutralDirection = FML::Quaternion<>(Vector<>(0,0,1).cross(tvcNeutralDirection), Vector<>(0,0,1).getAngleTo(tvcNeutralDirection)); //get rotation for nuetralDirection vector
+        _tvcNeutralDirection = FML::Quaternion<>(VectorOLD<>(0,0,1).cross(tvcNeutralDirection), VectorOLD<>(0,0,1).getAngleTo(tvcNeutralDirection)); //get rotation for nuetralDirection vector
     }
 
     /**
@@ -36,15 +36,15 @@ public:
      * tvcNeutralDirection is the direction of the force the TVC will produce 
      * when its angle is at 0.
      * 
-     * tvcPosition is a vector<> pointing from vehicle CG to the point the TVC applies 
+     * tvcPosition is a VectorOLD<> pointing from vehicle CG to the point the TVC applies 
      * its force.
      *
      * @param values tvcPosition and tvcNeutralDirection.
      * @return none.
      */
-    void setTVCParameters(const Vector<> &tvcPosition, const Vector<> &tvcNeutralDirection) {
+    void setTVCParameters(const VectorOLD<> &tvcPosition, const VectorOLD<> &tvcNeutralDirection) {
         _tvcPosition = tvcPosition;
-        _tvcNeutralDirection = FML::Quaternion<>(Vector<>(0,0,1).cross(tvcNeutralDirection), Vector<>(0,0,1).getAngleTo(tvcNeutralDirection));
+        _tvcNeutralDirection = FML::Quaternion<>(VectorOLD<>(0,0,1).cross(tvcNeutralDirection), VectorOLD<>(0,0,1).getAngleTo(tvcNeutralDirection));
         _valid = false;
     }
 
@@ -97,13 +97,13 @@ public:
      * 
      * Parameters are used as refernces meaning the will used as outputs.
      * 
-     * tvcDirection is a unit vector<> and in reference to the neutral direction
+     * tvcDirection is a unit VectorOLD<> and in reference to the neutral direction
      * vector.
      *
      * @param values tvcForce and tvcDirection.
      * @return none.
      */
-    void getTVCSettings(float &tvcForce, Vector<> &tvcDirection) {
+    void getTVCSettings(float &tvcForce, VectorOLD<> &tvcDirection) {
 
         _calculate();
 
@@ -121,7 +121,7 @@ private:
 
         if (_setpoint.torqe.isZeroVector()) {
 
-            _tvcDirection = -_tvcPosition.copy().normalize(); //Rotate vector<> to gimble angle.
+            _tvcDirection = -_tvcPosition.copy().normalize(); //Rotate VectorOLD<> to gimble angle.
 
             _tvcForce = _setpoint.force^(-_tvcPosition.copy()).normalize(); //Project to get force.
             _tvcForce = constrain(_tvcForce, _maxForce, 0.0f); //Limit to force constraint.
@@ -129,10 +129,10 @@ private:
         } else {
 
             Fm = _setpoint.torqe.cross(_tvcPosition.copy().normalize())/_tvcPosition.magnitude();
-            Vector<> Fp = (_setpoint.force - Fm).getProjectionOn(_tvcPosition);
+            VectorOLD<> Fp = (_setpoint.force - Fm).getProjectionOn(_tvcPosition);
 
             float FmMag = Fm.magnitude();
-            //Vector<> FmDir = Fm.copy().normalize();
+            //VectorOLD<> FmDir = Fm.copy().normalize();
 
             float FpMag = Fp.magnitude();
 
@@ -142,9 +142,9 @@ private:
             FML::Quaternion<> rotation = FML::Quaternion<>(_tvcPosition.cross(Fm), ang); //Get TVC rotation in body frame space
             rotation = _tvcNeutralDirection*rotation; //Get TVC rotation in body frame space
 
-            _tvcDirection = (rotation*(_tvcPosition.copy().normalize())*rotation.copy().conjugate()).toVector(); //Rotate vector<> to gimble angle.
+            _tvcDirection = (rotation*(_tvcPosition.copy().normalize())*rotation.copy().conjugate()).toVector(); //Rotate VectorOLD<> to gimble angle.
 
-            if (_tvcDirection.isZeroVector()) _tvcDirection = Vector<>(0,0,1);
+            if (_tvcDirection.isZeroVector()) _tvcDirection = VectorOLD<>(0,0,1);
 
             if (FmMag == 0) {
                 _tvcForce = 0;
@@ -171,7 +171,7 @@ private:
 
     float _maxForce = 0, _maxAngle = 0;
 
-    Vector<> _tvcPosition;
+    VectorOLD<> _tvcPosition;
     FML::Quaternion<> _tvcNeutralDirection;
 
     //Is set to false when variables need to be recalculated.
@@ -179,10 +179,10 @@ private:
 
     bool _forceMaster = false;
 
-    Vector<> _tvcDirection;
+    VectorOLD<> _tvcDirection;
     float _tvcForce = 0;
 
-    Vector<> Fm;
+    VectorOLD<> Fm;
 
 
     

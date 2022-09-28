@@ -25,7 +25,7 @@ void NavigationComplementaryFilter::thread() {
         DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>> sensorTime;
         gyroSub_.takeBack(sensorTime);
 
-        Vector<> rotationVector;
+        VectorOLD<> rotationVector;
         rotationVector.x = sensorTime.data.values[0][0];
         rotationVector.y = sensorTime.data.values[1][0];
         rotationVector.z = sensorTime.data.values[2][0];
@@ -39,7 +39,7 @@ void NavigationComplementaryFilter::thread() {
         gyroXBuffer_.placeFront(rotationVector.x, true);
         gyroYBuffer_.placeFront(rotationVector.y, true);
         gyroZBuffer_.placeFront(rotationVector.z, true);
-        rotationVector = Vector<>(gyroXBuffer_.getMedian(), gyroYBuffer_.getMedian(), gyroZBuffer_.getMedian());
+        rotationVector = VectorOLD<>(gyroXBuffer_.getMedian(), gyroYBuffer_.getMedian(), gyroZBuffer_.getMedian());
 
         //Calulate time delta
         float dt = float(timestamp - lastGyroTimestamp_)/SECONDS;
@@ -87,7 +87,7 @@ void NavigationComplementaryFilter::thread() {
         DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>> sensorTime;
         accelSub_.takeBack(sensorTime);
 
-        Vector<> accelVector;
+        VectorOLD<> accelVector;
         accelVector.x = sensorTime.data.values[0][0];
         accelVector.y = sensorTime.data.values[1][0];
         accelVector.z = sensorTime.data.values[2][0];
@@ -98,7 +98,7 @@ void NavigationComplementaryFilter::thread() {
         accelXBuffer_.placeFront(accelVector.x, true);
         accelYBuffer_.placeFront(accelVector.y, true);
         accelZBuffer_.placeFront(accelVector.z, true);
-        //accelVector = Vector<>(accelXBuffer_.getMedian(), accelYBuffer_.getMedian(), accelZBuffer_.getMedian());
+        //accelVector = VectorOLD<>(accelXBuffer_.getMedian(), accelYBuffer_.getMedian(), accelZBuffer_.getMedian());
         accelVector = accelLPF_.update(accelVector);
 
         //Serial.println(String("Accel: ") + accelVector.toString());
@@ -117,10 +117,10 @@ void NavigationComplementaryFilter::thread() {
             float beta = 0.1f;
 
             //Z-Axis correction
-            Vector<> zAxisIs = Vector<>(0,0,1);
-            Vector<> zAxisSet = (navigationData_.data.attitude*accelVector*navigationData_.data.attitude.copy().conjugate()).toVector();
+            VectorOLD<> zAxisIs = VectorOLD<>(0,0,1);
+            VectorOLD<> zAxisSet = (navigationData_.data.attitude*accelVector*navigationData_.data.attitude.copy().conjugate()).toVector();
 
-            Vector<> zAxisRotationAxis = zAxisSet.cross(zAxisIs);
+            VectorOLD<> zAxisRotationAxis = zAxisSet.cross(zAxisIs);
             float zAxisRotationAngle = zAxisSet.getAngleTo(zAxisIs);
 
             FML::Quaternion<> zAxisCorrectionQuat = FML::Quaternion<>(zAxisRotationAxis, zAxisRotationAngle*beta*dt);
@@ -139,14 +139,14 @@ void NavigationComplementaryFilter::thread() {
 
                 magTrue = magTrue*0.9999f + magBuf*0.0001f;
 
-                gravity_ = Vector<>(0,0, magTrue);
+                gravity_ = VectorOLD<>(0,0, magTrue);
 
                 //Serial.println(gravity_.toString());
 
             }*/
 
             //Update acceleration bias
-            Vector<> localLinearAccel = accelVector - navigationData_.data.attitude.copy().conjugate().rotateVector(gravity_);
+            VectorOLD<> localLinearAccel = accelVector - navigationData_.data.attitude.copy().conjugate().rotateVector(gravity_);
             //Serial.println(localLinearAccel.toString());
             if (abs(localLinearAccel.magnitude()) < 1.0f) {
                 //accelBiasLPF_.setParameters(0.1/(1 + localLinearAccel.magnitude()*10), 8000);
@@ -163,7 +163,7 @@ void NavigationComplementaryFilter::thread() {
             navigationData_.data.linearAcceleration = navigationData_.data.acceleration - gravity_;
 
             //Update error
-            Vector<> accelError(accelXBuffer_.getStandardDeviation(), accelYBuffer_.getStandardDeviation(), accelZBuffer_.getStandardDeviation());
+            VectorOLD<> accelError(accelXBuffer_.getStandardDeviation(), accelYBuffer_.getStandardDeviation(), accelZBuffer_.getStandardDeviation());
             accelError = (navigationData_.data.attitude*accelError*navigationData_.data.attitude.copy().conjugate()).toVector();
             navigationData_.data.accelerationError.x = abs(accelError.x);
             navigationData_.data.accelerationError.y = abs(accelError.y);
@@ -180,10 +180,10 @@ void NavigationComplementaryFilter::thread() {
             lastAccelTimestamp_ = timestamp;
 
             //Set Attitude
-            Vector<> zAxisIs = Vector<>(0,0,1);
-            Vector<> zAxisSet = (navigationData_.data.attitude*accelVector*navigationData_.data.attitude.copy().conjugate()).toVector();
+            VectorOLD<> zAxisIs = VectorOLD<>(0,0,1);
+            VectorOLD<> zAxisSet = (navigationData_.data.attitude*accelVector*navigationData_.data.attitude.copy().conjugate()).toVector();
 
-            Vector<> zAxisRotationAxis = zAxisSet.cross(zAxisIs);
+            VectorOLD<> zAxisRotationAxis = zAxisSet.cross(zAxisIs);
             float zAxisRotationAngle = zAxisSet.getAngleTo(zAxisIs);
 
             FML::Quaternion<> zAxisCorrectionQuat = FML::Quaternion<>(zAxisRotationAxis, zAxisRotationAngle);
@@ -211,7 +211,7 @@ void NavigationComplementaryFilter::thread() {
         DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>> sensorTime;
         magSub_.takeBack(sensorTime);
 
-        Vector<> magVector;
+        VectorOLD<> magVector;
         magVector.x = sensorTime.data.values[0][0];
         magVector.y = sensorTime.data.values[1][0];
         magVector.z = sensorTime.data.values[2][0];
@@ -252,9 +252,9 @@ void NavigationComplementaryFilter::thread() {
             Serial.println();*/
 
             //Mounting orientation compensation
-            //magVector = FML::Quaternion<>(Vector<>(0, -1, 0), 90*DEGREES).rotateVector(magVector);
+            //magVector = FML::Quaternion<>(VectorOLD<>(0, -1, 0), 90*DEGREES).rotateVector(magVector);
 
-            Vector<> magBuf = magVector;
+            VectorOLD<> magBuf = magVector;
             magVector.x = -magBuf.z;
             magVector.y = magBuf.x;
             magVector.z = magBuf.y;
@@ -270,11 +270,11 @@ void NavigationComplementaryFilter::thread() {
             float gamma = 0.1f;
 
             //X-Axis correction
-            Vector<> xAxisIs(1,0,0);
-            Vector<> xAxisSet = (navigationData_.data.attitude*magVector*navigationData_.data.attitude.copy().conjugate()).toVector();
+            VectorOLD<> xAxisIs(1,0,0);
+            VectorOLD<> xAxisSet = (navigationData_.data.attitude*magVector*navigationData_.data.attitude.copy().conjugate()).toVector();
             xAxisSet.z = 0;
 
-            Vector<> xAxisRotationAxis = Vector<>(0,0,1);
+            VectorOLD<> xAxisRotationAxis = VectorOLD<>(0,0,1);
             float xAxisRotationAngle = -atan2(xAxisSet.y, xAxisSet.x);
 
             FML::Quaternion<> xAxisCorrectionQuat = FML::Quaternion<>(xAxisRotationAxis, xAxisRotationAngle*gamma*dt);
@@ -291,12 +291,12 @@ void NavigationComplementaryFilter::thread() {
             lastMagTimestamp_ = timestamp;
 
             //Set heading
-            Vector<> xAxisIs(1,0,0);
-            Vector<> xAxisSet = (navigationData_.data.attitude*magVector*navigationData_.data.attitude.copy().conjugate()).toVector();
+            VectorOLD<> xAxisIs(1,0,0);
+            VectorOLD<> xAxisSet = (navigationData_.data.attitude*magVector*navigationData_.data.attitude.copy().conjugate()).toVector();
             xAxisSet.z = 0;
             xAxisSet.normalize();
 
-            Vector<> xAxisRotationAxis = Vector<>(0,0,1);
+            VectorOLD<> xAxisRotationAxis = VectorOLD<>(0,0,1);
             float xAxisRotationAngle = -atan2(xAxisSet.y, xAxisSet.x);
 
             FML::Quaternion<> xAxisCorrectionQuat = FML::Quaternion<>(xAxisRotationAxis, xAxisRotationAngle);
@@ -403,7 +403,7 @@ void NavigationComplementaryFilter::thread() {
             navigationData_.data.absolutePosition.longitude = positionAbsolute.longitude;
             //navigationData_.data.absolutePosition.height = positionAbsolute.height;
 
-            Vector<> positionBuf = positionAbsolute.getPositionVectorFrom(navigationData_.data.homePosition);
+            VectorOLD<> positionBuf = positionAbsolute.getPositionVectorFrom(navigationData_.data.homePosition);
 
             //Serial.println(navigationData_.data.homePosition.height);
 
@@ -413,14 +413,14 @@ void NavigationComplementaryFilter::thread() {
 
             if (gnssPositionXBuffer_.available() >= 2) {
 
-                ValueError<Vector<>> position;
-                position.value = positionBuf;//Vector<>(gnssPositionXBuffer_.getMedian(), gnssPositionYBuffer_.getMedian(), gnssPositionZBuffer_.getMedian());
-                position.error = Vector<>(posError, posError, heightError)/2;
+                ValueError<VectorOLD<>> position;
+                position.value = positionBuf;//VectorOLD<>(gnssPositionXBuffer_.getMedian(), gnssPositionYBuffer_.getMedian(), gnssPositionZBuffer_.getMedian());
+                position.error = VectorOLD<>(posError, posError, heightError)/2;
 
                 //Serial.print(String("Pos: ") + position.value.toString() + ", error: " + position.error.toString());
 
                 //Create corrcted prediction
-                position = ValueError<Vector<>>(Vector<>(navigationData_.data.position.x, navigationData_.data.position.y, navigationData_.data.absolutePosition.height), navigationData_.data.positionError).weightedAverage(position);
+                position = ValueError<VectorOLD<>>(VectorOLD<>(navigationData_.data.position.x, navigationData_.data.position.y, navigationData_.data.absolutePosition.height), navigationData_.data.positionError).weightedAverage(position);
 
                 if (!seaLevelPressureCorrected_ && baroPressure_ > 10) {
                     seaLevelPressureCorrected_ = true;
@@ -443,7 +443,7 @@ void NavigationComplementaryFilter::thread() {
             }
 
 
-            Vector<>& velocityBuf = gnssData.data.velocity;
+            VectorOLD<>& velocityBuf = gnssData.data.velocity;
             time = gnssData.timestamp;
 
             gnssVelocityXBuffer_.placeFront(velocityBuf.x, true);
@@ -452,14 +452,14 @@ void NavigationComplementaryFilter::thread() {
 
             if (gnssVelocityXBuffer_.available() >= 2) {
 
-                ValueError<Vector<>> velocity;
-                velocity.value = velocityBuf;//Vector<>(gnssVelocityXBuffer_.getMedian(), gnssVelocityYBuffer_.getMedian(), gnssVelocityZBuffer_.getMedian());
-                velocity.error = Vector<>(posError/50, posError/50, heightError/50);
+                ValueError<VectorOLD<>> velocity;
+                velocity.value = velocityBuf;//VectorOLD<>(gnssVelocityXBuffer_.getMedian(), gnssVelocityYBuffer_.getMedian(), gnssVelocityZBuffer_.getMedian());
+                velocity.error = VectorOLD<>(posError/50, posError/50, heightError/50);
 
                 //Serial.println(String(",\tVel: ") + velocity.value.toString() + ", error: " + velocity.error.toString());
                 
                 //Create corrcted prediction
-                velocity = ValueError<Vector<>>(navigationData_.data.velocity, navigationData_.data.velocityError).weightedAverage(velocity);
+                velocity = ValueError<VectorOLD<>>(navigationData_.data.velocity, navigationData_.data.velocityError).weightedAverage(velocity);
 
                 //Serial.println(String("Vel: ") + velocity.value.toString() + ", error: " + velocity.error.toString());
 

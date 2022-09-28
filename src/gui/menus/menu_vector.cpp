@@ -1,9 +1,10 @@
 #include "KraftKontrol/gui/menus/menu_vector.h"
 
 
+#include "Arduino.h"
 
 
-Menu_Vector::Menu_Vector(const Topic<Vector<>>& vectorTopic, const char* menuListName, MenuControl_Abstract& menuControl): Menu_Abstract(menuListName) {
+Menu_Vector::Menu_Vector(const Topic<VectorOLD<>>& vectorTopic, const char* menuListName, MenuControl_Abstract& menuControl): Menu_Abstract(menuListName) {
 
     menuControlSubscriber_.subscribe(menuControl.getMenuInputTopic());
     vectorSubr_.subscribe(vectorTopic);
@@ -11,7 +12,7 @@ Menu_Vector::Menu_Vector(const Topic<Vector<>>& vectorTopic, const char* menuLis
 }
 
 
-Menu_Abstract* Menu_Vector::menuDisplayUpdate(Display_Abstract& display, Task_Abstract& gui) {
+Menu_Abstract* Menu_Vector::menuDisplayUpdate(Display_Abstract& display, Task_Threading& gui) {
 
     Menu_Abstract* returnValue = this;
 
@@ -41,7 +42,7 @@ Menu_Abstract* Menu_Vector::menuDisplayUpdate(Display_Abstract& display, Task_Ab
 
     display.drawText(20, 20, color, 1, getMenuName());
 
-    display.drawText(10, display.getDisplayHeight()/2, color, 1, (vectorSubr_.getItem().toString()).c_str());
+    //display.drawText(10, display.getDisplayHeight()/2, color, 1, (vectorSubr_.getItem().toString()).c_str());
 
     display.update();
 

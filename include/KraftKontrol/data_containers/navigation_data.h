@@ -4,7 +4,6 @@
 
 
 #include "kinematic_data.h"
-#include "lib/MathHelperLibrary/vector_math.h"
 
 
 
@@ -80,7 +79,7 @@ struct WorldPosition {
      * @param WorldPosition Reference point for position
      * @returns position vector
      */
-    Vector<> getPositionVectorFrom(const WorldPosition &referencePoint) const {
+    VectorOLD<> getPositionVectorFrom(const WorldPosition &referencePoint) const {
 
         double heightRef = height - referencePoint.height;
 
@@ -90,7 +89,7 @@ struct WorldPosition {
         double north = (latitude - referencePoint.latitude)*radius;
         double east = (longitude - referencePoint.longitude)*radius*cosLat;
 
-        return Vector<>(north, -east, heightRef);
+        return VectorOLD<>(north, -east, heightRef);
 
         /*
         //Calculate helper variables
@@ -106,14 +105,14 @@ struct WorldPosition {
         float bY = radiusB*cos(referencePoint.latitude)*sin(referencePoint.longitude);
         float bZ = radiusB*sin(referencePoint.latitude);
 
-        Vector<> bToA = Vector<>(float(aX-bX), float(aY-bY), float(aZ-bZ));
+        VectorOLD<> bToA = VectorOLD<>(float(aX-bX), float(aY-bY), float(aZ-bZ));
 
         //Rotate vector onto tangential plane on references coordinates
-        Quaternion<> rotation = Quaternion<>(Vector<>(0,0,1), referencePoint.longitude)*Quaternion<>(Vector<>(0,1,0), referencePoint.latitude);
+        Quaternion<> rotation = Quaternion<>(VectorOLD<>(0,0,1), referencePoint.longitude)*Quaternion<>(VectorOLD<>(0,1,0), referencePoint.latitude);
         bToA = rotation.rotateVector(bToA);
 
         //Change to system coordinate system
-        Vector<> buf = bToA;
+        VectorOLD<> buf = bToA;
 
         bToA.x = buf.z;
         bToA.y = -buf.y;

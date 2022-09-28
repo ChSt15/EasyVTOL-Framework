@@ -107,7 +107,7 @@ void QMC5883Driver::thread() {
             if (!getData()) {
 
                 //moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
-                stopTaskThreading();
+                suspendUntil(END_OF_TIME);
 
             }
 
@@ -130,7 +130,7 @@ void QMC5883Driver::thread() {
     } else { //This section is for device failure or a wierd mode that should not be set, therefore assume failure
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
-        stopTaskThreading();
+        suspendUntil(END_OF_TIME);
 
     }
 

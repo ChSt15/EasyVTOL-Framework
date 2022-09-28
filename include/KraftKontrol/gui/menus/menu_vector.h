@@ -21,7 +21,7 @@ private:
     Buffer_Subscriber<eMenuControlInput_t, 10> menuControlSubscriber_;
 
     //Subscriber for vector data.
-    Simple_Subscriber<Vector<>> vectorSubr_;
+    Simple_Subscriber<VectorOLD<>> vectorSubr_;
 
 
 public:
@@ -29,7 +29,7 @@ public:
     /**
      * @param menuControl Which device to use as control for menu.
      */
-    Menu_Vector(const Topic<Vector<>>& vectorTopic, const char* menuListName, MenuControl_Abstract& menuControl);
+    Menu_Vector(const Topic<VectorOLD<>>& vectorTopic, const char* menuListName, MenuControl_Abstract& menuControl);
 
 
 protected:
@@ -47,7 +47,7 @@ protected:
      * @param gui Gui task that called this menu. Can be used to change display fps, etc. 
      * @returns pointer to Menu_Abstract.
      */
-    Menu_Abstract* menuDisplayUpdate(Display_Abstract& display, Task_Abstract& gui) override;
+    Menu_Abstract* menuDisplayUpdate(Display_Abstract& display, Task_Threading& gui) override;
 
 
 };

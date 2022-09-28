@@ -3,27 +3,8 @@
 
 
 
-Joystick::Joystick(const ADCChannel& adcXChannel, const ADCChannel& adcYChannel): 
-    Task_Abstract("Joystick", 100, eTaskPriority_t::eTaskPriority_VeryHigh),
-    xAxisPositive_(adcXChannel, joystickThreshold_, false),
-    xAxisNegative_(adcXChannel, joystickThreshold_, true),
-    yAxisPositive_(adcYChannel, joystickThreshold_, false),
-    yAxisNegative_(adcYChannel, joystickThreshold_, true),
-    button_(0)
-{
-
-    button_.removeFromScheduler(); //Dont waste time on this.
-
-    xAxisPositiveSubr_.subscribe(xAxisPositive_.getButtonTopic());
-    xAxisNegativeSubr_.subscribe(xAxisNegative_.getButtonTopic());
-    yAxisPositiveSubr_.subscribe(yAxisPositive_.getButtonTopic());
-    yAxisNegativeSubr_.subscribe(yAxisNegative_.getButtonTopic());
-
-}
-
-
-Joystick::Joystick(const ADCChannel& adcXChannel, const ADCChannel& adcYChannel, int buttonPin):
-    Task_Abstract("Joystick", 100, eTaskPriority_t::eTaskPriority_VeryHigh),
+Joystick::Joystick(const ADCChannel& adcXChannel, const ADCChannel& adcYChannel, GPIO_HAL_Abstract& buttonPin):
+    Task_Threading("Joystick", eTaskPriority_t::eTaskPriority_VeryHigh, SECONDS/100),
     xAxisPositive_(adcXChannel, joystickThreshold_, false),
     xAxisNegative_(adcXChannel, joystickThreshold_, true),
     yAxisPositive_(adcYChannel, joystickThreshold_, false),

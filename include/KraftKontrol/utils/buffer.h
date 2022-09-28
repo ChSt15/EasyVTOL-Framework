@@ -19,6 +19,20 @@
  */
 template<typename T, uint32_t size_> 
 class Buffer {
+private:
+
+    //Array for element storage
+    T bufferArray_[size_];
+
+    //Should always have number of elements.
+    uint32_t numElements_ = 0;
+
+    //Points to index ahead of first element
+    uint32_t front_ = 0;
+    //Points to index of last element
+    uint32_t back_ = 0;
+
+
 public:
 
     /**
@@ -141,7 +155,7 @@ public:
      * @param index Index of element to be removed.
      * @returns true if element was found and removed.
      */
-    inline bool removeElementIndex(uint32_t index);
+    inline bool removeElementIndex(int32_t index);
 
     /**
      * Places element into given index
@@ -187,7 +201,7 @@ public:
      * Starts from back of buffer("oldest" element or first that was placed inside).
      * @returns copy of element from index.
      */
-    inline T& operator[] (uint32_t index);
+    inline T& operator[] (int32_t index);
 
     /**
      * Used to access buffer like an array.
@@ -196,7 +210,7 @@ public:
      * Starts from back of buffer("oldest" element or first that was placed inside).
      * @returns copy of element from index.
      */
-    inline const T& operator[] (uint32_t index) const;
+    inline const T& operator[] (int32_t index) const;
 
     /**
      * Needs to be overloaded to also copy the data to instance.
@@ -217,17 +231,6 @@ private:
     inline uint32_t quickSortPartition(uint32_t left, uint32_t right);
 
     void insertionSort();
-
-    //Array for element storage
-    T bufferArray_[size_];
-
-    //Should always have number of elements.
-    uint32_t numElements_ = 0;
-
-    //Points to index ahead of first element
-    uint32_t front_ = 0;
-    //Points to index of last element
-    uint32_t back_ = 0;
 
 
 };
@@ -272,17 +275,17 @@ inline T Buffer<T, size_>::getMedian() const {
 
     T median;
 
-    Buffer<T, size_> bufferSorted; //Will not fragment heap as it will immediately be deallocated when this function returns.
+    Buffer<T, size_> bufferSorted;
 
     bufferSorted = *this;
 
     bufferSorted.sortElements();
 
-    if (numElements_%2 == 0) { //Is even?
+    if (numElements_%2 == 0) {
 
         median = (bufferSorted[numElements_/2-1] + bufferSorted[numElements_/2])/2;
 
-    } else { //Odd
+    } else {
     
         median = bufferSorted[numElements_/2];
 
@@ -395,7 +398,7 @@ inline void Buffer<T, size_>::clear() {
 
 
 template<typename T, uint32_t size_> 
-inline bool Buffer<T, size_>::removeElementIndex(uint32_t index) {
+inline bool Buffer<T, size_>::removeElementIndex(int32_t index) {
 
     //Make sure buffer isnt empty
     if (numElements_ == 0) return false;
@@ -446,13 +449,15 @@ inline bool Buffer<T, size_>::removeElement(T* pointerToElement) {
 
 
 template<typename T, uint32_t size_> 
-inline T& Buffer<T, size_>::operator[] (uint32_t index) {
+inline T& Buffer<T, size_>::operator[] (int32_t index) {
+    if (index < 0) index = numElements_ + index;
     return bufferArray_[(back_ + index)%numElements_];
 }
 
 
 template<typename T, uint32_t size_> 
-inline const T& Buffer<T, size_>::operator[] (uint32_t index) const {
+inline const T& Buffer<T, size_>::operator[] (int32_t index) const {
+    if (index < 0) index = numElements_ + index;
     return bufferArray_[(back_ + index)%numElements_];
 }
 

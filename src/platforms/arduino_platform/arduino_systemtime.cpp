@@ -1,11 +1,16 @@
-#include "KraftKontrol/platforms/arduino_platform/arduino_systemtime.h"
+#include "KraftKontrol/utils/system_time.h"
 
 
-int64_t NOW() {
+#include "Arduino.h"
+
+#include "stdint.h"
+
+
+int64_t internalTime() {
 
     static int32_t g_lastMicroseconds = 0;
     static int64_t g_currentTime = 0;
-    static bool lock = false; //Needed due to interrrupts to make "thread safe" and protect data.
+    static bool lock = false; //Needed due to interrupts to make "thread safe" and protect data.
 
     int32_t time = micros();
 

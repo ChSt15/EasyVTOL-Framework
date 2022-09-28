@@ -51,7 +51,6 @@ void IMUSimulator::thread() {
         lastAccel_ = accel;
         accel = attitude.data.rotateVec(accel);
 
-        SensorData<FML::Vector3_F, FML::Matrix33_F> dataOut;
         dataOut.values = accel;
         dataOut.values(0) += randNorm(accelVariance_);
         dataOut.values(1) += randNorm(accelVariance_);
@@ -92,7 +91,6 @@ void IMUSimulator::thread() {
         //Update accel with new attitude. Rotation will change accel in sensor frame
         auto accel = attitude.data.rotateVec(lastAccel_);
 
-        SensorData<FML::Vector3_F, FML::Matrix33_F> dataOut;
         dataOut.values = accel;
         dataOut.values(0) += randNorm(accelVariance_);
         dataOut.values(1) += randNorm(accelVariance_);

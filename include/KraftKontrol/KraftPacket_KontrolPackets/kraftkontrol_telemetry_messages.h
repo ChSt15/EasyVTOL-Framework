@@ -66,7 +66,7 @@ public:
 
     TelemetryMessagePosition() {}
 
-    TelemetryMessagePosition(const Vector<> &position): MessageVector_Abstract(position) {}
+    TelemetryMessagePosition(const VectorOLD<> &position): MessageVector_Abstract(position) {}
 
     uint32_t getDataType() const final override {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_Position;}
 
@@ -81,7 +81,7 @@ public:
 
     TelemetryMessageVelocity() {}
 
-    TelemetryMessageVelocity(const Vector<> &velocity): MessageVector_Abstract(velocity) {}
+    TelemetryMessageVelocity(const VectorOLD<> &velocity): MessageVector_Abstract(velocity) {}
 
     uint32_t getDataType() const final override {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_Velocity;}
 
@@ -96,7 +96,7 @@ public:
 
     TelemetryMessageAccel() {}
 
-    TelemetryMessageAccel(const Vector<> &accel): MessageVector_Abstract(accel) {}
+    TelemetryMessageAccel(const VectorOLD<> &accel): MessageVector_Abstract(accel) {}
 
     uint32_t getDataType() const final override {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_Acceleration;}
 
@@ -126,7 +126,7 @@ public:
 
     TelemetryMessageForce() {}
 
-    TelemetryMessageForce(const Vector<> &force): MessageVector_Abstract(force) {}
+    TelemetryMessageForce(const VectorOLD<> &force): MessageVector_Abstract(force) {}
 
     uint32_t getDataType() const final override {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_Force;}
 
@@ -141,7 +141,7 @@ public:
 
     TelemetryMessageTorque() {}
 
-    TelemetryMessageTorque(const Vector<> &torque): MessageVector_Abstract(torque) {}
+    TelemetryMessageTorque(const VectorOLD<> &torque): MessageVector_Abstract(torque) {}
 
     uint32_t getDataType() const final override {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_Torque;}
 
@@ -156,7 +156,7 @@ public:
 
     TelemetryMessageAngularVelocity() {}
 
-    TelemetryMessageAngularVelocity(const Vector<> &angularVelocity): MessageVector_Abstract(angularVelocity) {}
+    TelemetryMessageAngularVelocity(const VectorOLD<> &angularVelocity): MessageVector_Abstract(angularVelocity) {}
 
     uint32_t getDataType() const final override {return eMessageTypeTelemetry_t::eMessageTypeTelemetry_AngularVelocity;}
     

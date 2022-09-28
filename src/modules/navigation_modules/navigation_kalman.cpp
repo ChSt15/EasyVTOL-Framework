@@ -2,7 +2,7 @@
 
 
 
-NavigationKalman::NavigationKalman(SystemModel_Abstract& systemModel) : Task_Abstract("Nav Kalmanfilter", 1000, eTaskPriority_t::eTaskPriority_High), systemModel_(systemModel) {}
+NavigationKalman::NavigationKalman(SystemModel_Abstract& systemModel) : Task_Threading("Nav Kalmanfilter", eTaskPriority_t::eTaskPriority_High, SECONDS/1000), systemModel_(systemModel) {}
 
 
 
@@ -19,7 +19,7 @@ void NavigationKalman::thread() {
         int64_t smallestTime = NOW();
 
         //Gather valid sensor values
-        DataTimestamped<Vector<>> angularRateRaw;
+        DataTimestamped<VectorOLD<>> angularRateRaw;
         if (gyroSub_.isDataNew()) {
             angularRateRaw.data.x = gyroSub_.getItem().data.values[0][0];
             angularRateRaw.data.y = gyroSub_.getItem().data.values[1][0];
@@ -29,7 +29,7 @@ void NavigationKalman::thread() {
             newData = true;
         }
 
-        DataTimestamped<Vector<>> accelRaw;
+        DataTimestamped<VectorOLD<>> accelRaw;
         if (accelSub_.isDataNew()) {
             accelRaw.data.x = accelSub_.getItem().data.values[0][0];
             accelRaw.data.y = accelSub_.getItem().data.values[1][0];
@@ -39,7 +39,7 @@ void NavigationKalman::thread() {
             newData = true;
         }
 
-        DataTimestamped<Vector<>> magRaw;
+        DataTimestamped<VectorOLD<>> magRaw;
         if (magSub_.isDataNew()) {
             magRaw.data.x = magSub_.getItem().data.values[0][0];
             magRaw.data.y = magSub_.getItem().data.values[1][0];
@@ -97,7 +97,7 @@ void NavigationKalman::thread() {
             angularRateRaw.data = statePrediction.data.attitude.rotateVector(angularRateRaw.data);
 
             //Calulate gyro error
-            Vector<> gyroCov = (angularRateRaw.data-statePrediction.data.angularRate).square();
+            VectorOLD<> gyroCov = (angularRateRaw.data-statePrediction.data.angularRate).square();
 
             angularRateCovBuf_.placeFront(gyroCov, true);
             gyroCov = 0;
@@ -110,20 +110,20 @@ void NavigationKalman::thread() {
 
 
             //Calculate angular acceleration value and error
-            Vector<> gyroAccel = (angularRateRaw.data-lastAngularRateValue_)/dTime;
-            Vector<> gyroAccelCov = (gyroCov+lastAngularRateCov_)/dTime;
+            VectorOLD<> gyroAccel = (angularRateRaw.data-lastAngularRateValue_)/dTime;
+            VectorOLD<> gyroAccelCov = (gyroCov+lastAngularRateCov_)/dTime;
 
 
             //Correct state prediction
-            //Vector<> accelGain = statePrediction.data.angularAccelerationError/(statePrediction.data.angularAccelerationError + gyroAccelCov);
+            //VectorOLD<> accelGain = statePrediction.data.angularAccelerationError/(statePrediction.data.angularAccelerationError + gyroAccelCov);
             statePrediction.data.angularAcceleration = gyroAccel;//statePrediction.data.angularAcceleration + accelGain*(gyroAccel-statePrediction.data.angularAcceleration);
 
-            //Vector<> rateGain = statePrediction.data.angularRateError/(statePrediction.data.angularRateError + gyroCov);
+            //VectorOLD<> rateGain = statePrediction.data.angularRateError/(statePrediction.data.angularRateError + gyroCov);
             statePrediction.data.angularRate = angularRateRaw.data;//statePrediction.data.angularRate + rateGain*(angularRateRaw.data-statePrediction.data.angularRate);
             
             //Calculate new state errors
-            statePrediction.data.angularAccelerationError = gyroAccelCov;//(Vector<>(1)-accelGain)*statePrediction.data.angularAccelerationError;
-            statePrediction.data.angularRateError = gyroCov;//(Vector<>(1)-rateGain)*statePrediction.data.angularRateError;
+            statePrediction.data.angularAccelerationError = gyroAccelCov;//(VectorOLD<>(1)-accelGain)*statePrediction.data.angularAccelerationError;
+            statePrediction.data.angularRateError = gyroCov;//(VectorOLD<>(1)-rateGain)*statePrediction.data.angularRateError;
 
             //Serial.println(String(", Gyro: ") + navigationData_.data.angularRate.x + ", " + navigationData_.data.angularRate.y + ", " + navigationData_.data.angularRate.z);
 
@@ -143,8 +143,8 @@ void NavigationKalman::thread() {
             //Get delta time from last accel data
             float dTime = float(accelRaw.timestamp - lastAccelTimestamp_)/SECONDS;
 
-            //static LowPassFilter<Vector<>> LPF = 0.1;
-            //Vector<> value = LPF.update(accelRaw.data);
+            //static LowPassFilter<VectorOLD<>> LPF = 0.1;
+            //VectorOLD<> value = LPF.update(accelRaw.data);
 
             //Serial.println(String("Val: ") + String(value.x, 4) + ", " + String(value.y, 4) + ", " + String(value.z, 4));
 
@@ -155,8 +155,8 @@ void NavigationKalman::thread() {
 
             //Find out accel covariance and value in world coordinates
             //accelRaw.data = statePrediction.data.attitude.rotateVector(accelRaw.data);
-            //Vector<> accelMean = (lastAccelValue_ + accelRaw.data)*0.5;
-            /*Vector<> accelCov = (accelRaw.data-statePrediction.data.attitude.copy().conjugate().rotateVector(statePrediction.data.acceleration)).square();
+            //VectorOLD<> accelMean = (lastAccelValue_ + accelRaw.data)*0.5;
+            /*VectorOLD<> accelCov = (accelRaw.data-statePrediction.data.attitude.copy().conjugate().rotateVector(statePrediction.data.acceleration)).square();
             lastAccelValue_ = accelRaw.data;
 
             accelCovBuf_.placeFront(accelCov, true);
@@ -166,7 +166,7 @@ void NavigationKalman::thread() {
             }
             accelCov = sqrt(accelCov/accelCovBuf_.available());*/
 
-            Vector<> accelCov = Vector<>(0.03);
+            VectorOLD<> accelCov = VectorOLD<>(0.03);
 
             //Serial.println(String("Accel: ") + accelCov.x + ", " + accelCov.y + ", " + accelCov.z);
 
@@ -175,10 +175,10 @@ void NavigationKalman::thread() {
             beta = 0.1*beta*beta;
 
             //Z-Axis correction
-            Vector<> zAxisIs = Vector<>(0,0,1);
-            Vector<> zAxisSet = statePrediction.data.attitude.rotateVector(accelRaw.data);
+            VectorOLD<> zAxisIs = VectorOLD<>(0,0,1);
+            VectorOLD<> zAxisSet = statePrediction.data.attitude.rotateVector(accelRaw.data);
 
-            Vector<> zAxisRotationAxis = zAxisSet.cross(zAxisIs);
+            VectorOLD<> zAxisRotationAxis = zAxisSet.cross(zAxisIs);
             float zAxisRotationAngle = zAxisSet.getAngleTo(zAxisIs);
 
             FML::Quaternion<> zAxisCorrectionQuat = FML::Quaternion<>(zAxisRotationAxis, zAxisRotationAngle*beta*dTime);
@@ -194,7 +194,7 @@ void NavigationKalman::thread() {
             //accelCov = statePrediction.data.attitude.rotateVector(accelCov);
 
             //Run kalman filter correction stuff 
-            //Vector<> accelGain = statePrediction.data.accelerationError/(statePrediction.data.accelerationError + accelCov);
+            //VectorOLD<> accelGain = statePrediction.data.accelerationError/(statePrediction.data.accelerationError + accelCov);
             statePrediction.data.acceleration = accelRaw.data;//statePrediction.data.acceleration + accelGain*(accelRaw.data-statePrediction.data.acceleration);
 
             statePrediction.data.linearAcceleration = statePrediction.data.acceleration + GRAVITY_VECTOR;
@@ -208,7 +208,7 @@ void NavigationKalman::thread() {
             Serial.println(String("Bias: x: ") + accelBias.getValue().x +  ", y: " + accelBias.getValue().y +  ", z: " + accelBias.getValue().z);*/
             
             //Calculate new state errors
-            statePrediction.data.accelerationError = Vector<>(0.03);//(Vector<>(1)-accelGain)*statePrediction.data.accelerationError;
+            statePrediction.data.accelerationError = VectorOLD<>(0.03);//(VectorOLD<>(1)-accelGain)*statePrediction.data.accelerationError;
 
             //Serial.println(String("Cov: x: ") + abs(accelCov.x) + ", y: " + abs(accelCov.y) + ", z: " + abs(accelCov.z));
 
@@ -240,7 +240,7 @@ void NavigationKalman::thread() {
 
             //Find out mag covariance and value in world coordinates
             magRaw.data = statePrediction.data.attitude.rotateVector(magRaw.data);
-            //Vector<> magCov = (magRaw.data-statePrediction.data.attitude.rotateVector(Vector<>(1,0,0))).square();
+            //VectorOLD<> magCov = (magRaw.data-statePrediction.data.attitude.rotateVector(VectorOLD<>(1,0,0))).square();
 
             /*accelCovBuf_.placeFront(accelCov, true);
             accelCov = 0;
@@ -252,12 +252,12 @@ void NavigationKalman::thread() {
             float gamma = 0.1;
 
             //X-Axis correction
-            Vector<> xAxisIs(1,0,0);
-            Vector<> xAxisSet = magRaw.data;
+            VectorOLD<> xAxisIs(1,0,0);
+            VectorOLD<> xAxisSet = magRaw.data;
             xAxisSet.z = 0;
             xAxisSet.normalize();
 
-            Vector<> xAxisRotationAxis = Vector<>(0,0,1);
+            VectorOLD<> xAxisRotationAxis = VectorOLD<>(0,0,1);
             float xAxisRotationAngle = -atan2(xAxisSet.y, xAxisSet.x);
 
             FML::Quaternion<> xAxisCorrectionQuat = FML::Quaternion<>(xAxisRotationAxis, xAxisRotationAngle*gamma*dTime);
@@ -367,11 +367,11 @@ void NavigationKalman::thread() {
                 statePrediction.data.absolutePosition.longitude = gnssRaw.data.position.longitude;
                 //navigationData_.data.absolutePosition.height = positionAbsolute.height;
 
-                Vector<> positionBuf = gnssRaw.data.position.getPositionVectorFrom(statePrediction.data.homePosition);
+                VectorOLD<> positionBuf = gnssRaw.data.position.getPositionVectorFrom(statePrediction.data.homePosition);
 
 
                 //Run kalman filter correction stuff for pos
-                Vector<> posGain = 1;// statePrediction.data.positionError/(statePrediction.data.positionError + gnssRaw.data.positionError);
+                VectorOLD<> posGain = 1;// statePrediction.data.positionError/(statePrediction.data.positionError + gnssRaw.data.positionError);
                 statePrediction.data.position.x = statePrediction.data.position.x + posGain.x*(positionBuf.x - statePrediction.data.position.x);
                 statePrediction.data.position.y = statePrediction.data.position.y + posGain.y*(positionBuf.y - statePrediction.data.position.y);
 
@@ -382,7 +382,7 @@ void NavigationKalman::thread() {
 
 
                 //Run kalman filter correction stuff for vel
-                Vector<> velGain = 1;// statePrediction.data.velocityError/(statePrediction.data.velocityError + gnssRaw.data.velocityError);
+                VectorOLD<> velGain = 1;// statePrediction.data.velocityError/(statePrediction.data.velocityError + gnssRaw.data.velocityError);
                 statePrediction.data.velocity.x = statePrediction.data.velocity.x + posGain.x*(gnssRaw.data.velocity.x - statePrediction.data.velocity.x);
                 statePrediction.data.velocity.y = statePrediction.data.velocity.y + posGain.y*(gnssRaw.data.velocity.y - statePrediction.data.velocity.y);
 

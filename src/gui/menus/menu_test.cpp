@@ -10,7 +10,7 @@ Menu_Test::Menu_Test(const char* menuListName, MenuControl_Abstract& menuControl
 }
 
 
-Menu_Abstract* Menu_Test::menuDisplayUpdate(Display_Abstract& display, Task_Abstract& gui) {
+Menu_Abstract* Menu_Test::menuDisplayUpdate(Display_Abstract& display, Task_Threading& gui) {
 
     Menu_Abstract* returnValue = this;
 

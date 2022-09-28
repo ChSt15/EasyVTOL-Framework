@@ -51,7 +51,7 @@ public:
 
     CommandMessagePositionSet() {}
 
-    CommandMessagePositionSet(const Vector<> &position): MessageVector_Abstract(position) {}
+    CommandMessagePositionSet(const VectorOLD<> &position): MessageVector_Abstract(position) {}
 
     uint32_t getDataType() const final {return eMessageTypeCommand_t::eKraftMessageType_KraftKontrol_Position;}
 

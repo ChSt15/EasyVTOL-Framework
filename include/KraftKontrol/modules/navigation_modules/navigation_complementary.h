@@ -15,7 +15,7 @@
 
 #include "Arduino.h"
 
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 
 #include "navigation_abstract.h"
 
@@ -40,7 +40,7 @@
 
 
 
-class NavigationComplementaryFilter: public Navigation_Abstract, public Task_Abstract {
+class NavigationComplementaryFilter: public Navigation_Abstract, public Task_Threading {
 public:
 
     /**
@@ -52,7 +52,7 @@ public:
      * @param baro module to use.
      * @param gnss module to use.
      */
-    NavigationComplementaryFilter(Gyroscope_Abstract* gyro = nullptr, Accelerometer_Abstract* accel = nullptr, Magnetometer_Abstract* mag = nullptr, Barometer_Abstract* baro = nullptr, GNSS_Abstract* gnss = nullptr) : Task_Abstract("Complementary Navigation", 4000, eTaskPriority_t::eTaskPriority_VeryHigh) {
+    NavigationComplementaryFilter(Gyroscope_Abstract* gyro = nullptr, Accelerometer_Abstract* accel = nullptr, Magnetometer_Abstract* mag = nullptr, Barometer_Abstract* baro = nullptr, GNSS_Abstract* gnss = nullptr) : Task_Threading("Complementary Navigation", eTaskPriority_t::eTaskPriority_VeryHigh, SECONDS/4000) {
         if (gyro != nullptr) {
             gyroSub_.subscribe(gyro->getGyroTopic()); 
             gyroSub_.setOverwrite(true);
@@ -79,7 +79,7 @@ public:
     /**
      * @returns magnetic vector
      */
-    //Vector<> getMag() {return magVec_;}
+    //VectorOLD<> getMag() {return magVec_;}
 
 
 private:
@@ -96,12 +96,12 @@ private:
     Buffer_Subscriber<DataTimestamped<GNSSData>, 10> gnssSub_;
 
     //Filter data
-    LowPassFilter<Vector<>> gyroLPF_ = LowPassFilter<Vector<>>(0.01);
-    LowPassFilter<Vector<>> accelBiasLPF_ = LowPassFilter<Vector<>>(0.2, 8000);
-    LowPassFilter<Vector<>> accelLPF_ = LowPassFilter<Vector<>>(100);
+    LowPassFilter<VectorOLD<>> gyroLPF_ = LowPassFilter<VectorOLD<>>(0.01);
+    LowPassFilter<VectorOLD<>> accelBiasLPF_ = LowPassFilter<VectorOLD<>>(0.2, 8000);
+    LowPassFilter<VectorOLD<>> accelLPF_ = LowPassFilter<VectorOLD<>>(100);
 
-    Vector<> accelBias_ = 0;
-    Vector<> gravity_ = Vector<>(0,0,9.81);
+    VectorOLD<> accelBias_ = 0;
+    VectorOLD<> gravity_ = VectorOLD<>(0,0,9.81);
 
     //Buffers
     Buffer<float, 10> gyroXBuffer_;
@@ -131,17 +131,17 @@ private:
 
     int64_t lastLoopTimestamp_ = 0;
 
-    Vector<> lastGyroValue_ = 0;
-    ValueError<Vector<>> lastAngularRateValue_ = ValueError<Vector<>>(0, 0);
+    VectorOLD<> lastGyroValue_ = 0;
+    ValueError<VectorOLD<>> lastAngularRateValue_ = ValueError<VectorOLD<>>(0, 0);
     float _lastHeightValue = 0;
-    //Vector<> _gyroOffset = 0;
+    //VectorOLD<> _gyroOffset = 0;
 
     float baroPressure_ = 0;
     float sealevelPressure_ = 100e3;
     bool seaLevelPressureCorrected_ = false;
 
 
-    Vector<> magVec_ = 0;
+    VectorOLD<> magVec_ = 0;
 
     //System information flagges
     bool _angularRateValid = false;

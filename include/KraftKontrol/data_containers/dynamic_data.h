@@ -26,15 +26,15 @@ public:
      * @param forceN Force to initialise with.
      * @param torqueN Torque to initialise with.
      */
-    DynamicData(const Vector<>& forceN, const Vector<>& torqueN = 0) {
+    DynamicData(const VectorOLD<>& forceN, const VectorOLD<>& torqueN = 0) {
         force = forceN;
         torqe = torqueN;
     }
 
     //Force in Newtons.
-    Vector<> force;
+    VectorOLD<> force;
     //Torqe in Nm.
-    Vector<> torqe;
+    VectorOLD<> torqe;
 
     ///Adds all components together.
     DynamicData operator+ (const DynamicData& data) {

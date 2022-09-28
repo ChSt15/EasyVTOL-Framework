@@ -2,7 +2,7 @@
 #define PIN_INTERRUPT_HAL_ABSTRACT_H
 
 
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 #include "KraftKontrol/utils/list.h"
 
 #include "gpio_hal_abstract.h"
@@ -34,7 +34,7 @@ private:
     ePinInterruptMode_t mode_;
 
     //Task to be resumed on interrupt. Is a nullptr when no task is to be resumed
-    Task_Abstract* taskToResume = nullptr;
+    Task_Threading* taskToResume = nullptr;
 
     //If interrupt triggered then this is set to true until pin was reset.
     bool triggered_ = false;
@@ -78,7 +78,7 @@ public:
      * Sets what task will be resumed when interrupt occured.
      * @param task Which task to resume.
      */
-    void setTaskToResume(Task_Abstract& task) {
+    void setTaskToResume(Task_Threading& task) {
         taskToResume = &task;
     }
 
@@ -92,7 +92,7 @@ public:
     /**
      * @returns pointer to task that gets resumed in interrupt. Returns nullptr when no task is being resumed.
      */
-    const Task_Abstract* getTaskToResume() {
+    const Task_Threading* getTaskToResume() {
         return taskToResume;
     }
 

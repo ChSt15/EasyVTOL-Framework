@@ -4,7 +4,7 @@
 
 int64_t MPU9250Driver::_newDataTimestamp = 0;
 bool MPU9250Driver::_newDataInterrupt = false;
-Task_Abstract* MPU9250Driver::task_ = nullptr;
+Task_Threading* MPU9250Driver::task_ = nullptr;
 
 
 
@@ -12,7 +12,7 @@ void MPU9250Driver::_getData() {
 
     _imu.Read();
 
-    DataTimestamped<Vector<>> gyroVec(Vector<>(_imu.gyro_x_radps(), _imu.gyro_y_radps(), _imu.gyro_z_radps()), _newDataTimestamp);
+    DataTimestamped<VectorOLD<>> gyroVec(VectorOLD<>(_imu.gyro_x_radps(), _imu.gyro_y_radps(), _imu.gyro_z_radps()), _newDataTimestamp);
     if (_lastGyro != gyroVec.data || true) {
         
         DataTimestamped<SensorData<FML::Vector3_F, FML::Matrix33_F>> buf;
@@ -23,11 +23,10 @@ void MPU9250Driver::_getData() {
         buf.timestamp = gyroVec.timestamp;
         publishGyroData(buf);
         _lastGyro = gyroVec.data;
-        _gyroCounter++;
 
     }
 
-    DataTimestamped<Vector<>> accelVec = DataTimestamped<Vector<>>(Vector<>(_imu.accel_x_mps2(), _imu.accel_y_mps2(), _imu.accel_z_mps2()), _newDataTimestamp);
+    DataTimestamped<VectorOLD<>> accelVec = DataTimestamped<VectorOLD<>>(VectorOLD<>(_imu.accel_x_mps2(), _imu.accel_y_mps2(), _imu.accel_z_mps2()), _newDataTimestamp);
     //Serial.println(String("Dtime: ") + uint32_t(NOW()-_newDataTimestamp) + ", gyro: " + gyroVec.data.toString() + ", accel: " + accelVec.data.toString());
     //Serial.println(String() + "x:" + gyroVec.data.x + " y:" + gyroVec.data.y + " z: " + gyroVec.data.z);
     if (_lastAccel != accelVec.data || true) {
@@ -41,7 +40,6 @@ void MPU9250Driver::_getData() {
 
         publishAccelData(buf);
         _lastAccel = accelVec.data;
-        _accelCounter++;
         
     }
 
@@ -82,23 +80,11 @@ void MPU9250Driver::thread() {
     } else { //This section is for device failure or a wierd mode that should not be set, therefore assume failure
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
-        stopTaskThreading();
+        suspendUntil(END_OF_TIME);
 
     }
 
-
-    int64_t dTime;
-    if (_rateCalcInterval.isTimeToRun(dTime)) {
-        float dTime_s = (float)dTime/SECONDS;
-        _gyroRate = _gyroCounter/dTime_s;
-        _accelRate = _accelCounter/dTime_s;
-        _magRate = _magCounter/dTime_s;
-        _gyroCounter = 0;
-        _accelCounter = 0;
-        _magCounter = 0;
-    }
-
-    this->stopTaskThreading();
+    suspendUntil(END_OF_TIME);
 
 }
 
@@ -107,7 +93,7 @@ void MPU9250Driver::thread() {
 void MPU9250Driver::_interruptRoutine() {
     _newDataInterrupt = true;
     _newDataTimestamp =  NOW();
-    task_->startTaskThreading();
+    task_->suspendUntil(NOW());;
 }
 
 

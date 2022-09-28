@@ -2,7 +2,7 @@
 
 
 
-ButtonHID_Abstract::ButtonHID_Abstract(int64_t longPressThresholdTime, uint32_t buttonReadRate): Task_Abstract("Button Abstract", buttonReadRate, eTaskPriority_t::eTaskPriority_Middle) {
+ButtonHID_Abstract::ButtonHID_Abstract(int64_t longPressThresholdTime, uint32_t buttonReadRate): Task_Threading("Button Abstract", eTaskPriority_t::eTaskPriority_Middle, buttonReadRate) {
     longPressThreshold_ = longPressThresholdTime;
 }
 

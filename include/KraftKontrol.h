@@ -5,7 +5,7 @@
 #include "KraftKontrol/platforms/platform_hal.h"
 
 #include "KraftKontrol/modules/communication_modules/kraft_kommunication.h"
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 
 #include "KraftKontrol/vehicle/vehicle_interface.h"
 #include "KraftKontrol/vehicle/vehicle_general.h"
@@ -62,7 +62,6 @@
 #include "KraftKontrol/modules/communication_modules/kraft_message_subscriber.h"
 
 #include "KraftKontrol/modules/networking_modules/kraft_konnect_network.h"
-
 
 
 #endif 

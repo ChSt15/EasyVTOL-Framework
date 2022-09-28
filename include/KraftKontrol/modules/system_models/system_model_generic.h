@@ -26,7 +26,7 @@ private:
     float systemMass_ = 1;
 
     //System angular mass.
-    Vector<> systemAngularMass_ = 1;
+    VectorOLD<> systemAngularMass_ = 1;
 
 
 public: 
@@ -35,7 +35,7 @@ public:
      * @param systemMass Mass of the modeled system in kg.
      * @param systemAngularMass Angular mass of the modeled system.
      */
-    SystemModelGeneric(float systemMass = 1, Vector<> systemAngularMass = 1);
+    SystemModelGeneric(float systemMass = 1, VectorOLD<> systemAngularMass = 1);
 
     /**
      * Uses system model to predict future system state.
@@ -60,13 +60,13 @@ public:
     /**
      * @returns system angular mass.
      */
-    Vector<> getSystemAngularMass() const override;
+    VectorOLD<> getSystemAngularMass() const override;
 
     /**
      * Sets current system angular mass.
      * @param angularMass System angular mass.
      */
-    void setSystemAngularMass(const Vector<>& angularMass);
+    void setSystemAngularMass(const VectorOLD<>& angularMass);
 
 
 };

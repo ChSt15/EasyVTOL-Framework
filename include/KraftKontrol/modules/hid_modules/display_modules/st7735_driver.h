@@ -7,14 +7,14 @@
 
 #include "display_abstract.h"
 
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 #include "KraftKontrol/modules/module_abstract.h"
 
 #include "lib/Adafruit-ST7735-Library-master/Adafruit_ST7735.h"
 
 
 
-class ST7735Driver: public Display_Abstract, public Task_Abstract, public Module_Abstract {
+class ST7735Driver: public Display_Abstract, public Task_Threading, public Module_Abstract {
 public:
 
     ST7735Driver(SPIClass& spi, int backlightPin, int CSPin, int DCPin, int RSTPin = -1);

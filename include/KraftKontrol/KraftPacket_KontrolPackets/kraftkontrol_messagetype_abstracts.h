@@ -230,16 +230,16 @@ private:
 class MessageVector_Abstract: public KraftMessage_Interface {
 public:
 
-    void setVector(const Vector<> &vector) {vector_ = vector;}
+    void setVector(const VectorOLD<> &vector) {vector_ = vector;}
 
-    const Vector<>& getVector() const {return vector_;}
+    const VectorOLD<>& getVector() const {return vector_;}
 
 
 protected:
 
     MessageVector_Abstract() {}
 
-    MessageVector_Abstract(const Vector<> &vector) {
+    MessageVector_Abstract(const VectorOLD<> &vector) {
         vector_ = vector;
     }
 
@@ -273,7 +273,7 @@ protected:
 
     }
 
-    Vector<> vector_;
+    VectorOLD<> vector_;
 
 };
 

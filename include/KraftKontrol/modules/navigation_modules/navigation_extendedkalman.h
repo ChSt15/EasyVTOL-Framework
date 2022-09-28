@@ -12,7 +12,7 @@
 #include "KraftKontrol/modules/sensor_modules/gnss_modules/gnss_abstract.h"
 
 #include "KraftKontrol/utils/topic_subscribers.h"
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 #include "KraftKontrol/utils/low_pass_filter.h"
 
 #include "lib/MathHelperLibrary/FML.h"
@@ -25,7 +25,7 @@
  *          estimation using GPS, Barometer and accelerometer sensors.
  * 
  */
-class NavigationExtendedKalman: public Navigation_Abstract, public Task_Abstract {
+class NavigationExtendedKalman: public Navigation_Abstract, public Task_Threading{
 private:
 
     //Subscriber for gyro with fifo function

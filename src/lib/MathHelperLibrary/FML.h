@@ -9,5 +9,7 @@
 #include "objects/matrix_vector.h"
 #include "objects/matrix_quaternion.h"
 
+#include "objects/quaternion.h"
+
 
 #endif

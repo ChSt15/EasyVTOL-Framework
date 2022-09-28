@@ -24,15 +24,12 @@ void UbloxSerialGNSS::_getData() {
     position.longitude = (double)gnss_.getLongitude()/1e7*DEGREES;
     position.height = (float)gnss_.getAltitudeMSL()/1000.0;
 
-    Vector<> velocity;
+    VectorOLD<> velocity;
     velocity.x = (float)gnss_.getNedNorthVel()/1000.0;
     velocity.y = -(float)gnss_.getNedEastVel()/1000.0;
     velocity.z = -(float)gnss_.getNedDownVel()/1000.0;
 
     int64_t tow = gnss_.getTimeOfWeek()*MILLISECONDS;
-
-    positionCounter_++;
-    velocityCounter_++;
 
     if (numSats_ >= minNumSats_ && positionDeviation_ < 100 && altitudeDeviation_ < 100) {
         lockValid_ = true;
@@ -42,7 +39,7 @@ void UbloxSerialGNSS::_getData() {
 
     DataTimestamped<GNSSData> data;
     data.data.lockValid = lockValid_;
-    data.data.positionError = Vector<>(positionDeviation_/1.414f, positionDeviation_/1.414f, altitudeDeviation_); //Factor due to length of vector conversion
+    data.data.positionError = VectorOLD<>(positionDeviation_/1.414f, positionDeviation_/1.414f, altitudeDeviation_); //Factor due to length of vector conversion
     data.data.velocityError = velocityError/1.732f; //Factor due to length of vector conversion
     data.data.position = position;
     data.data.velocity = velocity;
@@ -96,16 +93,8 @@ void UbloxSerialGNSS::thread() {
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
 
-        stopTaskThreading();
+        suspendUntil(END_OF_TIME);
 
-    }
-
-
-    uint32_t dTime = 0;
-    if (rateCalcInterval_.isTimeToRun(dTime)) {
-        velocityRate_ = velocityCounter_;
-        positionRate_ = positionCounter_;
-        positionCounter_ = velocityCounter_ = 0;
     }
 
 }

@@ -2,7 +2,7 @@
 
 
 
-ADS1115Driver::ADS1115Driver(TwoWire& i2cBus, uint32_t rate) : Task_Abstract("ADS1115 Driver", rate*4, eTaskPriority_t::eTaskPriority_VeryHigh), i2cBus_(i2cBus), adc_(0x48) {
+ADS1115Driver::ADS1115Driver(TwoWire& i2cBus, uint32_t rate) : Task_Threading("ADS1115 Driver", eTaskPriority_t::eTaskPriority_VeryHigh, SECONDS/rate/4), i2cBus_(i2cBus), adc_(0x48) {
     
 }
 
@@ -50,7 +50,7 @@ void ADS1115Driver::thread() {
     } else { //This section is for device failure or a wierd mode that should not be set, therefore assume failure
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
-        stopTaskThreading();
+        suspendUntil(END_OF_TIME);
 
     }
 

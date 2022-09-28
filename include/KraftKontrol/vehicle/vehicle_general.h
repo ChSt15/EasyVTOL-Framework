@@ -3,7 +3,7 @@
 
 
 
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 
 #include "KraftKontrol/data_containers/kinematic_data.h"
 #include "KraftKontrol/data_containers/vehicle_data.h"
@@ -19,10 +19,10 @@
 
 
 
-class VehicleGeneral: public Vehicle_Interface, public Module_Abstract, public Task_Abstract {
+class VehicleGeneral: public Vehicle_Interface, public Module_Abstract, public Task_Threading {
 public:
 
-    VehicleGeneral(Guidance_Interface* guidancePointer, Navigation_Abstract* navigationPointer, Control_Interface* controlPointer, Dynamics_Interface* dynamicsPointer) : Task_Abstract("Vehicle General", 8000, eTaskPriority_t::eTaskPriority_High) {
+    VehicleGeneral(Guidance_Interface* guidancePointer, Navigation_Abstract* navigationPointer, Control_Interface* controlPointer, Dynamics_Interface* dynamicsPointer) : Task_Threading("Vehicle General", eTaskPriority_t::eTaskPriority_High, SECONDS/8000) {
         guidance_ = guidancePointer;
         navigation_ = navigationPointer;
         control_ = controlPointer;

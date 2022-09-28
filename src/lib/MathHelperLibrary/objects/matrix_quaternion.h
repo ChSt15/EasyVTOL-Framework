@@ -44,7 +44,7 @@ public:
      * @param rotVector 3x1 Vector to be converted to a quaternion.
      */
     template<typename TYPE2>
-    Quat(const FML::Vector<TYPE2, 3>& vector);
+    Quat(const FML::Matrix<TYPE2, 3, 1>& vector);
 
     /**
      * @brief Construct a new Quat object from a 3x3 rotation matrix.
@@ -86,7 +86,7 @@ public:
      * @return Vector<TYPE2> 
      */
     template<typename TYPE2>
-    Vector<TYPE2, 3> rotateVec(const Matrix<TYPE2, 3, 1>& vector) const;
+    Matrix<TYPE, 3, 1> rotateVec(const Matrix<TYPE2, 3, 1>& vector) const;
 
     /**
      * @brief Does quaternion multiplication. Different than matrix or vector multiplication.
@@ -178,7 +178,7 @@ Quat<TYPE>::Quat(const Matrix<TYPE2, 4, 1>& quaternion) {
 
 template<typename TYPE>
 template<typename TYPE2>
-Quat<TYPE>::Quat(const FML::Vector<TYPE2, 3>& vector) {
+Quat<TYPE>::Quat(const FML::Matrix<TYPE2, 3, 1>& vector) {
                 
     this->r[0][0] = 0;
     this->r[1][0] = vector.r[0][0];
@@ -240,9 +240,9 @@ Quat<TYPE> Quat<TYPE>::conjugate() const {
 
 template<typename TYPE>
 template<typename TYPE2>
-Vector<TYPE2, 3> Quat<TYPE>::rotateVec(const Matrix<TYPE2, 3, 1>& vector) const {
+Matrix<TYPE, 3, 1> Quat<TYPE>::rotateVec(const Matrix<TYPE2, 3, 1>& vector) const {
 
-    return (*this) * Quat<TYPE2>(vector) * this->conjugate();
+    return (*this) * Quat<TYPE>(vector) * this->conjugate();
 
 }
 
@@ -289,8 +289,8 @@ Quat<TYPE> Quat<TYPE>::operator* (const TYPE2& scaler) const {
 }
 
 
-template<typename TYPE, typename TYPE2>
-Quat<TYPE> operator * (const TYPE2& scaler, const Quat<TYPE>& right) {
+template<typename TYPE>
+Quat<TYPE> operator * (const TYPE& scaler, const Quat<TYPE>& right) {
     return right * scaler;
 }
 

@@ -56,6 +56,14 @@ public:
     inline int64_t getTimeRemain() {return -interval_ns_ + NOW() + lastRun_ns_;}
 
     /**
+     * Returns the amount of time till the next run.
+     * Negative number means the how long ago it should have ran
+     *
+     * @return remaining time till next run.
+     */
+    inline int64_t getTimeToRun() {return interval_ns_ + lastRun_ns_;}
+
+    /**
      * Sets the way the system limits the runs.
      * If limit is true then this will only limit the rate
      * and if the run takes longer than the set interval the 

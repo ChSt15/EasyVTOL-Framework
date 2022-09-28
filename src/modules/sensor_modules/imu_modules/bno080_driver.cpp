@@ -4,11 +4,11 @@
 
 volatile int64_t BNO080Driver::_newDataTimestamp = 0;
 volatile bool BNO080Driver::_newDataInterrupt = false;
-Task_Abstract* BNO080Driver::driverTask_ = nullptr;
+Task_Threading* BNO080Driver::driverTask_ = nullptr;
 
 
 
-BNO080Driver::BNO080Driver(int interruptPin, TwoWire& i2cBus, const Barometer_Abstract* baro, const GNSS_Abstract* gnss): Task_Abstract("BNO080 Driver", 200, eTaskPriority_t::eTaskPriority_VeryHigh), pinInterrupt_(interruptPin, _interruptRoutine, false, true), i2c_(i2cBus) {
+BNO080Driver::BNO080Driver(int interruptPin, TwoWire& i2cBus, const Barometer_Abstract* baro, const GNSS_Abstract* gnss): Task_Threading("BNO080 Driver", eTaskPriority_t::eTaskPriority_VeryHigh, SECONDS/200), pinInterrupt_(interruptPin, _interruptRoutine, false, true), i2c_(i2cBus) {
     if (baro != nullptr) baroSubr_.subscribe(baro->getBaroTopic());
     if (gnss != nullptr) gnssSubr_.subscribe(gnss->getGNSSTopic());
 }
@@ -35,11 +35,11 @@ void BNO080Driver::getGNSSData() {
 
     const DataTimestamped<GNSSData>& data = gnssSubr_.getItem();
 
-    ValueError<Vector<>> posBuf = ValueError<Vector<>>(data.data.position.getPositionVectorFrom(navigationData_.data.homePosition), data.data.positionError);
-    ValueError<Vector<>> velBuf = ValueError<Vector<>>(data.data.velocity, data.data.velocityError);
+    ValueError<VectorOLD<>> posBuf = ValueError<VectorOLD<>>(data.data.position.getPositionVectorFrom(navigationData_.data.homePosition), data.data.positionError);
+    ValueError<VectorOLD<>> velBuf = ValueError<VectorOLD<>>(data.data.velocity, data.data.velocityError);
 
-    posBuf = ValueError<Vector<>>(navigationData_.data.position, navigationData_.data.positionError).weightedAverage(posBuf);
-    velBuf = ValueError<Vector<>>(navigationData_.data.velocity, navigationData_.data.velocityError).weightedAverage(velBuf);
+    posBuf = ValueError<VectorOLD<>>(navigationData_.data.position, navigationData_.data.positionError).weightedAverage(posBuf);
+    velBuf = ValueError<VectorOLD<>>(navigationData_.data.velocity, navigationData_.data.velocityError).weightedAverage(velBuf);
 
     navigationData_.data.position = posBuf.value;
     //navigationData_.data.position.y = posBuf.value.y;
@@ -120,13 +120,13 @@ void BNO080Driver::getIMUData() {
 
     float angleAccuracy;
 
-    FML::Quaternion<> transform = FML::Quaternion<>(Vector<>(0,0,1), -90*DEG_TO_RAD)*FML::Quaternion<>(Vector<>(0,0,1), 90*DEG_TO_RAD)*FML::Quaternion<>(Vector<>(1,0,0), 180*DEG_TO_RAD);
+    FML::Quaternion<> transform = FML::Quaternion<>(VectorOLD<>(0,0,1), -90*DEG_TO_RAD)*FML::Quaternion<>(VectorOLD<>(0,0,1), 90*DEG_TO_RAD)*FML::Quaternion<>(VectorOLD<>(1,0,0), 180*DEG_TO_RAD);
 
     DataTimestamped<FML::Quaternion<>> quat(0, _newDataTimestamp);
     _imu.getQuat(quat.data.x, quat.data.y, quat.data.z, quat.data.w, angleAccuracy, accuracy);
     navigationData_.data.attitude = quat.data*transform;
 
-    DataTimestamped<Vector<>> bufVec(0, _newDataTimestamp);
+    DataTimestamped<VectorOLD<>> bufVec(0, _newDataTimestamp);
     _imu.getGyro(bufVec.data.x, bufVec.data.y, bufVec.data.z, accuracy);
     navigationData_.data.angularRate = navigationData_.data.attitude.rotateVector(bufVec.data);
 
@@ -186,7 +186,7 @@ void BNO080Driver::thread() {
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
         driverTask_ = nullptr;
-        stopTaskThreading();
+        suspendUntil(END_OF_TIME);
 
     }
 

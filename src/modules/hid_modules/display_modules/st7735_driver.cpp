@@ -2,7 +2,7 @@
 
 
 
-ST7735Driver::ST7735Driver(SPIClass& spi, int backlightPin, int CSPin, int DCPin, int RSTPin): Task_Abstract("ST7735 Driver", 1, 0), display_(&spi, CSPin, DCPin, RSTPin), buffer_(getDisplayWidth(), getDisplayHeight()) {
+ST7735Driver::ST7735Driver(SPIClass& spi, int backlightPin, int CSPin, int DCPin, int RSTPin): Task_Threading("ST7735 Driver", eTaskPriority_t::eTaskPriority_Middle, 1), display_(&spi, CSPin, DCPin, RSTPin), buffer_(getDisplayWidth(), getDisplayHeight()) {
 
     backlightPin_ = backlightPin;
 
@@ -60,6 +60,6 @@ void ST7735Driver::init() {
 
     Serial.println("Display Start Success.");
 
-    stopTaskThreading();
+    suspendUntil(END_OF_TIME);
 
 }

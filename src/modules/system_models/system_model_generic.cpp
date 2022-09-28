@@ -2,7 +2,7 @@
 
 
 
-SystemModelGeneric::SystemModelGeneric(float systemMass, Vector<> systemAngularMass) {
+SystemModelGeneric::SystemModelGeneric(float systemMass, VectorOLD<> systemAngularMass) {
 
     systemMass_ = systemMass;
     systemAngularMass_ = systemAngularMass;
@@ -33,7 +33,7 @@ void SystemModelGeneric::predictState(DataTimestamped<NavigationData>& systemSta
     systemState.data.angularRate = systemState.data.angularRate + systemState.data.angularAcceleration*dTime; //Integrate angular accel to get new angular rate
     systemState.data.angularRateError = systemState.data.angularAccelerationError*dTime + systemState.data.angularRateError; //Calculate new error
 
-    Vector<> angleChange = systemState.data.angularAcceleration*dTimeHalfPow2 + systemState.data.angularRate*dTime;
+    VectorOLD<> angleChange = systemState.data.angularAcceleration*dTimeHalfPow2 + systemState.data.angularRate*dTime;
     systemState.data.attitude = FML::Quaternion<>(angleChange, angleChange.magnitude())*systemState.data.attitude;
 
     //Calculate resulting accelerations
@@ -69,12 +69,12 @@ void SystemModelGeneric::setSystemMass(float mass) {
 
 
 
-Vector<> SystemModelGeneric::getSystemAngularMass() const {
+VectorOLD<> SystemModelGeneric::getSystemAngularMass() const {
     return systemAngularMass_;
 }
 
 
 
-void SystemModelGeneric::setSystemAngularMass(const Vector<>& angularMass) {
+void SystemModelGeneric::setSystemAngularMass(const VectorOLD<>& angularMass) {
     systemAngularMass_ = angularMass;
 }

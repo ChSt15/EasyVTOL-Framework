@@ -3,7 +3,7 @@
 
 
 
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 
 #include "KraftKontrol/modules/sensor_modules/gyroscope_modules/gyroscope_abstract.h"
 #include "KraftKontrol/modules/sensor_modules/accelerometer_modules/accelerometer_abstract.h"
@@ -19,10 +19,10 @@
 
 
 
-class IMUSimulator: public Gyroscope_Abstract, public Accelerometer_Abstract, public Magnetometer_Abstract, public Module_Abstract, public Task_Abstract {
+class IMUSimulator: public Gyroscope_Abstract, public Accelerometer_Abstract, public Magnetometer_Abstract, public Module_Abstract, public Task_Threading {
 public:
 
-    IMUSimulator(Topic<DataTimestamped<FML::Quat_F>> attitudeTopic, Topic<DataTimestamped<FML::Matrix_F<3, 1>>> positionTopic, float gyroVariance = 0.005, float accelVariance = 0.07, float magVariance = 0.5): Task_Abstract("IMU Simulator", 1000, eTaskPriority_t::eTaskPriority_Realtime) {
+    IMUSimulator(Topic<DataTimestamped<FML::Quat_F>> attitudeTopic, Topic<DataTimestamped<FML::Matrix_F<3, 1>>> positionTopic, float gyroVariance = 0.005, float accelVariance = 0.07, float magVariance = 0.5): Task_Threading("IMU Simulator", eTaskPriority_t::eTaskPriority_Realtime, 1*MILLISECONDS) {
         
         attitudeSubr_.subscribe(attitudeTopic);
         positionSubr_.subscribe(positionTopic);

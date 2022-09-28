@@ -5,7 +5,7 @@
 
 #include "Arduino.h"
 
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 
 #include "adc_abstract.h"
 
@@ -17,7 +17,7 @@
 
 
 
-class ADS1115Driver: public ADC_Abstract, public Module_Abstract, public Task_Abstract {
+class ADS1115Driver: public ADC_Abstract, public Module_Abstract, public Task_Threading {
 public:
 
     ADS1115Driver(TwoWire& i2cBus, uint32_t rate = 100);

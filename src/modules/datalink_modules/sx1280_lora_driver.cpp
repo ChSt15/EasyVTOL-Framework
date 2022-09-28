@@ -24,7 +24,7 @@ void SX1280Driver::thread() {
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
         
-        removeFromScheduler();
+        suspendUntil(END_OF_TIME);
 
     }
 
@@ -149,7 +149,7 @@ void SX1280Driver::internalLoop() {
         radio_.clearIrqStatus(IRQ_RADIO_ALL); 
 
         //radio_.receive(receivedData_, SX1280_DATA_BUFFER_SIZE, 0, NO_WAIT);
-        radio_.receiveSXBuffer(0, 0, NO_WAIT);
+        if (isReceivingEnabled_) radio_.receiveSXBuffer(0, 0, NO_WAIT);
 
     }
 
@@ -171,7 +171,11 @@ void SX1280Driver::internalLoop() {
 
         }
 
+        if (!isReceivingEnabled_) startReceiving();
+
         radio_.transmit(buffer, bufferSize, 0, SX1280_POWER_dB, NO_WAIT);
+
+        if (!isReceivingEnabled_) stopReceiving();
 
         for (uint32_t j = 0; j < i; j++) toSendBufferSub_.removeFront();
 
@@ -180,6 +184,38 @@ void SX1280Driver::internalLoop() {
         #endif
 
     }
+
+}
+
+
+void SX1280Driver::startReceiving() {
+
+    radio_.wake();
+
+    radio_.receiveSXBuffer(0, 0, NO_WAIT);
+
+    isReceivingEnabled_ = true;
+
+}
+
+
+void SX1280Driver::stopReceiving() {
+
+    radio_.setSleep(CONFIGURATION_RETENTION);
+
+    isReceivingEnabled_ = false;
+
+}
+
+
+void SX1280Driver::setLoRaParams(uint32_t frequency, uint8_t spreadFactor, uint8_t bandwidth, uint8_t codingRate, bool highSensitivity) {
+
+    radio_.setupLoRa(SX1280_FREQUENCY, 0, SX1280_SPREADFACTOR, SX1280_BANDWIDTH, SX1280_CODINGRATE);
+
+    if (highSensitivity) radio_.setHighSensitivity();
+    else radio_.setLowPowerRX();
+
+    if (isReceivingEnabled_) startReceiving();
 
 }
 

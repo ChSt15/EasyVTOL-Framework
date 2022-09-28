@@ -26,7 +26,7 @@ public:
 };
 
 
-class Joystick: public Task_Abstract, public MenuControl_Abstract {
+class Joystick: public Task_Threading, public MenuControl_Abstract {
 private:
 
     Topic<JoystickData> joystickDataTopic_;
@@ -55,19 +55,11 @@ public:
 
     /**
      * ADC channels should output a value between -1 and 1.
-     * No button given. This will never output a signal for button1.
-     * @param adcXChannel ADC channel for x axis.
-     * @param adcYChannel ADC channel for y axis.
-     */
-    Joystick(const ADCChannel& adcXChannel, const ADCChannel& adcYChannel);
-
-    /**
-     * ADC channels should output a value between -1 and 1.
      * @param adcXChannel ADC channel for x axis.
      * @param adcYChannel ADC channel for y axis.
      * @param buttonPin GPIO pin connected to joystick button.
      */
-    Joystick(const ADCChannel& adcXChannel, const ADCChannel& adcYChannel, int buttonPin);
+    Joystick(const ADCChannel& adcXChannel, const ADCChannel& adcYChannel, GPIO_HAL_Abstract& buttonPin);
 
     void init() override;
 

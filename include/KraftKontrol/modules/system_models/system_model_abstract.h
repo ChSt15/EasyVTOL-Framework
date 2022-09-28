@@ -31,7 +31,7 @@ public:
     /**
      * @returns system angular mass.
      */
-    virtual Vector<> getSystemAngularMass() const = 0;
+    virtual VectorOLD<> getSystemAngularMass() const = 0;
 
 
 };

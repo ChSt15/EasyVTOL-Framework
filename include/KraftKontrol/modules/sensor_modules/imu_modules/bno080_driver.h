@@ -5,7 +5,7 @@
 
 #include "Arduino.h"
 
-#include "KraftKontrol/utils/Simple-Schedule/task_autorun_class.h"
+#include "KraftKontrol/utils/Simple-Schedule/task_threading.h"
 
 #include "KraftKontrol/modules/sensor_modules/gyroscope_modules/gyroscope_abstract.h"
 #include "KraftKontrol/modules/sensor_modules/accelerometer_modules/accelerometer_abstract.h"
@@ -31,7 +31,7 @@
 
 
 
-class BNO080Driver: /*public Gyroscope_Interface, public Accelerometer_Interface, public Magnetometer_Interface*/ public Module_Abstract, public Navigation_Abstract, public Task_Abstract {
+class BNO080Driver: /*public Gyroscope_Interface, public Accelerometer_Interface, public Magnetometer_Interface*/ public Module_Abstract, public Navigation_Abstract, public Task_Threading {
 public:
 
     BNO080Driver(int interruptPin, TwoWire& i2cBus, const Barometer_Abstract* baro = nullptr, const GNSS_Abstract* gnss = nullptr);
@@ -48,8 +48,6 @@ private:
     void getBaroData();
     void prediction();
 
-    IntervalControl _rateCalcInterval = IntervalControl(1); 
-
     PinInterrupt_HAL pinInterrupt_;
 
     TwoWire& i2c_;
@@ -62,8 +60,8 @@ private:
 
     float _lastHeightValue = 0;
 
-    Buffer<Vector<>, 50> accelBuf_;
-    Buffer<Vector<>, 50> gyroBuf_;
+    Buffer<VectorOLD<>, 50> accelBuf_;
+    Buffer<VectorOLD<>, 50> gyroBuf_;
 
     Buffer<float, 20> baroHeightBuf_;
     Buffer<float, 20> baroVelBuf_;
@@ -73,7 +71,7 @@ private:
 
     volatile static int64_t _newDataTimestamp;
     volatile static bool _newDataInterrupt;
-    static Task_Abstract* driverTask_;
+    static Task_Threading* driverTask_;
     static void _interruptRoutine();
 
 

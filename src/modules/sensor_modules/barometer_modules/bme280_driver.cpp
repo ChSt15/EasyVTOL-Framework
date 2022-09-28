@@ -14,7 +14,6 @@ void BME280Driver::getData() {
         DataTimestamped<float> value(bufMeasurement, _newDataTimestamp);
         baroTopic_.publish(value);
         _lastPressure = bufMeasurement;
-        _pressureCounter++;
     }
 
     bufMeasurement = measurements.temperature;
@@ -22,7 +21,6 @@ void BME280Driver::getData() {
         _temperatureFifo.placeFront(bufMeasurement, true);
         _temperatureTimestampFifo.placeFront(_newDataTimestamp, true);
         _lastTemperature = bufMeasurement;
-        _temperatureCounter++;
     }
 
     bufMeasurement = measurements.humidity;
@@ -30,18 +28,12 @@ void BME280Driver::getData() {
         _humidityFifo.placeFront(bufMeasurement, true);
         _humidityTimestampFifo.placeFront(_newDataTimestamp, true);
         _lastHumidity = bufMeasurement;
-        _humidityCounter++;
     }
 
 }
 
 
 void BME280Driver::thread() {
-
-    if (_block) return;
-
-    _loopCounter++;
-
 
     if (moduleStatus_ == eModuleStatus_t::eModuleStatus_Running) {
 
@@ -70,22 +62,8 @@ void BME280Driver::thread() {
     } else { //This section is for device failure or a wierd mode that should not be set, therefore assume failure
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
-        _block = true;
-        _loopRate = 0;
+        suspendUntil(END_OF_TIME);
 
-    }
-
-
-
-    if (_rateCalcInterval.isTimeToRun()) {
-        _loopRate = _loopCounter;
-        _pressureRate = _pressureCounter;
-        _temperatureRate = _temperatureCounter;
-        _humidityRate = _humidityCounter;
-        _pressureCounter = 0;
-        _temperatureCounter = 0;
-        _humidityCounter = 0;
-        _loopCounter = 0;
     }
 
 }

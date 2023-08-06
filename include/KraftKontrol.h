@@ -42,6 +42,11 @@
 #include "KraftKontrol/modules/sensor_modules/adc_modules/adc_abstract.h"
 #include "KraftKontrol/modules/sensor_modules/adc_modules/ads1115_driver.h"
 
+#include "modules/hid_modules/display_modules/display_interface.h"
+#ifdef ESP32
+    //#include "modules/hid_modules/display_modules/st7735_driver.h"
+#endif
+
 #include "KraftKontrol/modules/hid_modules/input_modules/button_abstract.h"
 #include "KraftKontrol/modules/hid_modules/input_modules/gpio_button.h"
 #include "KraftKontrol/modules/hid_modules/input_modules/analog_button.h"

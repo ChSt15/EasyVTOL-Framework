@@ -1,12 +1,8 @@
-#include "sx1280_lora_driver.h"
+#include "KraftKontrol/modules/datalink_modules/sx1280_lora_driver.h"
 
 
 
 void SX1280Driver::thread() {
-
-    if (block_) return;
-
-    loopCounter_++;
 
 
     if (moduleStatus_ == eModuleStatus_t::eModuleStatus_Running) {
@@ -27,17 +23,9 @@ void SX1280Driver::thread() {
     } else { //This section is for device failure or a wierd mode that should not be set, therefore assume failure
 
         moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
-        block_ = true;
-        stopTaskThreading();
-        loopRate_ = 0;
+        
+        suspendUntil(END_OF_TIME);
 
-    }
-
-
-
-    if (rateCalcInterval_.isTimeToRun()) {
-        loopRate_ = loopCounter_;
-        loopCounter_ = 0;
     }
 
 }
@@ -65,21 +53,33 @@ void SX1280Driver::internalLoop() {
 
             byte packetL = radio_.readRXPacketL();
 
-            if (packetL != 0) { // make sure packet is okay
+            if (packetL > 0) { // make sure packet is okay
 
                 receivedDataRSSI_ = radio_.readPacketRSSI();
                 receivedDataSNR_ = radio_.readPacketSNR();
 
+                
+
                 radio_.startReadSXBuffer(0);
 
-                int i;
-                for (i = 0; i < packetL && i < SX1280_DATA_BUFFER_SIZE; i++) receivedData_[i] = radio_.readUint8();
-                //radio_.readBuffer(receivedData_);
+                for (uint32_t i = 0; i < packetL;) {
+
+                    uint32_t size = radio_.readUint8();
+
+                    DataMessageBuffer receivedData;
+
+                    for (uint32_t j = 0; j < size && j < SX1280_DATA_BUFFER_SIZE; j++) receivedData.getBuffer()[j] = radio_.readUint8();
+                    receivedData.setBufferSize(size);
+
+                    //Place inside buffer and publish.
+                    receivedDataTopic_.publish(receivedData);
+
+                    i += size;
+
+                }
 
                 radio_.endReadSXBuffer();
 
-                
-                receivedDataSize_ = packetL;
 
                 #ifdef SX1280_DEBUG
                     Serial.println("Data Received and is " + String(packetL) + " bytes long. At RSSI: " + receivedDataRSSI_ + ", SNR: " + receivedDataSNR_);
@@ -106,7 +106,7 @@ void SX1280Driver::internalLoop() {
         if (irqStatus & (IRQ_TX_DONE)) {
 
             isBusySending_ = false;
-            toSendDataSize_ = 0;
+            lastSendTimestamp_ = NOW();
 
             #ifdef SX1280_DEBUG
                 Serial.println("Interrupt says tx done!");
@@ -117,6 +117,7 @@ void SX1280Driver::internalLoop() {
         if (irqStatus & (IRQ_TX_TIMEOUT)) {
 
             isBusySending_ = false;
+            lastSendTimestamp_ = NOW();
 
             #ifdef SX1280_DEBUG
                 Serial.println("Interrupt says tx timeout!");
@@ -124,31 +125,97 @@ void SX1280Driver::internalLoop() {
 
         }
 
+        if (irqStatus & (IRQ_CAD_ACTIVITY_DETECTED)) {
+
+            channelBusy_ = true;
+
+            #ifdef SX1280_DEBUG
+                Serial.println("Channel is now busy!");
+            #endif
+
+        }
+
+        if (irqStatus & (IRQ_CAD_DONE)) {
+
+            channelBusy_ = false;
+            lastSendTimestamp_ = NOW();
+
+            #ifdef SX1280_DEBUG
+                Serial.println("Channel is now busy!");
+            #endif
+
+        }
+
         radio_.clearIrqStatus(IRQ_RADIO_ALL); 
 
         //radio_.receive(receivedData_, SX1280_DATA_BUFFER_SIZE, 0, NO_WAIT);
-        radio_.receiveSXBuffer(0, 0, NO_WAIT);
+        if (isReceivingEnabled_) radio_.receiveSXBuffer(0, 0, NO_WAIT);
 
     }
 
 
     
-    if (toSendDataSize_ > 0 && !isBusySending_ && !digitalRead(busyPin_)) { 
+    if (toSendBufferSub_.available() > 0 && !isBusySending_ && !channelBusy_ && NOW() - lastSendTimestamp_ > 5*MILLISECONDS) { 
 
         isBusySending_ = true;
 
-        radio_.transmit(toSendData_, toSendDataSize_, 0, SX1280_POWER_dB, NO_WAIT);
-        /*radio_.startWriteSXBuffer(0);
-        radio_.writeBuffer(toSendData_, toSendDataSize_);
-        radio_.endWriteSXBuffer();
+        uint8_t buffer[255];
+        uint32_t bufferSize = 0;
 
-        radio_.transmitSXBuffer(0, toSendDataSize_, 0, SX1280_POWER_dB, NO_WAIT);*/
+        uint32_t i;
+        for (i = 0; bufferSize + toSendBufferSub_[i].getBufferSize() + 1 < 220 && i < toSendBufferSub_.available(); i++) {
+            
+            buffer[bufferSize] = toSendBufferSub_[i].getBufferSize();
+            memcpy(buffer + bufferSize + 1, toSendBufferSub_[i].getBuffer(), toSendBufferSub_[i].getBufferSize());
+            bufferSize += toSendBufferSub_[i].getBufferSize() + 1;
+
+        }
+
+        if (!isReceivingEnabled_) startReceiving();
+
+        radio_.transmit(buffer, bufferSize, 0, SX1280_POWER_dB, NO_WAIT);
+
+        if (!isReceivingEnabled_) stopReceiving();
+
+        for (uint32_t j = 0; j < i; j++) toSendBufferSub_.removeFront();
 
         #ifdef SX1280_DEBUG
-            Serial.println("Sending data packet!");
+            Serial.println(String("Sent ") + i + " packets at once! Size: " + bufferSize + " bytes.");
         #endif
 
     }
+
+}
+
+
+void SX1280Driver::startReceiving() {
+
+    radio_.wake();
+
+    radio_.receiveSXBuffer(0, 0, NO_WAIT);
+
+    isReceivingEnabled_ = true;
+
+}
+
+
+void SX1280Driver::stopReceiving() {
+
+    radio_.setSleep(CONFIGURATION_RETENTION);
+
+    isReceivingEnabled_ = false;
+
+}
+
+
+void SX1280Driver::setLoRaParams(uint32_t frequency, uint8_t spreadFactor, uint8_t bandwidth, uint8_t codingRate, bool highSensitivity) {
+
+    radio_.setupLoRa(SX1280_FREQUENCY, 0, SX1280_SPREADFACTOR, SX1280_BANDWIDTH, SX1280_CODINGRATE);
+
+    if (highSensitivity) radio_.setHighSensitivity();
+    else radio_.setLowPowerRX();
+
+    if (isReceivingEnabled_) startReceiving();
 
 }
 
@@ -167,9 +234,11 @@ void SX1280Driver::init() {
         radio_.setDioIrqParams(IRQ_RADIO_ALL, IRQ_RADIO_ALL, 0, 0);
         radio_.setHighSensitivity();
 
-        radio_.receive(receivedData_, SX1280_DATA_BUFFER_SIZE, 0, NO_WAIT);
+        radio_.receiveSXBuffer(0, 0, NO_WAIT);
 
         Serial.println("SX1280 start success!");
+
+        toSendBufferSub_.subscribe(toSendDataTopic_);
 
         startAttempts_ = 0;
 
@@ -184,42 +253,5 @@ void SX1280Driver::init() {
     startAttempts_++;
 
     if (startAttempts_ >= 5 && moduleStatus_ == eModuleStatus_t::eModuleStatus_RestartAttempt) moduleStatus_ = eModuleStatus_t::eModuleStatus_Failure;
-
-}
-
-
-
-bool SX1280Driver::busy() {return isBusySending_ || toSendDataSize_ > 0;}
-
-
-
-uint8_t SX1280Driver::sendBuffer(uint8_t* buffer, uint8_t size) {
-
-    if (size > SX1280_DATA_BUFFER_SIZE) return 0;
-
-    toSendDataSize_ = size;
-
-    for (uint16_t i = 0; i < size; i++) toSendData_[i] = buffer[i];
-    
-    return size;
-
-}
-
-
-
-uint8_t SX1280Driver::available() {return receivedDataSize_;}
-
-
-
-uint8_t SX1280Driver::receiveBuffer(uint8_t* buffer, uint8_t size) {
-
-    if (receivedDataSize_ > size) return 0;
-
-    for (uint16_t i = 0; i < receivedDataSize_; i++) buffer[i] = receivedData_[i];
-
-    uint8_t sizePacket = receivedDataSize_;
-    receivedDataSize_ = 0;
-    
-    return sizePacket;
 
 }

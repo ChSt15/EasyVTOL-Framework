@@ -1,8 +1,8 @@
-#include "servo_ppm.h"
+#include "KraftKontrol/outputs/servo_ppm.h"
 
 
 
-PPMChannel::PPMChannel(int16_t pin, const ePPMProtocol_t &protocol, float offset, float scaler) {
+PPMChannel::PPMChannel(int16_t pin, ePPMProtocol_t protocol, float offset, float scaler) {
     _pin = pin;
     _offset = offset;
     _scaler = scaler;
@@ -33,9 +33,11 @@ PPMChannel::~PPMChannel() {
     * @param values float percent
     * @return bool.
 */
-bool PPMChannel::setChannel(const float &percent, const bool &limit) {
+bool PPMChannel::setChannel(float percent, bool limit) {
 
     if (_pin == -1) return false;
+
+    if (percent != percent) percent = 0;
     
     _percent = percent*_scaler + _offset; //apply offsets and scalers
     _percent = (_percent+1)/2; //Remap to 0-1 
@@ -43,10 +45,13 @@ bool PPMChannel::setChannel(const float &percent, const bool &limit) {
 
     float dutyCycle = ((float)_highMinUS + _percent*_deltaHighUS)/_periodUS;
 
-    dutyCycle = constrain(dutyCycle, 0.0f, 1.0f);
+    //dutyCycle = constrain(dutyCycle, 0.0f, 1.0f);
+
+    int32_t val = dutyCycle*_maxValue;
+    val = constrain(val, 0, _maxValue);
 
     #ifndef ESP32 
-    if (_active) analogWrite(_pin, dutyCycle*_maxValue);
+    if (_active) analogWrite(_pin, val);
     else {
         analogWrite(_pin, 0);
         digitalWrite(_pin, LOW);
@@ -64,7 +69,7 @@ bool PPMChannel::setChannel(const float &percent, const bool &limit) {
     * @param values angle, offset and scaler
     * @return bool.
 */
-bool PPMChannel::setAngle(const float &angle, const bool &limit) {
+bool PPMChannel::setAngle(float angle, bool limit) {
 
     float output = angle/(45.0f*DEGREES);
 
@@ -79,7 +84,7 @@ bool PPMChannel::setAngle(const float &angle, const bool &limit) {
     * @param values angle, offset and scaler
     * @return bool.
 */
-void PPMChannel::activateChannel(const bool &activate) {
+void PPMChannel::activateChannel(bool activate) {
 
     if (activate == _active) return;
 
@@ -118,7 +123,7 @@ float PPMChannel::getChannel() {return _percent;}
     * @param values min, max, protocol
     * @return none.
 */
-void PPMChannel::_getProtocolTiming(uint32_t &min, uint32_t max, const ePPMProtocol_t &protocol) {
+void PPMChannel::_getProtocolTiming(uint32_t &min, uint32_t &max, ePPMProtocol_t protocol) {
     
     switch (protocol) {
     case ePPMProtocol_t::ePPMProtocol_Standard_1000us :

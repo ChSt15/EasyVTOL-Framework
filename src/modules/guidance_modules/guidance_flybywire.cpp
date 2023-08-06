@@ -1,19 +1,22 @@
-#include "guidance_flybywire.h"
+#include "KraftKontrol/modules/guidance_modules/guidance_flybywire.h"
 
+#include "lib/MathHelperLibrary/FML.h"
 
 
 void GuidanceFlyByWire::thread() {
 
-    if (!initialised) init();
+    //if (!initialised) init();
 
-    float dT = ((float) micros() - _lastRunTimestamp)/1000000.0f; //Get time delta in seconds
-    _lastRunTimestamp = micros(); //Save current run timestamp for next run.
+    float dT = float(NOW() - _lastRunTimestamp)/SECONDS; //Get time delta in seconds
+    _lastRunTimestamp = NOW(); //Save current run timestamp for next run.
 
     //Integrate speed, position and attitude
     vehicleControlSettings_.velocity += vehicleControlSettings_.linearAcceleration*dT;
     vehicleControlSettings_.position += vehicleControlSettings_.velocity*dT;
 
-    vehicleControlSettings_.attitude = vehicleControlSettings_.attitude*Quaternion(vehicleControlSettings_.angularRate.copy().normalize(), vehicleControlSettings_.angularRate.magnitude()*dT);
+    vehicleControlSettings_.attitude = vehicleControlSettings_.attitude*FML::Quaternion<>(vehicleControlSettings_.angularRate.copy().normalize(), vehicleControlSettings_.angularRate.magnitude()*dT);
+
+    controlSetpointTopic_.publish(vehicleControlSettings_);
 
 }   
 
@@ -28,6 +31,8 @@ void GuidanceFlyByWire::init() {
     vehicleControlSettings_.linearAcceleration = 0;
     vehicleControlSettings_.angularRate = 0;
 
-    vehicleControlSettings_.attitudeControlMode = eControlMode_t::eControlMode_Acceleration_Velocity_Position;
+    vehicleControlSettings_.attitudeControlMode.accelerationControl = true;
+    vehicleControlSettings_.attitudeControlMode.velocityControl = true;
+    vehicleControlSettings_.attitudeControlMode.positionControl = true;
 
 }
